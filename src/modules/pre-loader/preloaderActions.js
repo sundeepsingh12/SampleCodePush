@@ -4,46 +4,36 @@ import {
   MASTER_DOWNLOAD_START,
   MASTER_DOWNLOAD_SUCCESS,
   MASTER_DOWNLOAD_FAILURE,
-
   MASTER_SAVING_START,
   MASTER_SAVING_SUCCESS,
   MASTER_SAVING_FAILURE,
-
   CHECK_ASSET_START,
   CHECK_ASSET_FAILURE,
-
   OTP_GENERATION_START,
   OTP_GENERATION_SUCCESS,
   OTP_GENERATION_FAILURE,
-
   OTP_VALIDATION_START,
   OTP_VALIDATION_SUCCESS,
   OTP_VALIDATION_FAILURE,
-
   SERVICE_PENDING,
   SERVICE_RUNNING,
   SERVICE_SUCCESS,
   SERVICE_FAILED,
-
   SHOW_OTP_SCREEN,
   SHOW_MOBILE_NUMBER_SCREEN,
-
   DEVICE_IMEI,
   DEVICE_SIM,
   USER,
   IS_PRELOADER_COMPLETE,
-
   PRE_LOGOUT_START,
   PRE_LOGOUT_SUCCESS,
   PRE_LOGOUT_FAILURE,
-
   ERROR_400_403_LOGOUT,
   ON_MOBILE_NO_CHANGE,
   ON_OTP_CHANGE,
   PRELOADER_SUCCESS,
   IS_SHOW_MOBILE_NUMBER_SCREEN,
   IS_SHOW_OTP_SCREEN,
-
   Home,
   Login,
   AutoLogoutScreen,
@@ -78,16 +68,19 @@ import {
   GEO_FENCING,
   PAGES,
   PAGES_ADDITIONAL_UTILITY,
+  DOWNLOAD_LATEST_APP,
   MDM_POLICIES,
-  FCM_TOKEN,
-  APP_THEME
+  APP_THEME,
+  SET_APP_UPDATE_BY_CODEPUSH,
+  SET_APP_UPDATE_STATUS,
+  FCM_TOKEN
 } from '../../lib/constants'
-import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
+import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
+import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog, resetNavigationState, resetApp, navigateToScene } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
@@ -96,9 +89,11 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
-import { LOGOUT_UNSUCCESSFUL, OK, SHOW_MOBILE_SCREEN, SHOW_OTP } from '../../lib/ContainerConstants'
+import { LOGOUT_UNSUCCESSFUL, OK, SHOW_MOBILE_SCREEN, SHOW_OTP, CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DOWNLOADING_PACKAGE, CODEPUSH_INSTALLING_UPDATE, CODEPUSH_SOMETHING_WENT_WRONG } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 import { trackingService } from '../../services/classes/Tracking'
+import codePush from "react-native-code-push"
+import { Platform, } from 'react-native'
 import { sync } from '../../services/classes/Sync'
 
 //Action dispatched when job master downloading starts
@@ -211,13 +206,6 @@ export function onChangeMobileNumber(mobileNumber) {
   }
 }
 
-// export function onChangeMobileNumber(mobileNumber) {
-//   return {
-//     type: ON_MOBILE_NO_CHANGE,
-//     payload: mobileNumber
-//   }
-// }
-
 //Action dispatched when user enters otp in enter mobile no screen
 export function onChangeOtp(otpNumber) {
   return {
@@ -311,9 +299,9 @@ export function invalidateUserSessionForAutoLogout() {
       dispatch(setState(TOGGLE_LOGOUT, true))
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await backupService.createBackupOnLogout()
-      const userObject  = await keyValueDBService.getValueFromStore(USER)
+      const userObject = await keyValueDBService.getValueFromStore(USER)
       const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
-      await sync.deregisterFcmTokenFromServer(userObject,token,fcmToken)
+      await sync.deregisterFcmTokenFromServer(userObject, token, fcmToken)
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
@@ -345,10 +333,10 @@ export function invalidateUserSession(createBackup) {
       if (createBackup) {
         await backupService.createBackupOnLogout()
       }
-      const userObject  = await keyValueDBService.getValueFromStore(USER)
+      const userObject = await keyValueDBService.getValueFromStore(USER)
       const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
-      
-      await sync.deregisterFcmTokenFromServer(userObject,token,fcmToken)
+
+      await sync.deregisterFcmTokenFromServer(userObject, token, fcmToken)
       let response = await authenticationService.logout(token) // hit logout api
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
@@ -410,6 +398,7 @@ export function startLoginScreenWithoutLogout() {
   }
 }
 
+
 /**Called when preloader container is mounted or when user clicks on Retry button
  * 
  * @param {*} configDownloadService 
@@ -458,6 +447,55 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
+      dispatch(checkIfAppIsOutdated(error))
+    }
+  }
+}
+
+export function patchUpdateViaCodePush(error) {
+  return async function (dispatch) {
+    dispatch(setState(SET_APP_UPDATE_BY_CODEPUSH, { isCodePushUpdate: true }))
+    codePush.sync({
+      updateDialog: true,
+      installMode: codePush.InstallMode.IMMEDIATE,
+      deploymentKey: (Platform.OS === 'ios') ? error.iosDeploymentKey : error.androidDeploymentKey,
+    }, (status) => {
+      switch (status) {
+        case codePush.SyncStatus.CHECKING_FOR_UPDATE:
+          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: CODEPUSH_CHECKING_FOR_UPDATE }))
+          break;
+        case codePush.SyncStatus.DOWNLOADING_PACKAGE:
+          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: CODEPUSH_DOWNLOADING_PACKAGE }))
+          break;
+        case codePush.SyncStatus.INSTALLING_UPDATE:
+          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: CODEPUSH_INSTALLING_UPDATE }))
+          break;
+        case codePush.SyncStatus.UP_TO_DATE:
+          dispatch(resetApp());
+          break;
+        case codePush.SyncStatus.UPDATE_INSTALLED:
+          dispatch(setState(SET_APP_UPDATE_BY_CODEPUSH, { isCodePushUpdate: false }))
+          break;
+        case codePush.SyncStatus.AWAITING_USER_ACTION:
+          break;
+        case codePush.SyncStatus.SYNC_IN_PROGRESS:
+          break;
+        default:
+          dispatch(jobMasterSavingFailure(CODEPUSH_SOMETHING_WENT_WRONG))
+      }
+    })
+  }
+}
+
+export function checkIfAppIsOutdated(error) {
+  return async function (dispatch) {
+    if (error.errorCode == MAJOR_VERSION_OUTDATED) {
+      dispatch(setState(DOWNLOAD_LATEST_APP, { displayMessage: error.errorCode, downloadUrl: error.downloadUrl }))
+    }
+    else if (error.errorCode == MINOR_PATCH_OUTDATED) {
+      dispatch(patchUpdateViaCodePush(error))
+    }
+    else {
       showToastAndAddUserExceptionLog(1807, error.message, 'danger', 0)
       const keys = [
         JOB_MASTER,
@@ -665,10 +703,10 @@ export function invalidateUserSessionWhenLogoutPressed(createBackup) {
       if (createBackup) {
         await backupService.createBackupOnLogout()
       }
-      const userObject  = await keyValueDBService.getValueFromStore(USER)
+      const userObject = await keyValueDBService.getValueFromStore(USER)
       const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
-      
-      await sync.deregisterFcmTokenFromServer(userObject,token,fcmToken)
+
+      await sync.deregisterFcmTokenFromServer(userObject, token, fcmToken)
       let response = await authenticationService.logout(token) // hit logout api
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
@@ -687,3 +725,8 @@ export function invalidateUserSessionWhenLogoutPressed(createBackup) {
     }
   }
 }
+
+
+
+
+

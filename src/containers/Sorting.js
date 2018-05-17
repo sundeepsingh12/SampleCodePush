@@ -4,7 +4,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import Loader from '../components/Loader'
 import renderIf from '../lib/renderIf'
 import QRCode from 'react-native-qrcode-svg'

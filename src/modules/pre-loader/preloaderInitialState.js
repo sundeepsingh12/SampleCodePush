@@ -1,8 +1,6 @@
 'use strict'
-/**
- * ## Import
- */
-const {Record} = require('immutable')
+
+const { Record } = require('immutable')
 
 import {
   SERVICE_PENDING,
@@ -10,7 +8,6 @@ import {
   SERVICE_SUCCESS,
   SERVICE_FAILED
 } from '../../lib/constants'
-
 
 var InitialState = Record({
   configDownloadService: SERVICE_PENDING, //Possible values => Constants.SERVICE_PENDING/ RUNNING/ SUCCESS/ FAILED
@@ -22,6 +19,11 @@ var InitialState = Record({
   mobileNumber:'',
   otpNumber:'',
   mobileOtpDisplayMessage: true, //message which will be displayed in mobile no screen
+  downloadLatestAppMessage: null,
+  downloadUrl: null,
+  isAppUpdatedThroughCodePush: false,
+  codePushUpdateStatus: '',
+  iosDownloadScreen: null
 })
 
 export default InitialState

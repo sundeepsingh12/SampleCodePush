@@ -351,7 +351,7 @@ module.exports = {
     REMEMBER_ME: 'Remember Me',
 
     //Preloader
-    SETTING_UP: 'Setting you up...',
+    SETTING_UP: 'Setting you up ...',
     DOWNLOAD_SETTINGS: 'Downloading settings',
     APPLYING_SETTINGS: 'Applying settings',
     VERIFY_HANDSET: 'Verifying handset',
@@ -390,6 +390,15 @@ module.exports = {
     APP: 'App',
     LOGOUT: 'Logout',
 
+    //App Upgrade Constants
+    DOWNLOAD_LATEST_APP_VERSION: 'You must download latest version to proceed',
+    NEW_VERSION_AVAILABLE: 'New version available',
+    DOWNLOAD: 'DOWNLOAD',
+    DOWNLOADING_LATEST_VERSION: 'Downloading latest version. Please wait',
+    UPDATE_FAILED: 'Update Failed',
+    NO_INTERNET_CONNECTIVITY: 'Please check your internet and try again',
+    HANG_ON: 'Hang On!',
+    PLEASE_WAIT_FOR_IOS_LINK_URL: 'Please wait while we generate a link to download the latest application in browser',
     //Pages Default Name
     ALL_TASKS: 'All Tasks',
 
@@ -406,7 +415,12 @@ module.exports = {
     TIME_SPENT: 'Time Spent: ',
     SEQUENCE: 'Sequence: ',
 
+    //CodePush Status
+    CODEPUSH_CHECKING_FOR_UPDATE: 'Checking for updates',
+    CODEPUSH_DOWNLOADING_PACKAGE: 'Downloading package',
+    CODEPUSH_INSTALLING_UPDATE: 'Installing update',
+    CODEPUSH_SOMETHING_WENT_WRONG: 'Something Went Wrong.Please try again.',
     //FCM
-    FCM_REGISTRATION_ERROR:'FCM Permission Denied',
-    APNS_TOKEN_ERROR:'APNS Token Registration Error'
+    FCM_REGISTRATION_ERROR: 'FCM Permission Denied',
+    APNS_TOKEN_ERROR: 'APNS Token Registration Error',
 }

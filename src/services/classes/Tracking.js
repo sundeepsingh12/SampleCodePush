@@ -57,7 +57,7 @@ class Tracking {
                                 this.showNotification(geofence)
                             })
                     }
-                })
+                }).catch((err) => console.log(err))
             } catch (error) {
                 //TODO
                 console.log("An error occurred in my code!", error)
@@ -282,15 +282,15 @@ class Tracking {
             eventId = 19
             message = OUTSIDE_BOUNDARY
         }
-        
+
         FCM.presentLocalNotification({
-            id: new Date().valueOf().toString(),        
-            title: FAREYE_UPDATES,      
-            body:message,  
-            priority: "high",              
+            id: new Date().valueOf().toString(),
+            title: FAREYE_UPDATES,
+            body: message,
+            priority: "high",
             show_in_foreground: true,
-            sound:"default" 
-          });
+            sound: "default"
+        });
         this.updateUserEvent(geofence, message, eventId)// update user event with appropriate eventId
     }
 

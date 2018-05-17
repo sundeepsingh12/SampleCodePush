@@ -6,7 +6,7 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
     "release": "cd android && ./gradlew assembleRelease",
-    "postinstall": "./src/scripts/camera/camera.sh && ./src/scripts/bluetooth/bluetooth.sh && rm ./node_modules/react-native/local-cli/core/__fixtures__/files/package.json"
+    "postinstall": "./src/scripts/camera/camera.sh && ./src/scripts/bluetooth/bluetooth.sh && ./src/scripts/installer/installer.sh && rm ./node_modules/react-native/local-cli/core/__fixtures__/files/package.json"
   },
   "dependencies": {
     "immutable": "3.8.2",
@@ -18,7 +18,8 @@
     "native-base": "2.4.1",
     "react": "16.2.0",
     "react-native": "0.53.3",
-    "react-native-background-fetch": "2.4.1",
+    "react-native-apk-installer": "0.0.2",
+    "react-native-background-fetch": "2.4.2",
     "react-native-background-geolocation": "2.12.0",
     "react-native-background-timer": "2.0.1",
     "react-native-bluetooth-serial": "1.0.0-rc1",
@@ -43,11 +44,11 @@
     "react-native-svg": "6.3.1",
     "react-native-swipe-gestures": "1.0.2",
     "react-native-vector-icons": "4.6.0",
-    "react-native-zip-archive": "2.2.3",
+    "react-native-zip-archive": "2.2.4",
     "react-navigation": "1.5.11",
     "react-navigation-redux-helpers": "1.0.4",
     "react-redux": "5.0.7",
-    "realm": "2.2.15",
+    "realm": "2.6.0",
     "redux": "4.0.0",
     "redux-logger": "3.0.6",
     "redux-mock-store": "1.5.1",

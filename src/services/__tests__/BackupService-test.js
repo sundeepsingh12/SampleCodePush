@@ -8,7 +8,6 @@ import RNFS from 'react-native-fs'
 import moment from 'moment'
 import {
     zip,
-    unzip
 } from 'react-native-zip-archive'
 var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';

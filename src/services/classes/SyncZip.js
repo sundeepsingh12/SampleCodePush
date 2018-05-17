@@ -2,7 +2,6 @@ import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs'
 import {
     zip,
-    unzip
 } from 'react-native-zip-archive'
 import { keyValueDBService } from './KeyValueDBService'
 import { jobTransactionService } from './JobTransaction'

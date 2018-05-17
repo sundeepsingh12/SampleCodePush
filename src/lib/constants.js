@@ -69,6 +69,10 @@ module.exports = keyMirror({
     TOGGLE_CHECKBOX: null,
     REMEMBER_ME_SET_TRUE: null,
     OTP_SUCCESS: null,
+    DOWNLOAD_LATEST_APP: null,
+    SET_APP_UPDATE_BY_CODEPUSH: null,
+    SET_APP_UPDATE_STATUS: null,
+    SET_IOS_UPGRADE_SCREEN: null,
 
     //Home Actions
     HOME_LOADING: null,
@@ -96,7 +100,7 @@ module.exports = keyMirror({
     SET_LANDING_TAB: null,
     TABS_LOADING: null,
     SET_SELECTED_DATE: null,
-    LOADER_FOR_SYNCING:null,
+    LOADER_FOR_SYNCING: null,
 
     //Pages
     PAGES_LOADING: null,
@@ -527,6 +531,9 @@ module.exports = keyMirror({
 
     //userExceptionLogs
     USER_EXCEPTION_LOGS: null,
+
+    //ApplicationVersion
+    APP_VERSION: null
 })
 
 

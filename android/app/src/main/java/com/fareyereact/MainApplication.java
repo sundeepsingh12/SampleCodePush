@@ -3,6 +3,7 @@ package com.fareyereact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.cnull.apkinstaller.ApkInstallerPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
 import com.imagepicker.ImagePickerPackage;
 import org.reactnative.camera.RNCameraPackage;
@@ -46,6 +47,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
             new MainReactPackage(),
+            new ApkInstallerPackage(),
             new ImagePickerPackage(),
             new RNCameraPackage(),
             new FIRMessagingPackage(),
@@ -65,6 +67,11 @@ public class MainApplication extends Application implements ReactApplication {
             new BackgroundTimerPackage() ,
             new RNIMEIPackage()
       );
+    }
+
+    @Override
+    protected String getJSMainModuleName() {
+      return "index.android";
     }
   };
 
