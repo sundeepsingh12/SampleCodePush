@@ -67,12 +67,12 @@ export function saveList(tableName, array) {
 export function performBatchSave(...tableNamesVsDataList) {
     return realm.write(() => {
         let imeiNumber = DeviceInfo.getUniqueID()
+        // Create counter block from imei number used for encryption
+        let counterBlock = Array.from(imeiNumber).slice(0, 8)
         tableNamesVsDataList.forEach(record => {
             try {
                 if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
                     if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
-                        // Create counter block from imei number used for encryption
-                        let counterBlock = Array.from(imeiNumber).slice(0, 8)
                         for (let data in record.value) {
                             record.value[data].value = _encryptData(record.value[data].value, imeiNumber, counterBlock)
                             realm.create(record.tableName, record.value[data], true)

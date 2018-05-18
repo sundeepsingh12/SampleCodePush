@@ -60,12 +60,10 @@ class SyncZip {
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
         //Writing Object to File at TEMP location
         await RNFS.writeFile(PATH_TEMP + '/logs.json', JSON.stringify(SYNC_RESULTS), 'utf8');
-        await RNFS.readdir(PATH_TEMP).then((data) => console.log('path_temp', data))
         //Creating ZIP file
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
-        await RNFS.stat(targetPath).then((data) => { console.log('sync', data) })
         //Deleting TEMP folder location
         // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }
