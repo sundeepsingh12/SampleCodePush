@@ -142,6 +142,7 @@ repositories {
 }
 
 dependencies {
+    compile project(':react-native-compress-image') 
     compile project(':react-native-apk-installer')
     compile project(':react-native-fcm')
     compile 'com.google.firebase:firebase-core:12.0.1' //this decides your firebase SDK version
