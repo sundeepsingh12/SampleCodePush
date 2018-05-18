@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     Image,
     ImageStore,
+    Platform
 } from 'react-native';
 
 import {
@@ -39,7 +40,6 @@ import {
     SET_CAMERA_LOADER
 } from '../lib/constants'
 import styles from '../themes/FeStyle'
-import platform from '../../native-base-theme/variables/platform'
 import getTheme from '../../native-base-theme/components'
 import ImagePicker from 'react-native-image-picker'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
@@ -154,8 +154,15 @@ class CameraFieldAttribute extends PureComponent {
             if (response.error) {
                 this._setToastForError(response.error)
             }
-            else if (response.uri) {
-                this.props.actions.compressImages(response.uri);
+            else if (response.data) {
+                if (Platform.OS === 'ios') {
+                    this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
+                        data: response.data,
+                        showImage: true
+                    })
+                } else {
+                    this.props.actions.compressImages(response.uri);
+                }
             }
         })
     }
@@ -277,8 +284,15 @@ class CameraFieldAttribute extends PureComponent {
             const options = { quality: 0.5, base64: true };
             try {
                 const data = await this.camera.takePictureAsync(options).then((capturedImg) => {
-                    const { uri, width, height } = capturedImg;
-                    this.props.actions.compressImages(uri);
+                    const { uri, base64 } = capturedImg;
+                    if (Platform.OS == 'ios') {
+                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
+                            data: base64,
+                            showImage: true
+                        })
+                    } else {
+                        this.props.actions.compressImages(uri);
+                    }
                 })
             } catch (error) {
                 this._setToastForError(error.message)
