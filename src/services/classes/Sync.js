@@ -12,7 +12,6 @@ import { addServerSmsService } from './AddServerSms'
 import { jobMasterService } from './JobMaster'
 import { syncZipService } from './SyncZip'
 import _ from 'lodash'
-
 import {
   TABLE_JOB_TRANSACTION,
   TABLE_FIELD_DATA,
@@ -32,22 +31,21 @@ import {
   LAST_SYNC_WITH_SERVER,
   PAGES
 } from '../../lib/constants'
-
-import {
-  FAREYE_UPDATES,
-  PAGE_OUTSCAN
-} from '../../lib/AttributeConstants'
+import { FAREYE_UPDATES, PAGE_OUTSCAN, PATH_TEMP } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
 import { pages } from './Pages'
-import {
-  JOBS_DELETED
-} from '../../lib/ContainerConstants'
+import { JOBS_DELETED } from '../../lib/ContainerConstants'
 import { geoFencingService } from './GeoFencingService'
 import FCM from "react-native-fcm"
+import RNFS from 'react-native-fs'
 
 class Sync {
 
   async createAndUploadZip(syncStoreDTO, currentDate) {
+    let isFileExists = await RNFS.exists(PATH_TEMP);
+    if (isFileExists) {
+      await RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
+    }
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
