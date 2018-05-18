@@ -43,6 +43,7 @@ import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
 import ImagePicker from 'react-native-image-picker'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import platform from '../../native-base-theme/variables/platform'
 import {
     CAMERA,
     CAMERA_HIGH,
