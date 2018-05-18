@@ -104,6 +104,8 @@ export default function preloaderReducer(state = initialState, action) {
         .set('otpNumber', '')
         .set('error', '')
         .set('errorMessage_403_400_Logout', '')
+        .set('isAppUpdatedThroughCodePush',false)
+        .set('iosDownloadScreen',null)
 
     case PRE_LOGOUT_FAILURE:
       return state.set('error', action.payload)

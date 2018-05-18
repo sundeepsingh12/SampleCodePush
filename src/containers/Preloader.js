@@ -62,6 +62,7 @@ class Preloader extends PureComponent {
     }
 
     invalidateSession = () => {
+        this.setState({errorInDownload:false})
         this.props.actions.invalidateUserSession()
     }
 

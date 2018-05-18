@@ -137,7 +137,7 @@ class InitialSetup extends PureComponent {
                     <View>
                         <Text style={[feStyle.fontCenter, feStyle.fontDanger]}>{this.props.error}</Text>
                     </View>
-                    <View style={[feStyle.row, feStyle.marginTop30]}>
+                    <View style={[feStyle.row, feStyle.marginTop30, feStyle.alignCenter, feStyle.justifyCenter]}>
                         <Button onPress={this.invalidateSession} rounded danger style={{ marginLeft: 10, marginRight: 10, }}>
                             <Text style={{ color: '#ffffff' }}>{CANCEL}</Text>
                         </Button>
