@@ -192,7 +192,6 @@ class RestAPI {
 
   async uploadZipFile(path, fileName, currenDate) {
     // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
-    // console.log('jid',jid)
     var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
     var filePath = (!path) ? PATH + '/sync.zip' : PATH
     let responseBody = "Fail"

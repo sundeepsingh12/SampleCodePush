@@ -37,13 +37,14 @@ import {
   PAGES_ADDITIONAL_UTILITY,
   HUB_LAT_LONG,
   MDM_POLICIES,
+  APP_VERSION,
   APP_THEME,
 } from '../../lib/constants'
-
-import {
-  UNSEEN,
-} from '../../lib/AttributeConstants'
+import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER } from '../../lib/AttributeConstants'
+import { DOWNLOAD_LATEST_APP_VERSION } from '../../lib/ContainerConstants'
 import _ from 'lodash'
+import package_json from '../../../package.json'
+
 
 class JobMaster {
   /**
@@ -133,6 +134,22 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
+    await keyValueDBService.validateAndSaveData(APP_VERSION, json.applicationVersion + "");
+    const packageJsonMajorVersion = parseInt(APP_VERSION_NUMBER.split('.')[0]);
+    //Check if appMajorVersion from server is greater than package json major version
+    if (json.applicationVersion && parseInt(json.applicationVersion) > packageJsonMajorVersion) {
+      throw ({ errorCode: MAJOR_VERSION_OUTDATED, downloadUrl: json.androidDownloadUrl })
+    }
+    const minorPatchVersion = json.minorPatchVersion
+    if (minorPatchVersion) {
+      const [minorVersionFromServer, patchVersionFromServer] = minorPatchVersion.split('.')
+      const [appMajorVersion, appMinorVersion, appPatchVersion] = APP_VERSION_NUMBER.split('.')
+      //Check if minor or patch version from server is greater than current minor/patch version installed in phone
+      if (parseInt(minorVersionFromServer) > parseInt(appMinorVersion) || parseInt(patchVersionFromServer) > parseInt(appPatchVersion)) {
+        throw ({ errorCode: MINOR_PATCH_OUTDATED, androidDeploymentKey: json.androidDeployementKey, iosDeploymentKey: json.iosDeployementKey })
+      }
+    }
+
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);
     await keyValueDBService.validateAndSaveData(USER, json.user);
@@ -161,7 +178,7 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'));
     await keyValueDBService.validateAndSaveData(PAGES, json.pages);
     await keyValueDBService.validateAndSaveData(PAGES_ADDITIONAL_UTILITY, json.additionalUtilities);
-    await keyValueDBService.checkForNullValidateAndSaveInStore(json.appTheme,APP_THEME)
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.appTheme, APP_THEME)
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.companyMDM, MDM_POLICIES)
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.hubLatLng, HUB_LAT_LONG)
   }

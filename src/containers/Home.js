@@ -15,11 +15,11 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
 import { Platform } from 'react-native'
-import PushNotification from 'react-native-push-notification'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { UNTITLED } from '../lib/ContainerConstants'
 import { Summary } from '../lib/constants'
 import DraftModal from '../components/DraftModal'
+import FCM, { NotificationActionType, FCMEvent } from "react-native-fcm";
 import SyncLoader from '../components/SyncLoader'
 
 function mapStateToProps(state) {
@@ -48,30 +48,16 @@ function mapDispatchToProps(dispatch) {
 class Home extends PureComponent {
 
   componentDidMount() {
-    if (Platform.OS === 'ios') {
-      PushNotification.configure({
-        onNotification: function (notification) {
-          console.log('NOTIFICATION:', notification);
-          Toast.show({
-            text: `${notification.message}`,
-            position: 'top',
-            buttonText: 'OK',
-            duration: 10000
-          })
-          notification.finish(PushNotificationIOS.FetchResult.NoData);
-        }
-      })
-    }
     this.props.actions.fetchPagesAndPiechart();
-    this.props.actions.startMqttService(this.props.pieChart);
-    this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated');
+    this.props.actions.performSyncService(this.props.customErpPullActivated == 'notActivated');
     this.props.actions.startTracking(this.props.trackingServiceStarted);
+    this.props.actions.startFCM();
   }
 
   getPageView(page) {
     return (
       <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
-        <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon,{backgroundColor: styles.primaryColor}]} />
+        <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon, { backgroundColor: styles.primaryColor }]} />
         <Body><Text style={[styles.fontWeight500, styles.fontLg]}>{page.name}</Text></Body>
         <Right><Icon name="ios-arrow-forward" /></Right>
       </ListItem>
@@ -107,7 +93,7 @@ class Home extends PureComponent {
     if (this.props.chartLoading) {
       return (
         <ActivityIndicator animating={this.props.chartLoading}
-          style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color="green" />
+          style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color={styles.bgPrimaryColor} />
       )
     }
 
@@ -143,7 +129,7 @@ class Home extends PureComponent {
             </Body>
           </Header>
           <Content>
-          {(this.props.moduleLoading) ? <SyncLoader moduleLoading = {this.props.moduleLoading} /> : null }
+            {(this.props.moduleLoading) ? <SyncLoader moduleLoading={this.props.moduleLoading} /> : null}
             {pieChartView}
             {this.getNewJobDraftModal()}
             <List>{this.getPageListItemsView()}</List>

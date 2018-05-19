@@ -4,7 +4,6 @@ import * as realm from '../../repositories/realmdb'
 import { keyValueDBService } from './KeyValueDBService'
 import BackgroundGeolocation from "react-native-background-geolocation"
 import moment from 'moment'
-import PushNotification from 'react-native-push-notification'
 import {
     TABLE_TRACK_LOGS,
     TRACK_BATTERY,
@@ -23,6 +22,7 @@ import {
     OUTSIDE_BOUNDARY
 } from '../../lib/ContainerConstants'
 import { userEventLogService } from './UserEvent'
+import FCM from "react-native-fcm"
 class Tracking {
 
     init() {
@@ -57,7 +57,7 @@ class Tracking {
                                 this.showNotification(geofence)
                             })
                     }
-                })
+                }).catch((err) => console.log(err))
             } catch (error) {
                 //TODO
                 console.log("An error occurred in my code!", error)
@@ -282,12 +282,15 @@ class Tracking {
             eventId = 19
             message = OUTSIDE_BOUNDARY
         }
-        PushNotification.localNotification({
-            /* iOS and Android properties */
+
+        FCM.presentLocalNotification({
+            id: new Date().valueOf().toString(),
             title: FAREYE_UPDATES,
-            message,
-            soundName: 'default'
-        })
+            body: message,
+            priority: "high",
+            show_in_foreground: true,
+            sound: "default"
+        });
         this.updateUserEvent(geofence, message, eventId)// update user event with appropriate eventId
     }
 

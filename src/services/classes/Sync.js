@@ -12,7 +12,6 @@ import { addServerSmsService } from './AddServerSms'
 import { jobMasterService } from './JobMaster'
 import { syncZipService } from './SyncZip'
 import _ from 'lodash'
-
 import {
   TABLE_JOB_TRANSACTION,
   TABLE_FIELD_DATA,
@@ -32,22 +31,21 @@ import {
   LAST_SYNC_WITH_SERVER,
   PAGES
 } from '../../lib/constants'
-
-import {
-  FAREYE_UPDATES,
-  PAGE_OUTSCAN
-} from '../../lib/AttributeConstants'
+import { FAREYE_UPDATES, PAGE_OUTSCAN, PATH_TEMP } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
 import { pages } from './Pages'
-import PushNotification from 'react-native-push-notification'
-import {
-  JOBS_DELETED
-} from '../../lib/ContainerConstants'
+import { JOBS_DELETED } from '../../lib/ContainerConstants'
 import { geoFencingService } from './GeoFencingService'
+import FCM from "react-native-fcm"
+import RNFS from 'react-native-fs'
 
 class Sync {
 
   async createAndUploadZip(syncStoreDTO, currentDate) {
+    let isFileExists = await RNFS.exists(PATH_TEMP);
+    if (isFileExists) {
+      await RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
+    }
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
@@ -642,14 +640,17 @@ class Sync {
   }
 
   showNotification(jobMasterTitleList) {
-    const alertBody = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
-    const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${alertBody} jobs` : alertBody
-    PushNotification.localNotification({
-      /* iOS and Android properties */
-      title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
-      message, // (required)
-      soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
+    const body = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
+    const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${body} jobs` : body
+    FCM.presentLocalNotification({
+      id: new Date().valueOf().toString(),
+      title: FAREYE_UPDATES,
+      body: message,
+      priority: "high",
+      sound: "default",
+      show_in_foreground: true
     });
+
   }
 
   async calculateDifference() {
@@ -684,6 +685,40 @@ class Sync {
       newJobTransactionsIds
     }
   }
+
+  /**Called when home screen is mounted,app sends fcm token to server
+   * 
+   * @param {*} token 
+   * @param {*} fcmToken 
+   * @param {*} topic 
+   */
+  sendRegistrationTokenToServer(token, fcmToken, topic) {
+    const url = CONFIG.API.FCM_TOKEN_REGISTRATON + '?topic=' + topic
+    RestAPIFactory(token.value).serviceCall(fcmToken, url, 'POST')
+  }
+
+
+  /**This de-registers fcm token from server and removes local/delivered notifications
+   * 
+   * Try/Catch is written here so that logout doesn't gets affected
+   * 
+   * @param {*} userObject 
+   * @param {*} token 
+   * @param {*} fcmToken 
+   */
+  deregisterFcmTokenFromServer(userObject, token, fcmToken) {
+    try {
+      FCM.cancelAllLocalNotifications()
+      FCM.removeAllDeliveredNotifications()
+      const topic = `FE_${userObject.value.id}`
+      FCM.unsubscribeFromTopic(topic);
+      const url = CONFIG.API.FCM_TOKEN_DEREGISTRATION + '?topic=' + topic
+      RestAPIFactory(token.value).serviceCall(fcmToken.value, url, 'POST')
+    } catch (error) {
+      console.log('error', error)
+    }
+  }
 }
+
 
 export let sync = new Sync()
