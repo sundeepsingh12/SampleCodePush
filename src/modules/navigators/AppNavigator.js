@@ -47,6 +47,7 @@ import AutoLogout from '../../containers/AutoLogout'
 import Backup from '../../containers/Backup'
 import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
 import HomeTabNavigator from '../../containers/HomeTabNavigator'
+import MosambeeWalletPayment from '../../containers/MosambeeWalletPayment'
 import { ApplicationScreen, HardwareBackPress, HomeScreen, HomeTabNavigatorScreen, LoginScreen, PreloaderScreen, SHOW_DISCARD_ALERT, RETURN_TO_HOME, SET_TRANSIENT_BACK_PRESSED, SET_SEQUENCE_BACK_ENABLED } from '../../lib/constants'
 import SplitPayment from '../../containers/SplitPayment'
 import { createReduxBoundAddListener, createReactNavigationReduxMiddleware } from 'react-navigation-redux-helpers'
@@ -197,6 +198,12 @@ export const AppNavigator = StackNavigator({
   },
   UPIPayment: {
     screen: UPIPayment
+  },
+  MosamBeeWalletPayment:{
+    screen: MosambeeWalletPayment,
+    navigationOptions: {
+      header: null
+    }
   },
   PayByLink: {
     screen: PayByLink

@@ -558,7 +558,8 @@ class JobDetailsV2 extends PureComponent {
   showContentView() {
     const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
     const etaTimer = this.etaUpdateTimer()
-    return (<Content>
+    return (
+    <Content>
       {!this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0 ?
         this.showRevertView() : null}
 
