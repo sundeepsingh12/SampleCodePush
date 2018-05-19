@@ -99,3 +99,6 @@
 # Google Play Services
 -keep class com.google.android.gms.** { *; }
 -dontwarn com.google.android.gms.**
+
+-keep class io.realm.react.** { *; }
+-dontwarn io.realm.react.**
