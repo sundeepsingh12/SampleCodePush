@@ -242,8 +242,13 @@ module.exports = {
     GET: 'GET',
     EXTERNAL_DATA_STORE_URL: "&externalDataStoreUrl=",
     DATA_STORE_ATTR_KEY: "&dataStoreAttributeKey=",
-    PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
-    PATH: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/CustomerImages/',
+
+    //Location where zip contents are temporarily added and then removed
+    PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP',
+    PATH_CUSTOMER_IMAGES: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/CustomerImages/',
+    PATH: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER,
+    PATH_BACKUP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUP',
+    PATH_BACKUP_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUPTEMP',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
 
@@ -285,6 +290,7 @@ module.exports = {
     EZE_TAP_ID: 10,
     M_SWIPE_ID: 9,
     JOB_ASSIGNMENT_ID: 20,
+    MOSAMBEE_WALLET_ID: 19,
     PAGE_NEW_JOB: 2,
     Piechart: {
         enabled: false,

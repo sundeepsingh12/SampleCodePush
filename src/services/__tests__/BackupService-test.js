@@ -6,19 +6,17 @@ import { error } from "util";
 import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs'
 import moment from 'moment'
-import {
-    zip,
-} from 'react-native-zip-archive'
-var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
-var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
-var PATH_BACKUP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUP';
-var PATH_BACKUP_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUPTEMP';
+import { zip } from 'react-native-zip-archive'
 import {
     SIGNATURE,
     CAMERA,
     CAMERA_HIGH,
     CAMERA_MEDIUM,
-    SIGNATURE_AND_FEEDBACK
+    SIGNATURE_AND_FEEDBACK,
+    PATH,
+    PATH_TEMP,
+    PATH_BACKUP,
+    PATH_BACKUP_TEMP
 } from '../../lib/AttributeConstants'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { logoutService } from '../../services/classes/Logout'

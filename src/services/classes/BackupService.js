@@ -16,7 +16,7 @@ import {
     PENDING_SYNC_TRANSACTION_IDS,
     BACKUP_ALREADY_EXIST,
     DOMAIN_URL,
-    JOB_SUMMARY
+    JOB_SUMMARY,
 } from '../../lib/constants'
 import { userEventLogService } from './UserEvent'
 import { jobSummaryService } from './JobSummary'
@@ -24,21 +24,11 @@ import { keyValueDBService } from './KeyValueDBService'
 import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs'
 import moment from 'moment'
-import {
-    zip,
-} from 'react-native-zip-archive'
+import { zip } from 'react-native-zip-archive'
 import _ from 'lodash'
 import { syncZipService } from './SyncZip'
-import {
-    USER_MISSING,
-    BACKUP_CREATED_SUCCESS_TOAST,
-    BACKUP_ALREADY_EXISTS,
-    TRANSACTIONLIST_IS_MISSING
-} from '../../lib/ContainerConstants'
-var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
-var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
-var PATH_BACKUP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUP';
-var PATH_BACKUP_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUPTEMP';
+import { USER_MISSING, BACKUP_CREATED_SUCCESS_TOAST, BACKUP_ALREADY_EXISTS, TRANSACTIONLIST_IS_MISSING } from '../../lib/ContainerConstants'
+import { PATH, PATH_BACKUP, PATH_BACKUP_TEMP } from '../../lib/AttributeConstants'
 
 class Backup {
     /**

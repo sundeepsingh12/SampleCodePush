@@ -55,7 +55,8 @@
     "redux-mock-store": "1.5.1",
     "redux-thunk": "2.2.0",
     "regenerator": "0.12.3",
-    "sha256": "0.2.0"
+    "sha256": "0.2.0",
+    "js-sha512": "0.7.1"
   },
   "jest": {
     "preset": "react-native",
