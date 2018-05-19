@@ -8,7 +8,6 @@ import com.evollu.react.fcm.FIRMessagingPackage;
 import com.imagepicker.ImagePickerPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
-import com.rusel.RCTBluetoothSerial.RCTBluetoothSerialPackage;
 import io.realm.react.RealmReactPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.rssignaturecapture.RSSignatureCapturePackage;
@@ -53,7 +52,6 @@ public class MainApplication extends Application implements ReactApplication {
             new RNCameraPackage(),
             new FIRMessagingPackage(),
             new RNBackgroundFetchPackage(),
-            new RCTBluetoothSerialPackage(),
             new RealmReactPackage(),
             new LinearGradientPackage(),
             new RSSignatureCapturePackage(),

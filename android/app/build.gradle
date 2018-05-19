@@ -149,7 +149,6 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:12.0.1'
     compile project(':react-native-background-fetch')
     compile project(':react-native-image-picker')
-    compile project(':react-native-bluetooth-serial')
     compile project(':realm')
     compile project(':react-native-linear-gradient')
     compile project(':react-native-signature-capture')
