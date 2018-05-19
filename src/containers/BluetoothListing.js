@@ -16,7 +16,6 @@ import {
 import {Toast,StyleProvider,Container,Content,Header,Left,Body,Right,Button,Icon,ListItem} from 'native-base'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import BluetoothSerial from 'react-native-bluetooth-serial'
 import * as bluetoothActions from '../modules/bluetooth/bluetoothActions'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -59,15 +58,15 @@ class BluetoothListing extends Component {
   }
 
   pairDevice(device){
-    BluetoothSerial.pairDevice(device.id)
-    .then(paired => {
-      if (paired) {
-        Toast.show({text:`Device ${device.name} paired successfully`})
-      } else {
-        Toast.show({text:`Device ${device.name} pairing failed`})
-      }
-    })
-    .catch((err) => Toast.show(err.message))
+    // BluetoothSerial.pairDevice(device.id)
+    // .then(paired => {
+    //   if (paired) {
+    //     Toast.show({text:`Device ${device.name} paired successfully`})
+    //   } else {
+    //     Toast.show({text:`Device ${device.name} pairing failed`})
+    //   }
+    // })
+    // .catch((err) => Toast.show(err.message))
   }
   
   static navigationOptions = ({ navigation }) => {
