@@ -6,11 +6,12 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
     "release": "cd android && ./gradlew assembleRelease",
-    "postinstall": "./src/scripts/camera/camera.sh && ./src/scripts/bluetooth/bluetooth.sh && ./src/scripts/installer/installer.sh && rm ./node_modules/react-native/local-cli/core/__fixtures__/files/package.json"
+    "postinstall": "./src/scripts/camera/camera.sh &&  ./src/scripts/installer/installer.sh && rm ./node_modules/react-native/local-cli/core/__fixtures__/files/package.json"
   },
   "dependencies": {
     "immutable": "3.8.2",
     "jest-cli": "23.0.0-alpha.0",
+    "js-sha512": "0.7.1",
     "jsonschema": "1.2.4",
     "keymirror": "0.1.1",
     "lodash": "4.17.10",
@@ -22,7 +23,6 @@
     "react-native-background-fetch": "2.4.2",
     "react-native-background-geolocation": "2.12.0",
     "react-native-background-timer": "2.0.1",
-    "react-native-bluetooth-serial": "1.0.0-rc1",
     "react-native-camera": "1.0.3",
     "react-native-cancelable-fetch": "0.1.1",
     "react-native-code-push": "5.2.1",

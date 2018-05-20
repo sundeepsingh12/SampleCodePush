@@ -170,7 +170,7 @@ export default {
     marginTop30: {
         marginTop: 30
     },
-
+    
     marginBottom5: {
         marginBottom: 5
     },

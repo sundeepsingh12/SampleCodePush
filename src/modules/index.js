@@ -45,6 +45,8 @@ import offlineDS from './offlineDS/offlineDSReducer'
 import cameraReducer from './camera/cameraReducer'
 import dataStoreFilterReducer from './dataStoreFilter/dataStoreFilterReducer'
 import backup from './backup/backupReducer'
+import mosambeeWalletPayment from './cardTypePaymentModules/mosambeeWalletPayment/mosambeeWalletReducer'
+// import profile from './profile/profileReducer'
 import bluetooth from './bluetooth/bluetoothReducer'
 
 
@@ -91,6 +93,7 @@ const rootReducer = combineReducers({
   dataStoreFilterReducer,
   backup,
   multipleOptionsAttribute,
+  mosambeeWalletPayment,
   bluetooth
 })
 
