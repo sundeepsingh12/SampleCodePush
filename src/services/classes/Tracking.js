@@ -150,7 +150,7 @@ class Tracking {
             'gpsSignal': location.coords.accuracy,
             'latitude': location.coords.latitude,
             'longitude': location.coords.longitude,
-            'speed': location.coords.speed,
+            'speed': location.coords.speed * 3.6,
             'trackTime': moment(location.timestamp).format('YYYY-MM-DD HH:mm:ss'),
             'userId': user.value.id
         }
