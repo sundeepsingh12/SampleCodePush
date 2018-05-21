@@ -225,7 +225,7 @@ class AddServerSms {
                     break
                 case JOB_ETA://check this
                     let jobEta = jobTransaction.jobEtaTime
-                    messageBody = (jobEta && jobEta.length > 0) ? messageBody.replace(key, moment(jobEta).format('DD MMM')) : messageBody.replace(key, '')
+                    messageBody = (jobEta && jobEta.length > 0) ? messageBody.replace(key, moment(jobEta).format('DD MMM HH:mm')) : messageBody.replace(key, 'N.A.')
                     break
                 case TRANSACTION_COMPLETED_DATE:
                     let lastTransactionTimeOnMobile = jobTransaction.lastTransactionTimeOnMobile
