@@ -464,7 +464,7 @@ export default class FormLayoutEventImpl {
                     skuArrayObject = value
                     continue
                 } else {
-                    value.childDataList = value.childDataList[jobTransactionId]
+                    value.childDataList = value.childDataList[jobTransactionId].childDataList
                 }
             }
             let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId, currentTime)
@@ -489,7 +489,7 @@ export default class FormLayoutEventImpl {
         currentFieldDataObject.currentFieldDataId = lastId
         skuArrayFieldData.push(this._convertFormLayoutToFieldData(fieldData, jobTransactionId, ++currentFieldDataObject.currentFieldDataId, currentTime))
         if (fieldData.childDataList) {
-            currentFieldDataObject.currentFieldDataId = this._recursivelyFindChildData(fieldData.childDataList[jobTransactionId], skuArrayFieldData, currentFieldDataObject, jobTransactionId, currentTime);
+            currentFieldDataObject.currentFieldDataId = this._recursivelyFindChildData(fieldData.childDataList[jobTransactionId].childDataList, skuArrayFieldData, currentFieldDataObject, jobTransactionId, currentTime);
         }
         return {
             skuArrayFieldData, currentFieldDataObject
