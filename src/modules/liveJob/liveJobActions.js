@@ -6,6 +6,7 @@ import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '..//
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { liveJobService } from '../../services/classes/LiveJobService'
 import * as realm from '../../repositories/realmdb'
+import {Toast} from 'native-base'
 import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
@@ -23,8 +24,9 @@ import {
     SET_MESSAGE,
     SET_LIVE_JOB_TOAST,
     HomeTabNavigatorScreen,
-    SET_LIVE_JOB_LOADER
+    SET_LIVE_JOB_LOADER,
 } from '../../lib/constants'
+import {OK} from '../../lib/ContainerConstants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
 
@@ -108,7 +110,7 @@ export function fetchAllLiveJobsList() {
         }
     }
 }
-export function toggleLiveJobSelection(jobId, allJobs) {
+export function toggleLiveJobSelection(jobId, allJobs, searchText) {
     return async function (dispatch) {
         try {
             const jobTransactions = await JSON.parse(JSON.stringify(allJobs))
@@ -119,13 +121,43 @@ export function toggleLiveJobSelection(jobId, allJobs) {
             const selectedItems = await liveJobService.getSelectedJobIds(jobTransactions)
             dispatch(setState(TOGGLE_LIVE_JOB_LIST_ITEM, {
                 selectedItems,
-                jobTransactions
+                jobTransactions,
+                searchText
             }))
         } catch (error) {
             showToastAndAddUserExceptionLog(1204, error.message, 'danger', 1)
         }
     }
 }
+
+export function toggleItemOnSearchText(searchText,allJobs) {
+    return async function (dispatch) {
+        try {
+            const jobTransactions = await JSON.parse(JSON.stringify(allJobs))
+            let searchValue = _.trim(_.toLower(searchText))
+            let searchedList = []
+            for (let item in jobTransactions){
+                if(_.isEqual(_.toLower(jobTransactions[item].referenceNumber), searchValue)){
+                    searchedList.push(jobTransactions[item].id)
+                }
+            }
+            if(searchedList.length == 1 ){
+                dispatch(toggleLiveJobSelection(searchedList[0],allJobs,''))
+            }else{
+                throw new Error('invalid scan')
+            }
+        } catch (error) {
+            Toast.show({
+                text: error.message,
+                position: 'bottom',
+                buttonText: OK,
+                type: 'warning',
+                duration: 5000
+            })
+        }
+    }
+}
+
 export function acceptOrRejectMultiple(status, selectedItems, liveJobList) {
     return async function (dispatch) {
         try {
@@ -178,7 +210,8 @@ export function selectNone(liveJobList) {
             Object.values(allJobs).forEach(job => job.isChecked = false)
             dispatch(setState(TOGGLE_LIVE_JOB_LIST_ITEM, {
                 selectedItems: [],
-                jobTransactions: allJobs
+                jobTransactions: allJobs,
+                searchText: ''
             }))
         } catch (error) {
             showToastAndAddUserExceptionLog(1207, error.message, 'danger', 1)
@@ -193,7 +226,8 @@ export function selectAll(liveJobList) {
             let selectedItems = Object.keys(allJobs)
             dispatch(setState(TOGGLE_LIVE_JOB_LIST_ITEM, {
                 selectedItems,
-                jobTransactions: allJobs
+                jobTransactions: allJobs,
+                searchText: ''
             }))
         } catch (error) {
             showToastAndAddUserExceptionLog(1208, error.message, 'danger', 1)
