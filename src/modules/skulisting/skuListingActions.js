@@ -150,7 +150,8 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                         break;
                     } else {
                         let { fieldDataList, latestPositionId } = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransactionId, parentObject.positionId, positionId)
-                        fieldDataListWithLatestPositionId.fieldDataList[jobTransactionId] = fieldDataList
+                        fieldDataListWithLatestPositionId.fieldDataList[jobTransactionId] = {}
+                        fieldDataListWithLatestPositionId.fieldDataList[jobTransactionId].childDataList = fieldDataList
                         positionId = latestPositionId
                     }
                 }
