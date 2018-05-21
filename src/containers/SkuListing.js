@@ -44,7 +44,7 @@ class SkuListing extends PureComponent {
 
   componentDidMount() {
     const jobTransactions = _.isArray(this.props.navigation.state.params.jobTransaction) ? this.props.navigation.state.params.jobTransaction :  [this.props.navigation.state.params.jobTransaction]
-    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, jobTransactions)
+    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement, jobTransactions)
   }
 
   renderData(item,title) {
