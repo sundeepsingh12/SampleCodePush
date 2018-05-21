@@ -92,6 +92,7 @@ class LiveJobListing extends PureComponent {
             this.props.actions.setState(SET_LIVE_JOB_TOAST, '')
         }
     }
+
     static navigationOptions = ({ navigation }) => {
         return {
             header: null
@@ -243,6 +244,7 @@ class LiveJobListing extends PureComponent {
                             <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS}</Text>
                         </View>
                         <View style={[style.headerRight]}>
+                        <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
                         </View>
                         <View />
                     </View>
@@ -254,6 +256,7 @@ class LiveJobListing extends PureComponent {
     }
 
     showMultipleSelectList() {
+        console.logs("size",_.size(this.props.liveJobList), _.size(this.props.selectedItems))
         let view
         if (this.props.selectedItems && this.props.selectedItems.length > 0) {
             view = <Header style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
@@ -268,7 +271,9 @@ class LiveJobListing extends PureComponent {
                                 </TouchableOpacity>
                                 <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + SELECTED} </Text>
                             </View>
-                            <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
+                            <TouchableHighlight disabled = {_.size(this.props.liveJobList) == _.size(this.props.selectedItems)} onPress={() => this.props.actions.selectAll(this.props.liveJobList)} >
+                            <Text style={[styles.fontWhite]}> {SELECT_ALL} </Text>
+                            </TouchableHighlight>
                         </View>
                         {this.searchBar()}
                     </View>
@@ -279,7 +284,7 @@ class LiveJobListing extends PureComponent {
     }
     getSelectedReferenceNo() {
         let referenceList = ''
-        this.props.selectedItems.forEach((item) => { referenceList += "  " + this.props.liveJobList[item].referenceNumber })
+        this.props.selectedItems.forEach((item) => { referenceList += this.props.liveJobList[item].referenceNumber  + ",  " })
         return (
             <ScrollView horizontal={true} style={[styles.padding10]}>
                 <Text>{referenceList}</Text>
@@ -351,14 +356,14 @@ const style = StyleSheet.create({
         paddingRight: 10
     },
     headerBody: {
-        width: '70%',
+        width: '60%',
         paddingTop: 10,
         paddingBottom: 10,
         paddingLeft: 10,
         paddingRight: 10
     },
     headerRight: {
-        width: '15%',
+        width: '35%',
         paddingTop: 10,
         paddingBottom: 10,
         paddingLeft: 10,
