@@ -61,6 +61,7 @@ export function navigateToScene(routeName, params) {
 export function deleteSessionToken() {
   return async function (dispatch) {
     try {
+      await keyValueDBService.deleteValueFromStore(USER)
       await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)

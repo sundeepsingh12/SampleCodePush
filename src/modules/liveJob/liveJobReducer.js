@@ -20,6 +20,7 @@ export default function liveJobReducer(state = initialState, action) {
 
         case SET_MESSAGE:
             return state.set('toastMessage', action.payload)
+                        .set('isLoading', false)
 
         case SET_LIVE_JOB_LOADER:
             return state.set('isLoading', action.payload)

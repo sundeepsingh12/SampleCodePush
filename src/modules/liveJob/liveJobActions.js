@@ -62,6 +62,7 @@ export function endFetchingJobDetails(jobDataList, currentStatus, jobTransaction
 export function acceptOrRejectJob(status, job, liveJobList) {
     return async function (dispatch) {
         try {
+            dispatch(setState(SET_LIVE_JOB_LOADER, true))
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             let serverResponse = await liveJobService.requestServerForApproval(status + '', token, job, liveJobList)
             if (serverResponse.toastMessage && serverResponse.toastMessage != '') {
@@ -69,31 +70,8 @@ export function acceptOrRejectJob(status, job, liveJobList) {
             }
             dispatch(fetchAllLiveJobsList())
             dispatch(NavigationActions.back())
-            // if (status == 1) {
-            //     dispatch(NavigationActions.reset({
-            //         index: 0,
-            //         actions: [
-            //             NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })
-            //         ]
-            //     }))
-            // } else if (status == 2 && _.isEmpty(serverResponse.newLiveJobList)) {
-            //     dispatch(NavigationActions.reset({
-            //         index: 0,
-            //         actions: [
-            //             NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-            //         ]
-            //     }))
-            // } else {
-            //     dispatch(NavigationActions.reset({
-            //         index: 1,
-            //         actions: [
-            //             NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-            //             NavigationActions.navigate({ routeName: 'LiveJobs' })
-            //         ]
-            //     }))
-            // }
-
         } catch (error) {
+            dispatch(setState(SET_LIVE_JOB_LOADER, false))
             showToastAndAddUserExceptionLog(1202, error.message, 'danger', 1)
         }
     }
@@ -161,34 +139,13 @@ export function toggleItemOnSearchText(searchText,allJobs) {
 export function acceptOrRejectMultiple(status, selectedItems, liveJobList) {
     return async function (dispatch) {
         try {
+            dispatch(setState(START_FETCHING_LIVE_JOB, true))
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             let serverResponseForLive = await liveJobService.requestServerForApprovalForMultiple(status + '', selectedItems, liveJobList, token)
             dispatch(setState(SET_LIVE_JOB_LIST, serverResponseForLive.newLiveJobList))
             dispatch(setState(SET_LIVE_JOB_TOAST, serverResponseForLive.toastMessage))
-            // if (status == 1) {
-            //     dispatch(NavigationActions.reset({
-            //         index: 0,
-            //         actions: [
-            //             NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
-            //         ]
-            //     }))
-            // } else if (status == 2 && _.isEmpty(serverResponseForLive.newLiveJobList)) {
-            //     dispatch(NavigationActions.reset({
-            //         index: 0,
-            //         actions: [
-            //             NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
-            //         ]
-            //     }))
-            // } else {
-            //     dispatch(NavigationActions.reset({
-            //         index: 1,
-            //         actions: [
-            //             NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
-            //             NavigationActions.navigate({ routeName: 'LiveJobs' })
-            //         ]
-            //     }))
-            // }
         } catch (error) {
+            dispatch(setState(START_FETCHING_LIVE_JOB, false))
             showToastAndAddUserExceptionLog(1205, error.message, 'danger', 1)
         }
     }
