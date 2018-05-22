@@ -23,7 +23,7 @@ import {
     OTP_CODE_SENT,
     PROCEED,
     EDIT,
-    RESEND,
+    RESEND_OTP_NO,
     DID_NOT_RECEIVE_OTP,
     ONE_TIME_PASSOWRD_WILL_BE_SENT_TO_MOBILE_NO,
     SHOW_MOBILE_SCREEN,
@@ -153,7 +153,7 @@ class MobileNoScreen extends PureComponent {
                 </View>
                 <Text style={[styles.marginTop20, styles.fontCenter, styles.fontDefault, styles.fontDarkGray]}>{DID_NOT_RECEIVE_OTP}</Text>
                 <TouchableOpacity onPress={this.getOtp}>
-                    <Text style={[styles.fontDefault, styles.marginLeft5, styles.fontBlack, styles.alignCenter, styles.justifyCenter]}>{RESEND}</Text>
+                    <Text style={[styles.fontDefault, styles.marginLeft5, styles.fontBlack, styles.alignCenter, styles.justifyCenter]}>{RESEND_OTP_NO}</Text>
                 </TouchableOpacity>
             </View>
         )

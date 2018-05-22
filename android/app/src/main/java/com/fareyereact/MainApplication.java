@@ -1,14 +1,13 @@
 package com.fareyereact;
 
 import android.app.Application;
-
+import com.emekalites.react.compress.image.ImageCompressPackage;
 import com.facebook.react.ReactApplication;
 import com.cnull.apkinstaller.ApkInstallerPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
 import com.imagepicker.ImagePickerPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
-import com.rusel.RCTBluetoothSerial.RCTBluetoothSerialPackage;
 import io.realm.react.RealmReactPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.rssignaturecapture.RSSignatureCapturePackage;
@@ -46,13 +45,13 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-            new MainReactPackage(),
-            new ApkInstallerPackage(),
-            new ImagePickerPackage(),
+          new MainReactPackage(),
+          new ImagePickerPackage(),
+           new ImageCompressPackage(), 
+          new ApkInstallerPackage(),
             new RNCameraPackage(),
             new FIRMessagingPackage(),
             new RNBackgroundFetchPackage(),
-            new RCTBluetoothSerialPackage(),
             new RealmReactPackage(),
             new LinearGradientPackage(),
             new RSSignatureCapturePackage(),

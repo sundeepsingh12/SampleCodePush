@@ -1,8 +1,6 @@
 import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs'
-import {
-    zip,
-} from 'react-native-zip-archive'
+import { zip } from 'react-native-zip-archive'
 import { keyValueDBService } from './KeyValueDBService'
 import { jobTransactionService } from './JobTransaction'
 import { jobSummaryService } from './JobSummary'
@@ -28,29 +26,17 @@ import moment from 'moment'
 import { trackingService } from './Tracking'
 import { userEventLogService } from './UserEvent'
 import { addServerSmsService } from './AddServerSms'
-import {
-    SIGNATURE,
-    CAMERA,
-    CAMERA_HIGH,
-    CAMERA_MEDIUM,
-    SIGNATURE_AND_FEEDBACK,
-    PENDING
-} from '../../lib/AttributeConstants'
+import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, SIGNATURE_AND_FEEDBACK, PENDING, PATH, PATH_TEMP } from '../../lib/AttributeConstants'
 import { jobStatusService } from './JobStatus'
 import { jobMasterService } from './JobMaster'
-var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
-//Location where zip contents are temporarily added and then removed
-var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
 import { userExceptionLogsService } from './UserException'
 
 class SyncZip {
 
     async createZip(syncStoreDTO) {
-
         //Create FarEye folder if doesn't exist
         RNFS.mkdir(PATH);
         RNFS.mkdir(PATH_TEMP);
-
         //Prepare the SYNC_RESULTS
         var SYNC_RESULTS = {};
         let lastSyncTime = syncStoreDTO.lastSyncWithServer
@@ -71,7 +57,6 @@ class SyncZip {
         const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
         await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
-        console.log('SYNC_RESULTS',SYNC_RESULTS)
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
         //Writing Object to File at TEMP location
         await RNFS.writeFile(PATH_TEMP + '/logs.json', JSON.stringify(SYNC_RESULTS), 'utf8');
@@ -80,7 +65,7 @@ class SyncZip {
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
         //Deleting TEMP folder location
-        RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
+        // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }
 
     updateUserSummaryNextJobTransactionId(statusList, jobMasterList, userSummary) {

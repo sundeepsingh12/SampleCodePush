@@ -1,4 +1,6 @@
 rootProject.name = 'Fareye'
+include ':react-native-compress-image'
+project(':react-native-compress-image').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-compress-image/android')
 include ':react-native-apk-installer'
 project(':react-native-apk-installer').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-apk-installer/android')
 include ':react-native-fcm'
@@ -9,8 +11,6 @@ include ':react-native-camera'
 project(':react-native-camera').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-camera/android')
 include ':react-native-background-fetch'
 project(':react-native-background-fetch').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-background-fetch/android')
-include ':react-native-bluetooth-serial'
-project(':react-native-bluetooth-serial').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-bluetooth-serial/android')
 include ':realm'
 project(':realm').projectDir = new File(rootProject.projectDir, '../node_modules/realm/android')
 include ':react-native-linear-gradient'

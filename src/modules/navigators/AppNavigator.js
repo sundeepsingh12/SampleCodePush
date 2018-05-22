@@ -1,31 +1,13 @@
 import React from 'react'
-import {
-  connect
-} from 'react-redux'
-import {
-  addNavigationHelpers,
-  StackNavigator,
-  TabNavigator
-} from 'react-navigation'
-import {
-  StyleSheet,
-  View,
-  Text,
-  Platform,
-  FlatList,
-  TouchableOpacity,
-  BackHandler
-} from 'react-native'
-
+import { connect } from 'react-redux'
+import { addNavigationHelpers, StackNavigator, TabNavigator } from 'react-navigation'
+import { BackHandler } from 'react-native'
 import Login from '../../containers/Login'
 import Preloader from '../../containers/Preloader'
 import Application from '../../containers/Application'
-import Home from '../../containers/Home'
 import Sequence from '../../containers/Sequence'
-import Menu from '../../containers/Menu'
 import ProfileView from '../../containers/ProfileView'
 import ResetPassword from '../../containers/ResetPassword'
-import SyncScreen from '../../containers/SyncScreen'
 import TabScreen from '../../containers/TabScreen'
 import TaskListScreen from '../../containers/TaskListScreen'
 import DataStore from '../../containers/DataStore'
@@ -38,23 +20,7 @@ import CustomApp from '../../containers/CustomApp'
 import QrCodeScanner from '../../containers/QrCodeScanner'
 import CameraFieldAttribute from '../../containers/CameraFieldAttribute'
 import SequenceRunsheetList from '../../containers/SequenceRunsheetList'
-import {
-  Container,
-  Content,
-  Footer,
-  FooterTab,
-  Card,
-  CardItem,
-  Button,
-  Body,
-  Header,
-  Left,
-  Right,
-  Icon,
-  List,
-  ListItem,
-  Root,
-} from 'native-base'
+import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem, Root, } from 'native-base'
 import styles from '../../themes/FeStyle'
 import Payment from '../../containers/Payment'
 import UPIPayment from '../../containers/UPIPayment'
@@ -81,23 +47,10 @@ import AutoLogout from '../../containers/AutoLogout'
 import Backup from '../../containers/Backup'
 import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
 import HomeTabNavigator from '../../containers/HomeTabNavigator'
-import {
-  ApplicationScreen,
-  HardwareBackPress,
-  HomeScreen,
-  HomeTabNavigatorScreen,
-  LoginScreen,
-  PreloaderScreen,
-  SHOW_DISCARD_ALERT,
-  RETURN_TO_HOME,
-  SET_TRANSIENT_BACK_PRESSED,
-  SET_SEQUENCE_BACK_ENABLED
-} from '../../lib/constants'
+import MosambeeWalletPayment from '../../containers/MosambeeWalletPayment'
+import { ApplicationScreen, HardwareBackPress, HomeScreen, HomeTabNavigatorScreen, LoginScreen, PreloaderScreen, SHOW_DISCARD_ALERT, RETURN_TO_HOME, SET_TRANSIENT_BACK_PRESSED, SET_SEQUENCE_BACK_ENABLED } from '../../lib/constants'
 import SplitPayment from '../../containers/SplitPayment'
-import {
-  createReduxBoundAddListener,
-  createReactNavigationReduxMiddleware,
-} from 'react-navigation-redux-helpers'
+import { createReduxBoundAddListener, createReactNavigationReduxMiddleware } from 'react-navigation-redux-helpers'
 import { setState } from '../global/globalActions'
 import BluetoothListing from '../../containers/BluetoothListing'
 
@@ -228,23 +181,14 @@ export const AppNavigator = StackNavigator({
   Summary: {
     screen: Summary,
   },
-  Menu: {
-    screen: Menu
-  },
   ProfileView: {
     screen: ProfileView
-  },
-  SyncScreen: {
-    screen: SyncScreen
   },
   ResetPassword: {
     screen: ResetPassword
   },
   TabScreen: {
     screen: TabScreen
-  },
-  ResetPassword: {
-    screen: ResetPassword
   },
   SkuListing: {
     screen: SkuListing,
@@ -254,6 +198,12 @@ export const AppNavigator = StackNavigator({
   },
   UPIPayment: {
     screen: UPIPayment
+  },
+  MosamBeeWalletPayment:{
+    screen: MosambeeWalletPayment,
+    navigationOptions: {
+      header: null
+    }
   },
   PayByLink: {
     screen: PayByLink
@@ -281,8 +231,7 @@ export const AppNavigator = StackNavigator({
   },
   ArrayFieldAttribute: {
     screen: ArrayFieldAttribute
-  }
-  ,
+  },
   DataStore: {
     screen: DataStore,
   },
@@ -359,9 +308,8 @@ export const AppNavigator = StackNavigator({
       gesturesEnabled: false
     }
   },
-  
-  BluetoothListing:{
-    screen:BluetoothListing
+  BluetoothListing: {
+    screen: BluetoothListing
   }
 },
   {

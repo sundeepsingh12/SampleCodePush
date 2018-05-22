@@ -58,10 +58,11 @@ class RestAPI {
    */
   async _fetch(opts, fetchRequestId) {
     let url = opts.url
-    if (!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK)) {
+    if (!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK) && opts.method != 'WALLET') {
       let data = await keyValueDBService.getValueFromStore(DOMAIN_URL)
       url = data.value + url
     }
+    if (opts.method == 'WALLET') opts.method = 'POST'
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
     }
@@ -129,12 +130,12 @@ class RestAPI {
   */
   serviceCall(body, url, method) {
     let opts;
-    if (method === 'POST') {
+    if (method === 'POST' || method === 'WALLET') {
       opts = {
         method,
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': method != 'WALLET' ? 'application/json' : 'application/x-www-form-urlencoded'
         },
         url,
         body
@@ -206,7 +207,7 @@ class RestAPI {
         const message = responseBody.split(",")[0]
         if (!path && message == 'success') {
           if (currenDate) {
-          await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
+            await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
           }
           await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         }

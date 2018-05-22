@@ -15,6 +15,18 @@ module.exports = keyMirror({
     //autoLogout Actions
     SET_LOADER_IN_AUTOLOGOUT: null,
 
+    //mosambeeWalletPaymentActions
+    SET_MOSAMBEE_WALLET_PARAMETERS: null,
+    SET_ERROR_MESSAGE_FOR_WALLET: null,
+    SET_MODAL_VIEW: null,
+    SET_OTP_MODAL_VIEW: null,
+    CHANGE_WALLET_MOBILE_NO: null,
+    SET_OTP_FOR_WALLET:null,
+    CHANGE_OTP_NUMBER: null,
+    SET_LOADER_FOR_WALLET: null,
+    RESET_STATE_FOR_WALLET: null,
+    SET_ERROR_FOR_OTP: null,
+
     //Auth Actions
     LOGOUT: null,
     LOGIN_START: null,
@@ -493,6 +505,7 @@ module.exports = keyMirror({
     UPDATE_SKU_LIST_ITEMS: null,
     SET_SHOW_IMAGE_AND_DATA: null,
     SET_VALIDATION_FOR_CAMERA: null,
+    SET_CAMERA_LOADER: null,
 
     //Offline Actions
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,
