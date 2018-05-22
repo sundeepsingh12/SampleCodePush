@@ -5,7 +5,8 @@ import {
     Text,
     Modal,
     TextInput,
-    TouchableOpacity
+    TouchableOpacity,
+    Platform
 } from 'react-native'
 import Loader from '../components/Loader'
 import { Content, Button, StyleProvider, Item, Icon, Spinner } from 'native-base';
@@ -79,12 +80,13 @@ class MobileNoScreen extends PureComponent {
                         keyboardType={'numeric'}
                         editable={true}
                         returnKeyType={'done'}
+                        underlineColorAndroid='transparent'
                         onChangeText={this.onChangeMobileNo}
-                        style={[styles.fontXxl]}
+                        style={[styles.fontXxl, {borderBottomWidth : 1}]}
                     />
                 </View>
                 <View style={{ height: 40 }}>
-                    {!(this.props.mobileOtpDisplayMessage === false) ? <Text style={[styles.fontCenter, styles.fontDanger]}>
+                    {!(this.props.mobileOtpDisplayMessage === false) ? <Text style={[styles.fontCenter, styles.fontDanger, styles.paddingTop10]}>
                         {this.props.mobileOtpDisplayMessage}
                     </Text> :
                         <View style={[styles.justifyCenter, styles.alignCenter, styles.marginBottom5]}>
@@ -111,9 +113,9 @@ class MobileNoScreen extends PureComponent {
                         <Text style={[styles.fontWeight500, styles.fontXxl, styles.fontBlack]}>{ENTER_OTP}</Text>
                         <Text style={[styles.fontDefault, styles.fontDarkGray, styles.marginTop10]}>{OTP_CODE_SENT}</Text>
                         <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.fontDefault, styles.fontDarkGray]}>{this.props.mobileNumber}</Text>
+                            <Text style={[styles.fontLg, styles.fontDarkGray]}>{this.props.mobileNumber}</Text>
                             <TouchableOpacity onPress={this.onShowMobileNoScreen}>
-                                <Text style={[styles.fontDefault, styles.marginLeft5, styles.fontBlack]}>{EDIT}</Text>
+                                <Text style={[styles.fontDefault, {marginLeft : 8}, styles.fontBlack]}>{EDIT}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -132,12 +134,13 @@ class MobileNoScreen extends PureComponent {
                         keyboardType='numeric'
                         editable={true}
                         returnKeyType='done'
+                        underlineColorAndroid='transparent'
                         onChangeText={this.onChangeOtp}
-                        style={[styles.fontXxl]}
+                        style={[styles.fontXxl, {borderBottomWidth : 1}]}
                     />
                 </View>
                 <View style={{ height: 40 }}>
-                    {!(this.props.mobileOtpDisplayMessage === false) ? <Text style={[styles.fontDanger]}>
+                    {!(this.props.mobileOtpDisplayMessage === false) ? <Text style={[styles.fontCenter, styles.fontDanger, styles.paddingTop10]}>
                         {this.props.mobileOtpDisplayMessage}
                     </Text> :
                         <View style={[styles.justifyCenter, styles.alignCenter, styles.marginBottom20]}>
@@ -160,7 +163,7 @@ class MobileNoScreen extends PureComponent {
     }
     showCloseButton() {
         return (
-            <View style={[{ top: 10, left: 0, height: 60, }]}>
+            <View style={[{ left: 0, height: 60, }, Platform.OS === 'ios' ? styles.marginTop30 : styles.marginTop10]}>
                 <Button transparent disabled={this.props.isLoggingOut}>
                     <Icon
                         name="md-close"
