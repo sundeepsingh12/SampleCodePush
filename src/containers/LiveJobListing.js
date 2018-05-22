@@ -8,7 +8,7 @@ import * as liveJobActions from '../modules/liveJob/liveJobActions'
 import Loader from '../components/Loader'
 import moment from 'moment'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, Alert, FlatList, Vibration, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, Alert, FlatList, Vibration, TouchableOpacity, TextInput, ScrollView } from 'react-native'
 import _ from 'lodash'
 import {
     Container,
@@ -28,7 +28,8 @@ import {
     StyleProvider,
     Spinner,
     ActionSheet,
-    Toast
+    Toast,
+    Input
 } from 'native-base'
 
 import getTheme from '../../native-base-theme/components'
@@ -40,8 +41,10 @@ import JobListItem from '../components/JobListItem'
 import SearchBarV2 from '../components/SearchBarV2'
 import {
     SET_SEARCH,
-    SET_LIVE_JOB_TOAST
+    SET_LIVE_JOB_TOAST,
+    QrCodeScanner
 } from '../lib/constants'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import {
     INVALID_SCAN,
     LIVE_TASKS,
@@ -71,12 +74,6 @@ function mapDispatchToProps(dispatch) {
 
 class LiveJobListing extends PureComponent {
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            isScannerUsed: false,
-        };
-    }
     componentDidMount() {
         this.props.actions.fetchAllLiveJobsList()
         if (this.props.navigation.state.params && this.props.navigation.state.params.callAlarm == true) {
@@ -95,6 +92,7 @@ class LiveJobListing extends PureComponent {
             this.props.actions.setState(SET_LIVE_JOB_TOAST, '')
         }
     }
+
     static navigationOptions = ({ navigation }) => {
         return {
             header: null
@@ -105,7 +103,8 @@ class LiveJobListing extends PureComponent {
             this.props.actions.navigateToScene('LiveJob',
                 {
                     job: item,
-                    liveJobList: this.props.liveJobList
+                    liveJobList: this.props.liveJobList,
+                    displayName: this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS
                 }
             )
         } else {
@@ -134,7 +133,7 @@ class LiveJobListing extends PureComponent {
         }
     }
     toggleLiveJobSelection = (id) => {
-        this.props.actions.toggleLiveJobSelection(id, this.props.liveJobList)
+        this.props.actions.toggleLiveJobSelection(id, this.props.liveJobList, this.props.searchText)
     }
     acceptOrRejectMultiple = (status) => {
         this.props.actions.acceptOrRejectMultiple(status, this.props.selectedItems, this.props.liveJobList)
@@ -147,7 +146,6 @@ class LiveJobListing extends PureComponent {
             if (jobTransactionList[index].jobMasterId == jobMasterId && this.checkTransactionForSearchText(jobTransactionList[index])) {
                 jobTransactionArray.push(jobTransactionList[index])
             }
-
         }
         return jobTransactionArray
     }
@@ -158,8 +156,7 @@ class LiveJobListing extends PureComponent {
         }
         let result = false;
         let searchText = _.toLower(trimmedSearchText);
-        let values = [jobTransaction.referenceNumber];
-        if (_.some(values, (data) => _.includes(_.toLower(data), searchText))) {
+        if (_.includes(_.toLower(jobTransaction.referenceNumber), searchText)) {
             result = true
         }
         return result;
@@ -169,7 +166,7 @@ class LiveJobListing extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
+                    <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -193,14 +190,48 @@ class LiveJobListing extends PureComponent {
         )
     }
 
-    setSearchText() {
-        this.props.actions.setState(SET_SEARCH, this.props.searchText)
-        this.setState({ isScannerUsed: true })
+    searchBar() {
+        return (
+            <View style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10]}>
+                <View style={[styles.relative, { width: '100%', height: 40 }]}>
+                    <TextInput
+                        placeholder={'Filter Reference Numbers'}
+                        placeholderTextColor={'rgba(255,255,255,.6)'}
+                        selectionColor={'rgba(224, 224, 224,.5)'}
+                        onChangeText={(searchText) => {
+                            this.props.actions.setState(SET_SEARCH, searchText)
+                        }}
+                        returnKeyType={"search"}
+                        keyboardAppearance={"dark"}
+                        underlineColorAndroid={'transparent'}
+                        value={this.props.searchText}
+                        onSubmitEditing={this.toggleItemOnSearchText}
+                        style={[style.headerSearch]} />
+                    <Button small transparent
+                        style={[style.headerQRButton]}
+                        onPress={() => this.props.navigation.navigate(QrCodeScanner, { returnData: this.toggleItemOnSearchBar.bind(this) })} >
+                        <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={styles.fontWhite.color} />
+                    </Button>
+                </View>
+            </View>
+        )
     }
+
+    setSearchText = (searchText) => {
+        this.props.actions.setState(SET_SEARCH, searchText)
+    }
+
+    toggleItemOnSearchText = () => {
+        this.props.actions.toggleItemOnSearchText(this.props.searchText, this.props.liveJobList)
+    }
+    toggleItemOnSearchBar = (searchText) => {
+        this.props.actions.toggleItemOnSearchText(searchText, this.props.liveJobList)
+    }
+
     showListWithSearchBar() {
         let view
         if (!this.props.selectedItems || this.props.selectedItems.length == 0) {
-            view = <Header searchBar style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
+            view = <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                 <Body>
                     <View
                         style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -213,11 +244,11 @@ class LiveJobListing extends PureComponent {
                             <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS}</Text>
                         </View>
                         <View style={[style.headerRight]}>
+                        <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
                         </View>
                         <View />
                     </View>
-                    <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} navigation={this.props.navigation}
-                        returnValue={(searchText) => this.setSearchText()} searchText={this.props.searchText} onPress={() => this.setSearchText()} />
+                    {this.searchBar()}
                 </Body>
             </Header>
         }
@@ -227,7 +258,7 @@ class LiveJobListing extends PureComponent {
     showMultipleSelectList() {
         let view
         if (this.props.selectedItems && this.props.selectedItems.length > 0) {
-            view = <Header style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
+            view = <Header style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
                 <Body>
                     <View style={[styles.column, { alignSelf: 'stretch' }]}>
                         <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>
@@ -239,17 +270,48 @@ class LiveJobListing extends PureComponent {
                                 </TouchableOpacity>
                                 <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + SELECTED} </Text>
                             </View>
-                            <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
+                            <TouchableHighlight disabled = {_.size(this.props.liveJobList) == _.size(this.props.selectedItems)} onPress={() => this.props.actions.selectAll(this.props.liveJobList)} >
+                            <Text style={[styles.fontWhite]}> {SELECT_ALL} </Text>
+                            </TouchableHighlight>
                         </View>
-                        <View style={[styles.row]}>
-                            <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(1)}> {ACCEPT} </Text>
-                            <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(2)}> {REJECT} </Text>
-                        </View>
+                        {this.searchBar()}
                     </View>
                 </Body>
             </Header>
         }
         return view
+    }
+    getSelectedReferenceNo() {
+        let referenceList = ''
+        this.props.selectedItems.forEach((item) => { referenceList += this.props.liveJobList[item].referenceNumber  + ",  " })
+        return (
+            <ScrollView horizontal={true} style={[styles.padding10]}>
+                <Text>{referenceList}</Text>
+                <View style={{ position: 'absolute', width: 5, backgroundColor: '#d9d9d9', zIndex: 1 }}></View>
+            </ScrollView>
+        )
+    }
+    showFooterView() {
+        if (this.props.selectedItems && this.props.selectedItems.length > 0) {
+            let referenceNumberView = this.getSelectedReferenceNo()
+            return (
+                <Footer style={[style.footer, styles.column]}>
+                    {referenceNumberView}
+                    <FooterTab style={[styles.paddingLeft10, styles.paddingRight10, { paddingBottom: 60 }, styles.paddingTop10, styles.row, styles.justifySpaceBetween]}>
+                        <Button danger full
+                            onPress={() => this.acceptOrRejectMultiple(2)}
+                            style={[styles.marginRight10]}
+                        >
+                            <Text style={[styles.fontWhite, styles.padding10]} > {REJECT} </Text>
+                        </Button>
+                        <Button success full
+                            onPress={() => this.acceptOrRejectMultiple(1)}
+                        >
+                            <Text style={[styles.fontWhite, styles.padding10]} > {ACCEPT} </Text>
+                        </Button>
+                    </FooterTab>
+                </Footer>)
+        }
     }
     render() {
         if (this.props.loaderRunning) {
@@ -269,6 +331,7 @@ class LiveJobListing extends PureComponent {
                                 renderItem={({ item }) => this.renderData(item)}
                                 keyExtractor={item => String(item.id)}
                             />
+                            {this.showFooterView()}
                         </Container>
                     </StyleProvider>
                 )
@@ -283,7 +346,6 @@ const style = StyleSheet.create({
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0,
-        paddingBottom: 10
     },
     headerLeft: {
         width: '15%',
@@ -293,14 +355,14 @@ const style = StyleSheet.create({
         paddingRight: 10
     },
     headerBody: {
-        width: '70%',
+        width: '60%',
         paddingTop: 10,
         paddingBottom: 10,
         paddingLeft: 10,
         paddingRight: 10
     },
     headerRight: {
-        width: '15%',
+        width: '35%',
         paddingTop: 10,
         paddingBottom: 10,
         paddingLeft: 10,
@@ -309,17 +371,24 @@ const style = StyleSheet.create({
     headerSearch: {
         paddingLeft: 10,
         paddingRight: 30,
-        backgroundColor: '#1260be',
+        backgroundColor: 'rgba(255, 255, 255, 0.20)',
         borderRadius: 2,
-        height: 40,
+        paddingTop: 0,
+        paddingBottom: 0,
+        height: 30,
         color: '#fff',
-        fontSize: 14
+        fontSize: 11
     },
     headerQRButton: {
         position: 'absolute',
         right: 5,
         paddingLeft: 0,
         paddingRight: 0
+    },
+    footer: {
+        height: 'auto',
+        borderTopWidth: 1,
+        borderTopColor: '#f9f9f9'
     },
 });
 

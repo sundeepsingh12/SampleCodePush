@@ -111,7 +111,6 @@ export function resetNavigationState(index, actions) {
 export function resetApp() {
   return async function (dispatch) {
     try {
-      console.log('package_json.version', package_json.version)
       await logoutService.deleteDataBase()
       const allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
       await keyValueDBService.deleteValueFromStore(allSchemaInstance)
