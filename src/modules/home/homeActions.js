@@ -443,7 +443,10 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull) {
         }))
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, syncStoreDTO);
         // check if live job module is present
-        const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO);
+        const isLiveJobModulePresent = syncStoreDTO.pageList ? syncStoreDTO.pageList.filter((module) => module.screenTypeId == PAGE_LIVE_JOB).length > 0 : false
+        if(isLiveJobModulePresent) { 
+          await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO)
+        }
         if (isJobsPresent) {
           if (Piechart.enabled) {
             dispatch(pieChartCount())

@@ -256,7 +256,6 @@ class LiveJobListing extends PureComponent {
     }
 
     showMultipleSelectList() {
-        console.logs("size",_.size(this.props.liveJobList), _.size(this.props.selectedItems))
         let view
         if (this.props.selectedItems && this.props.selectedItems.length > 0) {
             view = <Header style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
