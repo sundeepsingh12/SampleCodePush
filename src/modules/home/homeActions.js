@@ -424,7 +424,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull) {
         dispatch(navigateToScene(AutoLogoutScreen));
         return
       }
-      const syncCount = 0
+      let syncCount = 0
       if (!erpPull) {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
@@ -513,7 +513,7 @@ export function syncService() {
   return async (dispatch) => {
     try {
       if (CONFIG.intervalId) {
-        throw new Error(SERVICE_ALREADY_SCHEDULED)
+        return
       }
       const mdmPolicies = await keyValueDBService.getValueFromStore(MDM_POLICIES)
       const timeInterval = (mdmPolicies && mdmPolicies.value && mdmPolicies.value.basicSetting && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : CONFIG.SYNC_SERVICE_DELAY
