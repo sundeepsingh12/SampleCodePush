@@ -234,6 +234,7 @@ module.exports = {
     SUM: 'sum',
     THEN: 'then',
     TIME_COMPARATOR: 'timeComparator',
+    SKUVALIDATION: 'SKUValidation',
 
     //REST API 
     SEARCH_VALUE: '?searchValue=',

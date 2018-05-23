@@ -32,6 +32,7 @@ import {
     SKU_PHOTO,
     SKU_REASON,
     NA,
+    SKUVALIDATION
 } from '../../lib/AttributeConstants'
 import { NavigationActions } from 'react-navigation'
 
@@ -46,13 +47,13 @@ import {
 import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
 import { SKIP_SKU_MESSAGE, OK } from '../../lib/ContainerConstants'
 
-export function prepareSkuList(fieldAttributeMasterId, jobId) {
+export function prepareSkuList(fieldAttributeMaster, jobId) {
     return async function (dispatch) {
         try {
             dispatch(setState(SKU_LIST_FETCHING_START, true))
-            const skuListingDto = await skuListing.getSkuListingDto(fieldAttributeMasterId)
+            const skuListingDto = await skuListing.getSkuListingDto(fieldAttributeMaster.fieldAttributeMasterId)
             const skuObjectValidation = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(skuListingDto.childFieldAttributeId)
-            const skuValidationForImageAndReason = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(fieldAttributeMasterId)
+            const skuValidationForImageAndReason = fieldAttributeMaster.validation ? fieldAttributeMaster.validation.filter(validation => validation.timeOfExecution == SKUVALIDATION)[0] : null;
             const skuData = await skuListing.prepareSkuListingData(skuListingDto.idFieldAttributeMap, jobId, skuObjectValidation, skuValidationForImageAndReason)
             const skuArrayChildAttributes = await skuListing.getSkuChildAttributes(skuListingDto.idFieldAttributeMap, skuData.attributeTypeIdValueMap)
             dispatch(setState(SKU_LIST_FETCHING_STOP, {
@@ -150,7 +151,8 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                         break;
                     } else {
                         let { fieldDataList, latestPositionId } = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransactionId, parentObject.positionId, positionId)
-                        fieldDataListWithLatestPositionId.fieldDataList[jobTransactionId] = fieldDataList
+                        fieldDataListWithLatestPositionId.fieldDataList[jobTransactionId] = {}
+                        fieldDataListWithLatestPositionId.fieldDataList[jobTransactionId].childDataList = fieldDataList
                         positionId = latestPositionId
                     }
                 }
