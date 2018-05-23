@@ -23,6 +23,7 @@ import {
     EXTERNAL_DATA_STORE_URL,
     DATA_STORE_ATTR_KEY,
     DATA_STORE,
+    BEFORE,
 } from '../../lib/AttributeConstants'
 import * as realm from '../../repositories/realmdb'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -36,6 +37,8 @@ import {
     DATA_STORE_MAP_MISSING,
     CURRENT_ELEMENT_MISSING
 } from '../../lib/ContainerConstants'
+import { fieldValidationService } from '../../services/classes/FieldValidation'
+
 class DataStoreService {
 
     /**
@@ -581,21 +584,12 @@ class DataStoreService {
         if (!currentElement) {
             throw new Error(CURRENT_ELEMENT_MISSING)
         }
-        let validation = {
-            isScannerEnabled: false,
-            isAutoStartScannerEnabled: false,
-            isMinMaxValidation: false,
-            isSearchEnabled: false,
-            isAllowFromFieldInExternalDS: false
-        }
+
         if (!currentElement.dataStoreFilterMapping || _.isEqual(currentElement.dataStoreFilterMapping, '[]') || currentElement.attributeTypeId == EXTERNAL_DATA_STORE) {
-            validation = (currentElement.validation) ?
-                this.getValidations(currentElement.validation) : validation
             return {
                 dataStoreAttrValueMap: {},
                 dataStoreFilterReverseMap,
                 isFiltersPresent: false,
-                validation
             }
         }
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
@@ -605,7 +599,6 @@ class DataStoreService {
             dataStoreAttrValueMap,
             dataStoreFilterReverseMap: returnParams.dataStoreFilterReverseMap,
             isFiltersPresent: true,
-            validation
         }
     }
 
@@ -686,17 +679,43 @@ class DataStoreService {
                                }
      */
     async checkForFiltersAndValidationsForArray(functionParamsFromDS) {
-        let { currentElement, formElement, jobTransaction, arrayReverseDataStoreFilterMap, arrayFieldAttributeMasterId, rowId } = functionParamsFromDS
-        let rowFormElement = formElement[rowId].formLayoutObject //get current formElement
+        let { currentElement, formLayoutState, jobTransaction, arrayReverseDataStoreFilterMap, arrayFieldAttributeMasterId, rowId } = functionParamsFromDS
+        let rowFormElement = formLayoutState.formElement[rowId].formLayoutObject //get current formElement
         let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] //get map for current array this may contain map of multiple arrays
-        let returnParams = await this.checkForFiltersAndValidations(currentElement, rowFormElement, jobTransaction, dataStoreFilterReverseMap) //check for filters and if not present than check for validations
+        //let returnParams = await this.checkForFiltersAndValidations(currentElement, rowFormElement, jobTransaction, dataStoreFilterReverseMap) //check for filters and if not present than check for validations
+        let cloneFormElement = _.cloneDeep(rowFormElement)
+        let returnParams = await this.runDataStoreBeforeValidations(currentElement, formLayoutState, jobTransaction, cloneFormElement, dataStoreFilterReverseMap)
         let cloneArrayReverseDataStoreFilterMap = _.cloneDeep(arrayReverseDataStoreFilterMap)
         cloneArrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] = returnParams.dataStoreFilterReverseMap //change reverse DSF map which contains all mapping related to DSF and Data store
         return {
             dataStoreAttrValueMap: returnParams.dataStoreAttrValueMap,
             isFiltersPresent: returnParams.isFiltersPresent,
-            validation: returnParams.validation,
+            validationObject: returnParams.validationObject,
+            isDataStoreEditable: returnParams.isDataStoreEditable,
+            searchText: returnParams.searchText,
             arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap
+        }
+    }
+
+    async runDataStoreBeforeValidations(currentElement, formLayoutState, jobTransaction, cloneFormElement, dataStoreFilterReverse) {
+        let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, BEFORE, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
+        let { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent } = await dataStoreService.checkForFiltersAndValidations(currentElement, cloneFormElement, jobTransaction, dataStoreFilterReverse)
+        let validation = {
+            isScannerEnabled: false,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
+        }
+        let validationObject = (currentElement.validation) ? this.getValidations(currentElement.validation) : validation
+        let isDataStoreEditable = cloneFormElement.get(currentElement.fieldAttributeMasterId).editable
+        if (isFiltersPresent) {
+            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject: validation, searchText: '', isDataStoreEditable: true }
+        } else if (!_.isEmpty(cloneFormElement.get(currentElement.fieldAttributeMasterId).value)) {
+            validationObject.isAutoStartScannerEnabled = false
+            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: cloneFormElement.get(currentElement.fieldAttributeMasterId).value, isDataStoreEditable }
+        } else {
+            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: '', isDataStoreEditable }
         }
     }
 }

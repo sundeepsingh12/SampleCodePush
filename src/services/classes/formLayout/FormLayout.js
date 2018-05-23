@@ -318,9 +318,9 @@ class FormLayout {
             }
             let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
-            if (!jobTransaction.length) { //Delete draft only if not bulk
-                draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
-            }
+            //if (!jobTransaction.length) { //Delete draft only if not bulk
+            draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
+            //}
             //await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
             await keyValueDBService.validateAndSaveData(BACKUP_ALREADY_EXIST, new Boolean(false))
             await geoFencingService.addNewGeoFenceAndDeletePreviousFence()

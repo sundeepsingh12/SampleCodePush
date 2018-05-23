@@ -37,12 +37,10 @@ class LiveJobService {
             return {}
         }
         let expiredJobIds = []
-        let liveJobList = Object.values(liveJobMap)
-        for (let job of liveJobList) {
-            let jobEndTime = moment(job.jobEndTime, 'HH:mm:ss')
-            let currentTime = moment()
-            if (moment(jobEndTime).diff(moment(currentTime)) <= 0) {
-                expiredJobIds.push(job.id)
+        for (let index in liveJobMap) {
+            let jobEndTime = moment(liveJobMap[index].jobEndTime, 'HH:mm:ss')
+            if (moment(jobEndTime).diff(moment()) <= 0) {
+                expiredJobIds.push(liveJobMap[index].id)
             }
         }
         if (expiredJobIds.length > 0) {
