@@ -117,7 +117,7 @@ import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutAc
 import FCM, { NotificationActionType, FCMEvent } from "react-native-fcm"
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster';
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR } from '../../lib/ContainerConstants'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR,FCM_PERMISSION_DENIED } from '../../lib/ContainerConstants'
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -339,10 +339,11 @@ export function startFCM() {
     if (token && token.value) {
       const userObject = await keyValueDBService.getValueFromStore(USER)
       const topic = `FE_${userObject.value.id}`
-      await FCM.requestPermissions()
+      FCM.requestPermissions()
+      .then(e =>{} )
+      .catch(() =>  Toast.show({ text: FCM_PERMISSION_DENIED , type: 'danger', position: 'bottom', buttonText: OK, duration: 6000 }))
 
       FCM.getFCMToken().then(async fcmToken => {
-        console.log('fcmToken', fcmToken)
         await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
         await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
       }, (error) => {
@@ -355,7 +356,6 @@ export function startFCM() {
       }
 
       FCM.getInitialNotification().then(notif => {
-        console.log('notif 111>>' + JSON.stringify(notif))
       }, (err) => {
       })
 
@@ -390,13 +390,22 @@ export function startFCM() {
         }
       })
 
+       // fcm token may not be available on first load, catch it here
       FCM.on(FCMEvent.RefreshToken, async fcmToken => {
         await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
         await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
       });
 
+      FCM.enableDirectChannel();
+      FCM.on(FCMEvent.DirectChannelConnectionChanged, (data) => {
+      });
+      setTimeout(function() {
+        FCM.isDirectChannelEstablished().then(d =>  {});
+      }, 1000);
+
       FCM.subscribeToTopic(topic)
     }
+    
     else {
       Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
     }
