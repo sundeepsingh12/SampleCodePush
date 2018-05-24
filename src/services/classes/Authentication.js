@@ -9,8 +9,12 @@ import {
     USERNAME,
     PASSWORD,
     REMEMBER_ME,
+    USER,
+    FCM_TOKEN
 } from '../../lib/constants'
-
+import { backupService } from './BackupService'
+import { sync } from './Sync'
+import { logoutService } from './Logout'
 class Authentication {
 
     /**
@@ -50,12 +54,12 @@ class Authentication {
      * @param {*} rememberMe 
      */
     saveLoginCredentials(username, password, rememberMe) {
-            keyValueDBService.validateAndSaveData(USERNAME, username)
-            keyValueDBService.validateAndSaveData(PASSWORD, password)
-        if (!rememberMe) {            
+        keyValueDBService.validateAndSaveData(USERNAME, username)
+        keyValueDBService.validateAndSaveData(PASSWORD, password)
+        if (!rememberMe) {
             keyValueDBService.deleteValueFromStore(REMEMBER_ME)
         }
-        else{
+        else {
             keyValueDBService.validateAndSaveData(REMEMBER_ME, rememberMe)
         }
     }
@@ -64,11 +68,19 @@ class Authentication {
      * LOGOUT API (GET)
      * @param {*} token 
      */
-    logout(token) {
-        if(!token) {
+    async logout(createBackup) {
+        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        if (!token || !token.value) {
             throw new Error('Token Missing')
         }
+        if (createBackup) {
+            await backupService.createBackupOnLogout()
+        }
+        const userObject = await keyValueDBService.getValueFromStore(USER)
+        const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
+        await sync.deregisterFcmTokenFromServer(userObject, token, fcmToken)
         let logoutResponse = RestAPIFactory(token.value).serviceCall(null, CONFIG.API.LOGOUT_API, 'GET')
+        await logoutService.deleteDataBase()
         return logoutResponse
     }
 

@@ -38,9 +38,7 @@ import { logoutService } from '../../services/classes/Logout'
 import {
   authenticationService
 } from '../../services/classes/Authentication'
-import {
-  invalidateUserSessionForAutoLogout
-} from '../pre-loader/preloaderActions'
+
 import CONFIG from '../../lib/config'
 import {
   keyValueDBService

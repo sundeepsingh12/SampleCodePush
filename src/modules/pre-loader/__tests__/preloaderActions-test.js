@@ -10,6 +10,10 @@ import { deviceVerificationService } from '../../../services/classes/DeviceVerif
 
 var actions = require('../preloaderActions')
 import {
+    SHOW_MOBILE_SCREEN,
+    SHOW_OTP
+} from '../../../lib/ContainerConstants'
+import {
 
     ON_LOGIN_PASSWORD_CHANGE,
     ON_LOGIN_USERNAME_CHANGE,
@@ -58,8 +62,7 @@ import {
     ON_MOBILE_NO_CHANGE,
     ON_OTP_CHANGE,
     PRELOADER_SUCCESS,
-    IS_SHOW_MOBILE_NUMBER_SCREEN,
-    IS_SHOW_OTP_SCREEN
+    TOGGLE_LOGOUT
 } from '../../../lib/constants'
 
 const middlewares = [thunk]
@@ -131,14 +134,14 @@ describe('Preloader Actions', () => {
     it('should set showMobileNumber()', () => {
         expect(actions.showMobileNumber()).toEqual({
             type: SHOW_MOBILE_NUMBER_SCREEN,
-            payload: true
+            payload: SHOW_MOBILE_SCREEN
         })
     })
 
     it('should set showOtp()', () => {
         expect(actions.showOtp()).toEqual({
             type: SHOW_OTP_SCREEN,
-            payload: true
+            payload: SHOW_OTP
         })
     })
 
@@ -180,7 +183,8 @@ describe('Preloader Actions', () => {
 
     it('should set otpGenerationStart()', () => {
         expect(actions.otpGenerationStart()).toEqual({
-            type: OTP_GENERATION_START
+            type: OTP_GENERATION_START,
+            payload: false
         })
     })
 
@@ -194,7 +198,8 @@ describe('Preloader Actions', () => {
 
     it('should set optValidationStart()', () => {
         expect(actions.optValidationStart()).toEqual({
-            type: OTP_VALIDATION_START
+            type: OTP_VALIDATION_START,
+            payload: false
         })
     })
 
@@ -210,11 +215,14 @@ describe('Preloader Actions', () => {
     it('should logout', () => {
         const expectedActions = [
             { type: PRE_LOGOUT_START },
-            { type: PRE_LOGOUT_SUCCESS }
+            {type : TOGGLE_LOGOUT, payload : true},
+            { type: PRE_LOGOUT_SUCCESS },
+            {type : TOGGLE_LOGOUT, payload : false}
         ]
         const store = mockStore({})
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValueOnce({ value: 'testtoken' })
+        keyValueDBService.getValueFromStore.mockReturnValueOnce({value : ''})
         authenticationService.logout = jest.fn()
         authenticationService.logout.mockReturnValue(true)
         return store.dispatch(actions.invalidateUserSession())
@@ -223,6 +231,11 @@ describe('Preloader Actions', () => {
                 expect(authenticationService.logout).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+                expect(store.getActions()[2].type).toEqual(expectedActions[2].type)
+                expect(store.getActions()[3].type).toEqual(expectedActions[3].type)
+                expect(store.getActions()[3].payload).toEqual(expectedActions[3].payload)
+
             })
     })
 

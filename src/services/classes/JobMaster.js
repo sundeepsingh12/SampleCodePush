@@ -125,7 +125,7 @@ class JobMaster {
         })
       }
     }
-    let jobMasterResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
+    let jobMasterResponse = await RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
     return jobMasterResponse
   }
 

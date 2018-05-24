@@ -16,8 +16,6 @@ import {
   LOGOUT_FAILURE,
   USER_SUMMARY,
   JOB_SUMMARY,
-  IS_SHOW_MOBILE_NUMBER_SCREEN,
-  IS_SHOW_OTP_SCREEN,
   IS_PRELOADER_COMPLETE,
   USER,
   RESET_STATE,
@@ -62,8 +60,6 @@ export function deleteSessionToken() {
   return async function (dispatch) {
     try {
       await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
-      await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
-      await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await keyValueDBService.deleteValueFromStore(SAVE_ACTIVATED)

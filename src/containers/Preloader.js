@@ -9,7 +9,7 @@ import { connect } from 'react-redux'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import renderIf from '../lib/renderIf'
-import MobileNoScreen from './MobileNoScreen'
+import MobileOtpScreen from './MobileOtpScreen'
 import InitialSetup from './InitialSetup'
 import * as globalActions from '../modules/global/globalActions'
 import RNFS from 'react-native-fs'
@@ -53,7 +53,7 @@ class Preloader extends PureComponent {
     }
 
     componentDidMount() {
-        this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
+        this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService, this.props.showMobileOtpNumberScreen)
     }
 
     startLoginScreenWithoutLogout = () => {
@@ -62,7 +62,7 @@ class Preloader extends PureComponent {
 
     invalidateSession = () => {
         this.setState({errorInDownload:false})
-        this.props.actions.invalidateUserSession()
+        this.props.actions.invalidateUserSession(true)
     }
 
     //Downloading Latest App programatically in Android 
@@ -138,14 +138,14 @@ class Preloader extends PureComponent {
         } else {
             return (
                 <Container>
-                    {(_.isEmpty(this.props.showMobileOtpNumberScreen) ? <InitialSetup /> : null)}
+                    {(_.isEmpty(this.props.showMobileOtpNumberScreen) ? <InitialSetup showMobileOtpNumberScreen = {this.props.showMobileOtpNumberScreen}  /> : null)}
                     {(!_.isEmpty(this.props.errorMessage_403_400_Logout) &&
                         <CustomAlert
                             title="Unauthorised Device"
                             message={this.props.errorMessage_403_400_Logout}
                             onCancelPressed={this.startLoginScreenWithoutLogout} />
                     )}
-                    {(!_.isEmpty(this.props.showMobileOtpNumberScreen) ? <MobileNoScreen invalidateUserSession={this.invalidateSession} isMobileScreen={this.props.showMobileOtpNumberScreen} /> : null)}
+                    {(!_.isEmpty(this.props.showMobileOtpNumberScreen) ? <MobileOtpScreen invalidateUserSession={this.invalidateSession} isMobileScreen={this.props.showMobileOtpNumberScreen} /> : null)}
                     
                     {renderIf(this.props.downloadLatestAppMessage,
                         <AppOutdated downloadLatestApk={this.downloadLatestApk} />

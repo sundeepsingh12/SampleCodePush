@@ -11,10 +11,8 @@ import {
   CHECK_ASSET_START,
   CHECK_ASSET_FAILURE,
   OTP_GENERATION_START,
-  OTP_GENERATION_SUCCESS,
   OTP_GENERATION_FAILURE,
   OTP_VALIDATION_START,
-  OTP_VALIDATION_SUCCESS,
   OTP_VALIDATION_FAILURE,
   SERVICE_PENDING,
   SERVICE_RUNNING,
@@ -26,7 +24,6 @@ import {
   ERROR_400_403_LOGOUT,
   PRE_LOGOUT_START,
   PRE_LOGOUT_SUCCESS,
-  PRE_LOGOUT_FAILURE,
   ON_MOBILE_NO_CHANGE,
   ON_OTP_CHANGE,
   PRELOADER_SUCCESS,
@@ -106,9 +103,6 @@ export default function preloaderReducer(state = initialState, action) {
         .set('errorMessage_403_400_Logout', '')
         .set('isAppUpdatedThroughCodePush',false)
         .set('iosDownloadScreen',null)
-
-    case PRE_LOGOUT_FAILURE:
-      return state.set('error', action.payload)
 
     case ERROR_400_403_LOGOUT:
       return state.set('errorMessage_403_400_Logout', action.payload)

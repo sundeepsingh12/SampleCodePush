@@ -41,11 +41,11 @@ function mapDispatchToProps(dispatch) {
 class InitialSetup extends PureComponent {
 
     invalidateSession = () => {
-        this.props.actions.invalidateUserSession()
+        this.props.actions.invalidateUserSession(true)
     }
 
     retry = () => {
-        this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
+        this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService, this.props.showMobileOtpNumberScreen)
     }
 
     showSettingUpHeader() {
