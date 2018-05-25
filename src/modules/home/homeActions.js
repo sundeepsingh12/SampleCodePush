@@ -335,20 +335,21 @@ export function startTracking(trackingServiceStarted) {
 
 export function startFCM() {
   return async function (dispatch) {
+    try{
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (token && token.value) {
       const userObject = await keyValueDBService.getValueFromStore(USER)
       const topic = `FE_${userObject.value.id}`
       FCM.requestPermissions()
-      .then(e =>{} )
+      .then(e =>{
+        FCM.getFCMToken().then(async fcmToken => {
+          await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+          await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+        }, (error) => {
+        }).catch(
+          () => Toast.show({ text: FCM_REGISTRATION_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }))
+      } )
       .catch(() =>  Toast.show({ text: FCM_PERMISSION_DENIED , type: 'danger', position: 'bottom', buttonText: OK, duration: 6000 }))
-
-      FCM.getFCMToken().then(async fcmToken => {
-        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
-        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
-      }, (error) => {
-      }).catch(
-        () => Toast.show({ text: FCM_REGISTRATION_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }))
 
       if (Platform.OS === 'ios') {
         FCM.getAPNSToken().then(token => {
@@ -409,6 +410,9 @@ export function startFCM() {
     else {
       Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
     }
+  }catch(error){
+    Toast.show({ text: error.message, position: 'bottom', buttonText: OK, duration: 6000 })
+  }
   }
 }
 
