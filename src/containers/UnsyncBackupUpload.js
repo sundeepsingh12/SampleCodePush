@@ -10,14 +10,8 @@ import { StyleSheet, View, Image, Text } from 'react-native'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import {
-    SET_FAIL_UPLOAD_COUNT
-} from '../lib/constants'
-import {
-    Container,
-    Button,
-    StyleProvider,
-} from 'native-base'
+import { SET_FAIL_UPLOAD_COUNT } from '../lib/constants'
+import { Container, Button, StyleProvider, } from 'native-base'
 import _ from 'lodash'
 import {
     UNABLE_TO_UPLOAD,
@@ -78,7 +72,7 @@ class UnsyncBackupUpload extends Component {
             </View>
         }
     }
-    
+
     failureView() {
         if (this.props.failedUploadCount > 0) {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
@@ -107,7 +101,7 @@ class UnsyncBackupUpload extends Component {
                                 this.props.actions.navigateToScene('HomeTabNavigatorScreen')
                                 this.props.actions.resetFailCountInStore()
                             }}  >
-                            <Text style={[{color : styles.fontPrimaryColor}, styles.fontXl]}>{CONTINUE}</Text>
+                            <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>{CONTINUE}</Text>
                         </Button>
                     </View>
                 </View>
@@ -135,19 +129,19 @@ class UnsyncBackupUpload extends Component {
                 <View style={[styles.justifyCenter, styles.flexBasis25, styles.padding20]}>
                     <Text style={[styles.fontXl, styles.fontBlack]}>
                         {this.props.unsyncBackupFilesList.length} {UNSYNCED_BACKUP_FILES_FOUND}
-                </Text>
+                    </Text>
                 </View>
                 <View style={[styles.flexBasis33_3, styles.justifyCenter, styles.column, styles.padding10]}>
                     <View style={[styles.row, styles.justifySpaceBetween, styles.paddingBottom10]}>
                         <Text style={[styles.fontBlack]}>
                             {UPLOADED} {this.props.uploadingFileCount}/{this.props.unsyncBackupFilesList.length} {UNSYNCED_BACKUP_FILES}
-                    </Text>
+                        </Text>
                         <Text style={[styles.fontDarkGray]}>
                             {parseInt(this.props.uploadingFileCount / this.props.unsyncBackupFilesList.length * 100)}%
                  </Text>
                     </View>
                     <View style={{ width: '100%', borderRadius: 8, height: 10, backgroundColor: styles.bgGray.backgroundColor }}>
-                        <View style={{ width: String(this.props.uploadingFileCount / this.props.unsyncBackupFilesList.length * 100 + "%"), borderRadius: 8, height: 10, backgroundColor:  styles.bgPrimaryColor}}>
+                        <View style={{ width: String(this.props.uploadingFileCount / this.props.unsyncBackupFilesList.length * 100 + "%"), borderRadius: 8, height: 10, backgroundColor: styles.bgPrimaryColor }}>
                         </View>
                     </View>
                 </View>
@@ -155,7 +149,7 @@ class UnsyncBackupUpload extends Component {
             </View>
         }
     }
-    
+
     render() {
         let uploadingView = this.getUploadingView()
         let failureView = this.failureView()

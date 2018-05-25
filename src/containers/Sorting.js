@@ -2,8 +2,6 @@
 'use strict'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-
-
 import Loader from '../components/Loader'
 import renderIf from '../lib/renderIf'
 import QRCode from 'react-native-qrcode-svg'
@@ -13,22 +11,8 @@ import { NA } from '../lib/AttributeConstants'
 import * as sortingActions from '../modules/sorting/sortingActions'
 import * as globalActions from '../modules/global/globalActions'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native'
-import {
-    Container,
-    Content,
-    Header,
-    Button,
-    Text,
-    Input,
-    Left,
-    Body,
-    Right,
-    Icon,
-    StyleProvider,
-    Toast
-} from 'native-base'
-
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator, FlatList, SafeAreaView } from 'react-native'
+import { Container, Content, Header, Button, Text, Input, Left, Body, Right, Icon, StyleProvider, Toast } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -212,19 +196,21 @@ class Sorting extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
-                        <Body>
-                            {this.showTitleAndBackArrow()}
+                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                            <Body>
+                                {this.showTitleAndBackArrow()}
 
-                            <View style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10, styles.paddingBottom10]}>
-                                {this.showReferenceNoInputView()}
+                                <View style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10, styles.paddingBottom10]}>
+                                    {this.showReferenceNoInputView()}
 
-                                <TouchableOpacity style={[{ width: '15%' }, styles.marginLeft15]} onPress={() => this.props.navigation.navigate(QrCodeScanner, { returnData: this._searchForReferenceValue.bind(this) })} >
-                                    <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={styles.fontWhite.color} />
-                                </TouchableOpacity>
-                            </View>
-                        </Body>
-                    </Header>
+                                    <TouchableOpacity style={[{ width: '15%' }, styles.marginLeft15]} onPress={() => this.props.navigation.navigate(QrCodeScanner, { returnData: this._searchForReferenceValue.bind(this) })} >
+                                        <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={styles.fontWhite.color} />
+                                    </TouchableOpacity>
+                                </View>
+                            </Body>
+                        </Header>
+                    </SafeAreaView>
                     <Content style={[styles.flex1, styles.bgLightGray]}>
                         {renderView}
                     </Content>

@@ -6,27 +6,10 @@ import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
-import { View, TouchableOpacity, FlatList, StyleSheet } from 'react-native'
-import {
-    SET_FORM_LAYOUT_STATE,
-    FormLayout,
-    SET_TRANSIENT_BACK_PRESSED
-} from '../lib/constants'
-
-import {
-    Select_Next_Status
-} from '../lib/AttributeConstants'
-import {
-    Container,
-    Header,
-    Text,
-    Body,
-    Icon,
-    Content,
-    List,
-    ListItem,
-    Right,
-} from 'native-base'
+import { View, TouchableOpacity, FlatList, StyleSheet, SafeAreaView } from 'react-native'
+import { SET_FORM_LAYOUT_STATE, FormLayout, SET_TRANSIENT_BACK_PRESSED } from '../lib/constants'
+import { Select_Next_Status } from '../lib/AttributeConstants'
+import { Container, Header, Text, Body, Icon, Content, List, ListItem, Right, } from 'native-base'
 import _ from 'lodash'
 
 function mapStateToProps(state) {
@@ -111,27 +94,29 @@ class Transient extends PureComponent {
         }
         return (
             <Container>
-                <Header style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
-                    <Body>
-                        <View
-                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                            <TouchableOpacity style={[style.headerLeft]} onPress={this._goBack}>
-                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                            </TouchableOpacity>
-                            <View style={[style.headerBody]}>
-                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>
-                                    {this.props.navigation.state.params.currentStatus.name}
-                                </Text>
+                <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                    <Header style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                        <Body>
+                            <View
+                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                <TouchableOpacity style={[style.headerLeft]} onPress={this._goBack}>
+                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                </TouchableOpacity>
+                                <View style={[style.headerBody]}>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>
+                                        {this.props.navigation.state.params.currentStatus.name}
+                                    </Text>
+                                </View>
+                                <View style={[style.headerRight]}>
+                                </View>
                             </View>
-                            <View style={[style.headerRight]}>
-                            </View>
-                        </View>
-                    </Body>
-                </Header>
+                        </Body>
+                    </Header>
+                </SafeAreaView>
 
                 <Content style={[styles.bgWhite]}>
                     <View style={[styles.flexBasis25]}>
-                        <Text style={[styles.fontSm, {color : styles.fontPrimaryColor}, styles.padding15]}>{Select_Next_Status}</Text>
+                        <Text style={[styles.fontSm, { color: styles.fontPrimaryColor }, styles.padding15]}>{Select_Next_Status}</Text>
                         <List style={[styles.flex1]}>
                             <FlatList
                                 data={this.props.navigation.state.params.currentStatus.nextStatusList}
@@ -141,7 +126,7 @@ class Transient extends PureComponent {
                             </FlatList>
                         </List>
                     </View>
-                </Content>        
+                </Content>
             </Container>
         )
     }

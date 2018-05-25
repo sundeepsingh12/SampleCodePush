@@ -1,48 +1,9 @@
 import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
-
-import {
-    Container,
-    Content,
-    Header,
-    Button,
-    Text,
-    Left,
-    Body,
-    Right,
-    Item,
-    Input,
-    Icon,
-    List,
-    Label,
-    ListItem,
-    StyleProvider,
-    Footer,
-    FooterTab,
-    Toast,
-} from 'native-base';
-
-import {
-    Print,
-    Receipt,
-    SMS,
-    TotalAmount,
-    CONTACT_NUMBER_TO_SEND_SMS,
-    SET_SAVE_ACTIVATED_TOAST_MESSAGE,
-    EMAILID_VIEW_ARRAY,
-    USER,
-    RETURN_TO_HOME,
-} from '../lib/constants'
-
-import {
-    EMAIL,
-    Return_To_Home,
-    View_SignOff_Summary,
-    View_Parcel_Summary,
-    Sign_Off_Summary,
-    REGEX_TO_CHECK_PHONE_NUMBER
-} from '../lib/AttributeConstants'
+import { StyleSheet, View, FlatList, TouchableOpacity, Modal, SafeAreaView } from 'react-native'
+import { Container, Content, Header, Button, Text, Left, Body, Right, Item, Input, Icon, List, Label, ListItem, StyleProvider, Footer, FooterTab, Toast, } from 'native-base';
+import { Print, Receipt, SMS, TotalAmount, CONTACT_NUMBER_TO_SEND_SMS, SET_SAVE_ACTIVATED_TOAST_MESSAGE, EMAILID_VIEW_ARRAY, USER, RETURN_TO_HOME, } from '../lib/constants'
+import { EMAIL, Return_To_Home, View_SignOff_Summary, View_Parcel_Summary, Sign_Off_Summary, REGEX_TO_CHECK_PHONE_NUMBER } from '../lib/AttributeConstants'
 import Loader from '../components/Loader'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -66,7 +27,6 @@ import {
     OK
 } from '../lib/ContainerConstants'
 
-
 function mapStateToProps(state) {
     return {
         loading: state.saveActivated.loading,
@@ -78,6 +38,7 @@ function mapStateToProps(state) {
         isReturnToHome: state.saveActivated.isReturnToHome,
     }
 };
+
 /*
  * Bind all the actions
  */
@@ -148,11 +109,7 @@ class CheckoutDetails extends PureComponent {
     _keyExtractor = (item, index) => String(item.id);
 
     _showModalView = (modalStatus) => {
-        this.setState(() => {
-            return {
-                isModalVisible: modalStatus
-            }
-        })
+        this.setState(() => { return { isModalVisible: modalStatus } })
     }
 
     _sendMailToAllEmailsIds = () => {
@@ -234,13 +191,13 @@ class CheckoutDetails extends PureComponent {
                             <View style={{ width: '50%' }}>
                                 <Button transparent full
                                     onPress={() => { this._showModalView(-1) }} >
-                                    <Text style={{color : styles.fontPrimaryColor}}>{CANCEL}</Text>
+                                    <Text style={{ color: styles.fontPrimaryColor }}>{CANCEL}</Text>
                                 </Button>
                             </View>
                             <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
                                 <Button transparent full
                                     onPress={() => { this._sendSmsToTheNumberEntered() }} >
-                                    <Text style={{color : styles.fontPrimaryColor}}>{SEND}</Text>
+                                    <Text style={{ color: styles.fontPrimaryColor }}>{SEND}</Text>
                                 </Button>
                             </View>
                         </View>
@@ -267,7 +224,7 @@ class CheckoutDetails extends PureComponent {
                             {emails[counter]}
                         </Text>
                         <View style={[{ paddingVertical: 3, paddingHorizontal: 5 }]}>
-                            <Icon name="ios-close-outline" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} onPress={() => { this._deleteEmailId(counter) }} />
+                            <Icon name="ios-close-outline" style={[styles.fontLg, { color: styles.fontPrimaryColor }]} onPress={() => { this._deleteEmailId(counter) }} />
                         </View>
                     </View>
                 )
@@ -312,13 +269,13 @@ class CheckoutDetails extends PureComponent {
                             <View style={{ width: '50%' }}>
                                 <Button transparent full
                                     onPress={() => { this._showModalView(-1) }} >
-                                    <Text style={{color : styles.fontPrimaryColor}}>{CANCEL}</Text>
+                                    <Text style={{ color: styles.fontPrimaryColor }}>{CANCEL}</Text>
                                 </Button>
                             </View>
                             <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
                                 <Button transparent full
                                     onPress={() => { this._sendMailToAllEmailsIds() }}>
-                                    <Text style={{color : styles.fontPrimaryColor}}>{SEND}</Text>
+                                    <Text style={{ color: styles.fontPrimaryColor }}>{SEND}</Text>
                                 </Button>
                             </View>
                         </View>
@@ -335,7 +292,7 @@ class CheckoutDetails extends PureComponent {
                     <List>
                         <ListItem style={[style.jobListItem]} >
                             <View style={[styles.row, styles.alignCenter]}>
-                                <Icon name="md-print" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} />
+                                <Icon name="md-print" style={[styles.fontLg, { color: styles.fontPrimaryColor }]} />
                                 <View style={[style.statusCircle, { backgroundColor: '#4cd964' }]}></View>
                                 <Text style={[styles.fontDefault, styles.fontWeight400, styles.marginLeft10]}>{Print}</Text>
                             </View>
@@ -347,7 +304,7 @@ class CheckoutDetails extends PureComponent {
                     <List>
                         <ListItem style={[style.jobListItem]} onPress={() => { this._showModalView(3) }}>
                             <View style={[styles.row, styles.alignCenter]}>
-                                <Icon name="md-mail" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} />
+                                <Icon name="md-mail" style={[styles.fontLg, { color: styles.fontPrimaryColor }]} />
                                 <Text style={[styles.fontDefault, styles.fontWeight400, styles.marginLeft10]}>{EMAIL}</Text>
                             </View>
                             <Right>
@@ -358,7 +315,7 @@ class CheckoutDetails extends PureComponent {
                     <List>
                         <ListItem style={[style.jobListItem]} onPress={() => { this._sendSMS() }}>
                             <View style={[styles.row, styles.alignCenter]}>
-                                <Icon name="md-chatboxes" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} />
+                                <Icon name="md-chatboxes" style={[styles.fontLg, { color: styles.fontPrimaryColor }]} />
                                 <View style={[style.statusCircle, { backgroundColor: '#4cd964' }]}></View>
                                 <Text style={[styles.fontDefault, styles.fontWeight400, styles.marginLeft10]}>{SMS}</Text>
                             </View>
@@ -396,22 +353,23 @@ class CheckoutDetails extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-
-                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]}>
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{Receipt}</Text>
+                    <SafeAreaView>
+                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                            <Body>
+                                <View
+                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                    <TouchableOpacity style={[style.headerLeft]}>
+                                    </TouchableOpacity>
+                                    <View style={[style.headerBody]}>
+                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{Receipt}</Text>
+                                    </View>
+                                    <View style={[style.headerRight]}>
+                                    </View>
+                                    <View />
                                 </View>
-                                <View style={[style.headerRight]}>
-                                </View>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
+                            </Body>
+                        </Header>
+                    </SafeAreaView>
 
                     <Content style={[styles.flex1, styles.bgLightGray]}>
                         {emailSmsPrintViewButton}
@@ -458,15 +416,17 @@ class CheckoutDetails extends PureComponent {
                             </List>
                         </View>)}
                     </Content>
-                    <Footer style={[style.footer]}>
-                        <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
-                            <Button onPress={() => {
-                                this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId)
-                            }}>
-                                <Text style={[{color : styles.fontPrimaryColor}, styles.fontDefault]}>{Return_To_Home}</Text>
-                            </Button>
-                        </FooterTab>
-                    </Footer>
+                    <SafeAreaView>
+                        <Footer style={[style.footer]}>
+                            <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
+                                <Button onPress={() => {
+                                    this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId)
+                                }}>
+                                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontDefault]}>{Return_To_Home}</Text>
+                                </Button>
+                            </FooterTab>
+                        </Footer>
+                    </SafeAreaView>
                 </Container>
             </StyleProvider>
         )

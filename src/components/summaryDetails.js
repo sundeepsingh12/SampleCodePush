@@ -1,24 +1,8 @@
 import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
-
-import {
-    Container,
-    Content,
-    Header,
-    Text,
-    Left,
-    Body,
-    Right,
-    Icon,
-    List,
-    StyleProvider,
-    Footer,
-} from 'native-base';
-import {
-    Parcel_Summary
-} from '../lib/AttributeConstants'
-
+import { StyleSheet, View, FlatList, TouchableOpacity, Modal, SafeAreaView } from 'react-native'
+import { Container, Content, Header, Text, Left, Body, Right, Icon, List, StyleProvider, Footer, } from 'native-base';
+import { Parcel_Summary } from '../lib/AttributeConstants'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
@@ -59,22 +43,24 @@ export default class SummaryDetails extends PureComponent {
                 onRequestClose={() => this.props.showParcelSummary(false)}>
                 <StyleProvider style={getTheme(platform)}>
                     <Container>
-                        <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
-                            <Body>
-                                <View
-                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.showParcelSummary(false) }}>
-                                        <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                    </TouchableOpacity>
-                                    <View style={[style.headerBody]}>
-                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{Parcel_Summary}</Text>
+                        <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                                <Body>
+                                    <View
+                                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                        <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.showParcelSummary(false) }}>
+                                            <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                        </TouchableOpacity>
+                                        <View style={[style.headerBody]}>
+                                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{Parcel_Summary}</Text>
+                                        </View>
+                                        <View style={[style.headerRight]}>
+                                        </View>
+                                        <View />
                                     </View>
-                                    <View style={[style.headerRight]}>
-                                    </View>
-                                    <View />
-                                </View>
-                            </Body>
-                        </Header>
+                                </Body>
+                            </Header>
+                        </SafeAreaView>
 
                         <Content style={[styles.bgLightGray]}>
                             <FlatList

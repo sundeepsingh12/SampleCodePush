@@ -225,9 +225,6 @@ export const AppNavigator = StackNavigator({
   },
   FormLayout: {
     screen: FormLayout,
-    navigationOptions: {
-      header: null
-    }
   },
   ArrayFieldAttribute: {
     screen: ArrayFieldAttribute

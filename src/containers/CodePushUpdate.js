@@ -9,7 +9,6 @@ import platform from '../../native-base-theme/variables/platform'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
-// import { DOWNLOAD_LATEST_APP_VERSION, NEW_VERSION_AVAILABLE, DOWNLOAD } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -42,18 +41,7 @@ class CodePushUpdate extends PureComponent {
                             <Text style={[styles.fontBlack, styles.marginTop30, styles.fontLg, styles.bold]}>
                                 {this.props.codePushUpdateStatus}
                             </Text>
-                            {/* <Text style={[styles.fontBlack, styles.marginTop15, styles.fontLg, styles.fontDarkGray, styles.fontCenter, { width: '60%' }]}>
-                                {DOWNLOAD_LATEST_APP_VERSION}
-                            </Text> */}
                         </View>
-                        {/* <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
-                            <View style={[styles.marginTop30, styles.alignCenter]}>
-                                <TouchableOpacity style={[styles.bgWhite, styles.padding30]}
-                                    onPress={this.props.downloadLatestApk}  >
-                                    <Text style={[styles.fontPrimary, styles.bold, styles.fontLg]}>{DOWNLOAD}</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View> */}
                     </View>
                 </StyleProvider>
             </Modal>

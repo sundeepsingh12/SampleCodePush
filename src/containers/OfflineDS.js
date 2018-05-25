@@ -5,30 +5,14 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SearchBar from '../components/SearchBar'
 import * as globalActions from '../modules/global/globalActions'
-import { StyleSheet, View, TouchableOpacity, Image, Text } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Image, Text, SafeAreaView } from 'react-native'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import {
-    SET_OFFLINEDS_INITIAL_STATE,
-} from '../lib/constants'
-import {
-    Container,
-    Header,
-    Button,
-    Body,
-    Right,
-    Icon,
-    StyleProvider,
-} from 'native-base'
-import {
-    DOWNLOADING_OFFLINE_DS,
-    DOWNLOAD_SUCCESSFUL,
-    DOWNLOAD_FAILED,
-    CLOSE
-} from '../lib/ContainerConstants'
+import { SET_OFFLINEDS_INITIAL_STATE, } from '../lib/constants'
+import { Container, Header, Button, Body, Right, Icon, StyleProvider, } from 'native-base'
+import { DOWNLOADING_OFFLINE_DS, DOWNLOAD_SUCCESSFUL, DOWNLOAD_FAILED, CLOSE } from '../lib/ContainerConstants'
 import _ from 'lodash'
-
 
 function mapStateToProps(state) {
     return {
@@ -59,21 +43,25 @@ class OfflineDS extends Component {
     }
 
     headerView() {
-        return <Header style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
-            <Body>
-                <View
-                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.goBack() }}>
-                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                    </TouchableOpacity>
-                    <View style={[style.headerBody]}>
-                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}</Text>
-                    </View>
-                    <View style={[style.headerRight]}>
-                    </View>
-                </View>
-            </Body>
-        </Header>
+        return (
+            <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                <Header style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+                    <Body>
+                        <View
+                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.goBack() }}>
+                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                            </TouchableOpacity>
+                            <View style={[style.headerBody]}>
+                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}</Text>
+                            </View>
+                            <View style={[style.headerRight]}>
+                            </View>
+                        </View>
+                    </Body>
+                </Header>
+            </SafeAreaView>
+        )
 
     }
 
@@ -91,7 +79,7 @@ class OfflineDS extends Component {
                         {this.props.lastSyncTime}
                     </Text>
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button style={{backgroundColor : styles.bgPrimaryColor}}
+                        <Button style={{ backgroundColor: styles.bgPrimaryColor }}
                             onPress={() => {
                                 this.props.actions.syncDataStore(this.props.lastSyncTime)
                             }} >
@@ -116,7 +104,7 @@ class OfflineDS extends Component {
                     </Text>
                     </View>
                     <View style={{ width: '100%', borderRadius: 8, height: 10, backgroundColor: styles.bgGray.backgroundColor }}>
-                        <View style={{ width: String(this.props.progressBarStatus + "%"), borderRadius: 8, height: 10, backgroundColor:styles.bgPrimaryColor}}>
+                        <View style={{ width: String(this.props.progressBarStatus + "%"), borderRadius: 8, height: 10, backgroundColor: styles.bgPrimaryColor }}>
                         </View>
                     </View>
                 </View>
@@ -141,7 +129,7 @@ class OfflineDS extends Component {
                     <View style={[styles.marginTop30, styles.alignCenter]}>
                         <Button bordered style={{ borderColor: styles.bgPrimaryColor }}
                             onPress={() => { this.goBack() }}  >
-                            <Text style={{color : styles.fontPrimaryColor}}>Close</Text>
+                            <Text style={{ color: styles.fontPrimaryColor }}>Close</Text>
                         </Button>
                     </View>
                 </View>
@@ -164,9 +152,9 @@ class OfflineDS extends Component {
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
 
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button bordered style={{ borderColor: styles.bgPrimaryColor}}
+                        <Button bordered style={{ borderColor: styles.bgPrimaryColor }}
                             onPress={() => { this.goBack() }}  >
-                            <Text style={{color : styles.fontPrimaryColor}}>{CLOSE}</Text>
+                            <Text style={{ color: styles.fontPrimaryColor }}>{CLOSE}</Text>
                         </Button>
                     </View>
                 </View>
