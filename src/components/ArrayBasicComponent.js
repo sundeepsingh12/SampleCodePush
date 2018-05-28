@@ -107,7 +107,7 @@ class ArrayBasicComponent extends PureComponent {
     }
 
     getComponentLabelStyle(focus, editable) {
-        return focus ? {color : styles.fontPrimaryColor} : editable ? styles.fontBlack : styles.fontLowGray
+        return focus ? { color: styles.fontPrimaryColor } : editable ? styles.fontBlack : styles.fontLowGray
     }
 
     getComponentSubLabelStyle(editable) {
@@ -224,7 +224,7 @@ class ArrayBasicComponent extends PureComponent {
     getMultipleOptionCardView(modalView, item) {
         return (
             <TouchableOpacity
-                style={[{ paddingVertical: 50 }, item.focus ? {borderLeftColor : styles.borderLeft4Color, borderLeftWidth: 4} : null]}
+                style={[{ paddingVertical: 50 }, item.focus ? { borderLeftColor: styles.borderLeft4Color, borderLeftWidth: 4 } : null]}
                 onPress={() => this.props.actions.showOrDropModal(item.fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, item.fieldAttributeMasterId, this.props.isSaveDisabled)
                 }
                 disabled={!item.editable || this.props.modalFieldAttributeMasterId ? true : false}
@@ -295,10 +295,11 @@ class ArrayBasicComponent extends PureComponent {
                             </Item>
                             {(item.attributeTypeId == SCAN_OR_TEXT) ?
                                 <TouchableHighlight
-                                    style={[styles.absolute, { bottom: 50, right: 10 }]}
+                                    style={[styles.absolute, { top: 40, right: 10 }]}
                                     onPress={() => this.goToQRCode(item)} >
                                     <View>
-                                        <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentLabelStyle(item.focus, item.editable).color} />                                    </View>
+                                        <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentLabelStyle(item.focus, item.editable).color} />
+                                    </View>
                                 </TouchableHighlight> : null}
                             {item.alertMessage ?
                                 <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{item.alertMessage}</Label>
@@ -337,7 +338,7 @@ class ArrayBasicComponent extends PureComponent {
                     <View>
                         <FormLayoutActivityComponent item={item} press={
                             () => {
-                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
+                                //this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
                                 this.props.actions.navigateToScene('DataStore',
                                     {
                                         currentElement: item,

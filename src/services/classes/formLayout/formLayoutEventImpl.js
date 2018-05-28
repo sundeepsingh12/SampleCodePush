@@ -1,64 +1,17 @@
-import {
-    ON_BLUR,
-    NEXT_FOCUS,
-    TABLE_FIELD_DATA,
-    TABLE_RUNSHEET,
-    TABLE_JOB_TRANSACTION,
-    JOB_MASTER,
-    JOB_STATUS,
-    JOB_SUMMARY,
-    HUB,
-    USER,
-    DEVICE_IMEI,
-    TABLE_JOB,
-    TABLE_TRANSACTION_LOGS,
-    TABLE_TRACK_LOGS,
-    LAST_JOB_COMPLETED_TIME,
-    USER_SUMMARY,
-    PREVIOUSLY_TRAVELLED_DISTANCE,
-    TRANSACTION_TIME_SPENT,
-    TRACK_BATTERY,
-    NPSFEEDBACK_VALUE,
-    CUSTOM_NAMING,
-    PENDING_SYNC_TRANSACTION_IDS,
-} from '../../../lib/constants'
+import _ from 'lodash';
+import moment from 'moment';
+import sha256 from 'sha256';
+import { AFTER, AMOUNT, BEFORE, DATA_STORE, EXTERNAL_DATA_STORE, FAIL, GET, MONEY_COLLECT, NPS_FEEDBACK, PENDING, RE_ATTEMPT_DATE, SEQUENCE_COUNT, SEQUENCE_ID, SEQUENCE_ID_UNAVAILABLE, SIGNATURE_AND_FEEDBACK, SKU_ARRAY, SUCCESS, TOKEN_MISSING } from '../../../lib/AttributeConstants';
+import RestAPIFactory from '../../../lib/RestAPIFactory';
+import CONFIG from '../../../lib/config';
+import { CUSTOM_NAMING, DEVICE_IMEI, HUB, JOB_MASTER, JOB_STATUS, JOB_SUMMARY, LAST_JOB_COMPLETED_TIME, NEXT_FOCUS, PENDING_SYNC_TRANSACTION_IDS, PREVIOUSLY_TRAVELLED_DISTANCE, TABLE_FIELD_DATA, TABLE_JOB, TABLE_JOB_TRANSACTION, TABLE_RUNSHEET, TABLE_TRANSACTION_LOGS, TRACK_BATTERY, TRANSACTION_TIME_SPENT, USER, USER_SUMMARY } from '../../../lib/constants';
+import * as realm from '../../../repositories/realmdb';
+import { addServerSmsService } from '../AddServerSms';
+import { fieldValidationService } from '../FieldValidation';
+import { jobStatusService } from '../JobStatus';
+import { keyValueDBService } from '../KeyValueDBService.js';
 
-import CONFIG from '../../../lib/config'
 
-import * as realm from '../../../repositories/realmdb'
-import { keyValueDBService } from '../KeyValueDBService.js'
-import RestAPIFactory from '../../../lib/RestAPIFactory'
-import _ from 'lodash'
-import moment from 'moment'
-import sha256 from 'sha256'
-import { jobStatusService } from '../JobStatus'
-import { formLayoutService } from '../../classes/formLayout/FormLayout'
-import { fieldValidationService } from '../FieldValidation'
-import {
-    AFTER,
-    BEFORE,
-    DATA_STORE,
-    SIGNATURE_AND_FEEDBACK,
-    NPS_FEEDBACK,
-    RE_ATTEMPT_DATE,
-    EXTERNAL_DATA_STORE,
-    MONEY_COLLECT,
-    AMOUNT,
-    ORIGINAL_AMOUNT,
-    ACTUAL_AMOUNT,
-    PENDING,
-    FAIL,
-    SUCCESS,
-    SEQUENCE_COUNT,
-    SEQUENCE_ID,
-    SEQUENCE_ID_UNAVAILABLE,
-    GET,
-    TOKEN_MISSING,
-    SKU_ARRAY
-} from '../../../lib/AttributeConstants'
-import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
-import { summaryAndPieChartService } from '../SummaryAndPieChart'
-import { addServerSmsService } from '../AddServerSms'
 
 export default class FormLayoutEventImpl {
 
@@ -295,7 +248,7 @@ export default class FormLayoutEventImpl {
     }
 
     _updateTransactionLogs(jobTransaction, statusId, prevStatusId, jobMasterId, user, lastTrackLog) {
-        let transactionLogs = this._prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user.value, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'), lastTrackLog)
+        let transactionLogs = this._prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user.value, moment().format('YYYY-MM-DD HH:mm:ss'), lastTrackLog)
         return { tableName: TABLE_TRANSACTION_LOGS, value: transactionLogs }
     }
 
@@ -365,7 +318,7 @@ export default class FormLayoutEventImpl {
 
     async _updateJobSummary(jobTransaction, statusId, jobTransactionList) {
         const prevStatusId = (jobTransactionList && jobTransactionList.length) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
-        const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+        const currentDate = moment().format('YYYY-MM-DD HH:mm:ss')
         const count = (jobTransactionList && jobTransactionList.length) ? jobTransactionList.length : 1
         let jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
         jobSummaryList.value.forEach(item => {
@@ -627,8 +580,12 @@ export default class FormLayoutEventImpl {
     async _getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList) {
         let hub = await keyValueDBService.getValueFromStore(HUB)
         let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-        let status = await keyValueDBService.getValueFromStore(JOB_STATUS).then(jobStatus => { return jobStatus.value.filter(jobStatus1 => jobStatus1.id == statusId) })
-        let jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER).then(jobMasterObject => { return jobMasterObject.value.filter(jobMasterObject1 => jobMasterObject1.id == jobMasterId) })
+        //let x = await keyValueDBService.getValueFromStore(JOB_STATUS)
+        //console.log(x)
+        let jobStatus = await keyValueDBService.getValueFromStore(JOB_STATUS)
+        let jobMasterObject = await keyValueDBService.getValueFromStore(JOB_MASTER)
+        let status = jobStatus.value.filter(jobStatus1 => jobStatus1.id == statusId)
+        let jobMaster = jobMasterObject.value.filter(jobMasterObject1 => jobMasterObject1.id == jobMasterId)
 
         let jobTransaction = null
         let jobTransactionDBObject = null

@@ -16,9 +16,10 @@ import {
     SET_DSF_REVERSE_MAP,
     SEARCH_DATA_STORE_RESULT,
     SET_ARRAY_DATA_STORE_FILTER_MAP,
+
 } from '../../lib/constants'
 import {
-    DATA_STORE
+    DATA_STORE,
 } from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
@@ -80,16 +81,22 @@ export function getJobAttribute(jobAttributeMasterId, value) {
  * @param {*} dataStoreFilterReverseMap 
  * this actions check for filters and validations
  */
-export function checkForFiltersAndValidation(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap) {
+export function checkForFiltersAndValidation(currentElement, formLayoutState, jobTransaction, dataStoreFilterReverseMap) {
     return async function (dispatch) {
         try {
             dispatch(setState(SHOW_LOADER_DS, true))
-            let returnParams = await dataStoreService.checkForFiltersAndValidations(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap)
+            let cloneFormElement = _.cloneDeep(formLayoutState.formElement)
+            let returnParams = await dataStoreService.runDataStoreBeforeValidations(currentElement, formLayoutState, jobTransaction, cloneFormElement, dataStoreFilterReverseMap)
             dispatch(setState(SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP, {
                 dataStoreAttrValueMap: returnParams.dataStoreAttrValueMap,
                 isFiltersPresent: returnParams.isFiltersPresent,
-                validation: returnParams.validation
+                validation: returnParams.validationObject,
+                searchText: returnParams.searchText,
+                isDataStoreEditable: returnParams.isDataStoreEditable
             }))
+            if (!returnParams.isFiltersPresent && !_.isEmpty(returnParams.searchText) && returnParams.validationObject.isSearchEnabled) {
+                dispatch(checkOfflineDS(returnParams.searchText, currentElement.dataStoreMasterId, currentElement.dataStoreAttributeId, currentElement.externalDataStoreMasterUrl, currentElement.key, currentElement.attributeTypeId))
+            }
             dispatch(setState(SET_DSF_REVERSE_MAP, returnParams.dataStoreFilterReverseMap))
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {
@@ -335,13 +342,19 @@ export function checkForFiltersAndValidationForArray(functionParamsFromDS) {
     return async function (dispatch) {
         try {
             dispatch(setState(SHOW_LOADER_DS, true))
-            let dataStoreParams = await dataStoreService.checkForFiltersAndValidationsForArray(functionParamsFromDS)
+            let returnParams = await dataStoreService.checkForFiltersAndValidationsForArray(functionParamsFromDS)
             dispatch(setState(SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP, {
-                dataStoreAttrValueMap: dataStoreParams.dataStoreAttrValueMap,
-                isFiltersPresent: dataStoreParams.isFiltersPresent,
-                validation: dataStoreParams.validation
+                dataStoreAttrValueMap: returnParams.dataStoreAttrValueMap,
+                isFiltersPresent: returnParams.isFiltersPresent,
+                validation: returnParams.validationObject,
+                searchText: returnParams.searchText,
+                isDataStoreEditable: returnParams.isDataStoreEditable
             }))
-            dispatch(setState(SET_ARRAY_DATA_STORE_FILTER_MAP, dataStoreParams.arrayReverseDataStoreFilterMap))  // set formLayout state of arrayReverseDataStoreFilterMap which is avilable globally
+            let currentElement=functionParamsFromDS.currentElement
+            if (!returnParams.isFiltersPresent && !_.isEmpty(returnParams.searchText) && returnParams.validationObject.isSearchEnabled) {
+                dispatch(checkOfflineDS(returnParams.searchText, currentElement.dataStoreMasterId, currentElement.dataStoreAttributeId, currentElement.externalDataStoreMasterUrl, currentElement.key, currentElement.attributeTypeId))
+            }
+            dispatch(setState(SET_ARRAY_DATA_STORE_FILTER_MAP, returnParams.arrayReverseDataStoreFilterMap))  // set formLayout state of arrayReverseDataStoreFilterMap which is avilable globally
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {
                 errorMessage: error.message,

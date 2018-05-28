@@ -214,32 +214,7 @@ class FormLayout {
         return { formLayoutObject, isSaveDisabled: isRequiredAttributeFound, latestPositionId: positionId, noFieldAttributeMappedWithStatus: false }
     }
 
-    /**
-     * creates nextEditable object, which contains attributeMasterId wise required and non required elements
-     * @param {*fieldAttributeMasterId} attributeMasterId 
-     * @param {*currentSequence of calling method} currentSequence 
-     * @param {*formLayout array} formLayoutArr 
-     * @param {*nextEditable object} nextEditable 
-     */
-    getNextEditableAndFocusableElements(attributeMasterId, currentSequence, formLayoutArr, nextEditable) {
-        if (!formLayoutArr || formLayoutArr.length == 0) {
-            return;
-        }
-        for (let i = 0; i < formLayoutArr.length; i++) {
-            if (!nextEditable[attributeMasterId]) {
-                nextEditable[attributeMasterId] = [];
-            }
-            const fieldAttribute = formLayoutArr[i];
-            if (i < currentSequence || (i == currentSequence && (attributeMasterId == fieldAttribute.id || attributeMasterId == fieldAttribute.fieldAttributeMasterId))) {
-                continue; // if parent iteration is less than child iteration then continue
-            }
-            if (fieldAttribute.required && !fieldAttribute.value) {
-                nextEditable[attributeMasterId].push('required$$' + (fieldAttribute.id ? fieldAttribute.id : fieldAttribute.fieldAttributeMasterId)); //this is not necessary that required is always the last element in array, ex - if there are all non required. So instead of adding a new data structure, used a separator to know that this element is the required element
-                break; // as soon as next required attribute is found without value then break the loop
-            }
-            nextEditable[attributeMasterId].push(fieldAttribute.id ? fieldAttribute.id : fieldAttribute.fieldAttributeMasterId);
-        }
-    }
+
 
     /**
      * creates fieldAttributeDto
@@ -318,9 +293,9 @@ class FormLayout {
             }
             let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
-            if (!jobTransaction.length) { //Delete draft only if not bulk
-                draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
-            }
+            //if (!jobTransaction.length) { //Delete draft only if not bulk
+            draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
+            //}
             //await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
             await keyValueDBService.validateAndSaveData(BACKUP_ALREADY_EXIST, new Boolean(false))
             await geoFencingService.addNewGeoFenceAndDeletePreviousFence()
@@ -363,7 +338,7 @@ class FormLayout {
             case NUMBER:
                 return dataStoreService.checkForUniqueValidation(currentObject.displayValue, currentObject)
             default:
-                false
+                return false
         }
     }
     getLatestPositionIdForJobTransaction(jobTransaction) {

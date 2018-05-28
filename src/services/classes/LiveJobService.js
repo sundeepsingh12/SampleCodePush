@@ -37,12 +37,10 @@ class LiveJobService {
             return {}
         }
         let expiredJobIds = []
-        let liveJobList = Object.values(liveJobMap)
-        for (let job of liveJobList) {
-            let jobEndTime = moment(job.jobEndTime, 'HH:mm:ss')
-            let currentTime = moment()
-            if (moment(jobEndTime).diff(moment(currentTime)) <= 0) {
-                expiredJobIds.push(job.id)
+        for (let index in liveJobMap) {
+            let jobEndTime = moment(liveJobMap[index].jobEndTime, 'HH:mm:ss')
+            if (moment(jobEndTime).diff(moment()) <= 0) {
+                expiredJobIds.push(liveJobMap[index].id)
             }
         }
         if (expiredJobIds.length > 0) {
@@ -56,20 +54,16 @@ class LiveJobService {
         let postJson = "{\"jobId\":\"" + job.id + "\",\"jobDate\":\"" + job.jobStartTime + "\",\"statusId\":\"" + status + "\"}"
         let toastMessage = '', newLiveJobList
         let serviceAlertResponse = await RestAPIFactory(token.value).serviceCall(postJson, CONFIG.API.SERVICE_ALERT_JOB, 'POST')
-        if (serviceAlertResponse && serviceAlertResponse.status == 200) {
-            let jobIdList = []
-            jobIdList.push(job.id)
-            newLiveJobList = this.deleteJob(jobIdList, liveJobList)
-            let statusMessage = serviceAlertResponse._bodyText
-            if (statusMessage == 'success') {
-                toastMessage = 'Your request has been accepted'
-            } else if (statusMessage == 'failed' && status == '1') {
-                toastMessage = 'Your request has been rejected'
-            } else if (statusMessage == 'failed' && status == '2') {
-                toastMessage = 'You rejected the job'
-            }
-        } else {
-            toastMessage = 'Something went wrong,try again'
+        let jobIdList = []
+        jobIdList.push(job.id)
+        newLiveJobList = this.deleteJob(jobIdList, liveJobList)
+        let statusMessage = serviceAlertResponse._bodyText
+        if (statusMessage == 'success') {
+            toastMessage = 'Your request has been accepted'
+        } else if (statusMessage == 'failed' && status == '1') {
+            toastMessage = 'Your request has been rejected'
+        } else if (statusMessage == 'failed' && status == '2') {
+            toastMessage = 'You rejected the job'
         }
         return { newLiveJobList, toastMessage }
     }
@@ -105,21 +99,16 @@ class LiveJobService {
         let toastMessage = '', newLiveJobList
         let postJson = JSON.stringify(multipleJobsDTO)
         let serviceAlertResponse = await RestAPIFactory(token.value).serviceCall(postJson, CONFIG.API.SERVICE_ALERT_JOB_MULTIPLE, 'POST')
-        if (serviceAlertResponse && serviceAlertResponse.status == 200) {
-            let successCount = serviceAlertResponse.json.successCount
-            let failCount = serviceAlertResponse.json.failCount
-            if (selectedItems.length == successCount && status == '1') {
-                toastMessage = 'All your jobs are accepted'
-            } else if (selectedItems.length == failCount && status == '2') {
-                toastMessage = 'All your jobs are rejected'
-            } else {
-                toastMessage = successCount + ' jobs were accepted and ' + failCount + ' jobs were rejected.'
-            }
-            newLiveJobList = this.deleteJob(selectedItems, liveJobList)
-            return { newLiveJobList, toastMessage }
+        let successCount = serviceAlertResponse.json.successCount
+        let failCount = serviceAlertResponse.json.failCount
+        if (selectedItems.length == successCount && status == '1') {
+            toastMessage = 'All your jobs are accepted'
+        } else if (selectedItems.length == failCount && status == '2') {
+            toastMessage = 'All your jobs are rejected'
         } else {
-            toastMessage = 'Something went wrong,try again'
+            toastMessage = successCount + ' jobs were accepted and ' + failCount + ' jobs were rejected.'
         }
+        newLiveJobList = this.deleteJob(selectedItems, liveJobList)
         return { newLiveJobList, toastMessage }
     }
 }

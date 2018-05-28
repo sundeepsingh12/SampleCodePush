@@ -95,7 +95,7 @@ describe('test cases of user summary count ', () => {
         return userSummaryService.updateUserSummaryCount(allCount)
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
-                expecct(keyValueDBService.validateAndSaveData).toHaveBeenCalled()
+                expect(keyValueDBService.validateAndSaveData).toHaveBeenCalled()
             })
     })
 })

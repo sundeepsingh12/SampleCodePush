@@ -77,7 +77,9 @@ class BasicFormElement extends PureComponent {
 
     navigateToScene = (item) => {
         let screenName = ''
-        this.props.actions.fieldValidations(item, this.props.formLayoutState, BEFORE, this.props.jobTransaction)
+        if (item.attributeTypeId != DATA_STORE && item.attributeTypeId != EXTERNAL_DATA_STORE) {
+            this.props.actions.fieldValidations(item, this.props.formLayoutState, BEFORE, this.props.jobTransaction)
+        }
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {

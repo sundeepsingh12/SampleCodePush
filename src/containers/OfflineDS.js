@@ -3,7 +3,6 @@ import React, { Component } from 'react'
 import * as offlineDSActions from '../modules/offlineDS/offlineDSActions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import SearchBar from '../components/SearchBar'
 import * as globalActions from '../modules/global/globalActions'
 import { StyleSheet, View, TouchableOpacity, Image, Text, SafeAreaView } from 'react-native'
 import getTheme from '../../native-base-theme/components';

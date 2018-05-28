@@ -203,3 +203,10 @@ export function getMaxValueOfProperty(tableName, query, property) {
     let filteredRecords = realm.objects(tableName).filtered(query).max(property)
     return filteredRecords
 }
+
+export function deleteRecordList(tableName, valueList, property) {
+    let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => property + ' = "' + value + '"').join(' OR '));
+    realm.write(() => {
+        realm.delete(filteredRecords)
+    });
+}

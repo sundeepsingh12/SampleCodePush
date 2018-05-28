@@ -2,7 +2,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import SearchBar from '../components/SearchBar'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import * as homeActions from '../modules/home/homeActions'
