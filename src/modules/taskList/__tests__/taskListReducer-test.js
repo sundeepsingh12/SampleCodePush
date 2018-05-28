@@ -52,18 +52,6 @@ describe('taskList reducer', () => {
         let nextState = taskListReducer(undefined, action)
         expect(nextState.searchText).toBe(action.payload)
     })
-    it('it should set future runsheet enabled and selected date', () => {
-        const action = {
-            type: SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE,
-            payload: {
-                selectedDate: 'test',
-                enableFutureDateRunsheet: true
-            }
-        }
-        let nextState = taskListReducer(undefined, action)
-        expect(nextState.isFutureRunsheetEnabled).toBe(action.payload.enableFutureDateRunsheet)
-        expect(nextState.selectedDate).toBe(action.payload.selectedDate)
-    })
 
     it('it should set initial state', () => {
         const InitialState = {

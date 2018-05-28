@@ -39,7 +39,7 @@ export default class SearchBar extends PureComponent {
     render() {
         let scanner = this._startScanner()
         return (
-            <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
+            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
                 <Body>
                     <View
                         style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
@@ -58,7 +58,8 @@ export default class SearchBar extends PureComponent {
                                 }}
                                 keyboardAppearance={"dark"}
                                 value={this.props.searchText}
-                                style={[style.headerSearch, styles.bgGray]} />
+                                style={[style.headerSearch, styles.bgGray]}
+                                editable={this.props.isDataStoreEditable} />
                             {scanner}
                         </View>
                         {(_.size(this.props.searchText) > 2 && !this.props.isFiltersPresent) &&

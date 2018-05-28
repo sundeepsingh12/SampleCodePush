@@ -1,21 +1,16 @@
 'use strict'
-import configureStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
+import configureStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
+import { SET_CAMERA_LOADER, SET_IMAGE_DATA, SET_SHOW_IMAGE, SET_SHOW_VIEW_IMAGE, VIEW_IMAGE_DATA } from '../../../lib/constants';
+import { signatureService } from '../../../services/classes/SignatureRemarks';
+import { userExceptionLogsService } from '../../../services/classes/UserException';
 var actions = require('../cameraActions')
-import {
-    NEXT_FOCUS,
-    SET_IMAGE_DATA,
-    VIEW_IMAGE_DATA,
-    SET_SHOW_IMAGE,
-    SET_SHOW_VIEW_IMAGE,
-} from '../../../lib/constants'
-import { signatureService } from '../../../services/classes/SignatureRemarks'
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
-import { updateFieldDataWithChildData } from '../../form-layout/formLayoutActions'
-import { fieldValidationService } from '../../../services/classes/FieldValidation'
-import { userExceptionLogsService } from '../../../services/classes/UserException'
-
+import CompressImage from 'react-native-compress-image';
+import {
+    ImageStore,
+} from 'react-native';
 describe('test for saveImage', () => {
 
     let result = 'test'
@@ -135,6 +130,41 @@ describe('test for setExistingImage', () => {
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+            })
+    })
+})
+
+describe('test for compressImages', () => {
+
+    const expectedActions = [
+        {
+            type: SET_CAMERA_LOADER,
+            payload: true
+        }
+    ]
+
+    it('throw error in image store', () => {
+        const store = mockStore({})
+        ImageStore.getBase64ForTag = jest.fn(() => {
+            throw new Error('error')
+        })
+        return store.dispatch(actions.compressImages('uri'))
+            .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].payload).toEqual(false)
+            })
+    })
+
+    it('throw error in image compress', () => {
+        const store = mockStore({})
+        return store.dispatch(actions.compressImages())
+            .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].payload).toEqual(false)
             })
     })
 })

@@ -49,7 +49,8 @@ function mapStateToProps(state) {
         isFiltersPresent: state.dataStore.isFiltersPresent,
         cloneDataStoreAttrValueMap: state.dataStore.cloneDataStoreAttrValueMap,
         arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
-        isAllowFromFieldInExternalDS: state.dataStore.isAllowFromFieldInExternalDS
+        isAllowFromFieldInExternalDS: state.dataStore.isAllowFromFieldInExternalDS,
+        isDataStoreEditable: state.dataStore.isDataStoreEditable
     }
 };
 
@@ -70,7 +71,7 @@ class DataStore extends PureComponent {
         if (this.props.navigation.state.params.calledFromArray) {
             this.props.actions.checkForFiltersAndValidationForArray({
                 currentElement: this.props.navigation.state.params.currentElement,
-                formElement: this.props.navigation.state.params.formLayoutState.formElement,
+                formLayoutState: this.props.navigation.state.params.formLayoutState,
                 jobTransaction: this.props.navigation.state.params.jobTransaction,
                 arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
                 arrayFieldAttributeMasterId: this.props.navigation.state.params.arrayFieldAttributeMasterId,
@@ -79,7 +80,7 @@ class DataStore extends PureComponent {
         } else {
             this.props.actions.checkForFiltersAndValidation(
                 this.props.navigation.state.params.currentElement,
-                this.props.navigation.state.params.formLayoutState.formElement,
+                this.props.navigation.state.params.formLayoutState,
                 this.props.navigation.state.params.jobTransaction,
                 this.props.dataStoreFilterReverseMap)
         }
@@ -246,7 +247,8 @@ class DataStore extends PureComponent {
                         setSearchText={this.setSearchText}
                         scanner={this.scanner}
                         isFiltersPresent={this.props.isFiltersPresent}
-                        searchDataStoreAttributeValueMap={this.searchDataStoreAttributeValueMap} />
+                        searchDataStoreAttributeValueMap={this.searchDataStoreAttributeValueMap}
+                        isDataStoreEditable={this.props.isDataStoreEditable} />
 
                     <Content style={[styles.marginLeft10]}>
                         {this.getLoader()}
@@ -256,7 +258,7 @@ class DataStore extends PureComponent {
                     {((this.props.isMinMaxValidation || this.props.isAllowFromFieldInExternalDS) && _.size(this.props.searchText) > 2) &&
                         <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
                             <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
-                                <Button success full style={{backgroundColor : styles.bgPrimaryColor}}
+                                <Button success full style={{ backgroundColor: styles.bgPrimaryColor }}
                                     onPress={() => {
                                         this.props.actions.onSave(
                                             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,

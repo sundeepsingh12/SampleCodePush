@@ -97,7 +97,9 @@ class BasicFormElement extends PureComponent {
 
     navigateToScene = (item) => {
         let screenName = ''
-        this.props.actions.fieldValidations(item, this.props.formLayoutState, BEFORE, this.props.jobTransaction)
+        if (item.attributeTypeId != DATA_STORE && item.attributeTypeId != EXTERNAL_DATA_STORE) {
+            this.props.actions.fieldValidations(item, this.props.formLayoutState, BEFORE, this.props.jobTransaction)
+        }
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
@@ -211,7 +213,7 @@ class BasicFormElement extends PureComponent {
     }
 
     getComponentLabelStyle(focus, editable) {
-        return focus ? {color : styles.fontPrimaryColor} : editable ? styles.fontBlack : styles.fontLowGray
+        return focus ? { color: styles.fontPrimaryColor } : editable ? styles.fontBlack : styles.fontLowGray
     }
 
     getComponentSubLabelStyle(editable) {
@@ -315,7 +317,7 @@ class BasicFormElement extends PureComponent {
     getMultipleOptionCardView(modalView) {
         return (
             <TouchableOpacity
-                style={[{ paddingVertical: 50 }, this.props.item.focus ? {borderLeftColor : styles.borderLeft4Color, borderLeftWidth: 4} : null]}
+                style={[{ paddingVertical: 50 }, this.props.item.focus ? { borderLeftColor: styles.borderLeft4Color, borderLeftWidth: 4 } : null]}
                 onPress={() => { this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, this.props.item.fieldAttributeMasterId) }}
                 disabled={!this.props.item.editable || this.props.modalFieldAttributeMasterId ? true : false}
             >
@@ -360,7 +362,7 @@ class BasicFormElement extends PureComponent {
             case CONTACT_NUMBER:
                 return (
                     <View>
-                        <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, styles.relative, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? {borderLeftColor : styles.borderLeft4Color, borderLeftWidth: 4} : null]}>
+                        <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, styles.relative, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? { borderLeftColor: styles.borderLeft4Color, borderLeftWidth: 4 } : null]}>
                             {this.props.item.label ?
                                 <Label style={[styles.fontDefault, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)]}>{this.props.item.label}
                                     {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> {OPTIONAL}</Text>}
