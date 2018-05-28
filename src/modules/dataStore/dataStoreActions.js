@@ -86,7 +86,6 @@ export function checkForFiltersAndValidation(currentElement, formLayoutState, jo
         try {
             dispatch(setState(SHOW_LOADER_DS, true))
             let cloneFormElement = _.cloneDeep(formLayoutState.formElement)
-            //let currentElement = _.clone(currentAttribute)
             let returnParams = await dataStoreService.runDataStoreBeforeValidations(currentElement, formLayoutState, jobTransaction, cloneFormElement, dataStoreFilterReverseMap)
             dispatch(setState(SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP, {
                 dataStoreAttrValueMap: returnParams.dataStoreAttrValueMap,

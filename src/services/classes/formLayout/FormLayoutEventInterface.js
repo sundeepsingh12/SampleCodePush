@@ -10,8 +10,8 @@ class FormLayoutEventsInterface extends FormLayoutEventImpl {
         return this.disableSave(attributeMasterId, isSaveDisabled, formLayoutObject, value);
     }
 
-    updateFieldData(attributeMasterId, value, formElement, calledFrom) {
-        return this.updateFieldInfo(attributeMasterId, value, formElement, calledFrom);
+    updateFieldData(attributeMasterId, value, formElement, calledFrom, fieldDataList) {
+        return this.updateFieldInfo(attributeMasterId, value, formElement, calledFrom, fieldDataList);
     }
 
     /**

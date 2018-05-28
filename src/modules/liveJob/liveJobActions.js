@@ -150,16 +150,16 @@ export function acceptOrRejectMultiple(status, selectedItems, liveJobList) {
         }
     }
 }
-export function deleteExpiredJob(jobId, liveJobList) {
-    return async function (dispatch) {
-        try {
-            let newLiveJobList = await liveJobService.deleteJob([jobId], liveJobList)
-            dispatch(setState(SET_LIVE_JOB_LIST, newLiveJobList))
-        } catch (error) {
-            showToastAndAddUserExceptionLog(1206, error.message, 'danger', 1)
-        }
-    }
-}
+// export function deleteExpiredJob(jobId, liveJobList) {
+//     return async function (dispatch) {
+//         try {
+//             let newLiveJobList = await liveJobService.deleteJob([jobId], liveJobList)
+//             dispatch(setState(SET_LIVE_JOB_LIST, newLiveJobList))
+//         } catch (error) {
+//             showToastAndAddUserExceptionLog(1206, error.message, 'danger', 1)
+//         }
+//     }
+// }
 export function selectNone(liveJobList) {
     return async function (dispatch) {
         try {

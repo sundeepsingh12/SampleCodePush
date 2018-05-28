@@ -87,9 +87,6 @@ class FormLayout extends PureComponent {
       this.props.actions.setState(ERROR_MESSAGE, '')
     }
   }
-  componentWillUnmount() {
-    this.props.actions.setState(RESET_STATE_FOR_WALLET)
-  }
 
   componentWillUnmount() {
     if (this.props.noFieldAttributeMappedWithStatus) {

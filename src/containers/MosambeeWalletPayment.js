@@ -73,7 +73,7 @@ function mapDispatchToProps(dispatch) {
 class MosambeeWalletPayment extends PureComponent {
 
     componentDidMount() {
-        if (!this.props.walletList) this.props.actions.setWalletParametersAndGetWalletList(this.props.navigation.state.params.contactData[0])
+        this.props.actions.setWalletParametersAndGetWalletList(this.props.navigation.state.params.contactData[0])
     }
 
     _showModalView = (modalStatus, checkForPayment) => {

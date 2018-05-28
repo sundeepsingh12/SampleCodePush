@@ -1,5 +1,4 @@
 import {
-    ON_BLUR,
     NEXT_FOCUS,
     TABLE_FIELD_DATA,
     TABLE_RUNSHEET,
@@ -295,7 +294,7 @@ export default class FormLayoutEventImpl {
     }
 
     _updateTransactionLogs(jobTransaction, statusId, prevStatusId, jobMasterId, user, lastTrackLog) {
-        let transactionLogs = this._prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user.value, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'), lastTrackLog)
+        let transactionLogs = this._prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user.value, moment().format('YYYY-MM-DD HH:mm:ss'), lastTrackLog)
         return { tableName: TABLE_TRANSACTION_LOGS, value: transactionLogs }
     }
 
@@ -365,7 +364,7 @@ export default class FormLayoutEventImpl {
 
     async _updateJobSummary(jobTransaction, statusId, jobTransactionList) {
         const prevStatusId = (jobTransactionList && jobTransactionList.length) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
-        const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+        const currentDate = moment().format('YYYY-MM-DD HH:mm:ss')
         const count = (jobTransactionList && jobTransactionList.length) ? jobTransactionList.length : 1
         let jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
         jobSummaryList.value.forEach(item => {

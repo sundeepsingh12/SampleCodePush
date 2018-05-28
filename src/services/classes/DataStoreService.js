@@ -580,7 +580,7 @@ class DataStoreService {
      * @returns { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validation}
      * this method checks for filters present and if filters are not present then it checks for validation 
      */
-    async checkForFiltersAndValidations(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap) {
+    async checkForFilters(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap) {
         if (!currentElement) {
             throw new Error(CURRENT_ELEMENT_MISSING)
         }
@@ -699,7 +699,7 @@ class DataStoreService {
 
     async runDataStoreBeforeValidations(currentElement, formLayoutState, jobTransaction, cloneFormElement, dataStoreFilterReverse) {
         let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, BEFORE, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
-        let { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent } = await dataStoreService.checkForFiltersAndValidations(currentElement, cloneFormElement, jobTransaction, dataStoreFilterReverse)
+        let { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent } = await this.checkForFilters(currentElement, cloneFormElement, jobTransaction, dataStoreFilterReverse)
         let validation = {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
