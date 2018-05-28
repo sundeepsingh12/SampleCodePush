@@ -163,7 +163,7 @@ class CameraFieldAttribute extends PureComponent {
                         flashMode={this.state.torchOff}
                         type={this.state.cameraType}>
                         <SafeAreaView style={[styles.absolute, styles.padding15, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
-                            <View>
+                            <View style={[styles.padding15]}>
                                 <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.flex1]}>
                                     <Icon
                                         name="md-close"
@@ -180,21 +180,19 @@ class CameraFieldAttribute extends PureComponent {
                     </RNCamera>
                 </View>
                 <SafeAreaView style={[style.cameraFooter]}>
-                    <View>
-                        <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.flex1]}>
-                            <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
-                                {(getValidationObject && getValidationObject.imageUploadFromDevice) ? <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} /> : null}
-                            </View>
-                            <View style={[styles.flexBasis33_3, styles.alignCenter]}>
-                                <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
-                                    <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }}>
-                                        <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={this.takePicture.bind(this)} />
-                                    </View>
+                    <View style={{height: 100, flexDirection: 'row', alignItems: 'center'}}>
+                        <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
+                            {(getValidationObject && getValidationObject.imageUploadFromDevice) ? <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} /> : null}
+                        </View>
+                        <View style={[styles.flexBasis33_3, styles.alignCenter, styles.marginTop10]}>
+                            <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
+                                <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }}>
+                                    <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={this.takePicture.bind(this)} />
                                 </View>
                             </View>
-                            <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
-                                {(getValidationObject && getValidationObject.isFrontCameraEnabled) ? <MaterialIcons name={'switch-camera'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.toggleCameraType()} /> : null}
-                            </View>
+                        </View>
+                        <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
+                            {(getValidationObject && getValidationObject.isFrontCameraEnabled) ? <MaterialIcons name={'switch-camera'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.toggleCameraType()} /> : null}
                         </View>
                     </View>
                 </SafeAreaView>
@@ -215,31 +213,35 @@ class CameraFieldAttribute extends PureComponent {
                             }}
                             style={[styles.flex1]}
                         />
-                        <View style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
-                            <Icon
-                                name="md-close"
-                                style={[styles.fontXxxl, styles.fontWhite]}
-                                onPress={() => {
-                                    this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-                                        data: '',
-                                        showImage: false
-                                    })
-                                }} />
-                        </View>
+                        <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
+                            <View style={[styles.paddingLeft15, styles.paddingRight15]}>
+                                <Icon
+                                    name="md-close"
+                                    style={[styles.fontXxxl, styles.fontWhite]}
+                                    onPress={() => {
+                                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
+                                            data: '',
+                                            showImage: false
+                                        })
+                                    }} />
+                            </View>
+                        </SafeAreaView>
                     </View>
-                    <View style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, { bottom: 0 }]}>
-                        <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
-                            <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
-                                if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
-                                    this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData, this.props.navigation.state.params.currentElement)
-                                } else {
-                                    this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
-                                }
-                            }}>
-                                <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
-                            </TouchableOpacity>
+                    <SafeAreaView style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, { bottom: 0 }]}>
+                        <View>
+                            <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
+                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
+                                    if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
+                                        this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData, this.props.navigation.state.params.currentElement)
+                                    } else {
+                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
+                                    }
+                                }}>
+                                    <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
+                    </SafeAreaView>
                 </Container>
             </StyleProvider>
         )
@@ -301,7 +303,10 @@ const style = StyleSheet.create({
         bottom: 0,
         height: 100,
         backgroundColor: 'rgba(0,0,0,.4)',
-        borderLeftWidth: 0
+        borderLeftWidth: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1
     }
 });
 
