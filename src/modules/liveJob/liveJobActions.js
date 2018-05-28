@@ -6,7 +6,7 @@ import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '..//
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { liveJobService } from '../../services/classes/LiveJobService'
 import * as realm from '../../repositories/realmdb'
-import {Toast} from 'native-base'
+import { Toast } from 'native-base'
 import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
@@ -26,7 +26,7 @@ import {
     HomeTabNavigatorScreen,
     SET_LIVE_JOB_LOADER,
 } from '../../lib/constants'
-import {OK} from '../../lib/ContainerConstants'
+import { OK } from '../../lib/ContainerConstants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
 
@@ -108,20 +108,20 @@ export function toggleLiveJobSelection(jobId, allJobs, searchText) {
     }
 }
 
-export function toggleItemOnSearchText(searchText,allJobs) {
+export function toggleItemOnSearchText(searchText, allJobs) {
     return async function (dispatch) {
         try {
             const jobTransactions = await JSON.parse(JSON.stringify(allJobs))
             let searchValue = _.trim(_.toLower(searchText))
             let searchedList = []
-            for (let item in jobTransactions){
-                if(_.isEqual(_.toLower(jobTransactions[item].referenceNumber), searchValue)){
+            for (let item in jobTransactions) {
+                if (_.isEqual(_.toLower(jobTransactions[item].referenceNumber), searchValue)) {
                     searchedList.push(jobTransactions[item].id)
                 }
             }
-            if(searchedList.length == 1 ){
-                dispatch(toggleLiveJobSelection(searchedList[0],allJobs,''))
-            }else{
+            if (searchedList.length == 1) {
+                dispatch(toggleLiveJobSelection(searchedList[0], allJobs, ''))
+            } else {
                 throw new Error('invalid scan')
             }
         } catch (error) {

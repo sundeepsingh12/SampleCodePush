@@ -63,6 +63,117 @@ describe('save events implementation', () => {
 
 })
 
+describe('test for _setJobTransactionValues', () => {
+
+    let id = 1,
+        status = { id: 1, code: 1 },
+        jobMaster = { id: 1, code: 1 },
+        user = { id: 1, cityId: 1, employeeCode: 1, company: { id: 1 } },
+        hub = { id: 1, code: 1 },
+        imei = {
+            imeiNumber: 1
+        },
+        currentTime = '12:10:10',
+        lastTrackLog = {
+            latitude: 0,
+            longitude: 0
+        },
+        trackBattery = {
+            value: 1
+        }
+    it('should return job transaction', () => {
+        let time = moment().valueOf()
+        let jobTransactionList = [{
+            id: 1,
+            referenceNumber: 1,
+            jobId: 1
+        }]
+        let jobTransaction = {}
+        jobTransaction.id = 1
+        jobTransaction.jobId = 1
+        jobTransaction.referenceNumber = 1
+        jobTransaction.jobType = jobMaster.code
+        jobTransaction.jobStatusId = status.id
+        jobTransaction.statusCode = status.code
+        jobTransaction.employeeCode = user.employeeCode
+        jobTransaction.hubCode = hub.code
+        jobTransaction.lastTransactionTimeOnMobile = currentTime
+        jobTransaction.imeiNumber = imei.imeiNumber
+        jobTransaction.latitude = lastTrackLog.latitude
+        jobTransaction.longitude = lastTrackLog.longitude
+        jobTransaction.trackKm = 1
+        jobTransaction.trackTransactionTimeSpent = 1 * 1000
+        jobTransaction.trackBattery = (trackBattery && trackBattery.value) ? trackBattery.value : 0
+        jobTransaction.npsFeedBack = 1
+        jobTransaction.originalAmount = 0
+        jobTransaction.actualAmount = 0
+        jobTransaction.moneyTransactionType = undefined
+        let jobTransactionArray = []
+        jobTransactionArray.push(jobTransaction)
+        let result = {
+            tableName: 'TABLE_JOB_TRANSACTION',
+            value: jobTransactionArray,
+            jobTransactionDTOList: jobTransactionList
+        }
+        expect(formLayoutEventsInterface._setJobTransactionValues(jobTransaction, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, 1, 1, trackBattery, 1, {})).toEqual(result)
+    })
+})
+
+describe('test for _setBulkJobTransactionValues', () => {
+
+    let id = 1,
+        status = { id: 1, code: 1 },
+        jobMaster = { id: 1, code: 1 },
+        user = { id: 1, cityId: 1, employeeCode: 1, company: { id: 1 } },
+        hub = { id: 1, code: 1 },
+        imei = {
+            imeiNumber: 1
+        },
+        currentTime = '12:10:10',
+        lastTrackLog = {
+            latitude: 0,
+            longitude: 0
+        },
+        trackBattery = {
+            value: 1
+        }
+    it('should return job transaction', () => {
+        let time = moment().valueOf()
+        let jobTransactionList = [{
+            id: 1,
+            referenceNumber: 1,
+            jobId: 1
+        }]
+        let jobTransaction = {}
+        jobTransaction.id = 1
+        jobTransaction.jobId = 1
+        jobTransaction.referenceNumber = 1
+        jobTransaction.jobType = jobMaster.code
+        jobTransaction.jobStatusId = status.id
+        jobTransaction.statusCode = status.code
+        jobTransaction.employeeCode = user.employeeCode
+        jobTransaction.hubCode = hub.code
+        jobTransaction.lastTransactionTimeOnMobile = currentTime
+        jobTransaction.imeiNumber = imei.imeiNumber
+        jobTransaction.latitude = lastTrackLog.latitude
+        jobTransaction.longitude = lastTrackLog.longitude
+        jobTransaction.trackKm = 1
+        jobTransaction.trackTransactionTimeSpent = 1 * 1000
+        jobTransaction.trackBattery = (trackBattery && trackBattery.value) ? trackBattery.value : 0
+        jobTransaction.npsFeedBack = 1
+        jobTransaction.originalAmount = 0
+        jobTransaction.actualAmount = 0
+        jobTransaction.moneyTransactionType = undefined
+        let jobTransactionArray = []
+        jobTransactionArray.push(jobTransaction)
+        let result = {
+            tableName: 'TABLE_JOB_TRANSACTION',
+            value: jobTransactionArray,
+            jobTransactionDTOList: jobTransactionList
+        }
+        expect(formLayoutEventsInterface._setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, 1, 1, trackBattery, 1, {})).toEqual(result)
+    })
+})
 describe('test for update field info', () => {
     it('should set display value to value', () => {
         let formElement = new Map()
@@ -234,6 +345,57 @@ describe('add transaction to sync list', () => {
     })
 })
 
+describe('test cases for _getDbObjects', () => {
+
+    beforeEach(() => {
+        keyValueDBService.getValueFromStore = jest.fn()
+        realm.getRecordListOnQuery = jest.fn()
+    })
+    let status = { value: [{ id: 1, code: 1 }] },
+        jobMaster = { value: [{ id: 1, code: 1 }] },
+        user = { value: { id: 1, cityId: 1, employeeCode: 1, company: { id: 1 } } },
+        hub = { value: { id: 1, code: 1 } },
+        referenceNumber = 1,
+        currentTime = '12:10:10',
+        imei = { value: { imeiNumber: 1 } }
+    it('returns job transaction array for single transaction', () => {
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(hub)
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(imei)
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(status)
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(jobMaster)
+        realm.getRecordListOnQuery.mockReturnValue([{ id: 1 }])
+        let resultObject = {
+            jobTransaction: { id: 1 },
+            user,
+            hub, imei,
+            status: [{ id: 1, code: 1 }],
+            jobMaster: [{ id: 1, code: 1 }]
+        }
+        return formLayoutEventsInterface._getDbObjects(1, 1, 1, currentTime, user, { referenceNumber: 1 }).then((result) => {
+            expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(4)
+            expect(result).toEqual(resultObject)
+        })
+    })
+
+    it('returns job transaction array for bulk', () => {
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(hub)
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(imei)
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(status)
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(jobMaster)
+        realm.getRecordListOnQuery.mockReturnValue([{ id: 1 }])
+        let resultObject = {
+            jobTransaction: [{ id: 1 }],
+            user,
+            hub, imei,
+            status: [{ id: 1, code: 1 }],
+            jobMaster: [{ id: 1, code: 1 }]
+        }
+        return formLayoutEventsInterface._getDbObjects(1, 1, 1, currentTime, user, [{ jobTransactionId: 1 }]).then((result) => {
+            expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(4)
+            expect(result).toEqual(resultObject)
+        })
+    })
+})
 describe('update jobSummary data ', () => {
     const jobSummary = {
         value: [
@@ -991,6 +1153,24 @@ describe('test for _setBulkJobDbValues', () => {
             value: result
         })
     })
+    it('should return job with re attempt date', () => {
+        let status = {
+            actionOnStatus: 1
+        }, referenceNumber = 1
+        let result = [{
+            jobId: 1,
+            status: 3,
+            id: 1,
+            jobStartTime: '2099-12-12 00:00:00'
+        }]
+        let reAttemptDate = '2099-12-12'
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue(jobTransactions)
+        expect(formLayoutEventsInterface._setBulkJobDbValues(status, jobTransactions, 1, null, null, reAttemptDate)).toEqual({
+            tableName: TABLE_JOB,
+            value: result
+        })
+    })
 })
 
 describe('test for _setJobDbValues', () => {
@@ -1075,6 +1255,56 @@ describe('test for _setJobDbValues', () => {
             value: result
         })
     })
+
+    it('should return job with status 4', () => {
+        let status = {
+            actionOnStatus: 3
+        }
+        let result = [{
+            jobId: 1,
+            status: 4,
+            id: 1
+        }]
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue(jobTransactions)
+        expect(formLayoutEventsInterface._setJobDbValues(status, id)).toEqual({
+            tableName: TABLE_JOB,
+            value: result
+        })
+    })
+    it('should return job with status 1', () => {
+        let status = {
+            actionOnStatus: 2
+        }
+        let result = [{
+            jobId: 1,
+            status: 1,
+            id: 1
+        }]
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue(jobTransactions)
+        expect(formLayoutEventsInterface._setJobDbValues(status, id)).toEqual({
+            tableName: TABLE_JOB,
+            value: result
+        })
+    })
+
+    it('should return job with status 2', () => {
+        let status = {
+            actionOnStatus: 0
+        }
+        let result = [{
+            jobId: 1,
+            status: 2,
+            id: 1
+        }]
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue(jobTransactions)
+        expect(formLayoutEventsInterface._setJobDbValues(status, id)).toEqual({
+            tableName: TABLE_JOB,
+            value: result
+        })
+    })
 })
 
 
@@ -1137,7 +1367,6 @@ describe('test for _getDefaultValuesForJobTransaction', () => {
         }
         expect(formLayoutEventsInterface._getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei, currentTime)).toEqual(jobTransaction)
     })
-
 })
 function getMapFromObject(obj) {
     let strMap = new Map();
