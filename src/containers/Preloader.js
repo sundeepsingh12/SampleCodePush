@@ -143,7 +143,7 @@ class Preloader extends PureComponent {
                         <CustomAlert
                             title="Unauthorised Device"
                             message={this.props.errorMessage_403_400_Logout}
-                            onCancelPressed={this.startLoginScreenWithoutLogout} />
+                            onOkPressed={this.startLoginScreenWithoutLogout} />
                     )}
                     {(!_.isEmpty(this.props.showMobileOtpNumberScreen) ? <MobileOtpScreen invalidateUserSession={this.invalidateSession} isMobileScreen={this.props.showMobileOtpNumberScreen} /> : null)}
                     

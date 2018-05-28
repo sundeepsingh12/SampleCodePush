@@ -95,7 +95,7 @@ class JobMaster {
    *
    */
 
-  downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
+  async downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
     if (!token) {
       throw new Error('Token Missing')
     }

@@ -4,13 +4,15 @@
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import { keyValueDBService } from './KeyValueDBService'
+import { trackingService } from './Tracking'
 import CONFIG from '../../lib/config'
 import {
     USERNAME,
     PASSWORD,
     REMEMBER_ME,
     USER,
-    FCM_TOKEN
+    FCM_TOKEN,
+    GEO_FENCING
 } from '../../lib/constants'
 import { backupService } from './BackupService'
 import { sync } from './Sync'
@@ -68,7 +70,7 @@ class Authentication {
      * LOGOUT API (GET)
      * @param {*} token 
      */
-    async logout(createBackup) {
+    async logout(createBackup, calledFromAutoLogout) {
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (!token || !token.value) {
             throw new Error('Token Missing')
@@ -79,8 +81,12 @@ class Authentication {
         const userObject = await keyValueDBService.getValueFromStore(USER)
         const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
         await sync.deregisterFcmTokenFromServer(userObject, token, fcmToken)
-        let logoutResponse = RestAPIFactory(token.value).serviceCall(null, CONFIG.API.LOGOUT_API, 'GET')
+        let logoutResponse = await RestAPIFactory(token.value).serviceCall(null, CONFIG.API.LOGOUT_API, 'GET')
         await logoutService.deleteDataBase()
+        if (calledFromAutoLogout) {
+            const fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+            await trackingService.inValidateStoreVariables(fenceIdentifier)
+        }
         return logoutResponse
     }
 

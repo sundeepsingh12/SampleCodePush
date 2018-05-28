@@ -53,9 +53,9 @@ import {
 function mapStateToProps(state) {
   return {
     loading: state.home.loading,
+    error: state.preloader.error,
     errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
     menu: state.home.menu,
-    isLoggingOut: state.home.isLoggingOut,
     isUnsyncTransactionOnLogout: state.home.isUnsyncTransactionOnLogout,
     subMenuList: state.home.subMenuList
   }
@@ -157,9 +157,8 @@ class Menu extends PureComponent {
               message={this.props.errorMessage_403_400_Logout}
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
-          {renderIf(this.props.isLoggingOut, <Loader />)}
           {this.getUnsyncTransactionPresentAlert()}
-          {renderIf(!this.props.isLoggingOut,
+          {(this.props.error == 'Logging out' ?  <Loader /> : 
             <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
               {this.getPageListItemsView()}
               {this.renderLogoutView()}

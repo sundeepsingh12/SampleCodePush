@@ -11,7 +11,6 @@ import {
   CHART_LOADING,
   RESET_STATE,
   LAST_SYNC_TIME,
-  TOGGLE_LOGOUT,
   SET_UNSYNC_TRANSACTION_PRESENT,
   SET_BACKUP_UPLOAD_VIEW,
   SET_UPLOAD_FILE_COUNT,
@@ -69,9 +68,6 @@ export default function homeReducer(state = initialState, action) {
     case RESET_STATE: {
       return initialState
     }
-
-    case TOGGLE_LOGOUT:
-      return state.set('isLoggingOut', action.payload)
 
     case SET_UNSYNC_TRANSACTION_PRESENT:
       return state.set('isUnsyncTransactionOnLogout', action.payload)

@@ -19,7 +19,6 @@ var InitialState = Record({
     moduleLoading: false,
     chartLoading: false,
     lastSyncTime: null,
-    isLoggingOut: false,
     isUnsyncTransactionOnLogout: false,
     backupUploadView: 0,
     uploadingFileCount: 0,

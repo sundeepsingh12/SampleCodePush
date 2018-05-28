@@ -71,6 +71,7 @@ module.exports = keyMirror({
     ON_MOBILE_NO_CHANGE: null,
     ON_OTP_CHANGE: null,
     ERROR_400_403_LOGOUT: null,
+    ERROR_LOGOUT: null,
     SHOW_OTP_MOBILE_LOADER: null,
 
     PRE_LOGOUT_START: null,
@@ -94,7 +95,6 @@ module.exports = keyMirror({
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
     SET_MODULES: null,
-    TOGGLE_LOGOUT: null,
     SEARCH_TAP: null,
     SET_UNSYNC_TRANSACTION_PRESENT: null,
     SET_BACKUP_UPLOAD_VIEW: null,

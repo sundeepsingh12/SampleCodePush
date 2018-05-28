@@ -51,12 +51,10 @@ import {
   JOB_ATTRIBUTE_STATUS,
   HomeTabNavigatorScreen,
   LoginScreen,
-  TOGGLE_LOGOUT,
   OTP_SUCCESS,
   PENDING_SYNC_TRANSACTION_IDS,
   SET_UNSYNC_TRANSACTION_PRESENT,
   UnsyncBackupUpload,
-  GEO_FENCING,
   PAGES,
   PAGES_ADDITIONAL_UTILITY,
   DOWNLOAD_LATEST_APP,
@@ -64,9 +62,10 @@ import {
   APP_THEME,
   SET_APP_UPDATE_BY_CODEPUSH,
   SET_APP_UPDATE_STATUS,
-  FCM_TOKEN
+  FCM_TOKEN,
+  ERROR_LOGOUT
 } from '../../lib/constants'
-import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../lib/AttributeConstants'
+import { MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
@@ -75,14 +74,12 @@ import { deleteSessionToken, setState, showToastAndAddUserExceptionLog, resetNav
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
 import { NavigationActions } from 'react-navigation'
-import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
 import { LOGOUT_UNSUCCESSFUL, OK, SHOW_MOBILE_SCREEN, SHOW_OTP, CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DOWNLOADING_PACKAGE, CODEPUSH_INSTALLING_UPDATE, CODEPUSH_SOMETHING_WENT_WRONG } from '../../lib/ContainerConstants'
-import { trackingService } from '../../services/classes/Tracking'
 import codePush from "react-native-code-push"
-import { Platform, } from 'react-native'
+import { Platform } from 'react-native'
 
 //This hits JOB Master Api and gets the response 
 export function downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
@@ -114,14 +111,9 @@ export function invalidateUserSession(isPreLoader, createBackup, calledFromAutoL
   return async function (dispatch) { // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "") /* uncomment this code when run sync in logout */
     try {
       dispatch(setState(PRE_LOGOUT_START))
-      dispatch(setState(TOGGLE_LOGOUT, true))
-      let response = await authenticationService.logout(createBackup) // create backup, hit logout api and delete dataBase
+      let response = await authenticationService.logout(createBackup, calledFromAutoLogout) // create backup, hit logout api and delete dataBase
       dispatch(setState(PRE_LOGOUT_SUCCESS))
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
-      if (calledFromAutoLogout) {
-        let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
-        await trackingService.inValidateStoreVariables(fenceIdentifier)
-      }
       dispatch(deleteSessionToken())
     } catch (error) {
       showToastAndAddUserExceptionLog(1803, error.message, 'danger', 1)
@@ -129,10 +121,9 @@ export function invalidateUserSession(isPreLoader, createBackup, calledFromAutoL
         dispatch(setState(ERROR_400_403_LOGOUT, error.message))
       } else if (calledFromAutoLogout) {
         dispatch(startLoginScreenWithoutLogout())
+      } else {
+        dispatch(setState(ERROR_LOGOUT, ''))
       }
-    }
-    finally {
-      dispatch(setState(TOGGLE_LOGOUT, false))
     }
   }
 }
@@ -174,7 +165,6 @@ export function startLoginScreenWithoutLogout() {
     } catch (error) {
       showToastAndAddUserExceptionLog(1805, error.message, 'danger', 1)
     }
-
   }
 }
 
@@ -205,20 +195,18 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
     try {
       if (showMobileOtpNumberScreen == SHOW_OTP) {
         dispatch(setState(SHOW_OTP_SCREEN, SHOW_OTP))
-        return
-      }
-      if (showMobileOtpNumberScreen == SHOW_MOBILE_SCREEN) {
+      } else if (showMobileOtpNumberScreen == SHOW_MOBILE_SCREEN) {
         dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, SHOW_MOBILE_SCREEN))
-        return
-      }
-      const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-      const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-      const userObject = await keyValueDBService.getValueFromStore(USER)
-      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-      if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationService === SERVICE_PENDING || deviceVerificationService == SERVICE_FAILED)) {
-        dispatch(checkAsset(deviceIMEI, deviceSIM, userObject, token))
       } else {
-        dispatch(downloadJobMaster(deviceIMEI, deviceSIM, userObject, token))
+        const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+        const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+        const userObject = await keyValueDBService.getValueFromStore(USER)
+        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationService === SERVICE_PENDING || deviceVerificationService == SERVICE_FAILED)) {
+          dispatch(checkAsset(deviceIMEI, deviceSIM, userObject, token))
+        } else {
+          dispatch(downloadJobMaster(deviceIMEI, deviceSIM, userObject, token))
+        }
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(1806, error.message, 'danger', 1)
@@ -338,12 +326,9 @@ export function checkAsset(deviceIMEI, deviceSIM, user, token) {
       dispatch(setState(CHECK_ASSET_START))
       const isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
       if (isVerified) {
-        await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
-        await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
         dispatch(setState(PRELOADER_SUCCESS))
         dispatch(checkForUnsyncBackupFilesAndNavigate(user))
       } else {
-        await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
         dispatch(checkIfSimValidOnServer(user, token));
       }
     } catch (error) {
@@ -364,7 +349,6 @@ export function checkIfSimValidOnServer(user, token) {
     try {
       const responseIsVerified = await deviceVerificationService.checkAssetApiAndSimVerificationOnServer(token)
       if (responseIsVerified) {
-        await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(setState(PRELOADER_SUCCESS))
         dispatch(checkForUnsyncBackupFilesAndNavigate(user))
       } else {
@@ -433,7 +417,6 @@ export function checkForUnsyncTransactionAndLogout() {
     } catch (error) {
       showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0)
       dispatch(setState(ERROR_400_403_LOGOUT, error.message))
-      dispatch(setState(TOGGLE_LOGOUT, false))
     }
   }
 }

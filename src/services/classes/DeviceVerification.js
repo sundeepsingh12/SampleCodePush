@@ -2,6 +2,7 @@
 
 import { keyValueDBService } from './KeyValueDBService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
+import { userEventLogService } from './UserEvent'
 import CONFIG from '../../lib/config'
 import DeviceInfo from 'react-native-device-info'
 import { Platform } from 'react-native'
@@ -12,6 +13,9 @@ import {
   DEVICE_SIM,
   IS_PRELOADER_COMPLETE
 } from '../../lib/constants'
+import {
+  LOGIN_SUCCESSFUL
+} from '../../lib/AttributeConstants'
 
 class DeviceVerification {
 
@@ -63,15 +67,17 @@ class DeviceVerification {
 
   async checkAssetLocal(deviceIMEI, deviceSIM, user) {
     if (!user || !user.value) throw new Error('Value of user missing')
-    const companyId = (user && user.value.company) ? user.value.company.id : 0;
-    const hubId = (user) ? user.value.hubId : 0;
-    if(!deviceIMEI || !deviceSIM || !deviceSIM.value.isVerified || deviceSIM.value.companyId != companyId){
+    const companyId = (user.value.company) ? user.value.company.id : 0;
+    if (!deviceIMEI || !deviceSIM || !deviceSIM.value.isVerified || deviceSIM.value.companyId != companyId) {
       await this.populateDeviceImeiAndDeviceSim(user)
       return false
-    }
-    if (hubId != deviceIMEI.value.hubId) {
-      deviceIMEI.value.hubId = hubId;
-      await keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI)
+    } else {
+      await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
+      await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
+      if (user.value.hubId != deviceIMEI.value.hubId) {
+        deviceIMEI.value.hubId = user.value.hubId;
+        await keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI)
+      }
     }
     return true
   }
@@ -81,7 +87,6 @@ class DeviceVerification {
    * @param {*} user 
    */
   async populateDeviceImeiAndDeviceSim(user) {
-    try {
       let imeiNumber, simNumber
       if (Platform.OS === 'ios') {
         imeiNumber = DeviceInfo.getUniqueID()
@@ -92,8 +97,6 @@ class DeviceVerification {
       }
       await this.populateDeviceImei(user, imeiNumber)
       await this.populateDeviceSim(user, simNumber)
-    } catch (error) {
-    }
   }
 
   /**Saves deviceIMEI in store
@@ -168,20 +171,19 @@ class DeviceVerification {
 
   async generateOTP(mobileNumber) {
     let reg = new RegExp('^[0-9]+$')
-    if(!reg.test(_.trim(mobileNumber))){
+    if (!reg.test(_.trim(mobileNumber))) {
       throw new Error('Mobile number not valid')
     }
     let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY) 
+    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token || !token.value) {
       throw new Error('Token Missing')
     }
-    if(!deviceSIM || !deviceSIM.value) {
+    if (!deviceSIM || !deviceSIM.value) {
       throw new Error('Value of sim missing')
     }
     deviceSIM.value.contactNumber = mobileNumber
     let generateOtpResponse = await RestAPIFactory(token.value).serviceCall(JSON.stringify(deviceSIM.value), CONFIG.API.GENERATE_OTP_API, 'POST')
-    let jsonstr = await generateOtpResponse.json
     await keyValueDBService.validateAndSaveData(DEVICE_SIM, generateOtpResponse.json)
   }
 
@@ -197,7 +199,7 @@ class DeviceVerification {
    */
   async verifySim(otpNumber) {
     let reg = new RegExp('^[0-9]+$')
-    if(!reg.test(_.trim(otpNumber))){
+    if (!reg.test(_.trim(otpNumber))) {
       throw new Error('OTP number not valid')
     }
     const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
@@ -213,7 +215,7 @@ class DeviceVerification {
   }
 
 
-  async checkAssetApiAndSimVerificationOnServer(token){
+  async checkAssetApiAndSimVerificationOnServer(token) {
     if (!token || !token.value) {
       throw new Error('Token Missing')
     }
@@ -225,6 +227,9 @@ class DeviceVerification {
     }
     await keyValueDBService.validateAndSaveData(DEVICE_IMEI, response.json.deviceIMEI)
     await keyValueDBService.validateAndSaveData(DEVICE_SIM, response.json.deviceSIM)
+    if(response.json.deviceSIM && response.json.deviceSIM.isVerified){
+      await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
+    }
     return response.json.deviceSIM ? response.json.deviceSIM.isVerified : false
   }
 }

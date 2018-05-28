@@ -7,6 +7,7 @@ import { jobMasterService } from '../../../services/classes/JobMaster'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { authenticationService } from '../../../services/classes/Authentication'
 import { deviceVerificationService } from '../../../services/classes/DeviceVerification'
+import {trackingService} from '../../../services/classes/Tracking'
 
 var actions = require('../preloaderActions')
 import {
@@ -62,180 +63,63 @@ import {
     ON_MOBILE_NO_CHANGE,
     ON_OTP_CHANGE,
     PRELOADER_SUCCESS,
-    TOGGLE_LOGOUT
+    ERROR_LOGOUT
 } from '../../../lib/constants'
 
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
 describe('Preloader Actions', () => {
-
-    it('should set jobMasterDownloadStart()', () => {
-        expect(actions.jobMasterDownloadStart()).toEqual({
-            type: MASTER_DOWNLOAD_START
-        })
+    beforeEach (() =>{
+        authenticationService.logout = jest.fn()
+        keyValueDBService.getValueFromStore = jest.fn()
+        trackingService.inValidateStoreVariables = jest.fn()
     })
+    const store = mockStore({})
 
-    it('should set jobMasterDownloadSuccess()', () => {
-        expect(actions.jobMasterDownloadSuccess()).toEqual({
-            type: MASTER_DOWNLOAD_SUCCESS
-        })
-    })
-
-
-    it('should set jobMasterDownloadFailure()', () => {
-        const error = 'error'
-        expect(actions.jobMasterDownloadFailure(error)).toEqual({
-            type: MASTER_DOWNLOAD_FAILURE,
-            payload: error
-        })
-    })
-
-    it('should set jobMasterSavingStart()', () => {
-        expect(actions.jobMasterSavingStart()).toEqual({
-            type: MASTER_SAVING_START
-        })
-    })
-
-    it('should set jobMasterSavingSuccess()', () => {
-        expect(actions.jobMasterSavingSuccess()).toEqual({
-            type: MASTER_SAVING_SUCCESS
-        })
-    })
-
-    it('should set jobMasterSavingFailure()', () => {
-        const error = 'error'
-        expect(actions.jobMasterSavingFailure(error)).toEqual({
-            type: MASTER_SAVING_FAILURE,
-            payload: error
-        })
-    })
-
-    it('should set checkAssetStart()', () => {
-        expect(actions.checkAssetStart()).toEqual({
-            type: CHECK_ASSET_START
-        })
-    })
-
-    it('should set preloaderSuccess()', () => {
-        expect(actions.preloaderSuccess()).toEqual({
-            type: PRELOADER_SUCCESS
-        })
-    })
-
-    it('should set checkAssetFailure()', () => {
-        const error = 'error'
-        expect(actions.checkAssetFailure(error)).toEqual({
-            type: CHECK_ASSET_FAILURE,
-            payload: error
-        })
-    })
-
-    it('should set showMobileNumber()', () => {
-        expect(actions.showMobileNumber()).toEqual({
-            type: SHOW_MOBILE_NUMBER_SCREEN,
-            payload: SHOW_MOBILE_SCREEN
-        })
-    })
-
-    it('should set showOtp()', () => {
-        expect(actions.showOtp()).toEqual({
-            type: SHOW_OTP_SCREEN,
-            payload: SHOW_OTP
-        })
-    })
-
-    it('should set preLogoutRequest()', () => {
-        expect(actions.preLogoutRequest()).toEqual({
-            type: PRE_LOGOUT_START
-        })
-    })
-
-    it('should set preLogoutSuccess()', () => {
-        expect(actions.preLogoutSuccess()).toEqual({
-            type: PRE_LOGOUT_SUCCESS
-        })
-    })
-
-    it('should set preLogoutFailure()', () => {
-        const error = 'error'
-        expect(actions.preLogoutFailure(error)).toEqual({
-            type: PRE_LOGOUT_FAILURE,
-            payload: error
-        })
-    })
-
-    it('should set onChangeMobileNumber()', () => {
-        const mobileNumber = '98811'
-        expect(actions.onChangeMobileNumber(mobileNumber)).toEqual({
-            type: ON_MOBILE_NO_CHANGE,
-            payload: mobileNumber
-        })
-    })
-
-    it('should set onChangeOtp()', () => {
-        const otpNumber = '98811'
-        expect(actions.onChangeOtp(otpNumber)).toEqual({
-            type: ON_OTP_CHANGE,
-            payload: otpNumber
-        })
-    })
-
-    it('should set otpGenerationStart()', () => {
-        expect(actions.otpGenerationStart()).toEqual({
-            type: OTP_GENERATION_START,
-            payload: false
-        })
-    })
-
-    it('should set otpGenerationFailure()', () => {
-        const error = 'error'
-        expect(actions.otpGenerationFailure(error)).toEqual({
-            type: OTP_GENERATION_FAILURE,
-            payload: error
-        })
-    })
-
-    it('should set optValidationStart()', () => {
-        expect(actions.optValidationStart()).toEqual({
-            type: OTP_VALIDATION_START,
-            payload: false
-        })
-    })
-
-    it('should set otpValidationFailure()', () => {
-        const error = 'error'
-        expect(actions.otpValidationFailure(error)).toEqual({
-            type: OTP_VALIDATION_FAILURE,
-            payload: error
-        })
-    })
-
-
-    it('should logout', () => {
+    it('should logout on preLoader button press', () => {
         const expectedActions = [
             { type: PRE_LOGOUT_START },
-            {type : TOGGLE_LOGOUT, payload : true},
             { type: PRE_LOGOUT_SUCCESS },
-            {type : TOGGLE_LOGOUT, payload : false}
         ]
-        const store = mockStore({})
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce({ value: 'testtoken' })
-        keyValueDBService.getValueFromStore.mockReturnValueOnce({value : ''})
-        authenticationService.logout = jest.fn()
-        authenticationService.logout.mockReturnValue(true)
-        return store.dispatch(actions.invalidateUserSession())
+        authenticationService.logout.mockReturnValueOnce({})
+        return store.dispatch(actions.invalidateUserSession(true))
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(authenticationService.logout).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+            })
+    })
+
+    it('should not logout on preLoader button press', () => {
+        const expectedActions = [
+            { type: PRE_LOGOUT_START },
+            { type: ERROR_400_403_LOGOUT, payload: 'error' },
+        ]
+        authenticationService.logout = jest.fn(() => {
+            throw new Error('error')
+        })
+        return store.dispatch(actions.invalidateUserSession(true))
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(authenticationService.logout).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
-                expect(store.getActions()[2].type).toEqual(expectedActions[2].type)
-                expect(store.getActions()[3].type).toEqual(expectedActions[3].type)
-                expect(store.getActions()[3].payload).toEqual(expectedActions[3].payload)
-
+            })
+    })
+    it('should  logout on autoLogout action', () => {
+        const expectedActions = [
+            { type: PRE_LOGOUT_START },
+            { type: PRE_LOGOUT_SUCCESS},
+        ]
+        return store.dispatch(actions.invalidateUserSession(false,true, true))
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(authenticationService.logout).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
             })
     })
 
