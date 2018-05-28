@@ -4,24 +4,12 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    TouchableHighlight,
-    Modal,
-    ScrollView,
-    FlatList,
-} from 'react-native'
+import { StyleSheet, View, Text, TouchableHighlight, Modal, ScrollView, FlatList } from 'react-native'
 import { List, ListItem, Item, Icon, Input } from 'native-base'
 import * as dataStoreFilterActions from '../modules/dataStoreFilter/dataStoreFilterActions'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
-import {
-    SET_DSF_SEARCH_TEXT,
-    DATA_STORE_FILTER_LIST,
-    SET_DSF_INITIAL_STATE,
-} from '../lib/constants'
+import { SET_DSF_SEARCH_TEXT, DATA_STORE_FILTER_LIST, SET_DSF_INITIAL_STATE, } from '../lib/constants'
 import { SEARCH } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {

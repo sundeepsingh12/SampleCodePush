@@ -1,27 +1,8 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    Platform,
-    TextInput,
-    Modal,
-    TouchableOpacity,
-    Image
-} from 'react-native'
-
-import {
-    SET_MODAL_VIEW,
-    SET_OTP_MODAL_VIEW,
-    CHANGE_WALLET_MOBILE_NO,
-    SET_ERROR_MESSAGE_FOR_WALLET,
-    CHANGE_OTP_NUMBER,
-    RESET_STATE_FOR_WALLET,
-    SET_ERROR_FOR_OTP
-} from '../lib/constants'
-
+import { StyleSheet, View, Text, Platform, TextInput, Modal, TouchableOpacity, Image, SafeAreaView } from 'react-native'
+import { SET_MODAL_VIEW, SET_OTP_MODAL_VIEW, CHANGE_WALLET_MOBILE_NO, SET_ERROR_MESSAGE_FOR_WALLET, CHANGE_OTP_NUMBER, RESET_STATE_FOR_WALLET, SET_ERROR_FOR_OTP } from '../lib/constants'
 import { Container, Content, Footer, FooterTab, Button, Icon, Body, Header, Toast, StyleProvider } from 'native-base';
 import styles from '../themes/FeStyle'
 import * as mosambeeWalletActions from '../modules/cardTypePaymentModules/mosambeeWalletPayment/mosambeeWalletActions'
@@ -131,15 +112,17 @@ class MosambeeWalletPayment extends PureComponent {
 
     getFooterView(checkForPayment, actualAmount) {
         return (
-            <Footer style={[style.footer]}>
-                <FooterTab style={[styles.padding10]}>
-                    <Button success full
-                        onPress={() => this._hitOtpUrlApi(null, checkForPayment, actualAmount)}
-                    >{checkForPayment ? <Text style={[styles.fontLg, styles.fontWhite]}>{_.isEqual(this.props.errorMessage, TRANSACTION_SUCCESSFUL) ? FINISH : RETRY_PAYMENT}</Text>
-                        : <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.isModalVisible == 2 ? SEND_OTP : SUBMIT}</Text>}
-                    </Button>
-                </FooterTab>
-            </Footer>
+            <SafeAreaView>
+                <Footer style={[style.footer]}>
+                    <FooterTab style={[styles.padding10]}>
+                        <Button success full
+                            onPress={() => this._hitOtpUrlApi(null, checkForPayment, actualAmount)}
+                        >{checkForPayment ? <Text style={[styles.fontLg, styles.fontWhite]}>{_.isEqual(this.props.errorMessage, TRANSACTION_SUCCESSFUL) ? FINISH : RETRY_PAYMENT}</Text>
+                            : <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.isModalVisible == 2 ? SEND_OTP : SUBMIT}</Text>}
+                        </Button>
+                    </FooterTab>
+                </Footer>
+            </SafeAreaView>
         )
     }
 
@@ -218,23 +201,25 @@ class MosambeeWalletPayment extends PureComponent {
 
     _headerModal(checkForPayment) {
         return (
-            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
-                <Body>
-                    <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                        {!checkForPayment ? <TouchableOpacity style={[style.headerLeft]} onPress={() => { this._showModalView(this.props.isModalVisible, checkForPayment) }}>
-                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                        </TouchableOpacity> : null}
-                        <View style={[style.headerBody]}>
-                            {checkForPayment ? <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, { marginLeft: 100 }, styles.fontWeight500]}>{PAYMENT}</Text>
-                                : <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>{MOSAMBEE_WALLET}</Text>}
+            <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                    <Body>
+                        <View
+                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                            {!checkForPayment ? <TouchableOpacity style={[style.headerLeft]} onPress={() => { this._showModalView(this.props.isModalVisible, checkForPayment) }}>
+                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                            </TouchableOpacity> : null}
+                            <View style={[style.headerBody]}>
+                                {checkForPayment ? <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, { marginLeft: 100 }, styles.fontWeight500]}>{PAYMENT}</Text>
+                                    : <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>{MOSAMBEE_WALLET}</Text>}
+                            </View>
+                            <View style={[style.headerRight]}>
+                            </View>
+                            <View />
                         </View>
-                        <View style={[style.headerRight]}>
-                        </View>
-                        <View />
-                    </View>
-                </Body>
-            </Header>
+                    </Body>
+                </Header>
+            </SafeAreaView>
         )
     }
 

@@ -1,6 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, SafeAreaView } from 'react-native'
 import { Container, Button, Footer, Header, Icon, Body, Toast } from 'native-base';
 import * as fixedSKUActions from '../modules/fixedSKU/fixedSKUActions'
 import { connect } from 'react-redux'
@@ -109,45 +109,49 @@ class FixedSKUListing extends PureComponent {
 
   showHeaderView() {
     return (
-      <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
-        <Body>
-          <View
-            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.goBack() }}>
-              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-            </TouchableOpacity>
-            <View style={[style.headerBody]}>
-              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.currentElement.label}</Text>
+      <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }]}>
+        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+          <Body>
+            <View
+              style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+              <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.goBack() }}>
+                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+              </TouchableOpacity>
+              <View style={[style.headerBody]}>
+                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.currentElement.label}</Text>
+              </View>
+              <View style={[style.headerRight]}>
+              </View>
+              <View />
             </View>
-            <View style={[style.headerRight]}>
-            </View>
-            <View />
-          </View>
-        </Body>
-      </Header>
+          </Body>
+        </Header>
+      </SafeAreaView>
     )
   }
 
   showFooterView() {
     return (
-      <Footer
-        style={[style.footer, styles.bgWhite, styles.column]}>
-        <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
-          <Text>
-            {TOTAL_QUANTITY} {parseInt(this.props.totalQuantity)}
-          </Text>
-        </View>
-        <View style={{backgroundColor : styles.bgPrimaryColor}}>
-          <Button success full style={{backgroundColor : styles.bgPrimaryColor}}
-            onPress={() => {
-              this.props.actions.onSave(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState, this.props.fixedSKUList, this.props.navigation.state.params.jobTransaction)
-            }}>
-            <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>
-              {SAVE}
+      <SafeAreaView>
+        <Footer
+          style={[style.footer, styles.bgWhite, styles.column]}>
+          <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
+            <Text>
+              {TOTAL_QUANTITY} {parseInt(this.props.totalQuantity)}
             </Text>
-          </Button>
-        </View>
-      </Footer>
+          </View>
+          <View style={{ backgroundColor: styles.bgPrimaryColor }}>
+            <Button success full style={{ backgroundColor: styles.bgPrimaryColor }}
+              onPress={() => {
+                this.props.actions.onSave(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState, this.props.fixedSKUList, this.props.navigation.state.params.jobTransaction)
+              }}>
+              <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>
+                {SAVE}
+              </Text>
+            </Button>
+          </View>
+        </Footer>
+      </SafeAreaView>
     )
   }
 
@@ -161,16 +165,12 @@ class FixedSKUListing extends PureComponent {
       <Container>
         <View style={style.container}>
           {this.showHeaderView()}
-
           <FlatList
             data={Object.values(this.props.fixedSKUList)}
             renderItem={({ item }) => this.renderData(item)}
             keyExtractor={item => String(item.id)}
           />
-
           {this.showFooterView()}
-
-
         </View>
       </Container >
     )

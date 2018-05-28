@@ -1,22 +1,13 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    Platform,
-    TextInput,
-    Modal,
-} from 'react-native'
-
+import { StyleSheet, View, Text, Platform, TextInput, Modal, } from 'react-native'
 import {
     SET_UPI_APPROVAL,
     SET_UPI_PAYMENT_CUSTOMER_CONTACT,
     SET_UPI_PAYMENT_CUSTOMER_NAME,
     SET_UPI_PAYMENT_PAYER_VPA,
 } from '../lib/constants'
-
 import { Container, Content, Footer, FooterTab, Input, Button, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox } from 'native-base';
 import styles from '../themes/FeStyle'
 import PopOver from '../components/PopOver'
@@ -68,7 +59,7 @@ class UPIPayment extends PureComponent {
                             </Text>
                         </View>
                         <View style={[styles.row, styles.justifyCenter, styles.marginTop30]}>
-                            <Button onPress={() => console.log() } 
+                            <Button onPress={() => console.log()}
                                 full rounded style={StyleSheet.flatten(styles.margin10)}
                             >
                                 <Text style={[styles.fontWhite]}>Proceed</Text>

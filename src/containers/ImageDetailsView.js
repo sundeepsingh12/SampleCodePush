@@ -1,26 +1,8 @@
 
 'use strict';
 import React, { PureComponent } from 'react';
-import {
-    AppRegistry,
-    StyleSheet,
-    Text,
-    View,
-    Image
-} from 'react-native'
-import {
-    Container,
-    Content,
-    Header,
-    Left,
-    Body,
-    Right,
-    Icon,
-    Footer,
-    StyleProvider,
-    Button,
-
-} from 'native-base';
+import { AppRegistry, StyleSheet, Text, View, Image } from 'react-native'
+import { Container, Content, Header, Left, Body, Right, Icon, Footer, StyleProvider, Button, } from 'native-base';
 import * as cameraActions from '../modules/camera/cameraActions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'

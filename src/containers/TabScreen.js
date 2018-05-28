@@ -67,8 +67,8 @@ class TabScreen extends PureComponent {
         renderTabList.push(
           <Tab
             key={tabs[index].id}
-            tabStyle={{backgroundColor : styles.bgPrimaryColor}}
-            activeTabStyle={{backgroundColor : styles.bgPrimaryColor}}
+            tabStyle={{ backgroundColor: styles.bgPrimaryColor }}
+            activeTabStyle={{ backgroundColor: styles.bgPrimaryColor }}
             textStyle={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14 }}
             activeTextStyle={[styles.fontWhite, styles.fontDefault]}
             heading={tabs[index].name}>
@@ -148,7 +148,7 @@ class TabScreen extends PureComponent {
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container>
-            <View style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
+            <View style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
               <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.fetchDataForScanner.bind(this)} />
               {this.props.syncLoadingInTaskList ? <SyncLoader moduleLoading={this.props.syncLoadingInTaskList} /> : null}
             </View>

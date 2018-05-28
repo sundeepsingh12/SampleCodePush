@@ -1,47 +1,31 @@
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    FlatList,
-    TouchableHighlight,
-}
-    from 'react-native'
+import { StyleSheet, View, FlatList, TouchableHighlight, SafeAreaView } from 'react-native'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as statisticsActions from '../modules/statistics/statisticsActions'
 import styles from '../themes/FeStyle'
-import {
-  Container,
-  Text,
-  List,
-  ListItem,
-  Icon,
-  StyleProvider,
-  Header,
-  Body,
-} from 'native-base';
+import { Container, Text, List, ListItem, Icon, StyleProvider, Header, Body, } from 'native-base';
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import moment from 'moment'
-import {
-  STATISTICS
-} from '../lib/ContainerConstants'
+import { STATISTICS } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
-    return {
-        statisticsListItems: state.statistics.statisticsListItems,
-    }
+  return {
+    statisticsListItems: state.statistics.statisticsListItems,
+  }
 }
 
 class Statistics extends PureComponent {
 
-    componentDidMount() {
-        this.props.getDataForStatisticsList()
-    }
+  componentDidMount() {
+    this.props.getDataForStatisticsList()
+  }
 
-    showHeaderView(){
-      return (
-        <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
+  showHeaderView() {
+    return (
+      <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
           <Body>
             <View
               style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
@@ -52,48 +36,49 @@ class Statistics extends PureComponent {
             </View>
           </Body>
         </Header>
-      )
-    }
+      </SafeAreaView>
+    )
+  }
 
-    showStatisticsList(){
-      return (
-        <FlatList
-          data={(Object.values(this.props.statisticsListItems))}
-          renderItem={({ item }) => {
-            return (
-              <TouchableHighlight underlayColor={'#eee'}>
-                <View style={style.seqCard}>
-                  <View style={style.seqCardDetail}>
-                    <View>
-                      <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-                        {item.label}
-                      </Text>
-                      <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-                        {item.value}
-                      </Text>
-                    </View>
+  showStatisticsList() {
+    return (
+      <FlatList
+        data={(Object.values(this.props.statisticsListItems))}
+        renderItem={({ item }) => {
+          return (
+            <TouchableHighlight underlayColor={'#eee'}>
+              <View style={style.seqCard}>
+                <View style={style.seqCardDetail}>
+                  <View>
+                    <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
+                      {item.label}
+                    </Text>
+                    <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
+                      {item.value}
+                    </Text>
                   </View>
                 </View>
-              </TouchableHighlight>
-            )
-          }}
-          keyExtractor={item => String(item.id)}
+              </View>
+            </TouchableHighlight>
+          )
+        }}
+        keyExtractor={item => String(item.id)}
       />
-      )
-    }
+    )
+  }
 
-    render() {
-            return (
-                <StyleProvider style={getTheme(platform)}>
-                <Container>
-                  {this.showHeaderView()}
-                  {this.showStatisticsList()}
-                 
-            </Container>
-        </StyleProvider>
-            )
-        }
-    }
+  render() {
+    return (
+      <StyleProvider style={getTheme(platform)}>
+        <Container>
+          {this.showHeaderView()}
+          {this.showStatisticsList()}
+
+        </Container>
+      </StyleProvider>
+    )
+  }
+}
 const style = StyleSheet.create({
   seqCard: {
     minHeight: 70,

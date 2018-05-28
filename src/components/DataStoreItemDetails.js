@@ -1,23 +1,8 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, FlatList, Modal } from 'react-native'
-import {
-    Container,
-    Content,
-    Header,
-    Button,
-    Text,
-    Body,
-    Icon,
-    Footer,
-    FooterTab,
-} from 'native-base'
-import {
-    _id,
-} from '../lib/constants'
-import {
-    SAVE,
-    CONFIRM
-} from '../lib/ContainerConstants'
+import { StyleSheet, View, FlatList, Modal, SafeAreaView } from 'react-native'
+import { Container, Content, Header, Button, Text, Body, Icon, Footer, FooterTab, } from 'native-base'
+import { _id, } from '../lib/constants'
+import { SAVE, CONFIRM } from '../lib/ContainerConstants'
 import styles from '../themes/FeStyle'
 export default class DataStoreItemDetails extends PureComponent {
 
@@ -53,22 +38,24 @@ export default class DataStoreItemDetails extends PureComponent {
                 animationType="slide"
                 onRequestClose={() => { this.props.goBack(-1, null, true) }}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
-                                <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.paddingRight5, styles.paddingLeft5]} onPress={() => { this.props.goBack(-1, null, true) }} />
-                                <Text
-                                    style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{CONFIRM}</Text>
-                                <View />
-                            </View>
-                            <View style={[styles.row,]}>
+                    <SafeAreaView style={{ backgroundColor: syles.bgPrimaryColor }}>
+                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                            <Body>
                                 <View
-                                    style={[styles.row, styles.flex1, styles.justifySpaceBetween, styles.relative]}>
+                                    style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
+                                    <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.paddingRight5, styles.paddingLeft5]} onPress={() => { this.props.goBack(-1, null, true) }} />
+                                    <Text
+                                        style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{CONFIRM}</Text>
+                                    <View />
                                 </View>
-                            </View>
-                        </Body>
-                    </Header>
+                                <View style={[styles.row,]}>
+                                    <View
+                                        style={[styles.row, styles.flex1, styles.justifySpaceBetween, styles.relative]}>
+                                    </View>
+                                </View>
+                            </Body>
+                        </Header>
+                    </SafeAreaView>
                     <Content style={[styles.margin5]}>
                         < FlatList
                             data={this.createDetails(this.props.selectedElement.dataStoreAttributeValueMap)}
@@ -76,16 +63,18 @@ export default class DataStoreItemDetails extends PureComponent {
                             keyExtractor={item => String(item.id)}
                         />
                     </Content>
-                    <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
-                        <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
-                            <Button success full style={{backgroundColor : styles.bgPrimaryColor}}
-                                onPress={() => {
-                                    this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.uniqueKey])
-                                }}>
-                                <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
-                            </Button>
-                        </FooterTab>
-                    </Footer>
+                    <SafeAreaView style={[styles.bgWhite]}>
+                        <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
+                            <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
+                                <Button success full style={{ backgroundColor: styles.bgPrimaryColor }}
+                                    onPress={() => {
+                                        this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.uniqueKey])
+                                    }}>
+                                    <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
+                                </Button>
+                            </FooterTab>
+                        </Footer>
+                    </SafeAreaView>
                 </Container>
             </Modal>
         )

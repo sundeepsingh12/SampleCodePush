@@ -1,18 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    Platform,
-    FlatList,
-    TouchableHighlight,
-    ActivityIndicator,
-    Modal,
-    Keyboard,
-    TouchableOpacity,
-}
-    from 'react-native'
+import { StyleSheet, View, Text, Platform, FlatList, TouchableHighlight, ActivityIndicator, Modal, Keyboard, TouchableOpacity, } from 'react-native'
 import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, Toast, Item, Label } from 'native-base'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
@@ -66,16 +54,8 @@ import {
     ADVANCE_DROPDOWN
 } from '../lib/AttributeConstants'
 
-import {
-    NEXT_FOCUS,
-    CameraAttribute,
-    Payment,
-    SET_MODAL_FIELD_ATTRIBUTE
-} from '../lib/constants'
-import {
-    OPTIONAL,
-    SELECTED
-} from '../lib/ContainerConstants'
+import { NEXT_FOCUS, CameraAttribute, Payment, SET_MODAL_FIELD_ATTRIBUTE } from '../lib/constants'
+import { OPTIONAL, SELECTED } from '../lib/ContainerConstants'
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'
 import TimePicker from '../components/TimePicker'

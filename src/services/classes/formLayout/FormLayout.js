@@ -319,9 +319,9 @@ class FormLayout {
             currentObject.value = afterValidationResult && !uniqueValidationResult ? currentObject.displayValue : null
             if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
                 return { isFormValid: false, formElement }
-            } else if ((currentObject.value || currentObject.value == 0) && (currentObject.attributeTypeId == 6 || currentObject.attributeTypeId == 27) && !Number.isInteger(Number(currentObject.value))) {
+            } else if ((currentObject.value && currentObject.value != 0) && (currentObject.attributeTypeId == 6 || currentObject.attributeTypeId == 27) && !Number.isInteger(Number(currentObject.value))) {
                 return { isFormValid: false, formElement }
-            } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 13 && !Number(currentObject.value)) {
+            } else if ((currentObject.value && currentObject.value != 0) && currentObject.attributeTypeId == 13 && !Number(currentObject.value)) {
                 return { isFormValid: false, formElement }
             }
         }

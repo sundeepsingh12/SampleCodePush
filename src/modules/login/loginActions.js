@@ -29,26 +29,14 @@ import {
   UnsyncBackupUpload,
   DOMAIN_URL
 } from '../../lib/constants'
-
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import moment from 'moment'
 import { logoutService } from '../../services/classes/Logout'
-
-
-import {
-  authenticationService
-} from '../../services/classes/Authentication'
-import {
-  invalidateUserSessionForAutoLogout
-} from '../pre-loader/preloaderActions'
+import { authenticationService } from '../../services/classes/Authentication'
+import { invalidateUserSessionForAutoLogout } from '../pre-loader/preloaderActions'
 import CONFIG from '../../lib/config'
-import {
-  keyValueDBService
-} from '../../services/classes/KeyValueDBService'
-import {
-  NavigationActions
-} from 'react-navigation'
-
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { NavigationActions } from 'react-navigation'
 import { setState, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
 
 /**
@@ -139,7 +127,9 @@ export function authenticateUser(username, password, rememberMe) {
       dispatch(loginRequest())
       const authenticationResponse = await authenticationService.login(username, password)
       let cookie = authenticationResponse.headers.map['set-cookie'][0]
-      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)
+      let jsessionID = authenticationResponse.headers.map['set-cookie'][0].split(',')[1].split(';')[0].trim()
+      console.log('jsessionID', jsessionID)
+      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, jsessionID)
       await authenticationService.saveLoginCredentials(username, password, rememberMe)
       dispatch(loginSuccess())
       dispatch(NavigationActions.navigate({
@@ -162,7 +152,7 @@ export function authenticateUser(username, password, rememberMe) {
 export function onLongPressResetSettings(url) {
   return async function (dispatch) {
     try {
-      if(!url) {
+      if (!url) {
         const domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
         url = domainUrl.value
       }
@@ -213,7 +203,7 @@ export function checkRememberMe() {
       showToastAndAddUserExceptionLog(1304, error.message, 'danger', 1)
     } finally {
       const url = await keyValueDBService.getValueFromStore(DOMAIN_URL)
-      if(!url || !url.value) await keyValueDBService.validateAndSaveData(DOMAIN_URL, CONFIG.FAREYE.domain[0].url)
+      if (!url || !url.value) await keyValueDBService.validateAndSaveData(DOMAIN_URL, CONFIG.FAREYE.domain[0].url)
     }
   }
 }
