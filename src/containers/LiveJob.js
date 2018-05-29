@@ -4,9 +4,8 @@ import { connect } from 'react-redux'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, SafeAreaView } from 'react-native'
 import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, StyleProvider, List, ListItem, Footer, FooterTab, Card, ActionSheet, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as liveJobActions from '../modules/liveJob/liveJobActions'
@@ -146,22 +145,24 @@ class LiveJob extends PureComponent {
 
     showHeaderView() {
         return (
-            <Header searchBar style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
-                <Body>
-                    <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                        <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                        </TouchableOpacity>
-                        <View style={[style.headerBody]}>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}</Text>
+            <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+                    <Body>
+                        <View
+                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                            </TouchableOpacity>
+                            <View style={[style.headerBody]}>
+                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}</Text>
+                            </View>
+                            <View style={[style.headerRight]}>
+                            </View>
+                            <View />
                         </View>
-                        <View style={[style.headerRight]}>
-                        </View>
-                        <View />
-                    </View>
-                </Body>
-            </Header>
+                    </Body>
+                </Header>
+            </SafeAreaView>
         )
     }
 

@@ -29,7 +29,6 @@ import {
   UnsyncBackupUpload,
   DOMAIN_URL
 } from '../../lib/constants'
-
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import moment from 'moment'
 import { logoutService } from '../../services/classes/Logout'
@@ -40,13 +39,8 @@ import {
 } from '../../services/classes/Authentication'
 
 import CONFIG from '../../lib/config'
-import {
-  keyValueDBService
-} from '../../services/classes/KeyValueDBService'
-import {
-  NavigationActions
-} from 'react-navigation'
-
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { NavigationActions } from 'react-navigation'
 import { setState, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
 
 /**
@@ -160,7 +154,7 @@ export function authenticateUser(username, password, rememberMe) {
 export function onLongPressResetSettings(url) {
   return async function (dispatch) {
     try {
-      if(!url) {
+      if (!url) {
         const domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
         url = domainUrl.value
       }
@@ -211,7 +205,7 @@ export function checkRememberMe() {
       showToastAndAddUserExceptionLog(1304, error.message, 'danger', 1)
     } finally {
       const url = await keyValueDBService.getValueFromStore(DOMAIN_URL)
-      if(!url || !url.value) await keyValueDBService.validateAndSaveData(DOMAIN_URL, CONFIG.FAREYE.domain[0].url)
+      if (!url || !url.value) await keyValueDBService.validateAndSaveData(DOMAIN_URL, CONFIG.FAREYE.domain[0].url)
     }
   }
 }

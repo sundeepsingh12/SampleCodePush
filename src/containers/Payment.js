@@ -1,18 +1,8 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    Platform,
-    TextInput,
-    TouchableOpacity,
-} from 'react-native'
-import {
-    Container, Content, Header, Footer, FooterTab, Input, Button, Item, Card,
-    CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox, StyleProvider
-} from 'native-base'
+import { StyleSheet, View, Text, Platform, TextInput, TouchableOpacity, SafeAreaView } from 'react-native'
+import { Container, Content, Header, Footer, FooterTab, Input, Button, Item, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
@@ -47,12 +37,7 @@ import {
     TICKET_RESTAURANT,
     UPI,
 } from '../lib/AttributeConstants'
-
-import {
-    SET_PAYMENT_CHANGED_PARAMETERS,
-    SET_SPLIT_PAYMENT,
-    SplitPayment
-} from '../lib/constants'
+import { SET_PAYMENT_CHANGED_PARAMETERS, SET_SPLIT_PAYMENT, SplitPayment } from '../lib/constants'
 
 import {
     AMOUNT_TO_BE_COLLECTED,
@@ -220,7 +205,7 @@ class Payment extends PureComponent {
         let finalPaymentView = []
         let paymentModeView = []
         paymentModeView.push(
-            <Text key='PaymentText' style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100, styles.marginBottom10]}>
+            <Text key='PaymentText' style={[{ color: styles.fontPrimaryColor }, styles.fontSm, styles.width100, styles.marginBottom10]}>
                 {this.props.splitPaymentMode == YES ? SELECT_PAYMENT_METHOD_TO_SPLIT : SELECT_PAYMENT_METHOD}
             </Text>
         )
@@ -264,7 +249,7 @@ class Payment extends PureComponent {
         }
         return (
             <View style={[styles.marginBottom15]}>
-                <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>
+                <Text style={[{ color: styles.fontPrimaryColor }, styles.fontSm]}>
                     {SPLIT_PAYMENT}
                 </Text>
                 <View style={[styles.row, styles.marginTop10]}>
@@ -356,22 +341,24 @@ class Payment extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingTop5]}>
-                                <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[styles.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Status</Text>
+                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
+                            <Body>
+                                <View
+                                    style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingTop5]}>
+                                    <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                    </TouchableOpacity>
+                                    <View style={[styles.headerBody]}>
+                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Status</Text>
+                                    </View>
+                                    <View style={[styles.headerRight]}>
+                                    </View>
+                                    <View />
                                 </View>
-                                <View style={[styles.headerRight]}>
-                                </View>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
+                            </Body>
+                        </Header>
+                    </SafeAreaView>
 
                     <Content style={[styles.flex1, styles.bgWhite, styles.padding10]}>
                         {amountTobeCollectedView}
@@ -383,19 +370,21 @@ class Payment extends PureComponent {
                             {paymentModeSelectedView}
                         </View>
                     </Content>
-                    <Footer style={[styles.padding10, style.footer]}>
-                        <FooterTab>
-                            <Button success
-                                disabled={this.props.isSaveButtonDisabled}
-                                style={StyleSheet.flatten([{ borderRadius: 0 }])}
-                                onPress={() => {
-                                    this.moveToSplitOrSavePayment()
-                                }}
-                            >
-                                <Text style={[styles.fontWhite]}>{this.props.splitPaymentMode == YES ? ENTER_SPLIT_DETAILS : SAVE}</Text>
-                            </Button>
-                        </FooterTab>
-                    </Footer>
+                    <SafeAreaView>
+                        <Footer style={[styles.padding10, style.footer]}>
+                            <FooterTab>
+                                <Button success
+                                    disabled={this.props.isSaveButtonDisabled}
+                                    style={StyleSheet.flatten([{ borderRadius: 0 }])}
+                                    onPress={() => {
+                                        this.moveToSplitOrSavePayment()
+                                    }}
+                                >
+                                    <Text style={[styles.fontWhite]}>{this.props.splitPaymentMode == YES ? ENTER_SPLIT_DETAILS : SAVE}</Text>
+                                </Button>
+                            </FooterTab>
+                        </Footer>
+                    </SafeAreaView>
                 </Container>
             </StyleProvider>
         )

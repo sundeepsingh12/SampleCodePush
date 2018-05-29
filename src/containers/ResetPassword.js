@@ -3,42 +3,16 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
-
-import {
-  Container,
-  Content,
-  Header,
-  Button,
-  Body,
-  Icon,
-  Item,
-  Input,
-  Label,
-  Footer,
-  FooterTab,
-  StyleProvider
-} from 'native-base'
-
+import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native'
+import { Container, Content, Header, Button, Body, Icon, Item, Input, Label, Footer, FooterTab, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as globalActions from '../modules/global/globalActions'
 import * as profileActions from '../modules/profile/profileActions'
-import {
-  CHECK_CURRENT_PASSWORD,
-  SET_NEW_PASSWORD,
-  SET_CONFIRM_NEW_PASSWORD,
-  TOGGLE_SAVE_RESET_BUTTON,
-} from '../lib/constants'
+import { CHECK_CURRENT_PASSWORD, SET_NEW_PASSWORD, SET_CONFIRM_NEW_PASSWORD, TOGGLE_SAVE_RESET_BUTTON, } from '../lib/constants'
 import Loader from '../components/Loader'
-import {
-  RESET_PASSWORD,
-  CURRENT_PASSWORD,
-  NEW_PASSWORD,
-  CONFIRM_NEW_PASSWORD,
-  MINIMUM_REQUIREMENT_FOR_PASSWORD,
-} from '../lib/ContainerConstants'
+import { RESET_PASSWORD, CURRENT_PASSWORD, NEW_PASSWORD, CONFIRM_NEW_PASSWORD, MINIMUM_REQUIREMENT_FOR_PASSWORD, } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -91,38 +65,42 @@ class ResetPassword extends PureComponent {
   }
 
   _getHeaderView() {
-    return <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
-      <Body>
-        <View
-          style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-          <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-          </TouchableOpacity>
-          <View style={[styles.headerBody, styles.paddingTop15]}>
-            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{RESET_PASSWORD}</Text>
-          </View>
-          <View style={[styles.headerRight]}>
-          </View>
-          <View />
-        </View>
-      </Body>
-    </Header>
+    return (
+      <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
+          <Body>
+            <View
+              style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+              <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+              </TouchableOpacity>
+              <View style={[styles.headerBody, styles.paddingTop15]}>
+                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{RESET_PASSWORD}</Text>
+              </View>
+              <View style={[styles.headerRight]}>
+              </View>
+              <View />
+            </View>
+          </Body>
+        </Header>
+      </SafeAreaView>
+    )
   }
 
   _getPasswordDetails() {
     return <Content style={[styles.flex1, styles.bgWhite]}>
       <View style={[styles.bgWhite, styles.padding10, styles.marginTop30]}>
         <Item stackedLabel style={[styles.marginBottom15]}>
-          <Label style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>{CURRENT_PASSWORD}</Label>
+          <Label style={[{ color: styles.fontPrimaryColor }, styles.fontSm]}>{CURRENT_PASSWORD}</Label>
           <Input style={[styles.inputType]} secureTextEntry={true} onChangeText={this._setCurrentPassword} value={this.props.currentPassword} />
         </Item>
         <Item stackedLabel style={[styles.marginBottom15]}>
-          <Label style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>{NEW_PASSWORD}</Label>
+          <Label style={[{ color: styles.fontPrimaryColor }, styles.fontSm]}>{NEW_PASSWORD}</Label>
           <Label style={[styles.fontDarkGray, styles.fontXs]}>{MINIMUM_REQUIREMENT_FOR_PASSWORD}</Label>
           <Input style={[styles.inputType]} secureTextEntry={true} onChangeText={this._setNewPassword} value={this.props.newPassword} />
         </Item>
         <Item stackedLabel style={[styles.marginBottom15]}>
-          <Label style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>{CONFIRM_NEW_PASSWORD}</Label>
+          <Label style={[{ color: styles.fontPrimaryColor }, styles.fontSm]}>{CONFIRM_NEW_PASSWORD}</Label>
           <Input style={[styles.inputType]} secureTextEntry={true} onChangeText={this._setConfirmNewPassword} value={this.props.confirmNewPassword} />
         </Item>
       </View>
@@ -130,13 +108,17 @@ class ResetPassword extends PureComponent {
   }
 
   _getFooterView() {
-    return <Footer style={[styles.footer]}>
-      <FooterTab style={[styles.padding10]}>
-        <Button success full onPress={this._onResetPress} disabled={this.props.isSaveResetButtonDisabled}>
-          <Text style={[styles.fontLg, styles.fontWhite]}>{RESET_PASSWORD}</Text>
-        </Button>
-      </FooterTab>
-    </Footer>
+    return (
+      <SafeAreaView>
+        <Footer style={[styles.footer]}>
+          <FooterTab style={[styles.padding10]}>
+            <Button success full onPress={this._onResetPress} disabled={this.props.isSaveResetButtonDisabled}>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{RESET_PASSWORD}</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
+      </SafeAreaView>
+    )
   }
 
   render() {

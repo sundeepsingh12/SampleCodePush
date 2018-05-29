@@ -1,12 +1,5 @@
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    FlatList,
-    TouchableOpacity,
-}
-    from 'react-native'
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, SafeAreaView } from 'react-native'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SignatureRemarks from '../components/SignatureRemarks'
@@ -16,23 +9,9 @@ import renderIf from '../lib/renderIf'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import {
-    Container,
-    Content,
-    Header,
-    Left,
-    Body,
-    Icon,
-    StyleProvider,
-    Toast
-} from 'native-base'
-import {
-    SIGNATURE,
-} from '../lib/AttributeConstants'
-import {
-    OK,
-    IMPROPER_SIGNATURE
-} from '../lib/ContainerConstants'
+import { Container, Content, Header, Left, Body, Icon, StyleProvider, Toast } from 'native-base'
+import { SIGNATURE } from '../lib/AttributeConstants'
+import { OK, IMPROPER_SIGNATURE } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -103,32 +82,34 @@ class Signature extends PureComponent {
     }
 
     headerView() {
-        let view
-        view = <Header searchBar style={[styles.bgWhite, style.header]}>
-            <Body>
-                <View
-                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                    <TouchableOpacity style={[style.headerLeft]} onPress={() => {
-                        this.setState({ isLandscape: 'portrait' })
-                        this.props.navigation.goBack(null)
-                    }}>
-                        <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
-                    </TouchableOpacity>
-                    <View style={[style.headerBody]}>
-                        <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter]}>Signature</Text>
-                    </View>
-                    <TouchableOpacity style={[style.headerRight]}
-                        onPress={this.resetSign} >
-                        <Text style={[styles.fontBlack, styles.fontLg, styles.fontRight]}>Clear</Text>
-                    </TouchableOpacity>
-                    <View />
-                </View>
-            </Body>
-        </Header>
-        return view
+        return (
+            <SafeAreaView style={[styles.bgWhite]}>
+                <Header searchBar style={[styles.bgWhite, style.header]}>
+                    <Body>
+                        <View
+                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                            <TouchableOpacity style={[style.headerLeft]} onPress={() => {
+                                this.setState({ isLandscape: 'portrait' })
+                                this.props.navigation.goBack(null)
+                            }}>
+                                <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
+                            </TouchableOpacity>
+                            <View style={[style.headerBody]}>
+                                <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter]}>Signature</Text>
+                            </View>
+                            <TouchableOpacity style={[style.headerRight]}
+                                onPress={this.resetSign} >
+                                <Text style={[styles.fontBlack, styles.fontLg, styles.fontRight]}>Clear</Text>
+                            </TouchableOpacity>
+                            <View />
+                        </View>
+                    </Body>
+                </Header>
+            </SafeAreaView>
+        )
     }
     saveSignButton() {
-        return <TouchableOpacity style={[style.fabButton, {backgroundColor : styles.bgPrimaryColor}]}
+        return <TouchableOpacity style={[style.fabButton, { backgroundColor: styles.bgPrimaryColor }]}
             onPress={this.saveSign} >
             <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
         </TouchableOpacity>

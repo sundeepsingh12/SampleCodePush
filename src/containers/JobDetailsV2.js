@@ -28,28 +28,8 @@ import {
 } from '../lib/ContainerConstants'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
-
-import {
-  Container,
-  Content,
-  Header,
-  Button,
-  Text,
-  Left,
-  Body,
-  Right,
-  Icon,
-  StyleProvider,
-  List,
-  ListItem,
-  Footer,
-  FooterTab,
-  Card,
-  ActionSheet,
-  Toast
-} from 'native-base'
-
+import { StyleSheet, View, TouchableOpacity, Alert, SafeAreaView } from 'react-native'
+import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, StyleProvider, List, ListItem, Footer, FooterTab, Card, ActionSheet, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import Loader from '../components/Loader'
@@ -66,12 +46,7 @@ import {
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
-import {
-  LANDMARK,
-  PINCODE,
-  ADDRESS_LINE_1,
-  ADDRESS_LINE_2
-} from '../lib/AttributeConstants'
+import { LANDMARK, PINCODE, ADDRESS_LINE_1, ADDRESS_LINE_2 } from '../lib/AttributeConstants'
 import Communications from 'react-native-communications'
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
@@ -508,13 +483,15 @@ class JobDetailsV2 extends PureComponent {
 
   showHeaderView() {
     return (
-      <Header style={[style.header]}>
-        <View style={style.seqCard}>
-          {this.showJobMasterIdentifier()}
-          <Line1Line2View data={this.props.navigation.state.params.jobTransaction} />
-          {this.showCloseIcon()}
-        </View>
-      </Header>
+      <SafeAreaView>
+        <Header style={[style.header]}>
+          <View style={style.seqCard}>
+            {this.showJobMasterIdentifier()}
+            <Line1Line2View data={this.props.navigation.state.params.jobTransaction} />
+            {this.showCloseIcon()}
+          </View>
+        </Header>
+      </SafeAreaView>
     )
   }
 
@@ -559,26 +536,26 @@ class JobDetailsV2 extends PureComponent {
     const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
     const etaTimer = this.etaUpdateTimer()
     return (
-    <Content>
-      {!this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0 ?
-        this.showRevertView() : null}
+      <Content>
+        {!this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0 ?
+          this.showRevertView() : null}
 
-      <View style={[styles.marginTop5, styles.bgWhite]}>
-        {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
-          <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
-            {this.props.errorMessage}
-          </Text>
-        </View> : null}
-        {etaTimer}
-        {statusView}
-      </View>
+        <View style={[styles.marginTop5, styles.bgWhite]}>
+          {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
+            <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
+              {this.props.errorMessage}
+            </Text>
+          </View> : null}
+          {etaTimer}
+          {statusView}
+        </View>
 
-      {/*Basic Details*/}
-      {this.showJobDetails()}
+        {/*Basic Details*/}
+        {this.showJobDetails()}
 
-      {/*Field Details*/}
-      {this.showFieldDetails()}
-    </Content>
+        {/*Field Details*/}
+        {this.showFieldDetails()}
+      </Content>
     )
   }
 
@@ -608,34 +585,36 @@ class JobDetailsV2 extends PureComponent {
 
   showFooterView() {
     return (
-      <Footer style={[style.footer]}>
-        {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0 && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
-          <FooterTab>
-            <Button full style={[styles.bgWhite]} onPress={this.chatButtonPressed}>
-              <Icon name="md-text" style={[styles.fontLg, styles.fontBlack]} />
-            </Button>
-          </FooterTab>
-        )}
-        {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
-          <FooterTab>
-            <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
-              <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
-            </Button>
-          </FooterTab>
-        )}
-        {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) || (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
-          <FooterTab>
-            <Button full onPress={this.navigationButtonPressed}>
-              <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
-            </Button>
-          </FooterTab>)}
-        {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
-          <FooterTab>
-            <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
-              <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
-            </Button>
-          </FooterTab>)}
-      </Footer>
+      <SafeAreaView style={[styles.bgWhite]}>
+        <Footer style={[style.footer]}>
+          {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0 && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
+            <FooterTab>
+              <Button full style={[styles.bgWhite]} onPress={this.chatButtonPressed}>
+                <Icon name="md-text" style={[styles.fontLg, styles.fontBlack]} />
+              </Button>
+            </FooterTab>
+          )}
+          {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
+            <FooterTab>
+              <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
+                <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+              </Button>
+            </FooterTab>
+          )}
+          {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) || (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
+            <FooterTab>
+              <Button full onPress={this.navigationButtonPressed}>
+                <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
+              </Button>
+            </FooterTab>)}
+          {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
+            <FooterTab>
+              <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
+                <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
+              </Button>
+            </FooterTab>)}
+        </Footer>
+      </SafeAreaView>
     )
   }
 
