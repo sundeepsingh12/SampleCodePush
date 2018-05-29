@@ -2463,8 +2463,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.roboticwares.fareye;
 				PRODUCT_NAME = Fareye;
-				PROVISIONING_PROFILE = "7642be6c-5d10-4b24-b619-da1886886c36";
-				PROVISIONING_PROFILE_SPECIFIER = "Development Provisioning Profile";
+				PROVISIONING_PROFILE = "b26de632-06bb-4e29-a903-8d9a2b02f112";
+				PROVISIONING_PROFILE_SPECIFIER = "Development Provision Profile";
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -2524,8 +2524,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.roboticwares.fareye;
 				PRODUCT_NAME = Fareye;
-				PROVISIONING_PROFILE = "7642be6c-5d10-4b24-b619-da1886886c36";
-				PROVISIONING_PROFILE_SPECIFIER = "Development Provisioning Profile";
+				PROVISIONING_PROFILE = "b26de632-06bb-4e29-a903-8d9a2b02f112";
+				PROVISIONING_PROFILE_SPECIFIER = "Development Provision Profile";
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
