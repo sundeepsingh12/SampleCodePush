@@ -15,13 +15,14 @@ import _ from 'lodash'
  * @param {*} transientFormLayoutMap //contains form layout state of previous statuses and current status
  * @param {*} currentStatus 
  */
-export function setStateFromNavigationParams(formLayout, transientFormLayoutMap, currentStatus, contactData, jobTransaction, jobMasterId) {
+export function setStateFromNavigationParams(navigationParams, transientFormLayoutMap) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_IS_RUNNING, true))
-            if (!currentStatus || !formLayout) throw new Error('current status missing')
+            let { formLayoutState, currentStatus, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams } = navigationParams
+            if (!currentStatus || !formLayoutState) throw new Error('current status missing')
             let cloneTransientFormLayoutMap = _.cloneDeep(transientFormLayoutMap)
-            cloneTransientFormLayoutMap[currentStatus.id] = _.cloneDeep(formLayout)
+            cloneTransientFormLayoutMap[currentStatus.id] = _.cloneDeep(formLayoutState)
             dispatch(setState(ADD_FORM_LAYOUT_STATE, cloneTransientFormLayoutMap))
             if (_.size(currentStatus.nextStatusList) == 1) {
                 dispatch(navigateToScene(FormLayout, {
@@ -32,10 +33,12 @@ export function setStateFromNavigationParams(formLayout, transientFormLayoutMap,
                     statusName: currentStatus.nextStatusList[0].name,
                     jobMasterId: jobMasterId,
                     navigationFormLayoutStates: cloneTransientFormLayoutMap,
-                    latestPositionId: formLayout.latestPositionId
+                    latestPositionId: formLayoutState.latestPositionId,
+                    jobDetailsScreenKey,
+                    pageObjectAdditionalParams
                 }))
             }
-            draftService.saveDraftInDb(formLayout, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
+            draftService.saveDraftInDb(formLayoutState, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
         } catch (error) {
             dispatch(setState(LOADER_IS_RUNNING, false))
             showToastAndAddUserExceptionLog(2501, error.message, 'danger', 1)

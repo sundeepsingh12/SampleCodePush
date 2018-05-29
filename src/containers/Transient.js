@@ -34,12 +34,8 @@ class Transient extends PureComponent {
 
     componentDidMount() {
         this.props.actions.setStateFromNavigationParams(
-            this.props.navigation.state.params.formLayoutState,
-            this.props.formLayoutStates,
-            this.props.navigation.state.params.currentStatus,
-            this.props.navigation.state.params.contactData,
-            this.props.navigation.state.params.jobTransaction,
-            this.props.navigation.state.params.jobMasterId)
+            this.props.navigation.state.params,
+            this.props.formLayoutStates)
     }
 
     navigateToFormLayout(statusId, statusName) {
@@ -51,6 +47,8 @@ class Transient extends PureComponent {
             statusName,
             jobMasterId: this.props.navigation.state.params.jobMasterId,
             navigationFormLayoutStates: this.props.formLayoutStates,
+            jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
+            pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
         })
     }
 
