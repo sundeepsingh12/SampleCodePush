@@ -421,9 +421,8 @@ describe('test for setSmsBodyJobData', () => {
             }
         }
         const returnmessage = 'hello N.A.'
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue('test')
-        expect(addServerSmsService.setSmsBodyJobData(message, jobData, jobTransaction, keyToJobAttributeMap)).toEqual(returnmessage)
+
+        expect(addServerSmsService.setSmsBodyJobData(message, jobData, jobTransaction, keyToJobAttributeMap, null, true)).toEqual(returnmessage)
     })
     it('should return message with value matching key', () => {
         const jobTransaction = {
@@ -487,7 +486,7 @@ describe('test for setSmsBodyJobData', () => {
         const returnmessage = 'hello N.A.'
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue('test')
-        expect(addServerSmsService.setSmsBodyJobData(message, null, jobTransaction, keyToJobAttributeMap, jobData)).toEqual(returnmessage)
+        expect(addServerSmsService.setSmsBodyJobData(message, null, jobTransaction, keyToJobAttributeMap, jobData, true)).toEqual(returnmessage)
     })
 })
 describe('test for setSMSBodyFieldData', () => {
@@ -563,7 +562,7 @@ describe('test for setSMSBodyFieldData', () => {
         const returnmessage = 'hello N.A.'
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue('test')
-        expect(addServerSmsService.setSMSBodyFieldData(message, fieldData, jobTransaction, keyToJobAttributeMap)).toEqual(returnmessage)
+        expect(addServerSmsService.setSMSBodyFieldData(message, fieldData, jobTransaction, keyToJobAttributeMap, null, true)).toEqual(returnmessage)
     })
 })
 
@@ -611,7 +610,7 @@ describe('set sms body fixed attributes', () => {
                 mobileNumber: 123
             }
         }
-        const returnmessage = 'shivani monga refno 1 runsheetno 123 10 Dec 10 Dec 10 Dec'
+        const returnmessage = 'shivani monga refno 1 runsheetno 123 10 Dec 10 Dec 10 Dec 12:12'
         expect(addServerSmsService.setSmsBodyFixedAttribute(message, jobTransaction, user)).toEqual(returnmessage)
     })
 })
@@ -741,6 +740,68 @@ describe('test for getJobFieldAttributeForJobmaster', () => {
                 expect(result).toEqual(resultObj)
             })
     })
+
+    it('should return job empty attributes list', () => {
+        keyValueDBService.getValueFromStore.mockReturnValueOnce({
+            value: [{
+                jobMasterId: 1,
+                employeeCode: 'xyz'
+            }]
+        })
+        keyValueDBService.getValueFromStore.mockReturnValueOnce({
+            value: null
+        })
+        const resultObj = {
+            jobAttributes: [],
+            fieldAttributes: []
+        }
+        return addServerSmsService.getJobFieldAttributeForJobmaster(1)
+            .then((result) => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(result).toEqual(resultObj)
+            })
+    })
+})
+
+describe('test for getJobMasterIdToAttributesMap', () => {
+    it('should return job master to job attributes map', () => {
+        let attributesList = {
+            value: [{
+                jobMasterId: 1,
+                id: 1
+            },
+            {
+                jobMasterId: 2,
+                id: 2
+            }]
+        }
+        let jobMasterIdToJobAtrributesMap = {
+            1: [{
+                jobMasterId: 1,
+                id: 1
+            }],
+            2: [{
+                jobMasterId: 2,
+                id: 2
+            }]
+        }
+        let jobMasterIdToFieldAtrributesMap = {
+            1: [{
+                jobMasterId: 1,
+                id: 1
+            }],
+            2: [{
+                jobMasterId: 2,
+                id: 2
+            }]
+        }
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue(attributesList)
+        return addServerSmsService.getJobMasterIdToAttributesMap().then((result) => {
+            expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
+            expect(result).toEqual({ jobMasterIdToJobAtrributesMap, jobMasterIdToFieldAtrributesMap })
+        })
+    })
 })
 
 describe('test for getServerSmsLogs', () => {
@@ -799,11 +860,6 @@ describe('test for setServerSmsMapForPendingStatus', () => {
                 employeeCode: 'xyz'
             }
         })
-        keyValueDBService.getValueFromStore.mockReturnValueOnce({
-            value: {
-                code: 'abc'
-            }
-        })
         addServerSmsService.prepareServerSmsMap = jest.fn()
         addServerSmsService.prepareServerSmsMap.mockReturnValue({})
         return addServerSmsService.setServerSmsMapForPendingStatus(transactionIdDtosMap)
@@ -814,16 +870,11 @@ describe('test for setServerSmsMapForPendingStatus', () => {
     })
 
     it('should save sms map', () => {
-        const transactionIdDtosMap = {
-            930: {
-                4814: {
-                    jobMasterId: 930,
-                    pendingStatusId: 4813,
-                    transactionId: '2521299',
-                    unSeenStatusId: 4814,
-                }
-            }
-        }
+        const transactionIdDtosMap = [{
+            jobMasterId: 930,
+            transactionId: '2521299',
+            jobStatusId: 123
+        }]
 
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValueOnce({
@@ -837,33 +888,17 @@ describe('test for setServerSmsMapForPendingStatus', () => {
             }
         })
         const serverSmsMap = {
-            4813: [{
-                statusId: 4813,
+            123: [{
+                statusId: 123,
                 messageBody: 'hello',
                 contactNoJobAttributeId: 100
             }]
         }
         const jobAndFieldAttributes = {
-            jobAttributes: {},
-            fieldAttributes: {}
+            jobMasterIdToJobAtrributesMap: { 930: {} },
+            jobMasterIdToFieldAtrributesMap: { 930: {} }
         }
-        const jobTransactionList = [{
-            id: 2521299,
-            jobId: 3,
-            jobMasterId: 3,
-            seqSelected: 12,
-            jobStatusId: 11,
-            referenceNumber: 'refno',
-            userId: 1,
-            companyId: 2,
-            runsheetNo: 'runsheetno',
-            cityId: 8,
-            hubId: 7,
-            attemptCount: 1,
-            jobEtaTime: '2018-12-10 12:12:12',
-            jobCreatedAt: '2018-12-10 12:12:12',
-            lastUpdatedAtServer: '2018-12-10 12:12:12',
-        }]
+
         const jobDataMap = {
             3: {
 
@@ -871,11 +906,12 @@ describe('test for setServerSmsMapForPendingStatus', () => {
         }
         addServerSmsService.prepareServerSmsMap = jest.fn()
         addServerSmsService.prepareServerSmsMap.mockReturnValue(serverSmsMap)
-        addServerSmsService.getJobFieldAttributeForJobmaster = jest.fn()
-        addServerSmsService.getJobFieldAttributeForJobmaster.mockReturnValue(jobAndFieldAttributes)
-        realm.getRecordListOnQuery = jest.fn()
-        realm.getRecordListOnQuery.mockReturnValueOnce(jobTransactionList)
-        realm.getRecordListOnQuery.mockReturnValueOnce([1])
+        addServerSmsService.getJobMasterIdToAttributesMap = jest.fn()
+        addServerSmsService.getJobMasterIdToAttributesMap.mockReturnValue(jobAndFieldAttributes)
+        addServerSmsService.setSmsBody = jest.fn()
+        addServerSmsService.setSmsBody.mockReturnValue([{
+            message: 'hello'
+        }])
         jobDataService.getJobData = jest.fn()
         jobDataService.getJobData.mockReturnValue(jobDataMap)
         realm.performBatchSave = jest.fn()
@@ -883,10 +919,9 @@ describe('test for setServerSmsMapForPendingStatus', () => {
             .then(() => {
                 expect(addServerSmsService.prepareServerSmsMap).toHaveBeenCalledTimes(1)
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
-                expect(addServerSmsService.getJobFieldAttributeForJobmaster).toHaveBeenCalledTimes(1)
-                expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(2)
+                expect(addServerSmsService.getJobMasterIdToAttributesMap).toHaveBeenCalledTimes(1)
                 expect(jobDataService.getJobData).toHaveBeenCalledTimes(1)
-                expect(realm.performBatchSave).toHaveBeenCalledTimes(1)
+                expect(addServerSmsService.setSmsBody).toHaveBeenCalledTimes(1)
             })
     })
 })

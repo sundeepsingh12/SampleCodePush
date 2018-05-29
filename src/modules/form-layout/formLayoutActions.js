@@ -189,7 +189,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap)
                 if (isFormValidAndFormElement.isFormValid) {
                     const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-                    let { routeName, routeParam } = await formLayoutService.saveAndNavigate(cloneFormLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList)
+                    let { routeName, routeParam } = await formLayoutService.saveAndNavigate(cloneFormLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, taskListScreenDetails)
                     dispatch(setState(IS_LOADING, false))
                     if (routeName == TabScreen && taskListScreenDetails.jobDetailsScreenKey) {
                         let landingTabId = JSON.parse(taskListScreenDetails.pageObjectAdditionalParams).landingTabAfterJobCompletion ? jobStatusService.getTabIdOnStatusId(statusList.value, cloneFormLayoutState.statusId) : null
@@ -310,7 +310,7 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                     jobId: draftRestored.formLayoutState.jobTransactionId,
                 }
             }
-            if (restoreDraftAndNavigateToFormLayout) {
+            if (!_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore)) {
                 dispatch(setState(ADD_FORM_LAYOUT_STATE, draftRestored.navigationFormLayoutStatesForRestore))
             }
             dispatch(navigateToScene('FormLayout', {

@@ -2,59 +2,20 @@
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-
 import * as bulkActions from '../modules/bulk/bulkActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
-
 import React, { PureComponent } from 'react'
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  TouchableOpacity,
-  BackHandler,
-  TextInput
-} from 'react-native'
-
-import {
-  Container,
-  Header,
-  Button,
-  Text,
-  Body,
-  Icon,
-  Footer,
-  StyleProvider,
-  ActionSheet,
-  Toast
-} from 'native-base'
-
+import { StyleSheet, View, FlatList, TouchableOpacity, BackHandler, TextInput, SafeAreaView } from 'react-native'
+import { Container, Header, Button, Text, Body, Icon, Footer, StyleProvider, ActionSheet, Toast } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import JobListItem from '../components/JobListItem'
 import _ from 'lodash'
-import {
-  NEXT_POSSIBLE_STATUS,
-  FILTER_REF_NO,
-  OK,
-  CANCEL,
-  UPDATE_ALL_SELECTED,
-  BULK_UPDATE,
-  NO_JOBS_PRESENT,
-  TOTAL_COUNT
-} from '../lib/ContainerConstants'
-
-import {
-  FormLayout,
-  CLEAR_BULK_STATE,
-  HardwareBackPress,
-  SET_BULK_SEARCH_TEXT,
-  SET_BULK_ERROR_MESSAGE,
-  QrCodeScanner
-} from '../lib/constants'
+import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED, BULK_UPDATE, NO_JOBS_PRESENT, TOTAL_COUNT } from '../lib/ContainerConstants'
+import { FormLayout, CLEAR_BULK_STATE, HardwareBackPress, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 function mapStateToProps(state) {
@@ -185,24 +146,24 @@ class BulkListing extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
-          <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.padding5])}>
-            <Body>
-              <View
-                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                <TouchableOpacity style={[styles.headerLeft, styles.paddingTop10]} onPress={() => {
-                  this.props.navigation.goBack(null)
-                }}>
-                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                </TouchableOpacity>
-                <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name}</Text>
+          <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }]}>
+            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }])}>
+              <Body>
+                <View
+                  style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                  <TouchableOpacity style={[styles.headerLeft, styles.paddingTop10]} onPress={() => { this.props.navigation.goBack(null) }}>
+                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                  </TouchableOpacity>
+                  <View style={[style.headerBody]}>
+                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name}</Text>
+                  </View>
+                  <View style={[style.headerRight]}>
+                  </View>
+                  <View />
                 </View>
-                <View style={[style.headerRight]}>
-                </View>
-                <View />
-              </View>
-            </Body>
-          </Header>
+              </Body>
+            </Header>
+          </SafeAreaView>
 
           <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
             <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
@@ -225,61 +186,60 @@ class BulkListing extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
-          <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
-            <Body>
-              <View
-                style={[styles.row, styles.width100, styles.justifySpaceBetween,]}>
-                <TouchableOpacity style={[styles.headerLeft, styles.paddingTop10]} onPress={() => {
-                  this.props.navigation.goBack(null)
-                }}>
-                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                </TouchableOpacity>
-                <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{(this.props.navigation.state.params.pageObject.groupId) ? this.props.navigation.state.params.pageObject.groupId : this.props.navigation.state.params.pageObject.name}</Text>
+          <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+              <Body>
+                <View
+                  style={[styles.row, styles.width100, styles.justifySpaceBetween,]}>
+                  <TouchableOpacity style={[styles.headerLeft, styles.paddingTop10]} onPress={() => {
+                    this.props.navigation.goBack(null)
+                  }}>
+                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                  </TouchableOpacity>
+                  <View style={[style.headerBody]}>
+                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{(this.props.navigation.state.params.pageObject.groupId) ? this.props.navigation.state.params.pageObject.groupId : this.props.navigation.state.params.pageObject.name}</Text>
+                  </View>
+                  <View style={[style.headerRight]}>
+                    {this.props.isSelectAllVisible ?
+                      <Text
+                        onPress={this.selectAll}
+                        style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{this.props.selectAllNone}</Text>
+                      : null}
+                  </View>
+                  <View />
                 </View>
-                <View style={[style.headerRight]}>
-                  {this.props.isSelectAllVisible ?
-                    <Text
-                      onPress={this.selectAll}
-                      style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{this.props.selectAllNone}</Text>
-                    : null}
-                </View>
-                <View />
-              </View>
-              {this.searchBarView()}
-            </Body>
-          </Header>
+                {this.searchBarView()}
+              </Body>
+            </Header>
+          </SafeAreaView>
           <FlatList
             data={this.renderList()}
             renderItem={({ item }) => this.renderData(item)}
             keyExtractor={item => String(item.id)}
           />
 
-          <Footer
-            style={[{ height: 'auto' }, styles.column, styles.padding10]}>
-            <Text
-              style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.selectedItems)}</Text>
-            <Button
-              onPress={() => {
-                (nextStatusNames.length > 2) ? ActionSheet.show(
-                  {
+          <SafeAreaView>
+            <Footer style={[{ height: 'auto' }, styles.column, styles.padding10]}>
+              <Text style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.selectedItems)}</Text>
+              <Button
+                onPress={() => {
+                  (nextStatusNames.length > 2) ? ActionSheet.show({
                     options: nextStatusNames,
                     cancelButtonIndex: nextStatusNames.length - 1,
                     title: NEXT_POSSIBLE_STATUS
-                  },
-                  buttonIndex => {
+                  }, buttonIndex => {
                     if (buttonIndex >= 0 && buttonIndex != nextStatusNames.length - 1) {
                       this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex].text)
                     }
-                  }
-                ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0].text)
-              }}
-              success full
-              disabled={_.isEmpty(this.props.selectedItems) || (this.props.navigation.state.params.pageObject.groupId && !_.isEqual(_.size(this.props.bulkTransactionList), _.size(this.props.selectedItems)))}
-            >
-              <Text style={[styles.fontLg, styles.fontWhite]}>{UPDATE_ALL_SELECTED}</Text>
-            </Button>
-          </Footer>
+                  }) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0].text)
+                }}
+                success full
+                disabled={_.isEmpty(this.props.selectedItems) || (this.props.navigation.state.params.pageObject.groupId && !_.isEqual(_.size(this.props.bulkTransactionList), _.size(this.props.selectedItems)))}
+              >
+                <Text style={[styles.fontLg, styles.fontWhite]}>{UPDATE_ALL_SELECTED}</Text>
+              </Button>
+            </Footer>
+          </SafeAreaView>
 
         </Container>
       </StyleProvider>

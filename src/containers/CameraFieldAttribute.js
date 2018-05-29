@@ -1,60 +1,23 @@
 'use strict';
 import React, { PureComponent } from 'react'
-import {
-    Dimensions,
-    StyleSheet,
-    Text,
-    View,
-    TouchableOpacity,
-    Image,
-    ImageStore,
-    Platform
-} from 'react-native';
-
-import {
-    Container,
-    Content,
-    Header,
-    Left,
-    Body,
-    Right,
-    Icon,
-    Footer,
-    StyleProvider,
-    Button,
-    Toast
-} from 'native-base';
+import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Image, ImageStore, Platform, SafeAreaView } from 'react-native';
+import { Container, Content, Header, Left, Body, Right, Icon, Footer, StyleProvider, Button, Toast } from 'native-base';
 import Loader from '../components/Loader'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
 import CompressImage from 'react-native-compress-image';
-
 import { RNCamera } from 'react-native-camera'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import * as cameraActions from '../modules/camera/cameraActions'
-import {
-    SET_IMAGE_DATA,
-    SET_SHOW_IMAGE,
-    SET_SHOW_IMAGE_AND_DATA,
-    SET_CAMERA_LOADER
-} from '../lib/constants'
+import { SET_IMAGE_DATA, SET_SHOW_IMAGE, SET_SHOW_IMAGE_AND_DATA, SET_CAMERA_LOADER } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
 import ImagePicker from 'react-native-image-picker'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import platform from '../../native-base-theme/variables/platform'
-import {
-    CAMERA,
-    CAMERA_HIGH,
-    CAMERA_MEDIUM,
-    SKU_PHOTO
-} from '../lib/AttributeConstants'
-import {
-    OPEN_CAMERA
-} from '../lib/ContainerConstants'
-
-
+import { CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, SKU_PHOTO } from '../lib/AttributeConstants'
+import { OPEN_CAMERA } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -81,15 +44,18 @@ class CameraFieldAttribute extends PureComponent {
             cameraType: 'back',
         }
     }
+
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
+
     componentWillUnmount() {
         this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
             data: '',
             showImage: true
         })
     }
+
     componentDidMount() {
         let item = this.props.navigation.state.params.currentElement
         if (!_.isEmpty(item.validation)) this.props.actions.getValidation(item.validation)
@@ -111,9 +77,11 @@ class CameraFieldAttribute extends PureComponent {
             this.props.actions.setExistingImage(item)
         }
     }
+
     _setTorchOn = () => {
         this.setState({ torchOff: RNCamera.Constants.FlashMode.on })
     }
+
     _setTorchOff = () => {
         this.setState({ torchOff: RNCamera.Constants.FlashMode.off })
     }
@@ -139,6 +107,7 @@ class CameraFieldAttribute extends PureComponent {
             }
         })
     }
+
     getImageGallery = () => {
         const options = {
             title: 'Photo Picker',
@@ -167,6 +136,7 @@ class CameraFieldAttribute extends PureComponent {
             }
         })
     }
+
     renderTorch() {
         let view
         if (this.state.torchOff == RNCamera.Constants.FlashMode.off) {
@@ -178,6 +148,7 @@ class CameraFieldAttribute extends PureComponent {
         }
         return view
     }
+
     imageCaptureView(getValidationObject) {
         let torchView = this.renderTorch()
         return <StyleProvider style={getTheme(platform)}>
@@ -191,27 +162,29 @@ class CameraFieldAttribute extends PureComponent {
                         style={style.preview}
                         flashMode={this.state.torchOff}
                         type={this.state.cameraType}>
-                        <View style={[styles.absolute, styles.padding15, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
-                            <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.flex1]}>
-                                <Icon
-                                    name="md-close"
-                                    style={[styles.fontXxxl, styles.fontWhite]}
-                                    onPress={() => {
-                                        this.props.navigation.goBack()
-                                    }} />
-                                <Right>
-                                    {torchView}
-                                </Right>
+                        <SafeAreaView style={[styles.absolute, styles.padding15, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
+                            <View style={[styles.padding15]}>
+                                <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.flex1]}>
+                                    <Icon
+                                        name="md-close"
+                                        style={[styles.fontXxxl, styles.fontWhite]}
+                                        onPress={() => {
+                                            this.props.navigation.goBack()
+                                        }} />
+                                    <Right>
+                                        {torchView}
+                                    </Right>
+                                </View>
                             </View>
-                        </View>
+                        </SafeAreaView>
                     </RNCamera>
                 </View>
-                <View style={[style.cameraFooter]}>
-                    <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.flex1]}>
+                <SafeAreaView style={[style.cameraFooter]}>
+                    <View style={{height: 100, flexDirection: 'row', alignItems: 'center'}}>
                         <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
                             {(getValidationObject && getValidationObject.imageUploadFromDevice) ? <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} /> : null}
                         </View>
-                        <View style={[styles.flexBasis33_3, styles.alignCenter]}>
+                        <View style={[styles.flexBasis33_3, styles.alignCenter, styles.marginTop10]}>
                             <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
                                 <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }}>
                                     <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={this.takePicture.bind(this)} />
@@ -222,7 +195,7 @@ class CameraFieldAttribute extends PureComponent {
                             {(getValidationObject && getValidationObject.isFrontCameraEnabled) ? <MaterialIcons name={'switch-camera'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.toggleCameraType()} /> : null}
                         </View>
                     </View>
-                </View>
+                </SafeAreaView>
             </Container>
         </StyleProvider>
     }
@@ -240,35 +213,40 @@ class CameraFieldAttribute extends PureComponent {
                             }}
                             style={[styles.flex1]}
                         />
-                        <View style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
-                            <Icon
-                                name="md-close"
-                                style={[styles.fontXxxl, styles.fontWhite]}
-                                onPress={() => {
-                                    this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-                                        data: '',
-                                        showImage: false
-                                    })
-                                }} />
-                        </View>
+                        <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
+                            <View style={[styles.paddingLeft15, styles.paddingRight15]}>
+                                <Icon
+                                    name="md-close"
+                                    style={[styles.fontXxxl, styles.fontWhite]}
+                                    onPress={() => {
+                                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
+                                            data: '',
+                                            showImage: false
+                                        })
+                                    }} />
+                            </View>
+                        </SafeAreaView>
                     </View>
-                    <View style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, { bottom: 0 }]}>
-                        <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
-                            <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
-                                if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
-                                    this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData, this.props.navigation.state.params.currentElement)
-                                } else {
-                                    this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction,this.props.navigation.goBack)
-                                }
-                            }}>
-                                <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
-                            </TouchableOpacity>
+                    <SafeAreaView style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, { bottom: 0 }]}>
+                        <View>
+                            <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
+                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
+                                    if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
+                                        this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData, this.props.navigation.state.params.currentElement)
+                                    } else {
+                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction,this.props.navigation.goBack)
+                                    }
+                                }}>
+                                    <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
+                    </SafeAreaView>
                 </Container>
             </StyleProvider>
         )
     }
+
     render() {
         let item = this.props.navigation.state.params.currentElement
         if (this.props.cameraLoader)
@@ -325,7 +303,10 @@ const style = StyleSheet.create({
         bottom: 0,
         height: 100,
         backgroundColor: 'rgba(0,0,0,.4)',
-        borderLeftWidth: 0
+        borderLeftWidth: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1
     }
 });
 

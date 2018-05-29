@@ -2,36 +2,14 @@
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-
 import * as globalActions from '../modules/global/globalActions'
 import * as liveJobActions from '../modules/liveJob/liveJobActions'
 import Loader from '../components/Loader'
 import moment from 'moment'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, Alert, FlatList, Vibration, TouchableOpacity, TextInput, ScrollView } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, Alert, FlatList, Vibration, TouchableOpacity, TextInput, ScrollView, SafeAreaView } from 'react-native'
 import _ from 'lodash'
-import {
-    Container,
-    Content,
-    Header,
-    Button,
-    Text,
-    List,
-    ListItem,
-    Left,
-    Body,
-    Right,
-    Icon,
-    Title,
-    Footer,
-    FooterTab,
-    StyleProvider,
-    Spinner,
-    ActionSheet,
-    Toast,
-    Input
-} from 'native-base'
-
+import { Container, Content, Header, Button, Text, List, ListItem, Left, Body, Right, Icon, Title, Footer, FooterTab, StyleProvider, Spinner, ActionSheet, Toast, Input } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -39,23 +17,9 @@ import renderIf from '../lib/renderIf'
 import TitleHeader from '../components/TitleHeader'
 import JobListItem from '../components/JobListItem'
 import SearchBarV2 from '../components/SearchBarV2'
-import {
-    SET_SEARCH,
-    SET_LIVE_JOB_TOAST,
-    QrCodeScanner
-} from '../lib/constants'
+import { SET_SEARCH, SET_LIVE_JOB_TOAST, QrCodeScanner } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import {
-    INVALID_SCAN,
-    LIVE_TASKS,
-    NO_JOBS_PRESENT,
-    FILTER_REF_NO,
-    SELECT_ALL,
-    ACCEPT,
-    REJECT,
-    SELECTED,
-    OK
-} from '../lib/ContainerConstants'
+import { INVALID_SCAN, LIVE_TASKS, NO_JOBS_PRESENT, FILTER_REF_NO, SELECT_ALL, ACCEPT, REJECT, SELECTED, OK } from '../lib/ContainerConstants'
 function mapStateToProps(state) {
     return {
         liveJobList: state.liveJobList.liveJobList,
@@ -73,6 +37,12 @@ function mapDispatchToProps(dispatch) {
 }
 
 class LiveJobListing extends PureComponent {
+
+    static navigationOptions = ({ navigation }) => {
+        return {
+            header: null
+        }
+    }
 
     componentDidMount() {
         this.props.actions.fetchAllLiveJobsList()
@@ -93,11 +63,7 @@ class LiveJobListing extends PureComponent {
         }
     }
 
-    static navigationOptions = ({ navigation }) => {
-        return {
-            header: null
-        }
-    }
+
     navigateToScene = (item) => {
         if (item.isChecked == 'false' || !item.isChecked && this.props.selectedItems.length == 0) {
             this.props.actions.navigateToScene('LiveJob',
@@ -167,22 +133,24 @@ class LiveJobListing extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[styles.headerBody, styles.paddingTop15]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS}</Text>
+                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
+                            <Body>
+                                <View
+                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                    <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                    </TouchableOpacity>
+                                    <View style={[styles.headerBody, styles.paddingTop15]}>
+                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS}</Text>
+                                    </View>
+                                    <View style={[styles.headerRight]}>
+                                    </View>
+                                    <View />
                                 </View>
-                                <View style={[styles.headerRight]}>
-                                </View>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
+                            </Body>
+                        </Header>
+                    </SafeAreaView>
                     <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
                         <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
                     </View>
@@ -245,7 +213,7 @@ class LiveJobListing extends PureComponent {
                             <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS}</Text>
                         </View>
                         <View style={[style.headerRight]}>
-                        <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
+                            <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
                         </View>
                         <View />
                     </View>
@@ -271,8 +239,8 @@ class LiveJobListing extends PureComponent {
                                 </TouchableOpacity>
                                 <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + SELECTED} </Text>
                             </View>
-                            <TouchableHighlight disabled = {_.size(this.props.liveJobList) == _.size(this.props.selectedItems)} onPress={() => this.props.actions.selectAll(this.props.liveJobList)} >
-                            <Text style={[styles.fontWhite]}> {SELECT_ALL} </Text>
+                            <TouchableHighlight disabled={_.size(this.props.liveJobList) == _.size(this.props.selectedItems)} onPress={() => this.props.actions.selectAll(this.props.liveJobList)} >
+                                <Text style={[styles.fontWhite]}> {SELECT_ALL} </Text>
                             </TouchableHighlight>
                         </View>
                         {this.searchBar()}
@@ -284,7 +252,7 @@ class LiveJobListing extends PureComponent {
     }
     getSelectedReferenceNo() {
         let referenceList = ''
-        this.props.selectedItems.forEach((item) => { referenceList += this.props.liveJobList[item].referenceNumber  + ",  " })
+        this.props.selectedItems.forEach((item) => { referenceList += this.props.liveJobList[item].referenceNumber + ",  " })
         return (
             <ScrollView horizontal={true} style={[styles.padding10]}>
                 <Text>{referenceList}</Text>
@@ -296,22 +264,25 @@ class LiveJobListing extends PureComponent {
         if (this.props.selectedItems && this.props.selectedItems.length > 0) {
             let referenceNumberView = this.getSelectedReferenceNo()
             return (
-                <Footer style={[style.footer, styles.column]}>
-                    {referenceNumberView}
-                    <FooterTab style={[styles.paddingLeft10, styles.paddingRight10, { paddingBottom: 60 }, styles.paddingTop10, styles.row, styles.justifySpaceBetween]}>
-                        <Button danger full
-                            onPress={() => this.acceptOrRejectMultiple(2)}
-                            style={[styles.marginRight10]}
-                        >
-                            <Text style={[styles.fontWhite, styles.padding10]} > {REJECT} </Text>
-                        </Button>
-                        <Button success full
-                            onPress={() => this.acceptOrRejectMultiple(1)}
-                        >
-                            <Text style={[styles.fontWhite, styles.padding10]} > {ACCEPT} </Text>
-                        </Button>
-                    </FooterTab>
-                </Footer>)
+                <SafeAreaView>
+                    <Footer style={[style.footer, styles.column]}>
+                        {referenceNumberView}
+                        <FooterTab style={[styles.paddingLeft10, styles.paddingRight10, { paddingBottom: 60 }, styles.paddingTop10, styles.row, styles.justifySpaceBetween]}>
+                            <Button danger full
+                                onPress={() => this.acceptOrRejectMultiple(2)}
+                                style={[styles.marginRight10]}
+                            >
+                                <Text style={[styles.fontWhite, styles.padding10]} > {REJECT} </Text>
+                            </Button>
+                            <Button success full
+                                onPress={() => this.acceptOrRejectMultiple(1)}
+                            >
+                                <Text style={[styles.fontWhite, styles.padding10]} > {ACCEPT} </Text>
+                            </Button>
+                        </FooterTab>
+                    </Footer>
+                </SafeAreaView>
+            )
         }
     }
     render() {

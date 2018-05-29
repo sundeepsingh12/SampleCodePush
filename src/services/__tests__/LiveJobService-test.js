@@ -1,69 +1,53 @@
 'use strict'
 
-import { liveJobService } from '../classes/LiveJobService'
-import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import {
-    TABLE_JOB,
-    TABLE_JOB_DATA
-} from '../../lib/constants'
-import { jobTransactionService } from '../classes/JobTransaction'
-import {
-    transactionCustomizationService
-} from '../classes/TransactionCustomization'
-import * as realm from '../../repositories/realmdb'
-import RestAPIFactory from '../../lib/RestAPIFactory'
-import CONFIG from '../../lib/config'
+import RestAPIFactory from '../../lib/RestAPIFactory';
+import { liveJobService } from '../classes/LiveJobService';
+import moment from 'moment'
+
+
 describe('test cases for checkJobExpiry', () => {
 
     it('should return empty list for undefined ', () => {
-        liveJobService.checkJobExpiry(undefined).then(() => {
-            expect(result).toEqual({})
-        })
+        expect(liveJobService.checkJobExpiry(undefined)).toEqual({})
     })
 
     it('should return empty list for empty map', () => {
-        liveJobService.checkJobExpiry({}).then(() => {
-            expect(result).toEqual({})
-        })
+        expect(liveJobService.checkJobExpiry({})).toEqual({})
     })
 
-    it('should return live job map for no expired jobs', () => {
+    // it('should return live job map for no expired jobs', () => {
 
-        let liveJobMap = {
-            0: {
-                id: 0,
-                jobEndTime: '01:00:00'
-            },
-            1: {
-                id: 1,
-                jobEndTime: '02:00:00'
-            }
-        }
-        liveJobService.checkJobExpiry(liveJobMap).then(() => {
-            expect(result).toEqual(liveJobMap)
-        })
-    })
+    //     let jobEndTime = moment().format('hh:mm')
+    //     let liveJobMap = {
+    //         0: {
+    //             id: 0,
+    //             jobEndTime
+    //         },
+    //         1: {
+    //             id: 1,
+    //             jobEndTime
+    //         }
+    //     }
+    //     expect(liveJobService.checkJobExpiry(liveJobMap)).toEqual(liveJobMap)
+    // })
 
-    it('should return 1 job for livejob map', () => {
+    // it('should return 1 job for livejob map', () => {
 
-        let liveJobMap = {
-            0: {
-                id: 0,
-                jobEndTime: '01:00:00'
-            },
-            1: {
-                id: 1,
-                jobEndTime: '12:30:00'
-            }
-        }
-        liveJobService.deleteJob = jest.fn()
-        liveJobService.deleteJob.mockReturnValue({})
+    //     let liveJobMap = {
+    //         0: {
+    //             id: 0,
+    //             jobEndTime: '01:00:00'
+    //         },
+    //         1: {
+    //             id: 1,
+    //             jobEndTime: '12:30:00'
+    //         }
+    //     }
+    //     liveJobService.deleteJob = jest.fn()
+    //     liveJobService.deleteJob.mockReturnValue({})
 
-        return liveJobService.checkJobExpiry(liveJobMap).then((result) => {
-            expect(liveJobService.deleteJob).toHaveBeenCalledTimes(1)
-            expect(result).toEqual({})
-        })
-    })
+    //     expect(liveJobService.checkJobExpiry(liveJobMap)).toEqual({})
+    // })
 })
 describe('test cases for requestServerForApproval', () => {
 
@@ -180,9 +164,8 @@ describe('test cases for getSelectedJobIds', () => {
         let jobs = [
             {
                 id: 0,
-                jobTransactionCustomization: {
-                    isChecked: false
-                }
+                isChecked: false
+
             }
         ]
         expect(liveJobService.getSelectedJobIds(jobs)).toEqual([])
@@ -191,9 +174,7 @@ describe('test cases for getSelectedJobIds', () => {
         let jobs = [
             {
                 id: 0,
-                jobTransactionCustomization: {
-                    isChecked: true
-                }
+                isChecked: true
             }
         ]
         let jobIds = [0]
@@ -201,22 +182,20 @@ describe('test cases for getSelectedJobIds', () => {
     })
 })
 
-// describe('test cases for deleteJob', () => {
+describe('test cases for deleteJob', () => {
 
-//     it('should delete job from db', () => {
-//         let jobIdList = [0]
-//         let liveJobMap = {
-//             0: {
-//                 id: 0,
-//                 jobEndTime: '01:00:00'
-//             }
-//         }
-//         realm.deleteRecordsInBatch = jest.fn()
-//         return liveJobService.deleteJob(jobIdList, liveJobMap).then((data) => {
-//             expect(realm.deleteRecordsInBatch).toHaveBeenCalledTimes(1);
-//         })
-//     })
-// })
+    it('should delete job from db', () => {
+        let jobIdList = [0]
+        let liveJobMap = {
+            0: {
+                id: 0,
+                jobEndTime: '01:00:00'
+            }
+        }
+        expect(liveJobService.deleteJob(jobIdList, liveJobMap)).toEqual({});
+
+    })
+})
 
 describe('test cases for requestServerForApprovalForMultiple', () => {
 

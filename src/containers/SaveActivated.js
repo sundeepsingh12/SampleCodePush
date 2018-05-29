@@ -4,53 +4,18 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
 import * as saveActivatedActions from '../modules/saveActivated/saveActivatedActions'
-
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
-
-
-import { StyleSheet, View, TouchableOpacity, FlatList, Alert } from 'react-native'
-
-import {
-    Container,
-    Content,
-    Header,
-    Button,
-    Text,
-    Body,
-    Right,
-    Icon,
-    List,
-    ListItem,
-    StyleProvider,
-    Footer,
-    FooterTab
-} from 'native-base';
-
+import { StyleSheet, View, TouchableOpacity, FlatList, Alert, SafeAreaView } from 'react-native'
+import { Container, Content, Header, Button, Text, Body, Right, Icon, List, ListItem, StyleProvider, Footer, FooterTab } from 'native-base';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import CheckoutDetails from '../containers/CheckoutDetails'
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
-import {
-    FormLayout,
-    Discard,
-    Keep,
-    Cancel,
-    Checkout,
-    SHOW_DISCARD_ALERT,
-    SET_SAVE_ACTIVATED_DRAFT
-} from '../lib/constants'
-import {
-    Yes_Checkout,
-    Total,
-} from '../lib/AttributeConstants'
-
-import {
-    Discard_these_jobs,
-    Do_you_want_to_checkout,
-    EDIT
-} from '../lib/ContainerConstants'
+import { FormLayout, Discard, Keep, Cancel, Checkout, SHOW_DISCARD_ALERT, SET_SAVE_ACTIVATED_DRAFT } from '../lib/constants'
+import { Yes_Checkout, Total, } from '../lib/AttributeConstants'
+import { Discard_these_jobs, Do_you_want_to_checkout, EDIT } from '../lib/ContainerConstants'
 import DraftModal from '../components/DraftModal'
 import _ from 'lodash'
 
@@ -304,23 +269,24 @@ class SaveActivated extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-
-                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this._goBack() }}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.headerTitle}</Text>
+                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                            <Body>
+                                <View
+                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this._goBack() }}>
+                                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                    </TouchableOpacity>
+                                    <View style={[style.headerBody]}>
+                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.headerTitle}</Text>
+                                    </View>
+                                    <View style={[style.headerRight]}>
+                                    </View>
+                                    <View />
                                 </View>
-                                <View style={[style.headerRight]}>
-                                </View>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
+                            </Body>
+                        </Header>
+                    </SafeAreaView>
 
                     <Content style={[styles.flex1, styles.bgLightGray]}>
                         {draftModalView}
@@ -345,8 +311,8 @@ class SaveActivated extends PureComponent {
 
                             <Button style={{ borderColor: '#338FFC', paddingLeft: 5, paddingRight: 5, height: 25 }} bordered small
                                 onPress={() => this.navigateToFormLayout(this.props.navigation.state.params.currentStatus.id, this.props.navigation.state.params.currentStatus.name)}>
-                                <Icon name="md-add" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} />
-                                <Text style={{color : styles.fontPrimaryColor}}>Add</Text>
+                                <Icon name="md-add" style={[styles.fontLg, { color: styles.fontPrimaryColor }]} />
+                                <Text style={{ color: styles.fontPrimaryColor }}>Add</Text>
                             </Button>
                             <View>
                                 <Text style={[styles.fontCenter, styles.fontBlack, styles.fontDefault, styles.alignCenter]}>
@@ -364,24 +330,26 @@ class SaveActivated extends PureComponent {
                             keyExtractor={this._keyExtractor}>
                         </FlatList>
                     </Content>
-                    <Footer style={[style.footer]}>
-                        {renderIf(this.props.isSignOffVisible, <FooterTab style={[styles.paddingLeft10, styles.paddingRight5, styles.bgLightGray, styles.marginLeft10]}>
-                            <Button onPress={() => {
-                                this.signOff(
-                                    this.props.navigation.state.params.currentStatus.nextStatusList[0].id,
-                                )
-                            }}>
-                                <Text style={[{color : styles.fontPrimaryColor}, styles.fontDefault]}>Signature</Text>
-                            </Button>
-                        </FooterTab>)}
-                        <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
-                            <Button style={[styles.bgSuccess]} onPress={() => {
-                                this.showAlert()
-                            }}>
-                                <Text style={[styles.fontWhite, styles.fontDefault]}>{Checkout}</Text>
-                            </Button>
-                        </FooterTab>
-                    </Footer>
+                    <SafeAreaView style={{ backgroundColor: '#ffffff' }}>
+                        <Footer style={[style.footer]}>
+                            {renderIf(this.props.isSignOffVisible, <FooterTab style={[styles.paddingLeft10, styles.paddingRight5, styles.bgLightGray, styles.marginLeft10]}>
+                                <Button onPress={() => {
+                                    this.signOff(
+                                        this.props.navigation.state.params.currentStatus.nextStatusList[0].id,
+                                    )
+                                }}>
+                                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontDefault]}>Signature</Text>
+                                </Button>
+                            </FooterTab>)}
+                            <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
+                                <Button style={[styles.bgSuccess]} onPress={() => {
+                                    this.showAlert()
+                                }}>
+                                    <Text style={[styles.fontWhite, styles.fontDefault]}>{Checkout}</Text>
+                                </Button>
+                            </FooterTab>
+                        </Footer>
+                    </SafeAreaView>
                 </Container>
             </StyleProvider>
 

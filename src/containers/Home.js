@@ -3,7 +3,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, PushNotificationIOS, Animated, SectionList } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, PushNotificationIOS, Animated, SectionList, SafeAreaView } from 'react-native'
 import Loader from '../components/Loader'
 import PieChart from '../components/PieChart'
 import renderIf from '../lib/renderIf'
@@ -122,13 +122,15 @@ class Home extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={StyleSheet.flatten([styles.bgWhite])}>
-          <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
-            <Body>
-              <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}><View style={[style.headerBody]}><View style={{ width: 90 }}>
-                <Image style={StyleSheet.flatten([styles.width100, { resizeMode: 'contain' }])} source={FareyeLogo} />
-              </View></View></View>
-            </Body>
-          </Header>
+          <SafeAreaView>
+            <Header searchBar style={StyleSheet.flatten([styles.bgWhite])}>
+              <Body>
+                <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}><View><View style={{ width: 90 }}>
+                  <Image style={StyleSheet.flatten([styles.width100, { resizeMode: 'contain' }])} source={FareyeLogo} />
+                </View></View></View>
+              </Body>
+            </Header>
+          </SafeAreaView>
           <Content>
             {(this.props.moduleLoading) ? <SyncLoader moduleLoading={this.props.moduleLoading} /> : null}
             {pieChartView}

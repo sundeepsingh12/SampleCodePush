@@ -1,6 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, SafeAreaView } from 'react-native'
 import { Container, Button, Header, Body, Content, Icon, Card, CardItem, Toast, Footer, StyleProvider } from 'native-base';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
@@ -127,22 +127,24 @@ class CashTendering extends PureComponent {
 
     showHeaderView() {
         return (
-            <Header searchBar style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
-                <Body>
-                    <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                        <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                        </TouchableOpacity>
-                        <View style={[style.headerBody]}>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.isReceive) ? 'Collect Cash' : 'Return Cash'}</Text>
+            <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }]}>
+                <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+                    <Body>
+                        <View
+                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                            </TouchableOpacity>
+                            <View style={[style.headerBody]}>
+                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.isReceive) ? 'Collect Cash' : 'Return Cash'}</Text>
+                            </View>
+                            <View style={[style.headerRight]}>
+                            </View>
+                            <View />
                         </View>
-                        <View style={[style.headerRight]}>
-                        </View>
-                        <View />
-                    </View>
-                </Body>
-            </Header>
+                    </Body>
+                </Header>
+            </SafeAreaView>
         )
     }
 

@@ -1,17 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import {
-  Alert,
-  StyleSheet,
-  View,
-  Text,
-  Platform,
-  TouchableHighlight,
-  Image,
-  TouchableOpacity,
-  TextInput
-}
-  from 'react-native'
+import { Alert, StyleSheet, View, Text, Platform, TouchableHighlight, Image, TouchableOpacity, TextInput } from 'react-native'
 import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg, ActionSheet } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -24,13 +13,7 @@ import renderIf from '../lib/renderIf'
 import { QrCodeScanner } from '../lib/constants'
 import Icon from '../../native-base-theme/components/Icon'
 import CONFIG from '../lib/config'
-import {
-  OK,
-  CANCEL,
-  CONFIRM_RESET,
-  RESET_ACCOUNT_SETTINGS,
-  REMEMBER_ME
-} from '../lib/ContainerConstants'
+import { OK, CANCEL, CONFIRM_RESET, RESET_ACCOUNT_SETTINGS, REMEMBER_ME } from '../lib/ContainerConstants'
 import { keyValueDBService } from '../services/classes/KeyValueDBService';
 
 
@@ -95,7 +78,6 @@ class Login extends PureComponent {
     } else {
       this.props.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe)
     }
-
   }
 
   scaneerLongPressToChooseEnvironment = () => {
@@ -114,7 +96,7 @@ class Login extends PureComponent {
       }
     )
   }
-  onScannerLongPress = (url ) => {
+  onScannerLongPress = (url) => {
     this.props.onLongPressResetSettings(url)
   }
 
@@ -228,7 +210,7 @@ class Login extends PureComponent {
     )
   }
 
-  showCodePush(){
+  showCodePush() {
     return (
       <Button
         full rounded success
@@ -257,9 +239,9 @@ class Login extends PureComponent {
           {this.props.auth.form.displayMessage}
         </Text>
         <Button
-          onPress={this.startScanner} full rounded 
-          onLongPress = {this.scaneerLongPressToChooseEnvironment}
-          >
+          onPress={this.startScanner} full rounded
+          onLongPress={this.scaneerLongPressToChooseEnvironment}
+        >
           <Text style={[styles.fontWhite]}>Scanner</Text>
         </Button>
       </View>

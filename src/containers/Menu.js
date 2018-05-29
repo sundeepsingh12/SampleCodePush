@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Alert, SectionList } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Alert, SectionList, SafeAreaView } from 'react-native'
 import Loader from '../components/Loader'
 import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, Footer, FooterTab, StyleProvider, Toast, Separator } from 'native-base'
 import getTheme from '../../native-base-theme/components'
@@ -16,14 +16,7 @@ import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import renderIf from '../lib/renderIf'
 import CustomAlert from '../components/CustomAlert'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import {
-  PROFILE_ID,
-  STATISTIC_ID,
-  OFFLINEDATASTORE_ID,
-  BACKUP_ID,
-  BLUETOOTH_ID
-} from '../lib/AttributeConstants'
-
+import { PROFILE_ID, STATISTIC_ID, OFFLINEDATASTORE_ID, BACKUP_ID, BLUETOOTH_ID } from '../lib/AttributeConstants'
 import {
   ProfileView,
   Statistics,
@@ -40,16 +33,7 @@ import {
   ERROR_400_403_LOGOUT_FAILURE,
   BluetoothListing
 } from '../lib/constants'
-
-import {
-  OK,
-  CANCEL,
-  LOGOUT_UNSYNCED_TRANSACTIONS_TITLE,
-  LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
-  UNTITLED,
-  APP,
-  LOGOUT
-} from '../lib/ContainerConstants'
+import { OK, CANCEL, LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE, UNTITLED, APP, LOGOUT } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -93,17 +77,19 @@ class Menu extends PureComponent {
   
   renderMenuHeader() {
     return (
-      <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
-        <Body>
-          <View
-            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-            <View style={[style.headerBody]}>
-              <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Menu</Text>
+      <SafeAreaView>
+        <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
+          <Body>
+            <View
+              style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+              <View style={[style.headerBody]}>
+                <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Menu</Text>
+              </View>
+              <View />
             </View>
-            <View />
-          </View>
-        </Body>
-      </Header>
+          </Body>
+        </Header>
+      </SafeAreaView>
     )
   }
 
@@ -113,7 +99,7 @@ class Menu extends PureComponent {
         <View style={[styles.bgWhite, styles.borderBottomGray]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             <View style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter]}>
-              <MaterialIcons name={page.icon} style={[{color: styles.fontPrimaryColor}, styles.fontLg]} />
+              <MaterialIcons name={page.icon} style={[{ color: styles.fontPrimaryColor }, styles.fontLg]} />
             </View>
             <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
               <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomColor: '#f3f3f3' }]}>
@@ -184,7 +170,7 @@ class Menu extends PureComponent {
             <View style={[styles.justifySpaceBetween, styles.flex1]}>
               <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
                 <Text style={[styles.fontDefault]}> {LOGOUT} </Text>
-                <Icon name="ios-log-in" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} />
+                <Icon name="ios-log-in" style={[styles.fontLg, { color: styles.fontPrimaryColor }]} />
               </View>
             </View>
           </View>

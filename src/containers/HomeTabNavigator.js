@@ -1,8 +1,8 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { Platform, BackHandler, View } from 'react-native'
-import { Icon } from 'native-base'
+import { Platform, BackHandler, View, StyleSheet, Text } from 'react-native'
+import { Icon, Header, Body, Image } from 'native-base'
 import { connect } from 'react-redux'
 import { createBottomTabNavigator,createStackNavigator } from 'react-navigation'
 import SyncScreen from './SyncScreen'
@@ -282,7 +282,6 @@ class HomeTabNavigator extends PureComponent {
             SyncScreen: {
                 screen: SyncScreen,
                 navigationOptions: {
-                    header: null,
                     title: 'Sync',
                     gesturesEnabled: false,
                     tabBarIcon: ({ tintColor }) => (
@@ -296,7 +295,6 @@ class HomeTabNavigator extends PureComponent {
             ErpSyncScreen: {
                 screen: ErpSyncScreen,
                 navigationOptions: {
-                    header: null,
                     title: 'ERP',
                     gesturesEnabled: false,
                     tabBarIcon: ({ tintColor }) => (
