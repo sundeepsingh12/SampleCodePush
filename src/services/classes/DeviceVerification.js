@@ -11,7 +11,8 @@ let imei = require('../../wrapper/IMEI')
 import {
   DEVICE_IMEI,
   DEVICE_SIM,
-  IS_PRELOADER_COMPLETE
+  IS_PRELOADER_COMPLETE,
+  IS_SHOW_MOBILE_OTP_SCREEN
 } from '../../lib/constants'
 import {
   LOGIN_SUCCESSFUL
@@ -212,6 +213,7 @@ class DeviceVerification {
     }
     let simVerificationResponse = await RestAPIFactory(token.value).serviceCall(JSON.stringify(deviceSIM.value), CONFIG.API.SIM_VERIFICATION_API, 'POST')
     await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
+    await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_OTP_SCREEN)
   }
 
 
@@ -229,6 +231,8 @@ class DeviceVerification {
     await keyValueDBService.validateAndSaveData(DEVICE_SIM, response.json.deviceSIM)
     if(response.json.deviceSIM && response.json.deviceSIM.isVerified){
       await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
+    }else{
+      await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_OTP_SCREEN, true)
     }
     return response.json.deviceSIM ? response.json.deviceSIM.isVerified : false
   }

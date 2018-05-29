@@ -229,7 +229,7 @@ export function getSessionToken() {
       const isPreloaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       const userData = await keyValueDBService.getValueFromStore(USER)
       const backupUploadFailCount = await keyValueDBService.getValueFromStore(BACKUP_UPLOAD_FAIL_COUNT)
-      if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')) && isPreloaderComplete) {
+      if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')) && token) {
         dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
       } else {
         if (token && isPreloaderComplete && isPreloaderComplete.value && backupUploadFailCount && backupUploadFailCount.value > 0) {

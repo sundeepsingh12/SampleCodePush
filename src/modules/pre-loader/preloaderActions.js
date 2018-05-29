@@ -63,7 +63,8 @@ import {
   SET_APP_UPDATE_BY_CODEPUSH,
   SET_APP_UPDATE_STATUS,
   FCM_TOKEN,
-  ERROR_LOGOUT
+  ERROR_LOGOUT,
+  IS_SHOW_MOBILE_OTP_SCREEN
 } from '../../lib/constants'
 import { MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -80,6 +81,7 @@ import moment from 'moment'
 import { LOGOUT_UNSUCCESSFUL, OK, SHOW_MOBILE_SCREEN, SHOW_OTP, CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DOWNLOADING_PACKAGE, CODEPUSH_INSTALLING_UPDATE, CODEPUSH_SOMETHING_WENT_WRONG } from '../../lib/ContainerConstants'
 import codePush from "react-native-code-push"
 import { Platform } from 'react-native'
+import { performSyncService } from '../home/homeActions';
 
 //This hits JOB Master Api and gets the response 
 export function downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
@@ -88,7 +90,7 @@ export function downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
       dispatch(setState(MASTER_DOWNLOAD_START))
       const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject, token)
       if (!jobMasters || !jobMasters.json)
-        throw new Error('No response returned from server1')
+        throw new Error('No response returned from server')
       dispatch(setState(MASTER_DOWNLOAD_SUCCESS))
       dispatch(validateAndSaveJobMaster(deviceIMEI, deviceSIM, token, jobMasters.json))
     } catch (error) {
@@ -107,11 +109,12 @@ export function downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
  * @return {Function}
  */
 
-export function invalidateUserSession(isPreLoader, createBackup, calledFromAutoLogout) {
+export function invalidateUserSession(isPreLoader, calledFromAutoLogout) {
   return async function (dispatch) { // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "") /* uncomment this code when run sync in logout */
-    try {
+   try {
       dispatch(setState(PRE_LOGOUT_START))
-      let response = await authenticationService.logout(createBackup, calledFromAutoLogout) // create backup, hit logout api and delete dataBase
+      const isPreLoaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
+      let response = await authenticationService.logout(calledFromAutoLogout, isPreLoaderComplete) // create backup, hit logout api and delete dataBase
       dispatch(setState(PRE_LOGOUT_SUCCESS))
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
       dispatch(deleteSessionToken())
@@ -193,9 +196,8 @@ export function checkForUnsyncBackupFilesAndNavigate(user) {
 export function saveSettingsAndValidateDevice(configDownloadService, configSaveService, deviceVerificationService, showMobileOtpNumberScreen) {
   return async function (dispatch) {
     try {
-      if (showMobileOtpNumberScreen == SHOW_OTP) {
-        dispatch(setState(SHOW_OTP_SCREEN, SHOW_OTP))
-      } else if (showMobileOtpNumberScreen == SHOW_MOBILE_SCREEN) {
+      const mobileOtpScreen = await keyValueDBService.getValueFromStore(IS_SHOW_MOBILE_OTP_SCREEN)
+      if (mobileOtpScreen && mobileOtpScreen.value) {
         dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, SHOW_MOBILE_SCREEN))
       } else {
         const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
@@ -404,19 +406,24 @@ export function validateOtp(otpNumber) {
 
 }
 
-export function checkForUnsyncTransactionAndLogout() {
+export function checkForUnsyncTransactionAndLogout(calledFromAutoLogout) {
   return async function (dispatch) {
     try {
+      dispatch(setState(PRE_LOGOUT_START))
+      let message = await dispatch(performSyncService(true, null,null, calledFromAutoLogout))
       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       let isUnsyncTransactionsPresent = logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
-      if (isUnsyncTransactionsPresent) {
+      if (isUnsyncTransactionsPresent && !calledFromAutoLogout) {
         dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, true))
       } else {
-        dispatch(invalidateUserSession(false, true))
+        dispatch(invalidateUserSession(false, calledFromAutoLogout))
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0)
       dispatch(setState(ERROR_400_403_LOGOUT, error.message))
+    }
+    finally{
+      dispatch(setState(ERROR_LOGOUT, ''))
     }
   }
 }

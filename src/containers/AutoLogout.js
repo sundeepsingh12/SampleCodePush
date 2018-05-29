@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import Loader from '../components/Loader'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { invalidateUserSession } from '../modules/pre-loader/preloaderActions'
+import { checkForUnsyncTransactionAndLogout } from '../modules/pre-loader/preloaderActions'
 import {
     StyleSheet,
     View,
@@ -13,12 +13,12 @@ import {
     from 'react-native'
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ invalidateUserSession }, dispatch)
+        actions: bindActionCreators({ checkForUnsyncTransactionAndLogout }, dispatch)
     }
 }
 class AutoLogout extends PureComponent {
     componentDidMount() {
-        this.props.actions.invalidateUserSession(false, true, true)
+        this.props.actions.checkForUnsyncTransactionAndLogout(true)
     }
     render() {
         return (

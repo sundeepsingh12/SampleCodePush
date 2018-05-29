@@ -6,7 +6,7 @@ import {
     Modal,
     TextInput,
     Platform,
-    TouchableOpacity
+    TouchableOpacity,
 } from 'react-native'
 import Loader from '../components/Loader'
 import { Content, Button, StyleProvider, Item, Icon, Spinner } from 'native-base';
@@ -53,9 +53,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 class MobileOtpScreen extends PureComponent {
-    componentDidMount() {
-        if (this.props.isMobileScreen == SHOW_OTP && !this.props.mobileNumber) this.onShowMobileNoScreen()
-    }
+    // componentDidMount() {
+    //     if (this.props.isMobileScreen == SHOW_OTP && !this.props.mobileNumber) this.onShowMobileNoScreen()
+    // }
 
     getOtp = () => {
         this.props.actions.generateOtp(this.props.mobileNumber)
@@ -105,7 +105,7 @@ class MobileOtpScreen extends PureComponent {
                 {this.errorLoaderView()}
                 <View>
                     <Button onPress={this.getOtp} full
-                        style={[{ width: 150 }, styles.justifyCenter, styles.alignCenter, styles.marginTop5, checkForGetOtpButton ? { backgroundColor: '#007AFF', opacity: 0.3 } : { backgroundColor: '#007AFF' }]}
+                        style={[{ width: 150 }, styles.justifyCenter, styles.alignCenter, styles.marginTop5]}
                         disabled={checkForGetOtpButton}>
                         <Text style={[styles.fontWhite, styles.fontWeight500]}>{SEND_OTP}</Text>
                     </Button>
@@ -161,7 +161,7 @@ class MobileOtpScreen extends PureComponent {
                 {this.errorLoaderView()}
                 <View>
                     <Button onPress={this.validateOtp} full
-                        style={[{ width: 100 }, styles.marginTop10, checkForProceed ? { backgroundColor: '#007AFF', opacity: 0.3 } : { backgroundColor: '#007AFF' }]}
+                        style={[{ width: 100 }, styles.marginTop10]}
                         disabled={checkForProceed}>
                         <Text style={[styles.fontWhite, styles.fontWeight500, styles.fontRegular]}>{PROCEED}</Text>
                     </Button>

@@ -403,7 +403,7 @@ export function startFCM() {
   }
 }
 
-export function performSyncService(isCalledFromHome, isLiveJob, erpPull) {
+export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledFromAutoLogout) {
   return async function (dispatch) {
     let syncStoreDTO
     try {
@@ -420,7 +420,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull) {
       const userData = syncStoreDTO.user
       const autoLogoutEnabled = userData ? userData.company ? userData.company.autoLogoutFromDevice : null : null
       const lastLoginTime = userData ? userData.lastLoginTime : null
-      if (autoLogoutEnabled && !moment(moment(lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
+      if (!calledFromAutoLogout && autoLogoutEnabled && !moment(moment(lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
         dispatch(navigateToScene(AutoLogoutScreen));
         return
       }

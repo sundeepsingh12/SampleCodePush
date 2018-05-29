@@ -73,6 +73,7 @@ module.exports = keyMirror({
     ERROR_400_403_LOGOUT: null,
     ERROR_LOGOUT: null,
     SHOW_OTP_MOBILE_LOADER: null,
+    IS_SHOW_MOBILE_OTP_SCREEN: null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,

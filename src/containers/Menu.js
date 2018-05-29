@@ -81,7 +81,7 @@ class Menu extends PureComponent {
         {
           text: OK, onPress: () => {
             this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false)
-            this.props.actions.invalidateUserSession(false, true)
+            this.props.actions.invalidateUserSession(false)
           }
         },],
         { cancelable: false })

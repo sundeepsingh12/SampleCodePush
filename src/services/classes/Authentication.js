@@ -70,12 +70,12 @@ class Authentication {
      * LOGOUT API (GET)
      * @param {*} token 
      */
-    async logout(createBackup, calledFromAutoLogout) {
+    async logout(calledFromAutoLogout, isPreLoaderComplete) {
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (!token || !token.value) {
             throw new Error('Token Missing')
         }
-        if (createBackup) {
+        if (isPreLoaderComplete && isPreLoaderComplete.value) {
             await backupService.createBackupOnLogout()
         }
         const userObject = await keyValueDBService.getValueFromStore(USER)
