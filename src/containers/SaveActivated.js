@@ -127,7 +127,8 @@ class SaveActivated extends PureComponent {
                 commonData: this.props.commonData,
                 recurringData: this.props.recurringData,
             }
-        })
+        },
+    this.props.navigation.navigate)
     }
 
     navigateToFormLayout = (statusId, statusName) => {

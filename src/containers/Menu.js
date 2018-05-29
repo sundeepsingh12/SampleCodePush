@@ -78,10 +78,11 @@ class Menu extends PureComponent {
 
   getUnsyncTransactionPresentAlert() {
     if (this.props.isUnsyncTransactionOnLogout) {
+      
       return Alert.alert(LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
         [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false), style: 'cancel' },
         {
-          text: OK, onPress: () => {
+          text: OK, onPress: ()=>{
             this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false)
             this.props.actions.invalidateUserSessionWhenLogoutPressed(true)
           }
@@ -89,7 +90,7 @@ class Menu extends PureComponent {
         { cancelable: false })
     }
   }
-
+  
   renderMenuHeader() {
     return (
       <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
@@ -108,7 +109,7 @@ class Menu extends PureComponent {
 
   getPageView(page) {
     return (
-      <TouchableOpacity key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
+      <TouchableOpacity key={page.id} onPress={() => this.props.actions.navigateToPage(page,this.props.navigation.navigate)}>
         <View style={[styles.bgWhite, styles.borderBottomGray]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             <View style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter]}>
@@ -204,7 +205,7 @@ class Menu extends PureComponent {
   }
 
   logoutButtonPressed = () => {
-    this.props.actions.checkForUnsyncTransactionAndLogout()
+    this.props.actions.checkForUnsyncTransactionAndLogout(this.props)
   }
 }
 

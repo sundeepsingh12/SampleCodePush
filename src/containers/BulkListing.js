@@ -309,7 +309,8 @@ class BulkListing extends PureComponent {
       statusName,
       jobMasterId: JSON.parse(this.props.navigation.state.params.pageObject.jobMasterIds)[0],
       jobTransaction: Object.values(this.props.selectedItems),
-    }
+    },
+    this.props.navigation.navigate
     )
   }
 }

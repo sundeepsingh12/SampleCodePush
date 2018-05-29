@@ -193,7 +193,7 @@ class LiveJob extends PureComponent {
     }
 
     onButtonPress = (status) => {
-        this.props.actions.acceptOrRejectJob(status, this.props.jobTransaction, this.props.navigation.state.params.liveJobList)
+        this.props.actions.acceptOrRejectJob(status, this.props.jobTransaction, this.props.navigation.state.params.liveJobList,this.props.navigation.goBack)
     }
 
     showAccepRejectButtons() {

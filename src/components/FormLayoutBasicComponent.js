@@ -114,7 +114,8 @@ class BasicFormElement extends PureComponent {
                     jobTransaction: this.props.jobTransaction,
                     returnData: this._searchForReferenceValue.bind(this),
                     formLayoutState: this.props.formLayoutState
-                })
+                },
+            this.props.navigate)
                 break
             }
             case SIGNATURE: {
@@ -127,7 +128,8 @@ class BasicFormElement extends PureComponent {
                     jobTransaction: this.props.jobTransaction,
                     returnData: this._searchForReferenceValue.bind(this),
                     formLayoutState: this.props.formLayoutState
-                })
+                },
+                this.props.navigate)
                 break
             }
             case EXTERNAL_DATA_STORE:
@@ -157,7 +159,6 @@ class BasicFormElement extends PureComponent {
                 break
             }
         }
-
         if (screenName) {
             this.props.actions.navigateToScene(screenName,
                 {
@@ -165,7 +166,8 @@ class BasicFormElement extends PureComponent {
                     formLayoutState: this.props.formLayoutState,
                     jobTransaction: this.props.jobTransaction,
                     returnData: this._searchForReferenceValue.bind(this),
-                }
+                },
+                this.props.navigate
             )
         }
     }
@@ -286,7 +288,8 @@ class BasicFormElement extends PureComponent {
         this.props.actions.navigateToScene('QrCodeScanner',
             {
                 returnData: this._searchForReferenceValue.bind(this)
-            })
+            },
+        this.props.navigate)
     }
 
     getValueTextForMultipleOption() {

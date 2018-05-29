@@ -1,63 +1,32 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { addNavigationHelpers, StackNavigator, TabNavigator } from 'react-navigation'
+import { addNavigationHelpers, createStackNavigator } from 'react-navigation'
 import { BackHandler } from 'react-native'
 import Login from '../../containers/Login'
 import Preloader from '../../containers/Preloader'
 import Application from '../../containers/Application'
-import Sequence from '../../containers/Sequence'
-import ProfileView from '../../containers/ProfileView'
-import ResetPassword from '../../containers/ResetPassword'
-import TabScreen from '../../containers/TabScreen'
-import TaskListScreen from '../../containers/TaskListScreen'
-import DataStore from '../../containers/DataStore'
-import BulkListing from '../../containers/BulkListing'
-import JobDetailsV2 from '../../containers/JobDetailsV2'
-import LiveJobListing from '../../containers/LiveJobListing'
-import LiveJob from '../../containers/LiveJob'
-import Summary from '../../containers/Summary'
-import CustomApp from '../../containers/CustomApp'
 import QrCodeScanner from '../../containers/QrCodeScanner'
-import CameraFieldAttribute from '../../containers/CameraFieldAttribute'
-import SequenceRunsheetList from '../../containers/SequenceRunsheetList'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem, Root, } from 'native-base'
 import styles from '../../themes/FeStyle'
-import Payment from '../../containers/Payment'
-import UPIPayment from '../../containers/UPIPayment'
-import PayByLink from '../../containers/PayByLink'
-import FixedSKUListing from '../../containers/FixedSKUListing'
-import Signature from '../../containers/Signature'
-import FormLayout from '../../containers/FormLayout'
-import SkuListing from '../../containers/SkuListing'
-import ArrayFieldAttribute from '../../containers/ArrayFieldAttribute'
-import DataStoreItemDetails from '../../components/DataStoreItemDetails'
-import SignatureAndNps from '../../containers/SignatureAndNps'
-import SaveActivated from '../../containers/SaveActivated'
-import Transient from '../../containers/Transient'
-import CheckoutDetails from '../../containers/CheckoutDetails'
-import CashTendering from '../../containers/CashTendering'
-import Statistics from '../../containers/Statistics'
-import Sorting from '../../containers/Sorting'
-import DataStoreDetails from '../../containers/DataStoreDetails'
-import OfflineDS from '../../containers/OfflineDS'
-import ImageDetailsView from '../../containers/ImageDetailsView'
 import { NavigationActions } from 'react-navigation'
-import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
 import AutoLogout from '../../containers/AutoLogout'
-import Backup from '../../containers/Backup'
 import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
 import HomeTabNavigator from '../../containers/HomeTabNavigator'
-import MosambeeWalletPayment from '../../containers/MosambeeWalletPayment'
 import { ApplicationScreen, HardwareBackPress, HomeScreen, HomeTabNavigatorScreen, LoginScreen, PreloaderScreen, SHOW_DISCARD_ALERT, RETURN_TO_HOME, SET_TRANSIENT_BACK_PRESSED, SET_SEQUENCE_BACK_ENABLED } from '../../lib/constants'
-import SplitPayment from '../../containers/SplitPayment'
-import { createReduxBoundAddListener, createReactNavigationReduxMiddleware } from 'react-navigation-redux-helpers'
+import { createReduxBoundAddListener, createReactNavigationReduxMiddleware,initializeListeners } from 'react-navigation-redux-helpers'
 import { setState } from '../global/globalActions'
-import BluetoothListing from '../../containers/BluetoothListing'
+import PropTypes from 'prop-types'
 
 
 class AppWithNavigationState extends React.PureComponent {
 
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    nav: PropTypes.object.isRequired,
+  };
+
   componentDidMount() {
+    initializeListeners('root', this.props.nav);
     BackHandler.addEventListener(HardwareBackPress, this.onBackPress);
   }
 
@@ -91,7 +60,8 @@ class AppWithNavigationState extends React.PureComponent {
       case HomeTabNavigatorScreen:
         return false
     }
-    dispatch(NavigationActions.back());
+    // dispatch(NavigationActions.back());
+    this.props.navigation.goBack()
     return true
   };
 
@@ -100,22 +70,22 @@ class AppWithNavigationState extends React.PureComponent {
   }
 
   render() {
+    const { dispatch, nav } = this.props;
+    const navigation = {
+      dispatch,
+      state: nav,
+      addListener: createReduxBoundAddListener('root'),
+    };
     return (
       <Root>
-        <AppNavigator navigation={
-          addNavigationHelpers({
-            dispatch: this.props.dispatch,
-            state: this.props.nav,
-            addListener
-          })
-        }
+        <AppNavigator navigation={navigation }
         />
       </Root>
     )
   }
 }
 
-export const AppNavigator = StackNavigator({
+export const AppNavigator = createStackNavigator({
   ApplicationScreen: {
     screen: Application,
     navigationOptions: {
@@ -136,13 +106,6 @@ export const AppNavigator = StackNavigator({
       gesturesEnabled: false
     }
   },
-  Payment: {
-    screen: Payment
-  },
-  JobDetailsV2: {
-    screen: JobDetailsV2,
-    header: null
-  },
   AutoLogoutScreen: {
     screen: AutoLogout,
     navigationOptions: {
@@ -156,150 +119,11 @@ export const AppNavigator = StackNavigator({
       header: null,
     }
   },
-  Statistics: {
-    screen: Statistics,
-    navigationOptions: {
-      header: null,
-    }
-  },
-  Sorting: {
-    screen: Sorting,
-    navigationOptions: {
-      title: 'Sorting',
-      header: null,
-    }
-  },
   HomeTabNavigatorScreen: {
     screen: HomeTabNavigator,
     navigationOptions: {
       gesturesEnabled: false
     }
-  },
-  Sequence: {
-    screen: Sequence,
-  },
-  Summary: {
-    screen: Summary,
-  },
-  ProfileView: {
-    screen: ProfileView
-  },
-  ResetPassword: {
-    screen: ResetPassword
-  },
-  TabScreen: {
-    screen: TabScreen
-  },
-  SkuListing: {
-    screen: SkuListing,
-    navigationOptions: {
-      title: 'SKU Listing',
-    }
-  },
-  UPIPayment: {
-    screen: UPIPayment
-  },
-  MosamBeeWalletPayment:{
-    screen: MosambeeWalletPayment,
-    navigationOptions: {
-      header: null
-    }
-  },
-  PayByLink: {
-    screen: PayByLink
-  },
-  CustomApp: {
-    screen: CustomApp
-  },
-  FixedSKUListing: {
-    screen: FixedSKUListing,
-    navigationOptions: {
-      header: null
-    }
-  },
-  Signature: {
-    screen: Signature,
-    navigationOptions: {
-      header: null
-    }
-  },
-  FormLayout: {
-    screen: FormLayout,
-    navigationOptions: {
-      header: null
-    }
-  },
-  ArrayFieldAttribute: {
-    screen: ArrayFieldAttribute
-  },
-  DataStore: {
-    screen: DataStore,
-  },
-  DataStoreItemDetails: {
-    screen: DataStoreItemDetails
-  },
-  SaveActivated: {
-    screen: SaveActivated,
-    navigationOptions: {
-      gesturesEnabled: false,
-    }
-  },
-  Transient: {
-    screen: Transient,
-    navigationOptions: {
-      gesturesEnabled: false,
-    }
-  },
-  CheckoutDetails: {
-    screen: CheckoutDetails,
-    navigationOptions: {
-      gesturesEnabled: false,
-    }
-  },
-  SignatureAndNps: {
-    screen: SignatureAndNps
-  },
-  BulkListing: {
-    screen: BulkListing
-  },
-  CashTendering: {
-    screen: CashTendering,
-    navigationOptions: {
-      header: null
-    }
-  },
-  TaskListScreen: {
-    screen: TaskListScreen
-  },
-  LiveJobs: {
-    screen: LiveJobListing
-  },
-  LiveJob: {
-    screen: LiveJob
-  },
-  PostAssignmentScanner: {
-    screen: PostAssignmentScanner
-  },
-  DataStoreDetails: {
-    screen: DataStoreDetails
-  },
-  OfflineDS: {
-    screen: OfflineDS
-  },
-  CameraAttribute: {
-    screen: CameraFieldAttribute,
-  },
-  ImageDetailsView: {
-    screen: ImageDetailsView,
-  },
-  Backup: {
-    screen: Backup,
-  },
-  SplitPayment: {
-    screen: SplitPayment,
-  },
-  SequenceRunsheetList: {
-    screen: SequenceRunsheetList
   },
   UnsyncBackupUpload: {
     screen: UnsyncBackupUpload,
@@ -308,9 +132,6 @@ export const AppNavigator = StackNavigator({
       gesturesEnabled: false
     }
   },
-  BluetoothListing: {
-    screen: BluetoothListing
-  }
 },
   {
     cardStyle: {
@@ -320,14 +141,9 @@ export const AppNavigator = StackNavigator({
 
 const middleware = createReactNavigationReduxMiddleware(
   "root",
-  state => state.nav,
+  state => state.nav
 );
-const addListener = createReduxBoundAddListener("root");
-// end for react-navigation 1.0.0-beta.30
 
-// const AppWithNavigationState = ({ dispatch, nav }) => (
-//   <AppNavigator navigation={addNavigationHelpers({ dispatch, state: nav })} />
-// );
 
 const mapStateToProps = state => ({
   nav: state.nav,

@@ -65,11 +65,12 @@ class Signature extends PureComponent {
             await this.props.actions.saveSignature(result,
                 this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
                 this.props.navigation.state.params.formLayoutState,
-                this.props.navigation.state.params.jobTransaction
+                this.props.navigation.state.params.jobTransaction,
+                this.props.navigation.goBack
+
             )
         }
         this.setState({ isLandscape: 'portrait' })
-        this.props.navigation.goBack()
     }
 
     static navigationOptions = ({ navigation }) => {

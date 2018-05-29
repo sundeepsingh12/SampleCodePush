@@ -79,7 +79,7 @@ import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog, resetNavigationState, resetApp, navigateToScene } from '../global/globalActions'
+import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog, resetNavigationState, resetApp } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
@@ -590,7 +590,8 @@ export function checkIfSimValidOnServer() {
         dispatch(preloaderSuccess())
         let unsyncBackupFilesList = await backupService.checkForUnsyncBackup(user)
         if (unsyncBackupFilesList.length > 0) {
-          dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
+          // dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
+          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: UnsyncBackupUpload })]))
         } else {
           dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
@@ -670,7 +671,7 @@ export function validateOtp(otpNumber) {
 
 }
 
-export function checkForUnsyncTransactionAndLogout() {
+export function checkForUnsyncTransactionAndLogout(props) {
   return async function (dispatch) {
     try {
       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
@@ -678,7 +679,7 @@ export function checkForUnsyncTransactionAndLogout() {
       if (isUnsyncTransactionsPresent) {
         dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, true))
       } else {
-        dispatch(invalidateUserSessionWhenLogoutPressed(true))
+        dispatch(invalidateUserSessionWhenLogoutPressed(true,props))
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0)
@@ -688,7 +689,7 @@ export function checkForUnsyncTransactionAndLogout() {
   }
 }
 
-export function invalidateUserSessionWhenLogoutPressed(createBackup) {
+export function invalidateUserSessionWhenLogoutPressed(createBackup,props) {
   return async function (dispatch) {
     try {
       dispatch(preLogoutRequest())
@@ -699,14 +700,17 @@ export function invalidateUserSessionWhenLogoutPressed(createBackup) {
       if (createBackup) {
         await backupService.createBackupOnLogout()
       }
+      console.log('after createBackupOnLogout >>>')
       const userObject = await keyValueDBService.getValueFromStore(USER)
       const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
 
+      console.log('before deregisterFcmTokenFromServer >>>')
       await sync.deregisterFcmTokenFromServer(userObject, token, fcmToken)
       let response = await authenticationService.logout(token) // hit logout api
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
-      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+      // dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+      dispatch(resetNavigationState(0,[NavigationActions.navigate({routeName: LoginScreen})]))
       dispatch(deleteSessionToken())
       // below 2 lines are used to delete geofence on logout 
       // <---- DON'T REMOVE THESE LINES --->

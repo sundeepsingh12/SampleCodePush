@@ -100,7 +100,7 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
  * @param {*} receipt 
  * @param {*} jobTransactionIdAmountMap 
  */
-export function saveMoneyCollectObject(actualAmount, currentElement, jobTransaction, moneyCollectMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt, jobTransactionIdAmountMap, formLayoutState) {
+export function saveMoneyCollectObject(actualAmount, currentElement, jobTransaction, moneyCollectMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt, jobTransactionIdAmountMap, formLayoutState,goBack) {
     return async function (dispatch) {
         try {
             //While saving actual amount should be a number
@@ -134,7 +134,7 @@ export function saveMoneyCollectObject(actualAmount, currentElement, jobTransact
                 isCardPayment
             }
             formLayoutState.paymentAtEnd = paymentAtEnd
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction,null,null,goBack))
             dispatch(setState(UPDATE_PAYMENT_AT_END, {
                 paymentAtEnd
             }))
@@ -157,7 +157,7 @@ export function saveMoneyCollectObject(actualAmount, currentElement, jobTransact
  * @param {*} splitPaymentModeMap 
  * @param {*} paymentContainerKey 
  */
-export function saveMoneyCollectSplitObject(actualAmount, currentElement, formLayoutState, jobTransaction, moneyCollectMaster, originalAmount, splitPaymentModeMap, paymentContainerKey) {
+export function saveMoneyCollectSplitObject(actualAmount, currentElement, formLayoutState, jobTransaction, moneyCollectMaster, originalAmount, splitPaymentModeMap, paymentContainerKey,navigation) {
     return async function (dispatch) {
         try {
             paymentService.checkSplitAmount(actualAmount, splitPaymentModeMap)
@@ -169,12 +169,13 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formLa
             //     modeTypeId: selectedPaymentMode,
             //     isCardPayment
             // }
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction,null,null.navigation.goBack))
             // dispatch(setState(UPDATE_PAYMENT_AT_END, {
             //     paymentAtEnd
             // }))
-            dispatch(setState(CLEAR_PAYMENT_STATE))
-            dispatch(NavigationActions.back())
+            // dispatch(setState(CLEAR_PAYMENT_STATE))
+            // dispatch(NavigationActions.back())
+            navigation.pop(1)
         } catch (error) {
             showToastAndAddUserExceptionLog(1603, error.message, 'danger', 1)
         }

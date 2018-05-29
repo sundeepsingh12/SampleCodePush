@@ -89,7 +89,8 @@ class SequenceRunsheetList extends Component {
                 runsheetNumber: item,
                 displayName: this.props.navigation.state.params.displayName,
                 jobMasterIds: this.props.navigation.state.params.jobMasterIds
-            })}>
+            },
+            this.props.navigation.navigate)}>
                 <Text style={[styles.fontDefault, styles.fontWeight500]}>{item}</Text>
                 <Right>
                     <Icon name="ios-arrow-forward" style={[styles.fontDefault, styles.fontBlack]} />

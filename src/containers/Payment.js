@@ -330,7 +330,8 @@ class Payment extends PureComponent {
                 moneyCollectMaster: this.props.moneyCollectMaster,
                 paymentContainerKey: this.props.navigation.state.key,
                 renderPaymentModeId: this.renderPaymentModeId,
-            })
+            },
+        this.props.navigation.navigate)
         } else {
             this.props.actions.saveMoneyCollectObject(
                 this.props.actualAmount,
@@ -343,7 +344,8 @@ class Payment extends PureComponent {
                 null,
                 null,
                 this.props.jobTransactionIdAmountMap,
-                this.props.navigation.state.params.formLayoutState
+                this.props.navigation.state.params.formLayoutState,
+                this.props.navigation.goBack
             )
         }
     }
@@ -364,7 +366,7 @@ class Payment extends PureComponent {
                                     <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                                 </TouchableOpacity>
                                 <View style={[styles.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Status</Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.currentElement.label}</Text>
                                 </View>
                                 <View style={[styles.headerRight]}>
                                 </View>

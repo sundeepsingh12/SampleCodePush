@@ -235,7 +235,8 @@ class SplitPayment extends Component {
                                         this.props.navigation.state.params.moneyCollectMaster,
                                         this.props.navigation.state.params.originalAmount,
                                         this.props.splitPaymentModeMap,
-                                        this.props.navigation.state.params.paymentContainerKey
+                                        this.props.navigation.state.params.paymentContainerKey,
+                                        this.props.navigation
                                     )
                                 }}
                             >

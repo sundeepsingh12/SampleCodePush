@@ -101,13 +101,14 @@ export function scanSkuItem(functionParams) {
  *This method updates SkuActualQuantity of a particular list item and TotalActualQuantity,
  * TotalOriginalQuantity & SkuActualAmount as well,Called when actualQuantity is changed by user
  */
-export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId) {
+export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId,goBack) {
     return async function (dispatch) {
         try {
             if (rowItem.attributeTypeId == SKU_PHOTO || rowItem.attributeTypeId == SKU_REASON) {
                 if (rowItem.attributeTypeId == SKU_PHOTO) {
                     value = await signatureService.saveFile(value, moment(), true)
-                    dispatch(NavigationActions.back())
+                    // dispatch(NavigationActions.back())
+                    goBack()
                     dispatch(setState(SET_SHOW_VIEW_IMAGE, { imageData: '', showImage: false, viewData: '' }))
                 }
                 let copyOfskuListItems = _.cloneDeep(skuListItems)
@@ -134,7 +135,7 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionList, parentObject, formLayoutState, skuValidationForImageAndReason, skuObjectAttributeKey) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionList, parentObject, formLayoutState, skuValidationForImageAndReason, skuObjectAttributeKey,navigate) {
     return async function (dispatch) {
         try {
             let jobTransaction = _.isArray(jobTransactionList) ? jobTransactionList : [jobTransactionList]
@@ -164,7 +165,7 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                     })
                 } else {
                     fieldDataListWithLatestPositionId.latestPositionId = positionId
-                    dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
+                    dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction,null,null,navigate))
                 }
             }
             else {
@@ -195,7 +196,7 @@ export function changeSkuCode(skuCode) {
  * else open SkuListing
  * @param {*} routeParams 
  */
-export function checkForNewJob(routeParams) {
+export function checkForNewJob(routeParams,navigate) {
     return async function (dispatch) {
         try {
             let { currentElement, jobTransaction } = routeParams
@@ -208,7 +209,7 @@ export function checkForNewJob(routeParams) {
                 })
                 dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, routeParams.formLayoutState, NA, NEXT_FOCUS, jobTransaction))// save NA as value
             } else {
-                dispatch(navigateToScene(SkuListing, routeParams))//navigate to SkuListing
+                dispatch(navigateToScene(SkuListing, routeParams,navigate))//navigate to SkuListing
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(2205, error.message, 'danger', 1)

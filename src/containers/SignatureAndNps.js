@@ -69,6 +69,7 @@ class SignatureAndNps extends PureComponent {
             this.props.navigation.state.params.currentElement,
             this.props.navigation.state.params.formLayoutState,
             this.props.navigation.state.params.jobTransaction,
+            this.props.navigation.goBack
         )
     }
 

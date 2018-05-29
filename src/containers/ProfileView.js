@@ -58,7 +58,7 @@ class ProfileView extends PureComponent {
   }
 
   _onResetButtonPress = () => {
-    this.props.actions.navigateToScene('ResetPassword')
+    this.props.actions.navigateToScene('ResetPassword',null,this.props.navigation.navigate)
   }
 
   _getHeaderView() {

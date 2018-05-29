@@ -35,7 +35,8 @@ function mapStateToProps(state) {
     utilities: state.home.utilities,
     pagesLoading: state.home.pagesLoading,
     pieChartSummaryCount: state.home.pieChartSummaryCount,
-    trackingServiceStarted: state.home.trackingServiceStarted
+    trackingServiceStarted: state.home.trackingServiceStarted,
+    customErpPullActivated:state.home.customErpPullActivated
   }
 }
 
@@ -56,7 +57,7 @@ class Home extends PureComponent {
 
   getPageView(page) {
     return (
-      <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
+      <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page,this.props.navigation.navigate)}>
         <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon, { backgroundColor: styles.primaryColor }]} />
         <Body><Text style={[styles.fontWeight500, styles.fontLg]}>{page.name}</Text></Body>
         <Right><Icon name="ios-arrow-forward" /></Right>
@@ -103,12 +104,12 @@ class Home extends PureComponent {
     return null
   }
   _onPieChartPress = () => {
-    this.props.actions.navigateToScene(Summary)
+    this.props.actions.navigateToScene(Summary,null,this.props.navigation.navigate)
   }
 
   getNewJobDraftModal() {
     if (!_.isEmpty(this.props.draftNewJobInfo)) {
-      return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
+      return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true,this.props.navigation.navigate)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false,this.props.navigation.navigate)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
     }
     return null
   }

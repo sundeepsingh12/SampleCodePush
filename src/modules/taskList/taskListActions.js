@@ -2,7 +2,7 @@
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
-import { setState, navigateToScene } from '../global/globalActions'
+import { setState } from '../global/globalActions'
 import { performSyncService } from '../../modules/home/homeActions'
 import { JOB_LISTING_START, JOB_LISTING_END, JOB_STATUS, SET_TABS_LIST, CUSTOM_NAMING, TAB, SHOULD_RELOAD_START, SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE, TABS_LOADING, TASKLIST_LOADER_FOR_SYNC, JobDetailsV2, BulkListing } from '../../lib/constants'
 import { Toast } from 'native-base'

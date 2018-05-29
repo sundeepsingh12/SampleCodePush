@@ -105,7 +105,8 @@ class LiveJobListing extends PureComponent {
                     job: item,
                     liveJobList: this.props.liveJobList,
                     displayName: this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS
-                }
+                },
+                this.props.navigation.navigate
             )
         } else {
             this.toggleLiveJobSelection(item.id)

@@ -140,7 +140,7 @@ class FixedSKUListing extends PureComponent {
         <View style={{backgroundColor : styles.bgPrimaryColor}}>
           <Button success full style={{backgroundColor : styles.bgPrimaryColor}}
             onPress={() => {
-              this.props.actions.onSave(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState, this.props.fixedSKUList, this.props.navigation.state.params.jobTransaction)
+              this.props.actions.onSave(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState, this.props.fixedSKUList, this.props.navigation.state.params.jobTransaction,this.props.navigation.goBack)
             }}>
             <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>
               {SAVE}

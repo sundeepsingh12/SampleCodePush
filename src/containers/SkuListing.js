@@ -49,12 +49,12 @@ class SkuListing extends PureComponent {
 
   renderData(item,title) {
     return (
-      <SkuListItem  item={item} title = {title} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} skuValidationForImageAndReason = {this.props.skuValidationForImageAndReason} />
+      <SkuListItem  navigate = {this.props.navigation.navigate} item={item} title = {title} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} skuValidationForImageAndReason = {this.props.skuValidationForImageAndReason} />
     )
   }
 
   updateSkuActualQty(value, rowItem, title) {
-    this.props.actions.updateSkuActualQuantityAndOtherData(value, rowItem, this.props.skuListItems, this.props.skuChildItems, this.props.skuValidationForImageAndReason, title)
+    this.props.actions.updateSkuActualQuantityAndOtherData(value, rowItem, this.props.skuListItems, this.props.skuChildItems, this.props.skuValidationForImageAndReason, title,this.props.navigation.goBack)
   }
 
   onChangeSkuCode(skuCode) {
@@ -164,7 +164,9 @@ class SkuListing extends PureComponent {
       this.props.navigation.state.params.currentElement,
       this.props.navigation.state.params.formLayoutState,
       this.props.skuValidationForImageAndReason,
-      this.props.skuObjectAttributeKey)
+      this.props.skuObjectAttributeKey,
+      this.props.navigation.goBack
+    )
   }
 }
 

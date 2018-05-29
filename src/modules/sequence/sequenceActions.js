@@ -102,7 +102,7 @@ export function resequenceJobsFromServer(sequenceList) {
  * then navigate to sequence container if no runsheet is present then show a toast
  * @param {*String} pageObject //pageobject from server 
  */
-export function getRunsheetsForSequence(pageObject) {
+export function getRunsheetsForSequence(pageObject,props) {
     return async function (dispatch) {
         try {
             //set loader to true
@@ -116,12 +116,12 @@ export function getRunsheetsForSequence(pageObject) {
                 dispatch(navigateToScene(Sequence, {
                     runsheetNumber: runsheetNumberList[0],
                     jobMasterIds: pageObject.jobMasterIds
-                }))
+                },props))
             } else if (_.size(runsheetNumberList) > 1) {//if more than 1 runsheet present then show list
                 dispatch(navigateToScene(SequenceRunsheetList, {
                     displayName: pageObject.name,
                     jobMasterIds: pageObject.jobMasterIds
-                }))
+                },props))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(2603, error.message, null, 0)

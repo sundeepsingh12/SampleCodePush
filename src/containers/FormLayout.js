@@ -131,6 +131,7 @@ class FormLayout extends PureComponent {
         jobTransaction={this.props.navigation.state.params.jobTransaction}
         jobStatusId={this.props.navigation.state.params.statusId}
         formLayoutState={formLayoutState}
+        navigate = {this.props.navigation.navigate}
       />
     )
   }
@@ -187,7 +188,8 @@ class FormLayout extends PureComponent {
           saveActivatedStatusData: this.props.navigation.state.params.saveActivatedStatusData,
           pieChart: this.props.pieChart,
           taskListScreenDetails
-        })
+        },
+      this.props.navigation.navigate)
     } else {
       this.props.actions.saveJobTransaction(
         formLayoutState,
@@ -197,7 +199,9 @@ class FormLayout extends PureComponent {
         this.props.navigation.state.params.navigationFormLayoutStates,
         this.props.navigation.state.params.saveActivatedStatusData,
         this.props.pieChart,
-        taskListScreenDetails
+        taskListScreenDetails,
+        this.props.navigation.navigate,
+        this.props.navigation.goBack
       )
     }
   }
