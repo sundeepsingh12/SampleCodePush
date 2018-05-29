@@ -23,6 +23,7 @@ export default function liveJobReducer(state = initialState, action) {
             return state.set('liveJobList', action.payload.jobTransactions)
                 .set('selectedItems', action.payload.selectedItems)
                 .set('liveJobToastMessage', '')
+                .set('searchText', action.payload.searchText)
         case START_FETCHING_LIVE_JOB:
             return state.set('loaderRunning', action.payload)
                 .set('liveJobToastMessage', '')

@@ -54,7 +54,7 @@ class DraftService {
             return draft
         }
     }
-    
+
     getDraftFromDb(jobTransaction, jobMasterId) {
         let draftQuery, draftDbObject
         let allData = realm.getRecordListOnQuery(TABLE_DRAFT)
@@ -69,10 +69,15 @@ class DraftService {
     }
 
     deleteDraftFromDb(jobTransaction, jobMasterId) {
-        if (jobTransaction.id < 0 && jobTransaction.jobId < 0) {
-            realm.deleteSingleRecord(TABLE_DRAFT, -jobMasterId, 'jobTransactionId')
+        if (jobTransaction.length) {
+            let transactionList = jobTransaction.map(transaction => transaction.jobTransactionId)
+            realm.deleteRecordList(TABLE_DRAFT, transactionList, 'jobTransactionId')
         } else {
-            realm.deleteSingleRecord(TABLE_DRAFT, jobTransaction.id, 'jobTransactionId')
+            if (jobTransaction.id < 0 && jobTransaction.jobId < 0) {
+                realm.deleteSingleRecord(TABLE_DRAFT, -jobMasterId, 'jobTransactionId')
+            } else {
+                realm.deleteSingleRecord(TABLE_DRAFT, jobTransaction.id, 'jobTransactionId')
+            }
         }
         
     }

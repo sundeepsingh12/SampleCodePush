@@ -5,36 +5,12 @@ import styles from '../themes/FeStyle'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import {
-    View,
-    Text,
-    TouchableHighlight,
-    Modal,
-    ScrollView,
-    Animated,
-    Dimensions,
-} from 'react-native'
-import {
-    Icon,
-    Input,
-    ListItem,
-    Item,
-    CheckBox,
-    Radio,
-    Body,
-    Right
-} from 'native-base'
+import { View, Text, TouchableHighlight, Modal, ScrollView, Animated, Dimensions } from 'react-native'
+import { Icon, Input, ListItem, Item, CheckBox, Radio, Body, Right } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as multipleOptionsAttributeActions from '../modules/multipleOptionsAttribute/multipleOptionsAttributeActions'
-import {
-    CHECKBOX,
-    RADIOBUTTON,
-    DROPDOWN,
-    OPTION_RADIO_FOR_MASTER,
-    SEARCH,
-    ADVANCE_DROPDOWN
-} from '../lib/AttributeConstants'
+import { CHECKBOX, RADIOBUTTON, DROPDOWN, OPTION_RADIO_FOR_MASTER, SEARCH, ADVANCE_DROPDOWN } from '../lib/AttributeConstants'
 import {
     SET_MODAL_FIELD_ATTRIBUTE,
     SET_OPTION_ATTRIBUTE_ERROR,
@@ -42,12 +18,7 @@ import {
     SET_ADV_DROPDOWN_MESSAGE_OBJECT,
     SET_ERROR_AND_ADV_DROPDOWN_MESSAGE_NULL
 } from '../lib/constants'
-import {
-    DONE,
-    NO_OPTIONS_PRESENT,
-    DISMISS,
-    MULTIPLE_SELECT_OPTIONS
-} from '../lib/ContainerConstants'
+import { DONE, NO_OPTIONS_PRESENT, DISMISS, MULTIPLE_SELECT_OPTIONS } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -225,7 +196,7 @@ class MultipleOptionsAttribute extends PureComponent {
                                         this.props.advanceDropdownMessageObject
                                     )
                                 }}>
-                                <Text style={[{color : styles.fontPrimaryColor}, styles.padding10]}> {DONE} </Text>
+                                <Text style={[{ color: styles.fontPrimaryColor }, styles.padding10]}> {DONE} </Text>
                             </TouchableHighlight>
                         </View>
                     </View>
@@ -304,7 +275,7 @@ class MultipleOptionsAttribute extends PureComponent {
                                                     this.props.rowId,
                                                 )
                                             }}>
-                                            <Text style={[{color : styles.fontPrimaryColor}, styles.padding10]}> {DONE} </Text>
+                                            <Text style={[{ color: styles.fontPrimaryColor }, styles.padding10]}> {DONE} </Text>
                                         </TouchableHighlight> : null
                                     }
                                 </View>

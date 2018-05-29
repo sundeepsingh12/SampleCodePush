@@ -18,6 +18,7 @@ var InitialState = Record({
     isFiltersPresent: true,
     cloneDataStoreAttrValueMap: {},
     isAllowFromFieldInExternalDS: false,
+    isDataStoreEditable: true,
 })
 
 export default InitialState

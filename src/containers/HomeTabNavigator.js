@@ -1,8 +1,8 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { Platform, BackHandler, View } from 'react-native'
-import { Icon } from 'native-base'
+import { Platform, BackHandler, View, StyleSheet, Text } from 'react-native'
+import { Icon, Header, Body, Image } from 'native-base'
 import { connect } from 'react-redux'
 import { TabNavigator } from 'react-navigation'
 import SyncScreen from './SyncScreen'
@@ -12,6 +12,7 @@ import Menu from './Menu'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 import ErpSyncTabIcon from '../svg_components/icons/ErpSyncTabIcon'
+import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
 
 function mapStateToProps(state) {
     return {
@@ -37,7 +38,6 @@ class HomeTabNavigator extends PureComponent {
             HomeScreen: {
                 screen: Home,
                 navigationOptions: {
-                    header: null,
                     gesturesEnabled: false,
                     title: 'Home',
                     tabBarIcon: ({ tintColor }) => (
@@ -51,7 +51,6 @@ class HomeTabNavigator extends PureComponent {
             SyncScreen: {
                 screen: SyncScreen,
                 navigationOptions: {
-                    header: null,
                     title: 'Sync',
                     gesturesEnabled: false,
                     tabBarIcon: ({ tintColor }) => (
@@ -65,7 +64,6 @@ class HomeTabNavigator extends PureComponent {
             ErpSyncScreen: {
                 screen: ErpSyncScreen,
                 navigationOptions: {
-                    header: null,
                     title: 'ERP',
                     gesturesEnabled: false,
                     tabBarIcon: ({ tintColor }) => (
@@ -79,7 +77,6 @@ class HomeTabNavigator extends PureComponent {
             MenuScreen: {
                 screen: Menu,
                 navigationOptions: {
-                    header: null,
                     title: 'Menu',
                     gesturesEnabled: false,
                     tabBarIcon: ({ tintColor }) => (

@@ -1,18 +1,8 @@
 'use strict'
 
 import React, { Component } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    Platform,
-    TextInput,
-    TouchableOpacity,
-} from 'react-native'
-import {
-    Container, Content, Header, Footer, FooterTab, Input, Button, Item, Card,
-    CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox, StyleProvider
-} from 'native-base'
+import { StyleSheet, View, Text, Platform, TextInput, TouchableOpacity, SafeAreaView } from 'react-native'
+import { Container, Content, Header, Footer, FooterTab, Input, Button, Item, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -45,12 +35,7 @@ import {
     TICKET_RESTAURANT,
     UPI,
 } from '../lib/AttributeConstants'
-
-import {
-    SET_PAYMENT_CHANGED_PARAMETERS,
-    SET_SPLIT_PAYMENT,
-} from '../lib/constants'
-
+import { SET_PAYMENT_CHANGED_PARAMETERS, SET_SPLIT_PAYMENT, } from '../lib/constants'
 import {
     AMOUNT_TO_BE_COLLECTED,
     AMOUNT,
@@ -69,7 +54,6 @@ function mapStateToProps(state) {
         splitPaymentModeMap: state.payment.splitPaymentModeMap
     }
 }
-
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -95,7 +79,7 @@ class SplitPayment extends Component {
                     <Text style={[styles.fontLg, styles.width100, styles.fontCenter, styles.marginBottom10, styles.paddingTop5]}>
                         {titleText} {PAYMENT}
                     </Text>
-                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100]}>
+                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontSm, styles.width100]}>
                         {AMOUNT}
                     </Text>
                     <Item>
@@ -114,7 +98,7 @@ class SplitPayment extends Component {
                 </View>
                 {paymentView ? <View style={[styles.marginTop5, styles.marginBottom15]}>
                     <Button bordered small onPress={() => { this.props.actions.changeChequeOrDDPaymentModeList(modeTypeId, this.props.splitPaymentModeMap) }}>
-                        <Text style={{color : styles.fontPrimaryColor}}>{ADD_PAYMENT_MODE}</Text>
+                        <Text style={{ color: styles.fontPrimaryColor }}>{ADD_PAYMENT_MODE}</Text>
                     </Button>
                 </View> : null}
             </View>
@@ -126,7 +110,7 @@ class SplitPayment extends Component {
         return (
             <View key={`${id}${modeTypeId}`} style={[styles.row, styles.justifySpaceBetween, styles.marginTop10]}>
                 <View style={[styles.justifySpaceBetween, { width: '50%' }]}>
-                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100]}>
+                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontSm, styles.width100]}>
                         {titleText} {NUMBER}
                     </Text>
                     <Item>
@@ -142,7 +126,7 @@ class SplitPayment extends Component {
                     </Item>
                 </View>
                 <View style={[styles.justifySpaceBetween, { width: '35%' }]}>
-                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100]}>
+                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontSm, styles.width100]}>
                         {titleText} {AMOUNT}
                     </Text>
                     <Item>
@@ -184,22 +168,24 @@ class SplitPayment extends Component {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingTop5]}>
-                                <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack() }}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[styles.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Status</Text>
+                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
+                            <Body>
+                                <View
+                                    style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingTop5]}>
+                                    <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack() }}>
+                                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                    </TouchableOpacity>
+                                    <View style={[styles.headerBody]}>
+                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Status</Text>
+                                    </View>
+                                    <View style={[styles.headerRight]}>
+                                    </View>
+                                    <View />
                                 </View>
-                                <View style={[styles.headerRight]}>
-                                </View>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
+                            </Body>
+                        </Header>
+                    </SafeAreaView>
 
                     <Content style={{ backgroundColor: '#f4f4f4' }}>
 
@@ -221,28 +207,30 @@ class SplitPayment extends Component {
                         </View>
                         {paymentModeListView}
                     </Content>
-                    <Footer style={[styles.padding10, style.footer]}>
-                        <FooterTab>
-                            <Button success
-                                disabled={this.props.isSaveButtonDisabled}
-                                style={{ borderRadius: 0 }}
-                                onPress={() => {
-                                    this.props.actions.saveMoneyCollectSplitObject(
-                                        this.props.navigation.state.params.actualAmount,
-                                        this.props.navigation.state.params.currentElement,
-                                        this.props.navigation.state.params.formLayoutState,
-                                        this.props.navigation.state.params.jobTransaction,
-                                        this.props.navigation.state.params.moneyCollectMaster,
-                                        this.props.navigation.state.params.originalAmount,
-                                        this.props.splitPaymentModeMap,
-                                        this.props.navigation.state.params.paymentContainerKey
-                                    )
-                                }}
-                            >
-                                <Text style={[styles.fontWhite]}>Save</Text>
-                            </Button>
-                        </FooterTab>
-                    </Footer>
+                    <SafeAreaView>
+                        <Footer style={[styles.padding10, style.footer]}>
+                            <FooterTab>
+                                <Button success
+                                    disabled={this.props.isSaveButtonDisabled}
+                                    style={{ borderRadius: 0 }}
+                                    onPress={() => {
+                                        this.props.actions.saveMoneyCollectSplitObject(
+                                            this.props.navigation.state.params.actualAmount,
+                                            this.props.navigation.state.params.currentElement,
+                                            this.props.navigation.state.params.formLayoutState,
+                                            this.props.navigation.state.params.jobTransaction,
+                                            this.props.navigation.state.params.moneyCollectMaster,
+                                            this.props.navigation.state.params.originalAmount,
+                                            this.props.splitPaymentModeMap,
+                                            this.props.navigation.state.params.paymentContainerKey
+                                        )
+                                    }}
+                                >
+                                    <Text style={[styles.fontWhite]}>Save</Text>
+                                </Button>
+                            </FooterTab>
+                        </Footer>
+                    </SafeAreaView>
                 </Container>
             </StyleProvider>
         )

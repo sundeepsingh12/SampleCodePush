@@ -8,30 +8,10 @@ import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
 import DataStoreItemDetails from '../components/DataStoreItemDetails'
-import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
-import {
-    SET_DATA_STORE_ATTR_MAP,
-    SET_SEARCH_TEXT,
-    SHOW_DETAILS,
-    _id,
-    SET_INITIAL_STATE,
-    QrCodeScanner,
-    DISABLE_AUTO_START_SCANNER,
-    SHOW_LOADER_DS
-} from '../lib/constants'
-import {
-    FooterTab,
-    Card,
-    Container,
-    Content,
-    Button,
-    Text,
-    Footer,
-    Toast
-} from 'native-base'
-import {
-    EXTERNAL_DATA_STORE,
-} from '../lib/AttributeConstants'
+import { StyleSheet, View, TouchableOpacity, FlatList, SafeAreaView } from 'react-native'
+import { SET_DATA_STORE_ATTR_MAP, SET_SEARCH_TEXT, SHOW_DETAILS, _id, SET_INITIAL_STATE, QrCodeScanner, DISABLE_AUTO_START_SCANNER, SHOW_LOADER_DS } from '../lib/constants'
+import { FooterTab, Card, Container, Content, Button, Text, Footer, Toast } from 'native-base'
+import { EXTERNAL_DATA_STORE, } from '../lib/AttributeConstants'
 import _ from 'lodash'
 import { SUGGESTIONS, OK } from '../lib/ContainerConstants'
 function mapStateToProps(state) {
@@ -49,7 +29,8 @@ function mapStateToProps(state) {
         isFiltersPresent: state.dataStore.isFiltersPresent,
         cloneDataStoreAttrValueMap: state.dataStore.cloneDataStoreAttrValueMap,
         arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
-        isAllowFromFieldInExternalDS: state.dataStore.isAllowFromFieldInExternalDS
+        isAllowFromFieldInExternalDS: state.dataStore.isAllowFromFieldInExternalDS,
+        isDataStoreEditable: state.dataStore.isDataStoreEditable
     }
 };
 
@@ -70,7 +51,7 @@ class DataStore extends PureComponent {
         if (this.props.navigation.state.params.calledFromArray) {
             this.props.actions.checkForFiltersAndValidationForArray({
                 currentElement: this.props.navigation.state.params.currentElement,
-                formElement: this.props.navigation.state.params.formLayoutState.formElement,
+                formLayoutState: this.props.navigation.state.params.formLayoutState,
                 jobTransaction: this.props.navigation.state.params.jobTransaction,
                 arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
                 arrayFieldAttributeMasterId: this.props.navigation.state.params.arrayFieldAttributeMasterId,
@@ -79,7 +60,7 @@ class DataStore extends PureComponent {
         } else {
             this.props.actions.checkForFiltersAndValidation(
                 this.props.navigation.state.params.currentElement,
-                this.props.navigation.state.params.formLayoutState.formElement,
+                this.props.navigation.state.params.formLayoutState,
                 this.props.navigation.state.params.jobTransaction,
                 this.props.dataStoreFilterReverseMap)
         }
@@ -235,7 +216,7 @@ class DataStore extends PureComponent {
     render() {
         if (this.props.detailsVisibleFor == -1) {
             return (
-                < Container >
+                <Container>
                     <SearchBar
                         title={this.props.navigation.state.params.currentElement.label}
                         isScannerEnabled={this.props.isScannerEnabled}
@@ -246,7 +227,8 @@ class DataStore extends PureComponent {
                         setSearchText={this.setSearchText}
                         scanner={this.scanner}
                         isFiltersPresent={this.props.isFiltersPresent}
-                        searchDataStoreAttributeValueMap={this.searchDataStoreAttributeValueMap} />
+                        searchDataStoreAttributeValueMap={this.searchDataStoreAttributeValueMap}
+                        isDataStoreEditable={this.props.isDataStoreEditable} />
 
                     <Content style={[styles.marginLeft10]}>
                         {this.getLoader()}
@@ -254,23 +236,25 @@ class DataStore extends PureComponent {
                         {this.flatListView()}
                     </Content>
                     {((this.props.isMinMaxValidation || this.props.isAllowFromFieldInExternalDS) && _.size(this.props.searchText) > 2) &&
-                        <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
-                            <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
-                                <Button success full style={{backgroundColor : styles.bgPrimaryColor}}
-                                    onPress={() => {
-                                        this.props.actions.onSave(
-                                            this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
-                                            this.props.navigation.state.params.formLayoutState,
-                                            this.props.searchText,
-                                            this.props.navigation.state.params.calledFromArray,
-                                            this.props.navigation.state.params.rowId,
-                                            this.props.navigation.state.params.jobTransaction,
-                                        )
-                                    }}>
-                                    <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
-                                </Button>
-                            </FooterTab>
-                        </Footer>}
+                        <SafeAreaView style={{ backgroundColor: 'white' }}>
+                            <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
+                                <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
+                                    <Button success full style={{ backgroundColor: styles.bgPrimaryColor }}
+                                        onPress={() => {
+                                            this.props.actions.onSave(
+                                                this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
+                                                this.props.navigation.state.params.formLayoutState,
+                                                this.props.searchText,
+                                                this.props.navigation.state.params.calledFromArray,
+                                                this.props.navigation.state.params.rowId,
+                                                this.props.navigation.state.params.jobTransaction,
+                                            )
+                                        }}>
+                                        <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
+                                    </Button>
+                                </FooterTab>
+                            </Footer>
+                        </SafeAreaView>}
                 </Container >
             )
         }

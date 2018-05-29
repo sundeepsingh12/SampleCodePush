@@ -22,10 +22,12 @@ import {
     TabScreen,
     SET_MESSAGE,
     SET_LIVE_JOB_TOAST,
-    HomeTabNavigatorScreen
+    HomeTabNavigatorScreen,
+    SET_LIVE_JOB_LOADER
 } from '../../../lib/constants'
 import CONFIG from '../../../lib/config'
 import thunk from 'redux-thunk'
+import { userExceptionLogsService } from '../../../services/classes/UserException'
 
 var actions = require('../liveJobActions')
 
@@ -384,12 +386,12 @@ describe('test for toggleLiveJobSelection', () => {
         let jobId = 0
         let allJobs = {
             0: {
-                jobTransactionCustomization: { isChecked: false }
+                isChecked: false
             }
         }
         let jobTransactions = {
             0: {
-                jobTransactionCustomization: { isChecked: true }
+                isChecked: true
             }
         }
         const selectedItems = []
@@ -417,7 +419,7 @@ describe('test for toggleLiveJobSelection', () => {
         let jobId = 0
         let allJobs = {
             0: {
-                
+
             }
         }
         let jobTransactions = {
@@ -456,6 +458,7 @@ describe('test for acceptOrRejectMultiple', () => {
     }
 
     const expectedActions = [
+        { type: START_FETCHING_LIVE_JOB, payload: true },
         {
             type: SET_LIVE_JOB_LIST,
             payload: liveJobList.newLiveJobList
@@ -473,50 +476,47 @@ describe('test for acceptOrRejectMultiple', () => {
                 expect(liveJobService.requestServerForApprovalForMultiple).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
             })
     })
 })
 
-describe('test for deleteExpiredJob', () => {
-    let jobId = 0
-    const liveJobList = []
+// describe('test for deleteExpiredJob', () => {
+//     let jobId = 0
+//     const liveJobList = []
 
-    const expectedActions = [
-        {
-            type: SET_LIVE_JOB_LIST,
-            payload: liveJobList
-        }
-    ]
-    it('should set new live job list', () => {
-        liveJobService.deleteJob = jest.fn()
-        liveJobService.deleteJob.mockReturnValue(liveJobList);
-        const store = mockStore({})
-        return store.dispatch(actions.deleteExpiredJob([jobId], liveJobList))
-            .then(() => {
-                expect(liveJobService.deleteJob).toHaveBeenCalled()
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-            })
-    })
-})
+//     const expectedActions = [
+//         {
+//             type: SET_LIVE_JOB_LIST,
+//             payload: liveJobList
+//         }
+//     ]
+//     it('should set new live job list', () => {
+//         liveJobService.deleteJob = jest.fn()
+//         liveJobService.deleteJob.mockReturnValue(liveJobList);
+//         const store = mockStore({})
+//         return store.dispatch(actions.deleteExpiredJob([jobId], liveJobList))
+//             .then(() => {
+//                 expect(liveJobService.deleteJob).toHaveBeenCalled()
+//                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+//                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+//             })
+//     })
+// })
 
 describe('test for selectNone', () => {
     it('should unselect all transactions', () => {
         const liveJobList = {
             1: {
                 id: 1,
-                jobTransactionCustomization: {
-                    isChecked: true
-                }
-
+                isChecked: true
             }
         }
         const selectedJobs = {
             1: {
                 id: 1,
-                jobTransactionCustomization: {
-                    isChecked: false
-                }
+                isChecked: false
 
             }
         }
@@ -527,7 +527,8 @@ describe('test for selectNone', () => {
                 type: TOGGLE_LIVE_JOB_LIST_ITEM,
                 payload: {
                     selectedItems,
-                    jobTransactions: selectedJobs
+                    jobTransactions: selectedJobs,
+                    searchText: ''
                 }
             }
         ]
@@ -548,18 +549,14 @@ describe('test for selectAll', () => {
         const liveJobList = {
             1: {
                 id: 1,
-                jobTransactionCustomization: {
-                    isChecked: false
-                }
+                isChecked: false
 
             }
         }
         const selectedJobs = {
             1: {
                 id: 1,
-                jobTransactionCustomization: {
-                    isChecked: true
-                }
+                isChecked: true
 
             }
         }
@@ -570,7 +567,8 @@ describe('test for selectAll', () => {
                 type: TOGGLE_LIVE_JOB_LIST_ITEM,
                 payload: {
                     selectedItems,
-                    jobTransactions: selectedJobs
+                    jobTransactions: selectedJobs,
+                    searchText: ''
                 }
             }
         ]
@@ -583,6 +581,44 @@ describe('test for selectAll', () => {
             .then(() => {
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+    it('should throw error', () => {
+        const liveJobList = {
+            1: {
+                id: 1,
+                isChecked: false
+
+            }
+        }
+        const selectedJobs = {
+            1: {
+                id: 1,
+                isChecked: true
+
+            }
+        }
+
+        const selectedItems = ['1']
+        const expectedActions = [
+            {
+                type: TOGGLE_LIVE_JOB_LIST_ITEM,
+                payload: {
+                    selectedItems,
+                    jobTransactions: selectedJobs,
+                    searchText: ''
+                }
+            }
+        ]
+        const result = {
+            selectedItems,
+            jobTransactions: selectedJobs
+        }
+        const store = mockStore({})
+        userExceptionLogsService.addUserExceptionLogs=jest.fn()
+        return store.dispatch(actions.selectAll(null))
+            .then(() => {
+                expect(userExceptionLogsService.addUserExceptionLogs).toHaveBeenCalled()
             })
     })
 })
@@ -601,37 +637,9 @@ describe('test for acceptOrRejectJob', () => {
 
         const expectedActions = [
             {
-                type: SET_MESSAGE,
-                payload: liveJobList.toastMessage
-            }
-        ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce(token)
-        liveJobService.requestServerForApproval = jest.fn()
-        liveJobService.requestServerForApproval.mockReturnValue(liveJobList);
-        const store = mockStore({})
-        return store.dispatch(actions.acceptOrRejectJob(status, job, []))
-            .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
-                expect(liveJobService.requestServerForApproval).toHaveBeenCalledTimes(1)
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-                // expect(NavigationActions.reset).toHaveBeenCalledTimes(1)
-            })
-    })
-    it('should reject single job', () => {
-        const token = 'token'
-        let job = {
-            id: 1
-        }
-        const status = 2
-        const selectedItems = []
-        const liveJobList = {
-            newLiveJobList: [],
-            toastMessage: 'Something went wrong,try again'
-        }
-
-        const expectedActions = [
+                type: SET_LIVE_JOB_LOADER,
+                payload: true
+            },
             {
                 type: SET_MESSAGE,
                 payload: liveJobList.toastMessage
@@ -648,6 +656,45 @@ describe('test for acceptOrRejectJob', () => {
                 expect(liveJobService.requestServerForApproval).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+            })
+    })
+    it('should reject single job', () => {
+        const token = 'token'
+        let job = {
+            id: 1
+        }
+        const status = 2
+        const selectedItems = []
+        const liveJobList = {
+            newLiveJobList: [],
+            toastMessage: 'Something went wrong,try again'
+        }
+
+        const expectedActions = [
+            {
+                type: SET_LIVE_JOB_LOADER,
+                payload: true
+            },
+            {
+                type: SET_MESSAGE,
+                payload: liveJobList.toastMessage
+            }
+        ]
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(token)
+        liveJobService.requestServerForApproval = jest.fn()
+        liveJobService.requestServerForApproval.mockReturnValue(liveJobList);
+        const store = mockStore({})
+        return store.dispatch(actions.acceptOrRejectJob(status, job, []))
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(liveJobService.requestServerForApproval).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
             })
     })
 })

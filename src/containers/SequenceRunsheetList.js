@@ -3,45 +3,19 @@
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
-
 import React, { Component } from 'react'
-import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
-
-import {
-    Container,
-    Content,
-    Header,
-    Text,
-    List,
-    ListItem,
-    Left,
-    Body,
-    Right,
-    Icon,
-    StyleProvider,
-    Toast
-} from 'native-base';
-
-
+import { StyleSheet, View, TouchableOpacity, FlatList, SafeAreaView } from 'react-native'
+import { Container, Content, Header, Text, List, ListItem, Left, Body, Right, Icon, StyleProvider, Toast } from 'native-base';
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as sequenceActions from '../modules/sequence/sequenceActions'
 import * as globalActions from '../modules/global/globalActions'
-import {
-    SELECT_RUNSHEET_NUMBER,
-    OK
-} from './../lib/ContainerConstants'
-import {
-    Sequence,
-    SET_RUNSHEET_NUMBER_LIST,
-    SET_RESPONSE_MESSAGE
-} from './../lib/constants'
-
+import { SELECT_RUNSHEET_NUMBER, OK } from './../lib/ContainerConstants'
+import { Sequence, SET_RUNSHEET_NUMBER_LIST, SET_RESPONSE_MESSAGE } from './../lib/constants'
 
 function mapStateToProps(state) {
     return {
@@ -104,24 +78,26 @@ class SequenceRunsheetList extends Component {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]}
-                                    onPress={this.goBack}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}</Text>
+                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                        <Header style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                            <Body>
+                                <View
+                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                    <TouchableOpacity style={[style.headerLeft]}
+                                        onPress={this.goBack}>
+                                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                    </TouchableOpacity>
+                                    <View style={[style.headerBody]}>
+                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}</Text>
+                                    </View>
+                                    <View style={[style.headerRight]}>
+                                    </View>
                                 </View>
-                                <View style={[style.headerRight]}>
-                                </View>
-                            </View>
-                        </Body>
-                    </Header>
+                            </Body>
+                        </Header>
+                    </SafeAreaView>
                     <Content style={[styles.bgWhite]}>
-                        <Text style={[styles.fontSm, {color : styles.fontPrimaryColor}, styles.padding15]}>{SELECT_RUNSHEET_NUMBER}</Text>
+                        <Text style={[styles.fontSm, { color: styles.fontPrimaryColor }, styles.padding15]}>{SELECT_RUNSHEET_NUMBER}</Text>
                         <List>
                             <FlatList
                                 data={(this.props.runsheetNumberList)}
