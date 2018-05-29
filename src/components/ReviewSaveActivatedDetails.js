@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
 import { StyleSheet, View, FlatList, TouchableOpacity, Modal, SafeAreaView } from 'react-native'
 import { Edit } from '../lib/constants'
-import { Conainer, Content, Header, Text, Left, Body, Right, Icon, List, StyleProvider, Footer, } from 'native-base';
+import { Container, Content, Header, Text, Left, Body, Right, Icon, List, StyleProvider, Footer, } from 'native-base';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'

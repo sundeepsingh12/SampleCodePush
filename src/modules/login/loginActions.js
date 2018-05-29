@@ -127,9 +127,7 @@ export function authenticateUser(username, password, rememberMe) {
       dispatch(loginRequest())
       const authenticationResponse = await authenticationService.login(username, password)
       let cookie = authenticationResponse.headers.map['set-cookie'][0]
-      let jsessionID = authenticationResponse.headers.map['set-cookie'][0].split(',')[1].split(';')[0].trim()
-      console.log('jsessionID', jsessionID)
-      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, jsessionID)
+      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)
       await authenticationService.saveLoginCredentials(username, password, rememberMe)
       dispatch(loginSuccess())
       dispatch(NavigationActions.navigate({

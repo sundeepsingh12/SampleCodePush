@@ -258,7 +258,7 @@ class FormLayout {
         return combineMap
     }
 
-    async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList) {
+    async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, taskListScreenDetails) {
         let routeName, routeParam
         const currentStatus = await transientStatusAndSaveActivatedService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
@@ -282,7 +282,8 @@ class FormLayout {
         }
         else if (currentStatus.transient) {
             routeName = Transient
-            routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, }
+            let { jobDetailsScreenKey, pageObjectAdditionalParams } = taskListScreenDetails
+            routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams }
         }
         else {
             routeName = TabScreen
