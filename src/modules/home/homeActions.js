@@ -409,7 +409,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
     try {
       const currenDate = moment().format('YYYY-MM-DD HH:mm:ss')
       let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
-      if (syncRunningAndTransactionSaving && syncRunningAndTransactionSaving.value && (syncRunningAndTransactionSaving.value.syncRunning || syncRunningAndTransactionSaving.value.transactionSaving)) {
+      if (!calledFromAutoLogout && syncRunningAndTransactionSaving && syncRunningAndTransactionSaving.value && (syncRunningAndTransactionSaving.value.syncRunning || syncRunningAndTransactionSaving.value.transactionSaving)) {
         return
       } else {
         await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, {
@@ -421,7 +421,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       const autoLogoutEnabled = userData ? userData.company ? userData.company.autoLogoutFromDevice : null : null
       const lastLoginTime = userData ? userData.lastLoginTime : null
       if (!calledFromAutoLogout && autoLogoutEnabled && !moment(moment(lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
-        dispatch(navigateToScene(AutoLogoutScreen));
+        dispatch(navigateToScene(AutoLogoutScreen))
         return
       }
       let syncCount = 0

@@ -32,8 +32,7 @@ import {
   SET_APP_UPDATE_BY_CODEPUSH,
   SET_APP_UPDATE_STATUS,
   RESET_STATE,
-  SET_IOS_UPGRADE_SCREEN,
-  ERROR_LOGOUT
+  SET_IOS_UPGRADE_SCREEN
 } from '../../lib/constants'
 
 /**
@@ -107,9 +106,6 @@ export default function preloaderReducer(state = initialState, action) {
 
     case ERROR_400_403_LOGOUT:
       return state.set('errorMessage_403_400_Logout', action.payload)
-    
-    case ERROR_LOGOUT:
-      return state.set('error', action.payload)
 
     case ON_MOBILE_NO_CHANGE:
       return state.set('mobileNumber', action.payload)

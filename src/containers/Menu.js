@@ -30,14 +30,14 @@ import {
   OfflineDS,
   Backup,
   SET_UNSYNC_TRANSACTION_PRESENT,
-  BluetoothListing
+  BluetoothListing,
+  IS_LOGGING_OUT
 } from '../lib/constants'
 import { OK, CANCEL, LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE, UNTITLED, APP, LOGOUT } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
-    loading: state.home.loading,
-    error: state.preloader.error,
+    isLoggingOut: state.home.isLoggingOut,
     errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
     menu: state.home.menu,
     isUnsyncTransactionOnLogout: state.home.isUnsyncTransactionOnLogout,
@@ -61,10 +61,10 @@ class Menu extends PureComponent {
   getUnsyncTransactionPresentAlert() {
     if (this.props.isUnsyncTransactionOnLogout) {
       return Alert.alert(LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
-        [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false), style: 'cancel' },
+        [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, {isUnsyncTransactionOnLogout : false, isLoggingOut : false}), style: 'cancel' },
         {
           text: OK, onPress: () => {
-            this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false)
+            this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, {isUnsyncTransactionOnLogout : false, isLoggingOut : true})
             this.props.actions.invalidateUserSession(false)
           }
         },],
@@ -144,14 +144,13 @@ class Menu extends PureComponent {
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
           {this.getUnsyncTransactionPresentAlert()}
-          {(this.props.error == 'Logging out' ?  <Loader /> : 
+          {((this.props.isLoggingOut && _.isEmpty(this.props.errorMessage_403_400_Logout)) ?  <Loader /> : 
             <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
               {this.getPageListItemsView()}
               {this.renderLogoutView()}
             </Content>)}
         </Container>
       </StyleProvider>
-
     )
   }
 

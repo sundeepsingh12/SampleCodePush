@@ -53,7 +53,7 @@ class Preloader extends PureComponent {
     }
 
     componentDidMount() {
-        this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService, this.props.showMobileOtpNumberScreen)
+        this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
     }
 
     startLoginScreenWithoutLogout = () => {

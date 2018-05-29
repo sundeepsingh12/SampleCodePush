@@ -89,7 +89,6 @@ class Authentication {
         }
         return logoutResponse
     }
-
 }
 
 export let authenticationService = new Authentication()

@@ -63,8 +63,8 @@ import {
   SET_APP_UPDATE_BY_CODEPUSH,
   SET_APP_UPDATE_STATUS,
   FCM_TOKEN,
-  ERROR_LOGOUT,
-  IS_SHOW_MOBILE_OTP_SCREEN
+  IS_SHOW_MOBILE_OTP_SCREEN,
+  IS_LOGGING_OUT
 } from '../../lib/constants'
 import { MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -125,7 +125,7 @@ export function invalidateUserSession(isPreLoader, calledFromAutoLogout) {
       } else if (calledFromAutoLogout) {
         dispatch(startLoginScreenWithoutLogout())
       } else {
-        dispatch(setState(ERROR_LOGOUT, ''))
+        dispatch(setState(IS_LOGGING_OUT, false))
       }
     }
   }
@@ -161,8 +161,8 @@ export function autoLogout(userData) {
 export function startLoginScreenWithoutLogout() {
   return async function (dispatch) {
     try {
-      await logoutService.deleteDataBase()
       dispatch(setState(PRE_LOGOUT_SUCCESS))
+      await logoutService.deleteDataBase()
       dispatch(deleteSessionToken())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
     } catch (error) {
@@ -193,7 +193,7 @@ export function checkForUnsyncBackupFilesAndNavigate(user) {
  * @param {*} configSaveService 
  * @param {*} deviceVerificationService 
  */
-export function saveSettingsAndValidateDevice(configDownloadService, configSaveService, deviceVerificationService, showMobileOtpNumberScreen) {
+export function saveSettingsAndValidateDevice(configDownloadService, configSaveService, deviceVerificationService) {
   return async function (dispatch) {
     try {
       const mobileOtpScreen = await keyValueDBService.getValueFromStore(IS_SHOW_MOBILE_OTP_SCREEN)
@@ -409,21 +409,18 @@ export function validateOtp(otpNumber) {
 export function checkForUnsyncTransactionAndLogout(calledFromAutoLogout) {
   return async function (dispatch) {
     try {
-      dispatch(setState(PRE_LOGOUT_START))
+      dispatch(setState(IS_LOGGING_OUT, true))
       let message = await dispatch(performSyncService(true, null,null, calledFromAutoLogout))
       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       let isUnsyncTransactionsPresent = logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
       if (isUnsyncTransactionsPresent && !calledFromAutoLogout) {
-        dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, true))
+        dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, {isUnsyncTransactionOnLogout : true, isLoggingOut : false}))
       } else {
         dispatch(invalidateUserSession(false, calledFromAutoLogout))
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0)
       dispatch(setState(ERROR_400_403_LOGOUT, error.message))
-    }
-    finally{
-      dispatch(setState(ERROR_LOGOUT, ''))
     }
   }
 }

@@ -45,7 +45,7 @@ class InitialSetup extends PureComponent {
     }
 
     retry = () => {
-        this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService, this.props.showMobileOtpNumberScreen)
+        this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
     }
 
     showSettingUpHeader() {

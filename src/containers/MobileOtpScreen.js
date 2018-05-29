@@ -53,9 +53,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class MobileOtpScreen extends PureComponent {
-    // componentDidMount() {
-    //     if (this.props.isMobileScreen == SHOW_OTP && !this.props.mobileNumber) this.onShowMobileNoScreen()
-    // }
 
     getOtp = () => {
         this.props.actions.generateOtp(this.props.mobileNumber)
