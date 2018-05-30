@@ -7,8 +7,16 @@ import { jobMasterService } from '../../../services/classes/JobMaster'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { authenticationService } from '../../../services/classes/Authentication'
 import { deviceVerificationService } from '../../../services/classes/DeviceVerification'
+import { trackingService } from '../../../services/classes/Tracking'
+import { logoutService } from '../../../services/classes/Logout'
+import { backupService } from '../../../services/classes/BackupService'
+
 
 var actions = require('../preloaderActions')
+import {
+    SHOW_MOBILE_SCREEN,
+    SHOW_OTP
+} from '../../../lib/ContainerConstants'
 import {
 
     ON_LOGIN_PASSWORD_CHANGE,
@@ -52,196 +60,50 @@ import {
 
     PRE_LOGOUT_START,
     PRE_LOGOUT_SUCCESS,
-    PRE_LOGOUT_FAILURE,
 
     ERROR_400_403_LOGOUT,
     ON_MOBILE_NO_CHANGE,
     ON_OTP_CHANGE,
     PRELOADER_SUCCESS,
-    IS_SHOW_MOBILE_NUMBER_SCREEN,
-    IS_SHOW_OTP_SCREEN
+    ERROR_LOGOUT,
+    DOWNLOAD_LATEST_APP,
+    OTP_SUCCESS,
+    SET_UNSYNC_TRANSACTION_PRESENT,
+    SET_APP_UPDATE_BY_CODEPUSH
 } from '../../../lib/constants'
+import { MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../../lib/AttributeConstants'
 
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
 describe('Preloader Actions', () => {
-
-    it('should set jobMasterDownloadStart()', () => {
-        expect(actions.jobMasterDownloadStart()).toEqual({
-            type: MASTER_DOWNLOAD_START
-        })
-    })
-
-    it('should set jobMasterDownloadSuccess()', () => {
-        expect(actions.jobMasterDownloadSuccess()).toEqual({
-            type: MASTER_DOWNLOAD_SUCCESS
-        })
-    })
-
-
-    it('should set jobMasterDownloadFailure()', () => {
-        const error = 'error'
-        expect(actions.jobMasterDownloadFailure(error)).toEqual({
-            type: MASTER_DOWNLOAD_FAILURE,
-            payload: error
-        })
-    })
-
-    it('should set jobMasterSavingStart()', () => {
-        expect(actions.jobMasterSavingStart()).toEqual({
-            type: MASTER_SAVING_START
-        })
-    })
-
-    it('should set jobMasterSavingSuccess()', () => {
-        expect(actions.jobMasterSavingSuccess()).toEqual({
-            type: MASTER_SAVING_SUCCESS
-        })
-    })
-
-    it('should set jobMasterSavingFailure()', () => {
-        const error = 'error'
-        expect(actions.jobMasterSavingFailure(error)).toEqual({
-            type: MASTER_SAVING_FAILURE,
-            payload: error
-        })
-    })
-
-    it('should set checkAssetStart()', () => {
-        expect(actions.checkAssetStart()).toEqual({
-            type: CHECK_ASSET_START
-        })
-    })
-
-    it('should set preloaderSuccess()', () => {
-        expect(actions.preloaderSuccess()).toEqual({
-            type: PRELOADER_SUCCESS
-        })
-    })
-
-    it('should set checkAssetFailure()', () => {
-        const error = 'error'
-        expect(actions.checkAssetFailure(error)).toEqual({
-            type: CHECK_ASSET_FAILURE,
-            payload: error
-        })
-    })
-
-    it('should set showMobileNumber()', () => {
-        expect(actions.showMobileNumber()).toEqual({
-            type: SHOW_MOBILE_NUMBER_SCREEN,
-            payload: true
-        })
-    })
-
-    it('should set showOtp()', () => {
-        expect(actions.showOtp()).toEqual({
-            type: SHOW_OTP_SCREEN,
-            payload: true
-        })
-    })
-
-    it('should set preLogoutRequest()', () => {
-        expect(actions.preLogoutRequest()).toEqual({
-            type: PRE_LOGOUT_START
-        })
-    })
-
-    it('should set preLogoutSuccess()', () => {
-        expect(actions.preLogoutSuccess()).toEqual({
-            type: PRE_LOGOUT_SUCCESS
-        })
-    })
-
-    it('should set preLogoutFailure()', () => {
-        const error = 'error'
-        expect(actions.preLogoutFailure(error)).toEqual({
-            type: PRE_LOGOUT_FAILURE,
-            payload: error
-        })
-    })
-
-    it('should set onChangeMobileNumber()', () => {
-        const mobileNumber = '98811'
-        expect(actions.onChangeMobileNumber(mobileNumber)).toEqual({
-            type: ON_MOBILE_NO_CHANGE,
-            payload: mobileNumber
-        })
-    })
-
-    it('should set onChangeOtp()', () => {
-        const otpNumber = '98811'
-        expect(actions.onChangeOtp(otpNumber)).toEqual({
-            type: ON_OTP_CHANGE,
-            payload: otpNumber
-        })
-    })
-
-    it('should set otpGenerationStart()', () => {
-        expect(actions.otpGenerationStart()).toEqual({
-            type: OTP_GENERATION_START
-        })
-    })
-
-    it('should set otpGenerationFailure()', () => {
-        const error = 'error'
-        expect(actions.otpGenerationFailure(error)).toEqual({
-            type: OTP_GENERATION_FAILURE,
-            payload: error
-        })
-    })
-
-    it('should set optValidationStart()', () => {
-        expect(actions.optValidationStart()).toEqual({
-            type: OTP_VALIDATION_START
-        })
-    })
-
-    it('should set otpValidationFailure()', () => {
-        const error = 'error'
-        expect(actions.otpValidationFailure(error)).toEqual({
-            type: OTP_VALIDATION_FAILURE,
-            payload: error
-        })
-    })
-
-
-    it('should logout', () => {
-        const expectedActions = [
-            { type: PRE_LOGOUT_START },
-            { type: PRE_LOGOUT_SUCCESS }
-        ]
-        const store = mockStore({})
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce({ value: 'testtoken' })
+    beforeEach(() => {
         authenticationService.logout = jest.fn()
-        authenticationService.logout.mockReturnValue(true)
-        return store.dispatch(actions.invalidateUserSession())
-            .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
-                expect(authenticationService.logout).toHaveBeenCalled()
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
-            })
+        keyValueDBService.getValueFromStore = jest.fn()
+        trackingService.inValidateStoreVariables = jest.fn()
+        logoutService.deleteDataBase = jest.fn()
+        backupService.checkForUnsyncBackup = jest.fn()
+        deviceVerificationService.checkAssetApiAndSimVerificationOnServer = jest.fn()
+        deviceVerificationService.checkAssetLocal = jest.fn()
+        jobMasterService.matchServerTimeWithMobileTime = jest.fn()
+        jobMasterService.saveJobMaster = jest.fn()
+        deviceVerificationService.checkAssetAPI = jest.fn()
+        deviceVerificationService.generateOTP = jest.fn()
+        deviceVerificationService.verifySim = jest.fn()
+        logoutService.checkForUnsyncTransactions = jest.fn()
+        keyValueDBService.deleteValueFromStore = jest.fn()
     })
-
-    it('should not logout', () => {
-        const error = 'error'
+    it('should not logout on preLoader button press', () => {
         const expectedActions = [
             { type: PRE_LOGOUT_START },
-            {
-                type: ERROR_400_403_LOGOUT,
-                payload: error
-            }
+            { type: ERROR_400_403_LOGOUT, payload: 'error' },
         ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce({ value: 'testtoken' })
         authenticationService.logout = jest.fn(() => {
-            throw new Error(error)
+            throw new Error('error')
         })
         const store = mockStore({})
-        return store.dispatch(actions.invalidateUserSession())
+
+        return store.dispatch(actions.invalidateUserSession(true))
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(authenticationService.logout).toHaveBeenCalled()
@@ -251,17 +113,87 @@ describe('Preloader Actions', () => {
             })
     })
 
+    it('should logout on preLoader button press', () => {
+        const expectedActions = [
+            { type: PRE_LOGOUT_START },
+            { type: PRE_LOGOUT_SUCCESS },
+        ]
+        const store = mockStore({})
+
+        authenticationService.logout.mockReturnValueOnce({})
+        return store.dispatch(actions.invalidateUserSession(true))
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(authenticationService.logout).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+            })
+    })
+
+
+    it('should logout on autoLogout action', () => {
+        const expectedActions = [
+            { type: PRE_LOGOUT_START },
+            { type: PRE_LOGOUT_SUCCESS },
+        ]
+        const store = mockStore({})
+
+        return store.dispatch(actions.invalidateUserSession(false, true, true))
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(authenticationService.logout).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+            })
+    })
+
+    it('should logout on autoLogout action after error occur', () => {
+        const expectedActions = [
+            { type: PRE_LOGOUT_START },
+            { type: PRE_LOGOUT_SUCCESS },
+        ]
+        const store = mockStore({})
+        authenticationService.logout = jest.fn(() => {
+            throw new Error('error')
+        })
+        return store.dispatch(actions.invalidateUserSession(false, true, true))
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(authenticationService.logout).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+            })
+    })
+
+    it('should not logout on menu logout button', () => {
+        const expectedActions = [
+            { type: PRE_LOGOUT_START },
+            { type: ERROR_LOGOUT },
+        ]
+        const store = mockStore({})
+        authenticationService.logout = jest.fn(() => {
+            throw new Error('error')
+        })
+        return store.dispatch(actions.invalidateUserSession(false, true, false))
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(authenticationService.logout).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+            })
+    })
+
     it('should start home screen, if server returns 500 for Logout', () => {
         const expectedActions = [
             {
                 type: PRE_LOGOUT_SUCCESS
             }
         ]
-        keyValueDBService.deleteValueFromStore = jest.fn()
-        keyValueDBService.deleteValueFromStore.mockReturnValue(null)
         const store = mockStore({})
         return store.dispatch(actions.startLoginScreenWithoutLogout())
             .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(logoutService.deleteDataBase).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
             })
     })
@@ -270,16 +202,12 @@ describe('Preloader Actions', () => {
         const expectedActions = [
             {
                 type: SHOW_OTP_SCREEN,
-                payload: true
+                payload: SHOW_OTP
             }
         ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce({ value: true })
-            .mockReturnValueOnce(null)
         const store = mockStore({})
-        return store.dispatch(actions.saveSettingsAndValidateDevice())
+        return store.dispatch(actions.saveSettingsAndValidateDevice(SERVICE_SUCCESS, SERVICE_SUCCESS, SERVICE_PENDING, SHOW_OTP))
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
@@ -289,16 +217,12 @@ describe('Preloader Actions', () => {
         const expectedActions = [
             {
                 type: SHOW_MOBILE_NUMBER_SCREEN,
-                payload: true
+                payload: SHOW_MOBILE_SCREEN
             }
         ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce(null)
-            .mockReturnValueOnce({ value: true })
         const store = mockStore({})
-        return store.dispatch(actions.saveSettingsAndValidateDevice())
+        return store.dispatch(actions.saveSettingsAndValidateDevice(SERVICE_SUCCESS, SERVICE_SUCCESS, SERVICE_PENDING, SHOW_MOBILE_SCREEN))
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
@@ -306,24 +230,48 @@ describe('Preloader Actions', () => {
 
     //not completed
     it('should dispatch download job master', () => {
+        const expectedActions = [
+            {
+                type: MASTER_DOWNLOAD_START,
+            },
+            {
+                type: MASTER_DOWNLOAD_FAILURE,
+            }
+        ]
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValueOnce(null)
+            .mockReturnValueOnce(null)
+            .mockReturnValueOnce(null)
             .mockReturnValueOnce(null)
         const store = mockStore({})
         return store.dispatch(actions.saveSettingsAndValidateDevice(SERVICE_PENDING, SERVICE_PENDING, SERVICE_PENDING))
             .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
             })
     })
 
     //not completed
     it('should dispatch check asset', () => {
+        const expectedActions = [
+            {
+                type: CHECK_ASSET_START,
+            },
+            {
+                type: SHOW_MOBILE_NUMBER_SCREEN,
+            }
+        ]
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValueOnce(null)
             .mockReturnValueOnce(null)
-            .mockReturnValue(null)
+            .mockReturnValueOnce(null)
+            .mockReturnValueOnce(null)
+
         const store = mockStore({})
         return store.dispatch(actions.saveSettingsAndValidateDevice(SERVICE_SUCCESS, SERVICE_SUCCESS, SERVICE_FAILED))
             .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
             })
     })
 
@@ -390,7 +338,7 @@ describe('Preloader Actions', () => {
         const store = mockStore({})
         return store.dispatch(actions.downloadJobMaster())
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(4)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
                 expect(jobMasterService.downloadJobMaster).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
@@ -400,8 +348,8 @@ describe('Preloader Actions', () => {
 
     it('download job master should throw error and show Unauthorized device alert for 403', () => {
         const error = {
-            code : 403,
-            message : 'test error'
+            code: 403,
+            message: 'test error'
         }
         const expectedActions = [
             { type: MASTER_DOWNLOAD_START },
@@ -410,7 +358,7 @@ describe('Preloader Actions', () => {
                 payload: error.message
             }
         ]
-        
+
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue({
             value: {}
@@ -423,7 +371,7 @@ describe('Preloader Actions', () => {
         const store = mockStore({})
         return store.dispatch(actions.downloadJobMaster())
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(4)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
                 expect(jobMasterService.downloadJobMaster).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
@@ -433,8 +381,8 @@ describe('Preloader Actions', () => {
 
     it('download job master should throw error and show Unauthorized device alert for 400', () => {
         const error = {
-            code : 400,
-            message : 'test error'
+            code: 400,
+            message: 'test error'
         }
         const expectedActions = [
             { type: MASTER_DOWNLOAD_START },
@@ -443,8 +391,7 @@ describe('Preloader Actions', () => {
                 payload: error.message
             }
         ]
-        
-        keyValueDBService.getValueFromStore = jest.fn()
+
         keyValueDBService.getValueFromStore.mockReturnValue({
             value: {}
         })
@@ -467,50 +414,49 @@ describe('Preloader Actions', () => {
         const expectedActions = [
             { type: CHECK_ASSET_START },
             { type: PRELOADER_SUCCESS },
-        ]        
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue(null)
-        deviceVerificationService.checkAssetLocal = jest.fn()
+        ]
         deviceVerificationService.checkAssetLocal.mockReturnValue(true)
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.validateAndSaveData.mockReturnValue(true)
         const store = mockStore({})
-        return store.dispatch(actions.checkAsset())
+        return store.dispatch(actions.checkAsset(null))
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(3)
-                expect(keyValueDBService.validateAndSaveData).toHaveBeenCalled()
+                expect(backupService.checkForUnsyncBackup).toHaveBeenCalled()
+                expect(deviceVerificationService.checkAssetLocal).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+            })
+    })
+    it('should fail to check device asset', () => {
+        const expectedActions = [
+            { type: CHECK_ASSET_START },
+            { type: CHECK_ASSET_FAILURE, payload: 'error' },
+        ]
+        deviceVerificationService.checkAssetLocal = jest.fn(() => {
+            throw new Error('error')
+        })
+        const store = mockStore({})
+        return store.dispatch(actions.checkAsset(null))
+            .then(() => {
+                expect(deviceVerificationService.checkAssetLocal).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
             })
     })
 
     it('should check device locally and hit check asset api', () => {
         const expectedActions = [
             { type: CHECK_ASSET_START },
+            { type: PRELOADER_SUCCESS }
         ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {}
-        })
-        deviceVerificationService.checkAssetLocal = jest.fn()
         deviceVerificationService.checkAssetLocal.mockReturnValue(false)
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.validateAndSaveData.mockReturnValue(true)
-        deviceVerificationService.checkAssetAPI = jest.fn()
-        deviceVerificationService.checkAssetAPI.mockReturnValue({
-            json: {
-                deviceIMEI: {},
-                deviceSIM: {}
-            }
-        })
-        deviceVerificationService.populateDeviceImeiAndDeviceSim = jest.fn()
-        deviceVerificationService.populateDeviceImeiAndDeviceSim.mockReturnValue(true)
+        deviceVerificationService.checkAssetApiAndSimVerificationOnServer.mockReturnValueOnce(true)
         const store = mockStore({})
-        return store.dispatch(actions.checkAsset())
+        return store.dispatch(actions.checkAsset(null))
             .then(() => {
-                expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(0)
-                expect(deviceVerificationService.populateDeviceImeiAndDeviceSim).toHaveBeenCalledTimes(1)
+                expect(deviceVerificationService.checkAssetLocal).toHaveBeenCalledTimes(1)
+                expect(deviceVerificationService.checkAssetApiAndSimVerificationOnServer).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
             })
     })
 
@@ -521,42 +467,47 @@ describe('Preloader Actions', () => {
         }
         const expectedActions = [
             { type: MASTER_SAVING_START },
-            { type: MASTER_SAVING_SUCCESS }
+            { type: MASTER_SAVING_SUCCESS },
+            { type: CHECK_ASSET_START }
         ]
-        jobMasterService.matchServerTimeWithMobileTime = jest.fn()
+        const userObject = {
+            value: {
+                username: 'abhishek_div001'
+            }
+        }
         jobMasterService.matchServerTimeWithMobileTime.mockReturnValue(true)
-        jobMasterService.saveJobMaster = jest.fn()
         jobMasterService.saveJobMaster.mockReturnValue(true)
+        keyValueDBService.getValueFromStore.mockReturnValue(userObject)
         const store = mockStore({})
-        return store.dispatch(actions.validateAndSaveJobMaster(response))
+        return store.dispatch(actions.validateAndSaveJobMaster(null, null, null, response))
             .then(() => {
                 expect(jobMasterService.matchServerTimeWithMobileTime).toHaveBeenCalled()
                 expect(jobMasterService.saveJobMaster).toHaveBeenCalled()
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[2].type).toEqual(expectedActions[2].type)
             })
     })
 
     it('should throw job master response null', () => {
-        const response = null
-        const error = 'No response returned from server'
+        const response = {
+            serverTime: null
+        }
+        const error = { errorCode: MAJOR_VERSION_OUTDATED }
         const expectedActions = [
             {
                 type: MASTER_SAVING_FAILURE,
-                payload: error
-            },
+            }
         ]
-        jobMasterService.matchServerTimeWithMobileTime = jest.fn()
-        jobMasterService.matchServerTimeWithMobileTime.mockReturnValue(true)
-        jobMasterService.saveJobMaster = jest.fn()
+        jobMasterService.matchServerTimeWithMobileTime = jest.fn(() => {
+            throw new Error(error)
+        })
         jobMasterService.saveJobMaster.mockReturnValue(true)
         const store = mockStore({})
-        return store.dispatch(actions.validateAndSaveJobMaster(response))
+        return store.dispatch(actions.validateAndSaveJobMaster(null, null, null, response))
             .then(() => {
-                expect(jobMasterService.matchServerTimeWithMobileTime).not.toHaveBeenCalled()
-                expect(jobMasterService.saveJobMaster).not.toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
     })
 
@@ -574,12 +525,10 @@ describe('Preloader Actions', () => {
         jobMasterService.matchServerTimeWithMobileTime = jest.fn(() => {
             throw new Error(error)
         })
-        jobMasterService.saveJobMaster = jest.fn()
         jobMasterService.saveJobMaster.mockReturnValue(true)
         const store = mockStore({})
-        return store.dispatch(actions.validateAndSaveJobMaster(response))
+        return store.dispatch(actions.validateAndSaveJobMaster(null, null, null, response))
             .then(() => {
-                expect(jobMasterService.matchServerTimeWithMobileTime).toHaveBeenCalled()
                 expect(jobMasterService.saveJobMaster).not.toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
@@ -590,26 +539,12 @@ describe('Preloader Actions', () => {
         const expectedActions = [
             { type: PRELOADER_SUCCESS },
         ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {}
-        })
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.validateAndSaveData.mockReturnValue(true)
-        deviceVerificationService.checkAssetAPI = jest.fn()
-        deviceVerificationService.checkAssetAPI.mockReturnValue({
-            json: {
-                deviceIMEI: {},
-                deviceSIM: {}
-            }
-        })
-        deviceVerificationService.checkIfSimValidOnServer = jest.fn()
-        deviceVerificationService.checkIfSimValidOnServer.mockReturnValue(true)
+        deviceVerificationService.checkAssetApiAndSimVerificationOnServer.mockReturnValue(true)
         const store = mockStore({})
         return store.dispatch(actions.checkIfSimValidOnServer())
             .then(() => {
-                expect(deviceVerificationService.checkAssetAPI).toHaveBeenCalled()
-                expect(deviceVerificationService.checkIfSimValidOnServer).toHaveBeenCalled()
+                expect(backupService.checkForUnsyncBackup).toHaveBeenCalled()
+                expect(deviceVerificationService.checkAssetApiAndSimVerificationOnServer).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
             })
     })
@@ -617,56 +552,35 @@ describe('Preloader Actions', () => {
     it('check sim valid on server and throw no response', () => {
         const error = 'No response returned from server'
         const expectedActions = [
-            { 
+            {
                 type: CHECK_ASSET_FAILURE,
-                payload : error 
+                payload: error
             },
         ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {}
+        deviceVerificationService.checkAssetApiAndSimVerificationOnServer = jest.fn(() => {
+            throw new Error(error)
         })
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.validateAndSaveData.mockReturnValue(true)
-        deviceVerificationService.checkAssetAPI = jest.fn()
-        deviceVerificationService.checkAssetAPI.mockReturnValue(null)
-        deviceVerificationService.checkIfSimValidOnServer = jest.fn()
-        deviceVerificationService.checkIfSimValidOnServer.mockReturnValue(true)
+
         const store = mockStore({})
         return store.dispatch(actions.checkIfSimValidOnServer())
             .then(() => {
-                expect(deviceVerificationService.checkAssetAPI).toHaveBeenCalled()
-                expect(deviceVerificationService.checkIfSimValidOnServer).not.toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
     })
 
-    it('check sim valid on server and throw no response', () => {
+    it('check sim valid on server and open mobileOtpScreen', () => {
         const error = 'No response returned from server'
         const expectedActions = [
-            { 
-                type: CHECK_ASSET_FAILURE,
-                payload : error 
+            {
+                type: SHOW_MOBILE_NUMBER_SCREEN,
+                payload: SHOW_MOBILE_SCREEN
             },
         ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {}
-        })
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.validateAndSaveData.mockReturnValue(true)
-        deviceVerificationService.checkAssetAPI = jest.fn()
-        deviceVerificationService.checkAssetAPI.mockReturnValue({
-            json : null
-        })
-        deviceVerificationService.checkIfSimValidOnServer = jest.fn()
-        deviceVerificationService.checkIfSimValidOnServer.mockReturnValue(true)
+        deviceVerificationService.checkAssetApiAndSimVerificationOnServer.mockReturnValue(false)
         const store = mockStore({})
         return store.dispatch(actions.checkIfSimValidOnServer())
             .then(() => {
-                expect(deviceVerificationService.checkAssetAPI).toHaveBeenCalled()
-                expect(deviceVerificationService.checkIfSimValidOnServer).not.toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
@@ -674,32 +588,21 @@ describe('Preloader Actions', () => {
 
     it('check sim valid on server and logout for 403', () => {
         const error = {
-            code : 403,
-            message : 'test error'
+            code: 403,
+            message: 'test error'
         }
         const expectedActions = [
-            { 
+            {
                 type: ERROR_400_403_LOGOUT,
-                payload : error.message 
+                payload: error.message
             }
         ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {}
-        })
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.validateAndSaveData.mockReturnValue(true)
-        deviceVerificationService.checkAssetAPI = jest.fn(() => {
+        deviceVerificationService.checkAssetApiAndSimVerificationOnServer = jest.fn(() => {
             throw error
         })
-        deviceVerificationService.checkIfSimValidOnServer = jest.fn()
-        deviceVerificationService.checkIfSimValidOnServer.mockReturnValue(true)
         const store = mockStore({})
         return store.dispatch(actions.checkIfSimValidOnServer())
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(3)
-                expect(deviceVerificationService.checkAssetAPI).toHaveBeenCalled()
-                expect(deviceVerificationService.checkIfSimValidOnServer).not.toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
@@ -707,92 +610,44 @@ describe('Preloader Actions', () => {
 
     it('check sim valid on server and logout for 400', () => {
         const error = {
-            code : 400,
-            message : 'test error'
+            code: 400,
+            message: 'test error'
         }
         const expectedActions = [
-            { 
+            {
                 type: ERROR_400_403_LOGOUT,
-                payload : error.message 
+                payload: error.message
             }
         ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {}
-        })
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.validateAndSaveData.mockReturnValue(true)
-        deviceVerificationService.checkAssetAPI = jest.fn(() => {
+
+        deviceVerificationService.checkAssetApiAndSimVerificationOnServer = jest.fn(() => {
             throw error
         })
-        deviceVerificationService.checkIfSimValidOnServer = jest.fn()
-        deviceVerificationService.checkIfSimValidOnServer.mockReturnValue(true)
         const store = mockStore({})
         return store.dispatch(actions.checkIfSimValidOnServer())
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(3)
-                expect(deviceVerificationService.checkAssetAPI).toHaveBeenCalled()
-                expect(deviceVerificationService.checkIfSimValidOnServer).not.toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
     })
 
-
-    it('check sim valid on server and show mobile screen', () => {
-        const expectedActions = [
-            { type: SHOW_MOBILE_NUMBER_SCREEN },
-        ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {}
-        })
-        deviceVerificationService.checkAsset = jest.fn()
-        deviceVerificationService.checkAsset.mockReturnValue(false)
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.validateAndSaveData.mockReturnValue(true)
-        deviceVerificationService.checkAssetAPI = jest.fn()
-        deviceVerificationService.checkAssetAPI.mockReturnValue({
-            json: {
-                deviceIMEI: {},
-                deviceSIM: {}
-            }
-        })
-        deviceVerificationService.checkIfSimValidOnServer = jest.fn()
-        deviceVerificationService.checkIfSimValidOnServer.mockReturnValue(false)
-        const store = mockStore({})
-        return store.dispatch(actions.checkIfSimValidOnServer())
-            .then(() => {
-                expect(deviceVerificationService.checkAssetAPI).toHaveBeenCalled()
-                expect(deviceVerificationService.checkIfSimValidOnServer).toHaveBeenCalled()
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-            })
-    })
-
     it('generate otp successfully', () => {
         const expectedActions = [
-            { type: OTP_GENERATION_START },
-            { type: SHOW_OTP_SCREEN },
+            { type: OTP_GENERATION_START, payload: false },
+            { type: SHOW_OTP_SCREEN, payload: SHOW_OTP },
         ]
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.deleteValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {}
-        })
-        deviceVerificationService.generateOTP = jest.fn()
         deviceVerificationService.generateOTP.mockReturnValue({
             json: {}
         })
         const store = mockStore({})
         return store.dispatch(actions.generateOtp())
             .then(() => {
-                expect(keyValueDBService.deleteValueFromStore).toHaveBeenCalled()
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
                 expect(deviceVerificationService.generateOTP).toHaveBeenCalled()
-                expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(2)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+
             })
     })
 
@@ -805,20 +660,12 @@ describe('Preloader Actions', () => {
                 payload: error
             },
         ]
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.deleteValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {}
-        })
         deviceVerificationService.generateOTP = jest.fn(() => {
             throw new Error(error)
         })
         const store = mockStore({})
         return store.dispatch(actions.generateOtp())
             .then(() => {
-                expect(keyValueDBService.deleteValueFromStore).toHaveBeenCalled()
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
                 expect(deviceVerificationService.generateOTP).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
@@ -829,25 +676,20 @@ describe('Preloader Actions', () => {
     it('validate otp successfully', () => {
         const otp = 988128
         const expectedActions = [
-            { type: OTP_VALIDATION_START },
+            { type: OTP_VALIDATION_START, payload: false },
+            { type: OTP_SUCCESS }
         ]
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.deleteValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {
-                otpNumber: otp
-            }
-        })
-        deviceVerificationService.verifySim = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue({})
+        deviceVerificationService.verifySim.mockReturnValue(otp)
         const store = mockStore({})
         return store.dispatch(actions.validateOtp(otp))
             .then(() => {
-                expect(keyValueDBService.deleteValueFromStore).toHaveBeenCalled()
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(deviceVerificationService.verifySim).toHaveBeenCalled()
-                expect(keyValueDBService.validateAndSaveData).toHaveBeenCalled()
+                expect(backupService.checkForUnsyncBackup).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
             })
     })
 
@@ -861,28 +703,128 @@ describe('Preloader Actions', () => {
                 payload: error
             },
         ]
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.deleteValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue({
             value: {
-                otpNumber: '981'
+                id: '981'
             }
         })
-        deviceVerificationService.verifySim = jest.fn()
+        deviceVerificationService.verifySim = jest.fn(() => {
+            throw new Error(error)
+        })
         const store = mockStore({})
         return store.dispatch(actions.validateOtp(otp))
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
-                expect(keyValueDBService.deleteValueFromStore).not.toHaveBeenCalled()
-                expect(deviceVerificationService.verifySim).not.toHaveBeenCalled()
-                expect(keyValueDBService.validateAndSaveData).not.toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
             })
     })
 
+    it('should check for unsync transaction and not  logout', () => {
+        const expectedActions = [
+            { type: SET_UNSYNC_TRANSACTION_PRESENT }]
+        keyValueDBService.getValueFromStore.mockReturnValue({
+            value: [{ id: '981' },
+            { id: '981' },
+            { id: '981' },
+            { id: '981' },
+            { id: '981' },
+            ],
+        })
+        logoutService.checkForUnsyncTransactions.mockReturnValueOnce(true)
+        const store = mockStore({})
+        return store.dispatch(actions.checkForUnsyncTransactionAndLogout())
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(logoutService.checkForUnsyncTransactions).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+            })
+    })
+    it('should check for unsync transaction and   logout', () => {
+        const expectedActions = [
+            { type: PRE_LOGOUT_START },
+            { type: PRE_LOGOUT_SUCCESS }
+        ]
+        keyValueDBService.getValueFromStore.mockReturnValue({
+            value: [{ id: '981' },
+            { id: '981' },
+            { id: '981' },
+            { id: '981' },
+            { id: '981' },
+            ],
+        })
+        logoutService.checkForUnsyncTransactions.mockReturnValueOnce(false)
+        const store = mockStore({})
+        return store.dispatch(actions.checkForUnsyncTransactionAndLogout())
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(logoutService.checkForUnsyncTransactions).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+            })
+    })
+    it('should check for unsync transaction and throw error', () => {
+        const expectedActions = [
+            { type: ERROR_400_403_LOGOUT, payload: 'error' },
+        ]
+        keyValueDBService.getValueFromStore.mockReturnValue({
+            value: [{ id: '981' },
+            { id: '981' },
+            { id: '981' },
+            { id: '981' },
+            { id: '981' },
+            ],
+        })
+        logoutService.checkForUnsyncTransactions = jest.fn(() => {
+            throw new Error('error')
+        })
+        const store = mockStore({})
+        return store.dispatch(actions.checkForUnsyncTransactionAndLogout())
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+
+    it('should check for App is OutDated for error code MAJOR_VERSION_OUTDATED', () => {
+        const expectedActions = [
+            { type: DOWNLOAD_LATEST_APP, payload: { displayMessage: 1, downloadUrl: 'downloadUrl' } },
+        ]
+        const error = { errorCode: 1, downloadUrl: 'downloadUrl' }
+        const store = mockStore({})
+        return store.dispatch(actions.checkIfAppIsOutdated(error))
+            .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+    it('should check for App is OutDated for error code MINOR_PATCH_OUTDATED', () => {
+        const expectedActions = [
+            { type: SET_APP_UPDATE_BY_CODEPUSH, payload: { isCodePushUpdate: true } }
+        ]
+        const error = { errorCode: 2, downloadUrl: 'downloadUrl' }
+        const store = mockStore({})
+        return store.dispatch(actions.checkIfAppIsOutdated(error))
+            .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+    it('should check for App is OutDated for error code MINOR_PATCH_OUTDATED', () => {
+        const expectedActions = [
+            { type: MASTER_SAVING_FAILURE, payload: 'test' }
+        ]
+        const error = { errorCode: 3, message: 'test' }
+        const store = mockStore({})
+        return store.dispatch(actions.checkIfAppIsOutdated(error))
+            .then(() => {
+                expect(keyValueDBService.deleteValueFromStore).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
 })
 
 

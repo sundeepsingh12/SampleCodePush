@@ -12,8 +12,6 @@ import {
     LOGOUT_FAILURE,
     USER_SUMMARY,
     JOB_SUMMARY,
-    IS_SHOW_MOBILE_NUMBER_SCREEN,
-    IS_SHOW_OTP_SCREEN,
     IS_PRELOADER_COMPLETE
 } from '../../../lib/constants'
 
