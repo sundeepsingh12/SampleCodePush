@@ -97,7 +97,7 @@ class UnsyncBackupUpload extends Component {
                     <View style={[styles.marginTop30, styles.alignCenter]}>
                         <Button transparent style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}
                             onPress={() => {
-                                this.props.actions.navigateToScene('HomeTabNavigatorScreen')
+                                this.props.actions.navigateToScene('HomeTabNavigatorScreen',null,this.props.navigation.navigate)
                                 this.props.actions.resetFailCountInStore()
                             }}  >
                             <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>{CONTINUE}</Text>

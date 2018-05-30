@@ -16,8 +16,6 @@ import {
   LOGOUT_FAILURE,
   USER_SUMMARY,
   JOB_SUMMARY,
-  IS_SHOW_MOBILE_NUMBER_SCREEN,
-  IS_SHOW_OTP_SCREEN,
   IS_PRELOADER_COMPLETE,
   USER,
   RESET_STATE,
@@ -29,7 +27,8 @@ import {
   USER_EXCEPTION_LOGS,
   SYNC_RUNNING_AND_TRANSACTION_SAVING,
   DOWNLOAD_LATEST_APP,
-  LoginScreen
+  LoginScreen,
+  IS_SHOW_MOBILE_OTP_SCREEN
 } from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import CONFIG from '../../lib/config'
@@ -53,7 +52,6 @@ export function setState(type, payload) {
 //Use to navigate to other scene
 export function navigateToScene(routeName, params,navigate) {
   return async function (dispatch) {
-    // dispatch(NavigationActions.navigate({ routeName, params }))
    navigate(routeName,params)
   }
 }
@@ -63,9 +61,8 @@ export function deleteSessionToken() {
   return async function (dispatch) {
     try {
       await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
-      await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
-      await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
+      await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_OTP_SCREEN)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await keyValueDBService.deleteValueFromStore(SAVE_ACTIVATED)
       await keyValueDBService.deleteValueFromStore(LIVE_JOB)
@@ -102,7 +99,7 @@ export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, i
 export function resetNavigationState(index, actions) {
   return async function (dispatch) {
     dispatch(StackActions.reset({
-      index: 0,
+      index,
       actions
     }))
   }

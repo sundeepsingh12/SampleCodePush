@@ -46,6 +46,7 @@ export function fetchJobs() {
       let jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO);
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }));
     } catch (error) {
+      //TODO handle UI
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList: [] }));
     }
   }

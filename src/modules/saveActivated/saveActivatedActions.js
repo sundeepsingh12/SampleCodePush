@@ -53,7 +53,7 @@ export function addTransactionAndPopulateView(formLayoutState, recurringData, co
     }
 }
 
-export function checkout(previousFormLayoutState, recurringData, jobMasterId, commonData, statusId) {
+export function checkout(previousFormLayoutState, recurringData, jobMasterId, commonData, statusId,navigate) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_ACTIVE, true))
@@ -75,7 +75,9 @@ export function checkout(previousFormLayoutState, recurringData, jobMasterId, co
                 emailTableElement,
                 emailIdInFieldData,
                 contactNumberInFieldData
-            }))
+            },
+            navigate
+        ))
             dispatch(fetchJobs());
         } catch (error) {
             showToastAndAddUserExceptionLog(2002, error.message, 'danger', 1)

@@ -4,13 +4,19 @@
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import { keyValueDBService } from './KeyValueDBService'
+import { trackingService } from './Tracking'
 import CONFIG from '../../lib/config'
 import {
     USERNAME,
     PASSWORD,
     REMEMBER_ME,
+    USER,
+    FCM_TOKEN,
+    GEO_FENCING
 } from '../../lib/constants'
-
+import { backupService } from './BackupService'
+import { sync } from './Sync'
+import { logoutService } from './Logout'
 class Authentication {
 
     /**
@@ -50,12 +56,12 @@ class Authentication {
      * @param {*} rememberMe 
      */
     saveLoginCredentials(username, password, rememberMe) {
-            keyValueDBService.validateAndSaveData(USERNAME, username)
-            keyValueDBService.validateAndSaveData(PASSWORD, password)
-        if (!rememberMe) {            
+        keyValueDBService.validateAndSaveData(USERNAME, username)
+        keyValueDBService.validateAndSaveData(PASSWORD, password)
+        if (!rememberMe) {
             keyValueDBService.deleteValueFromStore(REMEMBER_ME)
         }
-        else{
+        else {
             keyValueDBService.validateAndSaveData(REMEMBER_ME, rememberMe)
         }
     }
@@ -64,14 +70,25 @@ class Authentication {
      * LOGOUT API (GET)
      * @param {*} token 
      */
-    logout(token) {
-        if(!token) {
+    async logout(calledFromAutoLogout, isPreLoaderComplete) {
+        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        if (!token || !token.value) {
             throw new Error('Token Missing')
         }
-        let logoutResponse = RestAPIFactory(token.value).serviceCall(null, CONFIG.API.LOGOUT_API, 'GET')
+        if (isPreLoaderComplete && isPreLoaderComplete.value) {
+            await backupService.createBackupOnLogout()
+        }
+        const userObject = await keyValueDBService.getValueFromStore(USER)
+        const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
+        await sync.deregisterFcmTokenFromServer(userObject, token, fcmToken)
+        let logoutResponse = await RestAPIFactory(token.value).serviceCall(null, CONFIG.API.LOGOUT_API, 'GET')
+        await logoutService.deleteDataBase()
+        if (calledFromAutoLogout) {
+            const fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+            await trackingService.inValidateStoreVariables(fenceIdentifier)
+        }
         return logoutResponse
     }
-
 }
 
 export let authenticationService = new Authentication()

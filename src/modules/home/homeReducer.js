@@ -11,7 +11,6 @@ import {
   CHART_LOADING,
   RESET_STATE,
   LAST_SYNC_TIME,
-  TOGGLE_LOGOUT,
   SET_UNSYNC_TRANSACTION_PRESENT,
   SET_BACKUP_UPLOAD_VIEW,
   SET_UPLOAD_FILE_COUNT,
@@ -21,7 +20,8 @@ import {
   SET_ERP_PULL_ACTIVATED,
   ERP_SYNC_STATUS,
   SET_NEWJOB_DRAFT_INFO,
-  LOADER_FOR_SYNCING
+  LOADER_FOR_SYNCING,
+  IS_LOGGING_OUT
 } from '../../lib/constants'
 
 export default function homeReducer(state = initialState, action) {
@@ -69,12 +69,13 @@ export default function homeReducer(state = initialState, action) {
     case RESET_STATE: {
       return initialState
     }
-
-    case TOGGLE_LOGOUT:
+    case IS_LOGGING_OUT: {
       return state.set('isLoggingOut', action.payload)
+    }
 
     case SET_UNSYNC_TRANSACTION_PRESENT:
-      return state.set('isUnsyncTransactionOnLogout', action.payload)
+      return state.set('isUnsyncTransactionOnLogout', action.payload.isUnsyncTransactionOnLogout)
+                  .set('isLoggingOut',action.payload.isLoggingOut)
 
     case SET_BACKUP_UPLOAD_VIEW:
       return state.set('backupUploadView', action.payload)

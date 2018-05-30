@@ -15,7 +15,7 @@ import _ from 'lodash'
  * @param {*} transientFormLayoutMap //contains form layout state of previous statuses and current status
  * @param {*} currentStatus 
  */
-export function setStateFromNavigationParams(navigationParams, transientFormLayoutMap) {
+export function setStateFromNavigationParams(navigationParams, transientFormLayoutMap,navigate) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_IS_RUNNING, true))
@@ -36,7 +36,9 @@ export function setStateFromNavigationParams(navigationParams, transientFormLayo
                     latestPositionId: formLayoutState.latestPositionId,
                     jobDetailsScreenKey,
                     pageObjectAdditionalParams
-                }))
+                },
+                navigate
+            ))
             }
             draftService.saveDraftInDb(formLayoutState, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
         } catch (error) {

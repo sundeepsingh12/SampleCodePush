@@ -9,10 +9,8 @@ import { connect } from 'react-redux'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import renderIf from '../lib/renderIf'
-import OtpScreen from './OtpScreen'
-import MobileNoScreen from './MobileNoScreen'
+import MobileOtpScreen from './MobileOtpScreen'
 import InitialSetup from './InitialSetup'
-import { ERROR_400_403_LOGOUT_FAILURE } from '../lib/constants'
 import * as globalActions from '../modules/global/globalActions'
 import RNFS from 'react-native-fs'
 import ApkInstaller from 'react-native-apk-installer'
@@ -28,10 +26,8 @@ import { DOWNLOADING_LATEST_VERSION, HANG_ON, PLEASE_WAIT_FOR_IOS_LINK_URL } fro
 
 function mapStateToProps(state) {
     return {
-        showMobileNumberScreen: state.preloader.showMobileNumberScreen,
+        showMobileOtpNumberScreen: state.preloader.showMobileOtpNumberScreen,
         errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
-        isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
-        showOtpScreen: state.preloader.showOtpScreen,
         downloadLatestAppMessage: state.preloader.downloadLatestAppMessage,
         downloadUrl: state.preloader.downloadUrl,
         isAppUpdatedThroughCodePush: state.preloader.isAppUpdatedThroughCodePush,
@@ -65,7 +61,8 @@ class Preloader extends PureComponent {
     }
 
     invalidateSession = () => {
-        this.props.actions.invalidateUserSession()
+        this.setState({errorInDownload:false})
+        this.props.actions.invalidateUserSession(true)
     }
 
     //Downloading Latest App programatically in Android 
@@ -141,22 +138,15 @@ class Preloader extends PureComponent {
         } else {
             return (
                 <Container>
-                    {renderIf(!this.props.showMobileNumberScreen,
-                        <InitialSetup />
-                    )}
-                    {(this.props.isErrorType_403_400_Logout &&
+                    {(_.isEmpty(this.props.showMobileOtpNumberScreen) ? <InitialSetup showMobileOtpNumberScreen = {this.props.showMobileOtpNumberScreen}  /> : null)}
+                    {(!_.isEmpty(this.props.errorMessage_403_400_Logout) &&
                         <CustomAlert
                             title="Unauthorised Device"
-                            message={this.props.errorMessage_403_400_Logout.message}
+                            message={this.props.errorMessage_403_400_Logout}
                             onOkPressed={this.startLoginScreenWithoutLogout} />
                     )}
-                    {renderIf(this.props.showMobileNumberScreen,
-                        <MobileNoScreen invalidateUserSession={this.invalidateSession} />
-                    )}
-
-                    {renderIf(this.props.showOtpScreen,
-                        <OtpScreen invalidateUserSession={this.invalidateSession} />
-                    )}
+                    {(!_.isEmpty(this.props.showMobileOtpNumberScreen) ? <MobileOtpScreen invalidateUserSession={this.invalidateSession} isMobileScreen={this.props.showMobileOtpNumberScreen} /> : null)}
+                    
                     {renderIf(this.props.downloadLatestAppMessage,
                         <AppOutdated downloadLatestApk={this.downloadLatestApk} />
                     )}

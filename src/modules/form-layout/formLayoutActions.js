@@ -199,12 +199,6 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         goBack(taskListScreenDetails.jobDetailsScreenKey )
                         
                     } else if (routeName == TabScreen) {
-                        // dispatch(NavigationActions.reset({
-                        //     index: 0,
-                        //     actions: [
-                        //         NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                        //     ]
-                        // }))
                         dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
                     } else {
                         dispatch(navigateToScene(routeName, routeParam,navigate))

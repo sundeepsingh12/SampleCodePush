@@ -53,6 +53,9 @@ export default {
     fontDarkGray: {
         color: '#a3a3a3'
     },
+    fontMediumGray: {
+        color: '#9B9B9B'
+    },
     fontLightGray: {
         color: '#e4e3e8'
     },
@@ -83,6 +86,9 @@ export default {
     },
     fontLg: {
         fontSize: 16
+    },
+    fontRegular: {
+        fontSize: 15
     },
     fontXl: {
         fontSize: 20
@@ -122,6 +128,9 @@ export default {
     },
     fontWeight500: {
         fontWeight: '500'
+    },
+    fontWeight600: {
+        fontWeight: '600'
     },
     lineHeight20: {
         lineHeight: 20

@@ -10,7 +10,9 @@ import {
     LoginScreen,
     SET_BACKUP_UPLOAD_VIEW,
     SET_BACKUP_TOAST,
-    DOMAIN_URL
+    DOMAIN_URL,
+    PRE_LOGOUT_START,
+    PRE_LOGOUT_SUCCESS
 } from '../../lib/constants'
 import _ from 'lodash'
 import { setState, deleteSessionToken, showToastAndAddUserExceptionLog } from '../global/globalActions'
@@ -18,7 +20,6 @@ import { backupService } from '../../services/classes/BackupService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
-import { preLogoutRequest, preLogoutSuccess, } from '../pre-loader/preloaderActions'
 import { NavigationActions } from 'react-navigation'
 import { authenticationService } from '../../services/classes/Authentication'
 import {
@@ -138,12 +139,9 @@ export function autoLogoutAfterUpload(calledFromHome) {
             } else {
                 dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 3))
             }
-            dispatch(preLogoutRequest())
-            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            await backupService.createBackupOnLogout() // creates backup on logout
-            let response = await authenticationService.logout(token) // hit logout api
-            await logoutService.deleteDataBase() //delete database.
-            dispatch(preLogoutSuccess())
+            dispatch(setState(PRE_LOGOUT_START))
+            let response = await authenticationService.logout(true, {value : true}) // hit logout api
+            dispatch(setState(PRE_LOGOUT_SUCCESS))
             dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
             dispatch(deleteSessionToken())
         } catch (error) {
