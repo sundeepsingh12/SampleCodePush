@@ -51,11 +51,9 @@ module.exports = keyMirror({
     CHECK_ASSET_FAILURE: null,
 
     OTP_GENERATION_START: null,
-    OTP_GENERATION_SUCCESS: null,
     OTP_GENERATION_FAILURE: null,
 
     OTP_VALIDATION_START: null,
-    OTP_VALIDATION_SUCCESS: null,
     OTP_VALIDATION_FAILURE: null,
 
     DELETE_TOKEN_REQUEST: null,
@@ -73,11 +71,12 @@ module.exports = keyMirror({
     ON_MOBILE_NO_CHANGE: null,
     ON_OTP_CHANGE: null,
     ERROR_400_403_LOGOUT: null,
-    ERROR_400_403_LOGOUT_FAILURE: null,
+    SHOW_OTP_MOBILE_LOADER: null,
+    IS_SHOW_MOBILE_OTP_SCREEN: null,
+    IS_LOGGING_OUT: null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,
-    PRE_LOGOUT_FAILURE: null,
     TOGGLE_CHECKBOX: null,
     REMEMBER_ME_SET_TRUE: null,
     OTP_SUCCESS: null,
@@ -97,7 +96,6 @@ module.exports = keyMirror({
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
     SET_MODULES: null,
-    TOGGLE_LOGOUT: null,
     SEARCH_TAP: null,
     SET_UNSYNC_TRANSACTION_PRESENT: null,
     SET_BACKUP_UPLOAD_VIEW: null,
@@ -178,10 +176,6 @@ module.exports = keyMirror({
     PASSWORD: null,
     REMEMBER_ME: null,
     DOMAIN_URL: null,
-
-    //Preloader Credentials
-    IS_SHOW_OTP_SCREEN: null,
-    IS_SHOW_MOBILE_NUMBER_SCREEN: null,
 
     //Schema (Store keys)
 
