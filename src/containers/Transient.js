@@ -36,7 +36,7 @@ class Transient extends PureComponent {
         this.props.actions.setStateFromNavigationParams(
             this.props.navigation.state.params,
             this.props.formLayoutStates,
-            this.props.navigation.navigate
+            this.props.navigation.push
         )
     }
 
@@ -52,7 +52,7 @@ class Transient extends PureComponent {
             jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
             pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
         },
-        this.props.navigation.navigate
+        this.props.navigation.push
     )
     }
 

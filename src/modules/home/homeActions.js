@@ -346,16 +346,17 @@ export function startFCM() {
         FCM.getFCMToken().then(async fcmToken => {
           await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
           await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+          if (Platform.OS === 'ios') {
+            FCM.getAPNSToken().then(token => {
+            }).catch(() => Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
+          }
         }, (error) => {
         }).catch(
           () => Toast.show({ text: FCM_REGISTRATION_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }))
       } )
       .catch(() =>  Toast.show({ text: FCM_PERMISSION_DENIED , type: 'danger', position: 'bottom', buttonText: OK, duration: 6000 }))
 
-      if (Platform.OS === 'ios') {
-        FCM.getAPNSToken().then(token => {
-        }).catch(() => Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
-      }
+     
 
       FCM.getInitialNotification().then(notif => {
       }, (err) => {

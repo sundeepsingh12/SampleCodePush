@@ -124,7 +124,7 @@ export function storeState(saveActivatedState, screenName, jobMasterId, navigati
 }
 
 
-export function clearStateAndStore(jobMasterId) {
+export function clearStateAndStore(jobMasterId,pop) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_ACTIVE, true))
@@ -136,7 +136,9 @@ export function clearStateAndStore(jobMasterId) {
                 jobId: -1
             }, jobMasterId)
             dispatch(setState(SAVE_ACTIVATED_INITIAL_STATE, {}))
-            dispatch(navigateToScene(HomeTabNavigatorScreen, {}))
+            // dispatch(navigateToScene(HomeTabNavigatorScreen, {},navigate))
+            pop(2)
+
         } catch (error) {
             showToastAndAddUserExceptionLog(2006, error.message, 'danger', 1)
             dispatch(setState(LOADER_ACTIVE, false))

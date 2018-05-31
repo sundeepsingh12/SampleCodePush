@@ -38,7 +38,7 @@ export default class DataStoreItemDetails extends PureComponent {
                 animationType="slide"
                 onRequestClose={() => { this.props.goBack(-1, null, true) }}>
                 <Container>
-                    <SafeAreaView style={{ backgroundColor: syles.bgPrimaryColor }}>
+                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
                         <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
                             <Body>
                                 <View
