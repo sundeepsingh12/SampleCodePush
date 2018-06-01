@@ -12,6 +12,7 @@ import { SET_FORM_LAYOUT_STATE, FormLayout, SET_TRANSIENT_BACK_PRESSED } from '.
 import { Select_Next_Status } from '../lib/AttributeConstants'
 import { Container, Header, Text, Body, Icon, Content, List, ListItem, Right, } from 'native-base'
 import _ from 'lodash'
+import TitleHeader from '../components/TitleHeader'
 
 function mapStateToProps(state) {
     return {
@@ -30,14 +31,17 @@ function mapDispatchToProps(dispatch) {
 class Transient extends PureComponent {
 
     static navigationOptions = ({ navigation }) => {
-        return { header: null }
+        return {
+            header: <TitleHeader pageName={navigation.state.params.currentStatus.name} goBack={navigation.state.params.backForTransient} />
+        }
     }
 
     componentDidMount() {
+        this.props.navigation.setParams({ backForTransient: this._goBack });
         this.props.actions.setStateFromNavigationParams(
             this.props.navigation.state.params,
             this.props.formLayoutStates,
-            this.props.navigation.navigate
+            this.props.navigation.push
         )
     }
 
@@ -53,8 +57,8 @@ class Transient extends PureComponent {
             jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
             pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
         },
-        this.props.navigation.navigate
-    )
+            this.props.navigation.push
+        )
     }
 
     componentDidUpdate() {
@@ -65,11 +69,11 @@ class Transient extends PureComponent {
     }
 
     _goBack = () => {
-        this.props.navigation.goBack()
         this.props.actions.setState(SET_FORM_LAYOUT_STATE, {
             editableFormLayoutState: this.props.formLayoutStates[this.props.navigation.state.params.currentStatus.id],
             statusName: this.props.navigation.state.params.currentStatus.name
         })
+        this.props.navigation.goBack()
     }
 
     renderData = (item) => {
@@ -97,26 +101,6 @@ class Transient extends PureComponent {
         }
         return (
             <Container>
-                <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                    <Header style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={this._goBack}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>
-                                        {this.props.navigation.state.params.currentStatus.name}
-                                    </Text>
-                                </View>
-                                <View style={[style.headerRight]}>
-                                </View>
-                            </View>
-                        </Body>
-                    </Header>
-                </SafeAreaView>
-
                 <Content style={[styles.bgWhite]}>
                     <View style={[styles.flexBasis25]}>
                         <Text style={[styles.fontSm, { color: styles.fontPrimaryColor }, styles.padding15]}>{Select_Next_Status}</Text>

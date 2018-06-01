@@ -113,6 +113,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('dataStoreFilterReverseMap', action.payload.editableFormLayoutState.dataStoreFilterReverseMap)
                 .set('arrayReverseDataStoreFilterMap', action.payload.editableFormLayoutState.arrayReverseDataStoreFilterMap)
                 .set('jobAndFieldAttributesList', action.payload.editableFormLayoutState.jobAndFieldAttributesList)
+                .set('noFieldAttributeMappedWithStatus', action.payload.editableFormLayoutState.noFieldAttributeMappedWithStatus)
         }
 
         case SET_UPDATE_DRAFT: {

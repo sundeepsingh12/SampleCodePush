@@ -67,11 +67,11 @@ class FormLayout extends PureComponent {
     }
   }
 
-  componentWillUnmount() {
-    if (this.props.noFieldAttributeMappedWithStatus) {
-      this.props.actions.setState(SET_NO_FIELD_ATTRIBUTE_MAPPED, false)
-    }
-  }
+  // componentWillUnmount() {
+  //   if (this.props.noFieldAttributeMappedWithStatus) {
+  //     this.props.actions.setState(SET_NO_FIELD_ATTRIBUTE_MAPPED, false)
+  //   }
+  // }
 
   componentDidMount() {
     if (!this.props.navigation.state.params.isDraftRestore) {
@@ -143,7 +143,8 @@ class FormLayout extends PureComponent {
       isLoading: this.props.isLoading,
       errorMessage: this.props.errorMessage,
       currentElement: this.props.currentElement,
-      fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+      fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
+      noFieldAttributeMappedWithStatus:this.props.noFieldAttributeMappedWithStatus
     }
 
     let taskListScreenDetails = {
@@ -165,7 +166,7 @@ class FormLayout extends PureComponent {
           pieChart: this.props.pieChart,
           taskListScreenDetails
         },
-        this.props.navigation.navigate)
+        this.props.navigation.push)
     } else {
       this.props.actions.saveJobTransaction(
         formLayoutState,
@@ -176,7 +177,7 @@ class FormLayout extends PureComponent {
         this.props.navigation.state.params.saveActivatedStatusData,
         this.props.pieChart,
         taskListScreenDetails,
-        this.props.navigation.navigate,
+        this.props.navigation.push,
         this.props.navigation.goBack
       )
     }

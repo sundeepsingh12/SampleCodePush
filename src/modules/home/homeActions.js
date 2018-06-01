@@ -343,23 +343,18 @@ export function startFCM() {
         const topic = `FE_${userObject.value.id}`
         FCM.requestPermissions()
           .then(e => {
-            console.log('requestPermissions then', e)
             FCM.getFCMToken().then(async fcmToken => {
-              console.log('requestPermissions inner then', fcmToken)
               await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
               await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+              if (Platform.OS === 'ios') {
+                FCM.getAPNSToken().then(token => {
+                }).catch(() => Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
+              }
             }, (error) => {
             }).catch(
               () => Toast.show({ text: FCM_REGISTRATION_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }))
           })
           .catch(() => Toast.show({ text: FCM_PERMISSION_DENIED, type: 'danger', position: 'bottom', buttonText: OK, duration: 6000 }))
-
-        if (Platform.OS === 'ios') {
-          console.log('before get apns')
-          FCM.getAPNSToken().then(token => {
-          }).catch(() => Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
-        }
-
         FCM.getInitialNotification().then(notif => {
         }, (err) => {
         })
@@ -662,7 +657,7 @@ export function restoreNewJobDraft(draftStatusInfo, restoreDraft, navigate) {
   return async function (dispatch) {
     try {
       if (restoreDraft) {
-        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft))
+        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft, null, null, null, navigate))
       } else {
         dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId, navigate))
       }

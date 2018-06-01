@@ -127,7 +127,6 @@ class HomeTabNavigator extends PureComponent {
             },
             JobDetailsV2: {
                 screen: JobDetailsV2,
-                header: null
             },
             FormLayout: {
                 screen: FormLayout,
@@ -161,10 +160,6 @@ class HomeTabNavigator extends PureComponent {
               },
               BulkListing: {
                 screen: BulkListing,
-                navigationOptions:{
-                    tabBarVisible: false,
-                    showTabBar: false,
-                }
               },
               CashTendering: {
                 screen: CashTendering,

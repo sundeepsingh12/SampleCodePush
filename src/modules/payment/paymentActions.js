@@ -169,7 +169,7 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formLa
             //     modeTypeId: selectedPaymentMode,
             //     isCardPayment
             // }
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction,null,null.navigation.goBack))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction,null,null,navigation.goBack))
             // dispatch(setState(UPDATE_PAYMENT_AT_END, {
             //     paymentAtEnd
             // }))

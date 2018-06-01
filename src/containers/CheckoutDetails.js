@@ -354,7 +354,7 @@ class CheckoutDetails extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <SafeAreaView>
+                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
                         <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
                             <Body>
                                 <View
@@ -417,11 +417,11 @@ class CheckoutDetails extends PureComponent {
                             </List>
                         </View>)}
                     </Content>
-                    <SafeAreaView>
+                    <SafeAreaView style = {[styles.bgWhite]}>
                         <Footer style={[style.footer]}>
                             <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
                                 <Button onPress={() => {
-                                    this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId)
+                                    this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId, this.props.navigation.navigate)
                                 }}>
                                     <Text style={[{ color: styles.fontPrimaryColor }, styles.fontDefault]}>{Return_To_Home}</Text>
                                 </Button>
@@ -459,7 +459,6 @@ const style = StyleSheet.create({
         padding: 15
     },
     footer: {
-        height: 'auto',
         backgroundColor: '#ffffff',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',

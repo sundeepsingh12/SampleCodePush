@@ -145,7 +145,7 @@ class JobMaster {
       const [minorVersionFromServer, patchVersionFromServer] = minorPatchVersion.split('.')
       const [appMajorVersion, appMinorVersion, appPatchVersion] = APP_VERSION_NUMBER.split('.')
       //Check if minor or patch version from server is greater than current minor/patch version installed in phone
-      if (parseInt(minorVersionFromServer) > parseInt(appMinorVersion) || parseInt(patchVersionFromServer) > parseInt(appPatchVersion)) {
+      if ((packageJsonMajorVersion == parseInt(json.applicationVersion)) && parseInt(minorVersionFromServer) > parseInt(appMinorVersion) || parseInt(patchVersionFromServer) > parseInt(appPatchVersion)) {
         throw ({ errorCode: MINOR_PATCH_OUTDATED, androidDeploymentKey: json.androidDeployementKey, iosDeploymentKey: json.iosDeployementKey })
       }
     }
@@ -295,7 +295,7 @@ class JobMaster {
   getJobMasterTitleListFromIds(jobMasterIdList, jobMasterList) {
     let jobMasterTitleList = []
     if (_.isUndefined(jobMasterIdList)) {
-      return null
+      return jobMasterTitleList
     }
     jobMasterList.forEach(jobMaster => {
       if (jobMasterIdList.includes(jobMaster.id)) {

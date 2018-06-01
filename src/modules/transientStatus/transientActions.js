@@ -15,12 +15,14 @@ import _ from 'lodash'
  * @param {*} transientFormLayoutMap //contains form layout state of previous statuses and current status
  * @param {*} currentStatus 
  */
-export function setStateFromNavigationParams(navigationParams, transientFormLayoutMap,navigate) {
+export function setStateFromNavigationParams(navigationParams, transientFormLayoutMap, navigate) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_IS_RUNNING, true))
             let { formLayoutState, currentStatus, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams } = navigationParams
-            if (!currentStatus || !formLayoutState) throw new Error('current status missing')
+            if (!currentStatus || !formLayoutState) {
+                throw new Error('current status missing')
+            }
             let cloneTransientFormLayoutMap = _.cloneDeep(transientFormLayoutMap)
             cloneTransientFormLayoutMap[currentStatus.id] = _.cloneDeep(formLayoutState)
             dispatch(setState(ADD_FORM_LAYOUT_STATE, cloneTransientFormLayoutMap))
@@ -37,8 +39,8 @@ export function setStateFromNavigationParams(navigationParams, transientFormLayo
                     jobDetailsScreenKey,
                     pageObjectAdditionalParams
                 },
-                navigate
-            ))
+                    navigate
+                ))
             }
             draftService.saveDraftInDb(formLayoutState, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
         } catch (error) {

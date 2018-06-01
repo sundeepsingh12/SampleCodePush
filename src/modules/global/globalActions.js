@@ -34,7 +34,7 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import CONFIG from '../../lib/config'
 import { onResyncPress } from '../home/homeActions'
 import BackgroundTimer from 'react-native-background-timer'
-import { NavigationActions,StackActions } from 'react-navigation'
+import { NavigationActions, StackActions } from 'react-navigation'
 import { trackingService } from '../../services/classes/Tracking'
 import { Toast } from 'native-base'
 import { userExceptionLogsService } from '../../services/classes/UserException'
@@ -50,9 +50,9 @@ export function setState(type, payload) {
 }
 
 //Use to navigate to other scene
-export function navigateToScene(routeName, params,navigate) {
+export function navigateToScene(routeName, params, navigate) {
   return async function (dispatch) {
-   navigate(routeName,params)
+    navigate(routeName, params)
   }
 }
 
