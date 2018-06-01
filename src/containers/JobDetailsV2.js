@@ -28,7 +28,8 @@ import {
 } from '../lib/ContainerConstants'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Alert, SafeAreaView } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, StyleProvider, List, ListItem, Footer, FooterTab, Card, ActionSheet, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
@@ -95,7 +96,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransaction.id)
+    this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransaction.id, this.props.navigation.navigate)
   }
 
   componentWillUnmount() {
@@ -109,10 +110,10 @@ class JobDetailsV2 extends PureComponent {
   }
 
   navigateToDataStoreDetails = (navigationParam) => {
-    this.props.actions.navigateToScene(DataStoreDetails, navigationParam)
+    this.props.actions.navigateToScene(DataStoreDetails, navigationParam, this.props.navigation.navigate)
   }
   navigateToCameraDetails = (navigationParam) => {
-    this.props.actions.navigateToScene(ImageDetailsView, navigationParam)
+    this.props.actions.navigateToScene(ImageDetailsView, navigationParam, this.props.navigation.navigate)
   }
 
   statusDataItem(statusList, index, minIndexDropDown) {
@@ -203,7 +204,9 @@ class JobDetailsV2 extends PureComponent {
       jobMasterId: this.props.jobTransaction.jobMasterId,
       pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
       jobDetailsScreenKey: this.props.navigation.state.key
-    })
+    },
+      null,
+      this.props.navigation)
     this._onCancel()
   }
   _onCancel = () => {
@@ -228,9 +231,10 @@ class JobDetailsV2 extends PureComponent {
         pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
         jobDetailsScreenKey: this.props.navigation.state.key
       }
-      this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
+      this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory, this.props.navigation.navigate)
     }
   }
+
   chatButtonPressed = () => {
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
       return
@@ -254,6 +258,7 @@ class JobDetailsV2 extends PureComponent {
       this.showSmsTemplateList(this.props.navigation.state.params.jobSwipableDetails.contactData[0])
     }
   }
+
   showSmsTemplateList = (contact) => {
     setTimeout(() => {
       if (this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 1) {
@@ -308,9 +313,11 @@ class JobDetailsV2 extends PureComponent {
         { cancelable: false })
     }
   }
+
   callContact = (contact) => {
     Communications.phonecall(contact, false)
   }
+
   customerCareButtonPressed = () => {
     let customerCareTitles = this.props.navigation.state.params.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
     customerCareTitles.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
@@ -405,7 +412,7 @@ class JobDetailsV2 extends PureComponent {
       jobMasterIds: JSON.stringify([this.props.jobTransaction.jobMasterId]),
       additionalParams: JSON.stringify({ statusId: this.props.currentStatus.id }),
       groupId: groupId
-    }, true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
+    }, true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL, this.props.navigation)
   }
 
   selectStatusToRevert = () => {
@@ -420,7 +427,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _onGoToPreviousStatus = (statusData) => {
-    this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation.state.params.pageObjectAdditionalParams)
+    this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation.state.params.pageObjectAdditionalParams, this.props.navigation.goBack)
   }
 
   statusRevertSelection(statusList) {
@@ -483,7 +490,7 @@ class JobDetailsV2 extends PureComponent {
 
   showHeaderView() {
     return (
-      <SafeAreaView>
+      <SafeAreaView style={[style.header]}>
         <Header style={[style.header]}>
           <View style={style.seqCard}>
             {this.showJobMasterIdentifier()}
@@ -636,7 +643,8 @@ class JobDetailsV2 extends PureComponent {
       this.props.draftStatusInfo,
       null,
       this.props.navigation.state.params.pageObjectAdditionalParams,
-      this.props.navigation.state.key
+      this.props.navigation.state.key,
+      this.props.navigation.navigate
     )
     this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
   }

@@ -136,7 +136,7 @@ class SkuListItem extends PureComponent {
             return (
                 <View style={[styles.row, styles.flexBasis50, styles.alignCenter, styles.marginTop15]}>
                     <Text style={[styles.fontDefault, styles.padding10, styles.paddingLeft0, {color : styles.fontPrimaryColor}]}
-                        onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
+                        onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) },this.props.navigate) }}>
                         {OPEN_CAMERA}
                     </Text>
                     {this._getIconForImageAlreadyCaptured(rowItem)}

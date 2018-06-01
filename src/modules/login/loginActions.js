@@ -233,7 +233,10 @@ export function getSessionToken() {
           }))
         }
         else if (token && isPreloaderComplete && isPreloaderComplete.value) {
-          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
+          dispatch(NavigationActions.navigate({
+            routeName: HomeTabNavigatorScreen
+          }))
+          // dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
         else if (token) {
           dispatch(NavigationActions.navigate({

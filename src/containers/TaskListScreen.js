@@ -6,7 +6,6 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as taskListActions from '../modules/taskList/taskListActions';
 import * as globalActions from '../modules/global/globalActions';
-import { startSyncAndNavigateToContainer } from '../modules/home/homeActions'
 import _ from 'lodash';
 import renderIf from '../lib/renderIf';
 import Loader from '../components/Loader';
@@ -27,7 +26,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...taskListActions, ...globalActions, startSyncAndNavigateToContainer }, dispatch)
+    actions: bindActionCreators({ ...taskListActions, ...globalActions }, dispatch)
   }
 }
 
@@ -51,7 +50,8 @@ class TaskListScreen extends PureComponent {
         jobTransaction: item,
         groupId: item.groupId == 'nullGroup' || countOfGroup < 2 ? null : item.groupId,
         pageObjectAdditionalParams: this.props.pageObject.additionalParams
-      }
+      },
+      this.props.navigationProps
     )
     this.props.actions.setState(LISTING_SEARCH_VALUE, {})
   }

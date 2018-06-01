@@ -1,6 +1,6 @@
 'use strict'
 
-import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { postAssignmentService } from '../../services/classes/PostAssignment'

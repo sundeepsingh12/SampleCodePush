@@ -185,13 +185,13 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function onSave(fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction) {
+export function onSave(fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction,goBack) {
     return async function (dispatch) {
         try {
             if (!calledFromArray) {
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction,null,null,goBack))
             } else {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState,goBack))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(705, error.message, 'danger', 0)
@@ -240,13 +240,13 @@ export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, it
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction) {
+export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction,goBack) {
     return async function (dispatch) {
         try {
             if (!calledFromArray) {
                 let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formLayoutState.formElement)
                 formLayoutState.formElement = formElementResult
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction,null,null,goBack))
             } else {
                 let formElementResult = await dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formLayoutState.formElement[rowId].formLayoutObject)
                 formLayoutState.formElement[rowId].formLayoutObject = formElementResult

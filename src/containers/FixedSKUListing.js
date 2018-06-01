@@ -1,6 +1,7 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, SafeAreaView } from 'react-native'
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Button, Footer, Header, Icon, Body, Toast } from 'native-base';
 import * as fixedSKUActions from '../modules/fixedSKU/fixedSKUActions'
 import { connect } from 'react-redux'
@@ -143,7 +144,7 @@ class FixedSKUListing extends PureComponent {
           <View style={{ backgroundColor: styles.bgPrimaryColor }}>
             <Button success full style={{ backgroundColor: styles.bgPrimaryColor }}
               onPress={() => {
-                this.props.actions.onSave(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState, this.props.fixedSKUList, this.props.navigation.state.params.jobTransaction)
+                this.props.actions.onSave(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState, this.props.fixedSKUList, this.props.navigation.state.params.jobTransaction,this.props.navigation.goBack)
               }}>
               <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>
                 {SAVE}

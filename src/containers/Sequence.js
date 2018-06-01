@@ -7,7 +7,8 @@ import * as sequenceActions from '../modules/sequence/sequenceActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Alert, TouchableOpacity, Modal, SafeAreaView } from 'react-native'
+import { StyleSheet, View, Alert, TouchableOpacity, Modal } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { ROUTE_OPTIMIZATION, FILTER_REF_NO } from '../lib/AttributeConstants'
 import {
   UPDATE_SEQUENCE, SAVE,

@@ -3,7 +3,8 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Body, Icon, Item, Input, Label, Footer, FooterTab, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -61,7 +62,7 @@ class ResetPassword extends PureComponent {
     }
   }
   _onResetPress = () => {
-    this.props.actions.checkAndResetPassword(this.props.currentPassword, this.props.newPassword, this.props.confirmNewPassword)
+    this.props.actions.checkAndResetPassword(this.props.currentPassword, this.props.newPassword, this.props.confirmNewPassword,this.props.navigation.goBack)
   }
 
   _getHeaderView() {
