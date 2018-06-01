@@ -131,9 +131,6 @@ class HomeTabNavigator extends PureComponent {
             },
             FormLayout: {
                 screen: FormLayout,
-                navigationOptions: {
-                  header: null
-                }
               },
               ArrayFieldAttribute: {
                 screen: ArrayFieldAttribute

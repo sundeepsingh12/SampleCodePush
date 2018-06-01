@@ -1,6 +1,7 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, Platform, FlatList, TouchableOpacity, KeyboardAvoidingView, SafeAreaView } from 'react-native'
+import { StyleSheet, View, Text, Platform, FlatList, TouchableOpacity, KeyboardAvoidingView } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Card, Button, Body, Header, Right, Icon, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
@@ -106,7 +107,7 @@ class FormLayout extends PureComponent {
         jobTransaction={this.props.navigation.state.params.jobTransaction}
         jobStatusId={this.props.navigation.state.params.statusId}
         formLayoutState={formLayoutState}
-        navigate = {this.props.navigation.navigate}
+        navigate={this.props.navigation.navigate}
       />
     )
   }
@@ -164,7 +165,7 @@ class FormLayout extends PureComponent {
           pieChart: this.props.pieChart,
           taskListScreenDetails
         },
-      this.props.navigation.navigate)
+        this.props.navigation.navigate)
     } else {
       this.props.actions.saveJobTransaction(
         formLayoutState,
@@ -199,7 +200,7 @@ class FormLayout extends PureComponent {
 
   getFooterView() {
     return (
-      <SafeAreaView>
+      <SafeAreaView style={[styles.bgWhite]}>
         <Footer style={[style.footer]}>
           <FooterTab style={[styles.padding10]}>
             <Button success full
@@ -219,7 +220,7 @@ class FormLayout extends PureComponent {
   emptyFieldAttributeForStatusView() {
     if (this.props.noFieldAttributeMappedWithStatus) {
       return (
-        <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+        <View style={[{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }]}>
           <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}> No visible attribute mapped</Text>
         </View>
       )
@@ -232,19 +233,21 @@ class FormLayout extends PureComponent {
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
-      <Footer style={[style.footer]}>
-        <FooterTab style={[styles.padding10]}>
-          <Button success full
-            onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
-            disabled={this.props.isSaveDisabled}>
-            <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
-          </Button>
-        </FooterTab>
-      </Footer>
+      <SafeAreaView style={[styles.bgWhite]}>
+        <Footer style={[style.footer]}>
+          <FooterTab style={[styles.padding10]}>
+            <Button success full
+              onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
+              disabled={this.props.isSaveDisabled}>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
+      </SafeAreaView>
     }
     const footerView = this.getFooterView()
     if (Platform.OS == 'ios') {
-      formView = <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+      formView = <KeyboardAvoidingView style={[{ flex: 1 }, styles.bgWhite]} behavior="padding">
         {invalidFormAlert}
         {emptyFieldAttributeForStatusView}
         <View style={[styles.flex1, styles.bgWhite]}>

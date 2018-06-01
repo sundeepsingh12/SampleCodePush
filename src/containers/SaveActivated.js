@@ -6,7 +6,8 @@ import * as globalActions from '../modules/global/globalActions'
 import * as saveActivatedActions from '../modules/saveActivated/saveActivatedActions'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
-import { StyleSheet, View, TouchableOpacity, FlatList, Alert, SafeAreaView } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, FlatList, Alert } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Body, Right, Icon, List, ListItem, StyleProvider, Footer, FooterTab } from 'native-base';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';

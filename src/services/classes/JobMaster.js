@@ -141,7 +141,7 @@ class JobMaster {
       throw ({ errorCode: MAJOR_VERSION_OUTDATED, downloadUrl: json.androidDownloadUrl })
     }
     const minorPatchVersion = json.minorPatchVersion
-    if (minorPatchVersion) {
+    if (parseInt(json.applicationVersion) == packageJsonMajorVersion && minorPatchVersion) {
       const [minorVersionFromServer, patchVersionFromServer] = minorPatchVersion.split('.')
       const [appMajorVersion, appMinorVersion, appPatchVersion] = APP_VERSION_NUMBER.split('.')
       //Check if minor or patch version from server is greater than current minor/patch version installed in phone

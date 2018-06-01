@@ -1,6 +1,7 @@
 'use strict';
 import React, { PureComponent } from 'react'
-import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Image, ImageStore, Platform, SafeAreaView } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Image, ImageStore, Platform } from 'react-native';
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Left, Body, Right, Icon, Footer, StyleProvider, Button, Toast } from 'native-base';
 import Loader from '../components/Loader'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
@@ -180,7 +181,7 @@ class CameraFieldAttribute extends PureComponent {
                     </RNCamera>
                 </View>
                 <SafeAreaView style={[style.cameraFooter]}>
-                    <View style={{height: 100, flexDirection: 'row', alignItems: 'center'}}>
+                    <View style={{ height: 100, flexDirection: 'row', alignItems: 'center' }}>
                         <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
                             {(getValidationObject && getValidationObject.imageUploadFromDevice) ? <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} /> : null}
                         </View>
@@ -234,7 +235,7 @@ class CameraFieldAttribute extends PureComponent {
                                     if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
                                         this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData, this.props.navigation.state.params.currentElement)
                                     } else {
-                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction,this.props.navigation.goBack)
+                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction, this.props.navigation.goBack)
                                     }
                                 }}>
                                     <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />

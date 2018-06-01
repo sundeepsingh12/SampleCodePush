@@ -1,6 +1,7 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, SafeAreaView } from 'react-native'
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Button, Footer, Header, Icon, Body, Toast } from 'native-base';
 import * as fixedSKUActions from '../modules/fixedSKU/fixedSKUActions'
 import { connect } from 'react-redux'

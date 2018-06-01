@@ -4,7 +4,8 @@ import * as offlineDSActions from '../modules/offlineDS/offlineDSActions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
-import { StyleSheet, View, TouchableOpacity, Image, Text, SafeAreaView } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Image, Text } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'

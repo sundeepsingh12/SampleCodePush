@@ -6,7 +6,8 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, SafeAreaView } from 'react-native'
+import { StyleSheet, View, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, StyleProvider } from 'native-base'
 import * as profileActions from '../modules/profile/profileActions'
 import * as globalActions from '../modules/global/globalActions'
