@@ -117,7 +117,7 @@ import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutAc
 import FCM, { NotificationActionType, FCMEvent,NotificationType,RemoteNotificationResult,WillPresentNotificationResult } from "react-native-fcm"
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster';
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR,FCM_PERMISSION_DENIED } from '../../lib/ContainerConstants'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR,FCM_PERMISSION_DENIED,OK } from '../../lib/ContainerConstants'
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -192,7 +192,7 @@ export function navigateToPage(pageObject,navigationProps) {
         }
         case PAGE_CUSTOM_WEB_PAGE:
           let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
-          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (customRemarks.length) ? customRemarks[0].customUrl : null },navigationProps)) : dispatch(customAppSelection(customRemarks,navigationProps))
+          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null },navigationProps)) : dispatch(customAppSelection(customRemarks,navigationProps))
           break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -339,29 +339,8 @@ export function startFCM() {
     try{
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (token && token.value) {
-      const userObject = await keyValueDBService.getValueFromStore(USER)
-      const topic = `FE_${userObject.value.id}`
-      FCM.requestPermissions()
-      .then(e =>{
-        FCM.getFCMToken().then(async fcmToken => {
-          await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
-          await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
-          if (Platform.OS === 'ios') {
-            FCM.getAPNSToken().then(token => {
-            }).catch(() => Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
-          }
-        }, (error) => {
-        }).catch(
-          () => Toast.show({ text: FCM_REGISTRATION_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }))
-      } )
-      .catch(() =>  Toast.show({ text: FCM_PERMISSION_DENIED , type: 'danger', position: 'bottom', buttonText: OK, duration: 6000 }))
 
-     
-
-      FCM.getInitialNotification().then(notif => {
-      }, (err) => {
-      })
-
+      //these callback will be triggered only when app is foreground or background
       FCM.on(FCMEvent.Notification, notif => {
         if (notif.Notification == 'Android push notification') {
           dispatch(performSyncService(true))
@@ -391,13 +370,6 @@ export function startFCM() {
           }
         }
       })
-
-       // fcm token may not be available on first load, catch it here
-      FCM.on(FCMEvent.RefreshToken, async fcmToken => {
-        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
-        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
-      });
-
       FCM.enableDirectChannel();
       FCM.on(FCMEvent.DirectChannelConnectionChanged, (data) => {
       });
@@ -405,14 +377,45 @@ export function startFCM() {
         FCM.isDirectChannelEstablished().then(d =>  {});
       }, 1000);
 
+      FCM.getInitialNotification().then(notif => {
+      });
+      try {
+        let result = await FCM.requestPermissions({
+          badge: false,
+          sound: true,
+          alert: true
+        });
+      } catch (e) {
+        showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED, 'danger', 1)
+      }
+      const userObject = await keyValueDBService.getValueFromStore(USER)
+      const topic = `FE_${userObject.value.id}`
+
+      FCM.getFCMToken().then(async fcmToken => {
+        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+
+      }, (error) => {
+      }).catch( () =>  showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR, 'danger', 1))
+      
+          if (Platform.OS === 'ios') {
+            FCM.getAPNSToken().then(token => {
+            }).catch(() =>  showToastAndAddUserExceptionLog(2718, APNS_TOKEN_ERROR, 'danger', 1))
+          }
+
+       // fcm token may not be available on first load, catch it here
+      FCM.on(FCMEvent.RefreshToken, async fcmToken => {
+        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+      });
+
       FCM.subscribeToTopic(topic)
     }
-    
     else {
       Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
     }
   }catch(error){
-    Toast.show({ text: error.message, position: 'bottom', buttonText: OK, duration: 6000 })
+    showToastAndAddUserExceptionLog(2715, error.message, 'danger', 1)    
   }
   }
 }

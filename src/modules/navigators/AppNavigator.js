@@ -60,8 +60,7 @@ class AppWithNavigationState extends React.PureComponent {
       case HomeTabNavigatorScreen:
         return false
     }
-    // dispatch(NavigationActions.back());
-    this.props.navigation.goBack()
+    dispatch(NavigationActions.back());
     return true
   };
 

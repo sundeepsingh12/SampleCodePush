@@ -187,7 +187,7 @@ class Menu extends PureComponent {
   }
 
   logoutButtonPressed = () => {
-    this.props.actions.checkForUnsyncTransactionAndLogout(this.props)
+    this.props.actions.checkForUnsyncTransactionAndLogout()
   }
 }
 
