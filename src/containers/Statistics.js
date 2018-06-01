@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, FlatList, TouchableHighlight, SafeAreaView } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableHighlight } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as statisticsActions from '../modules/statistics/statisticsActions'

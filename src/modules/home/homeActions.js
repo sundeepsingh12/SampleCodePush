@@ -96,7 +96,7 @@ import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieC
 import { trackingService } from '../../services/classes/Tracking'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { userEventLogService } from '../../services/classes/UserEvent'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog, deleteSessionToken, resetNavigationState } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
 import { NetInfo, Alert, Platform } from 'react-native'
@@ -114,10 +114,11 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions'
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
-import FCM, { NotificationActionType, FCMEvent,NotificationType,RemoteNotificationResult,WillPresentNotificationResult } from "react-native-fcm"
+import FCM, { NotificationActionType, FCMEvent, NotificationType, RemoteNotificationResult, WillPresentNotificationResult } from "react-native-fcm"
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster';
 import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR,FCM_PERMISSION_DENIED,OK } from '../../lib/ContainerConstants'
+
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -177,17 +178,17 @@ export function fetchPagesAndPiechart() {
  *  }
 */
 //TODO Move this to Globalfunction if feasible
-export function navigateToPage(pageObject,navigationProps) {
+export function navigateToPage(pageObject, navigationProps) {
   return async function (dispatch) {
     try {
       switch (pageObject.screenTypeId) {
         case PAGE_BACKUP:
-          dispatch(navigateToScene(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' },navigationProps));
+          dispatch(navigateToScene(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' }, navigationProps));
           break;
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
-          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING,navigationProps))
+          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING, navigationProps))
           break;
         }
         case PAGE_CUSTOM_WEB_PAGE:
@@ -201,42 +202,42 @@ export function navigateToPage(pageObject,navigationProps) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          dispatch(navigateToScene(LiveJobs, { pageObject },navigationProps));
+          dispatch(navigateToScene(LiveJobs, { pageObject }, navigationProps));
           break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_MSWIPE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_NEW_JOB: {
-          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING,navigationProps))
+          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING, navigationProps))
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
-          dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' },navigationProps))
+          dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' }, navigationProps))
           break;
         case PAGE_OUTSCAN:
-          dispatch(navigateToScene(PostAssignmentScanner, { pageObject },navigationProps))
-        
+          dispatch(navigateToScene(PostAssignmentScanner, { pageObject }, navigationProps))
+
           break
         case PAGE_PAYNEAR_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PICKUP:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PROFILE:
-          dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' },navigationProps))
+          dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' }, navigationProps))
           break;
         case PAGE_SEQUENCING: {
-          dispatch(getRunsheetsForSequence(pageObject,navigationProps));
+          dispatch(getRunsheetsForSequence(pageObject, navigationProps));
           break;
         }
         case PAGE_SORTING_PRINTING:
-          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' },navigationProps))
+          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' }, navigationProps))
           break;
         case PAGE_STATISTICS:
-          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' },navigationProps))
+          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' }, navigationProps))
           break;
         case PAGE_TABS:
-          dispatch(navigateToScene(TabScreen, { pageObject },navigationProps));
+          dispatch(navigateToScene(TabScreen, { pageObject }, navigationProps));
           break;
         default:
           throw new Error("Unknown page type " + pageObject.screenTypeId + ". Contact support");
@@ -247,7 +248,7 @@ export function navigateToPage(pageObject,navigationProps) {
   }
 }
 
-export function customAppSelection(appModule,navigationProps) {
+export function customAppSelection(appModule, navigationProps) {
   return async function (dispatch) {
     try {
       let BUTTONS = appModule.map(id => !(id.title) ? 'URL' : id.title)
@@ -260,7 +261,7 @@ export function customAppSelection(appModule,navigationProps) {
           destructiveButtonIndex: BUTTONS.length - 1
         },
         buttonIndex => {
-          (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? dispatch(navigateToScene(CustomApp, { customUrl: appModule[buttonIndex].customUrl },navigationProps)) : null
+          (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? dispatch(navigateToScene(CustomApp, { customUrl: appModule[buttonIndex].customUrl }, navigationProps)) : null
         }
       )
     } catch (error) {
@@ -289,7 +290,7 @@ export function checkCustomErpPullActivated() {
   }
 }
 
-export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader,navigate) {
+export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader, navigate) {
   return async function (dispatch) {
     try {
       if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
@@ -298,9 +299,9 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader,n
         if (message === true) {
           dispatch(setState(syncLoader, false))
           if (!isBulk) {
-            dispatch(redirectToContainer(pageObject,navigate))
+            dispatch(redirectToContainer(pageObject, navigate))
           } else {
-            dispatch(navigateToScene(BulkListing, { pageObject },navigate))
+            dispatch(navigateToScene(BulkListing, { pageObject }, navigate))
           }
         } else {
           dispatch(setState(syncLoader, false))
@@ -309,9 +310,9 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader,n
       }
       else {
         if (!isBulk) {
-          dispatch(redirectToContainer(pageObject,navigate))
+          dispatch(redirectToContainer(pageObject, navigate))
         } else {
-          dispatch(navigateToScene(BulkListing, { pageObject },navigate))
+          dispatch(navigateToScene(BulkListing, { pageObject }, navigate))
         }
       }
     } catch (error) {
@@ -355,21 +356,21 @@ export function startFCM() {
         if (notif.opened_from_tray) {
           return
         }
-
-        if (Platform.OS === 'ios') {
-          switch (notif._notificationType) {
-            case NotificationType.Remote:
-              notif.finish(RemoteNotificationResult.NewData) // other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
-              break
-            case NotificationType.NotificationResponse:
-              notif.finish()
-              break
-            case NotificationType.WillPresent:
-              notif.finish(WillPresentNotificationResult.All) // other types available: WillPresentNotificationResult.None
-              break
+          if (Platform.OS === 'ios') {
+            switch (notif._notificationType) {
+              case NotificationType.Remote:
+                notif.finish(RemoteNotificationResult.NewData) // other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
+                break
+              case NotificationType.NotificationResponse:
+                notif.finish()
+                break
+              case NotificationType.WillPresent:
+                notif.finish(WillPresentNotificationResult.All) // other types available: WillPresentNotificationResult.None
+                break
+            }
           }
-        }
-      })
+        })
+        
       FCM.enableDirectChannel();
       FCM.on(FCMEvent.DirectChannelConnectionChanged, (data) => {
       });
@@ -461,7 +462,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, syncStoreDTO);
         // check if live job module is present
         const isLiveJobModulePresent = syncStoreDTO.pageList ? syncStoreDTO.pageList.filter((module) => module.screenTypeId == PAGE_LIVE_JOB).length > 0 : false
-        if(isLiveJobModulePresent) { 
+        if (isLiveJobModulePresent) {
           await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO)
         }
         if (isJobsPresent) {
@@ -470,7 +471,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
           }
           dispatch(fetchJobs())
         }
-       
+
       }
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
         unsyncedTransactionList: [],
@@ -487,6 +488,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       }
       return true;
     } catch (error) {
+      console.log('error', error)
       showToastAndAddUserExceptionLog(2706, JSON.stringify(error), 'danger', 0)
       let syncStatus = ''
       if (error.code == 500 || error.code == 502) {
@@ -518,7 +520,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
         syncRunning: false
       })
     }
-    
+
   }
 }
 
@@ -577,7 +579,7 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
         }))
         await logoutService.deleteDataBase()
         dispatch(deleteSessionToken())
-        dispatch(navigateToScene(LoginScreen))
+        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: LoginScreen })]))
       } else {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
@@ -657,13 +659,13 @@ export function resetFailCountInStore() {
 }
 
 
-export function restoreNewJobDraft(draftStatusInfo, restoreDraft,navigate) {
+export function restoreNewJobDraft(draftStatusInfo, restoreDraft, navigate) {
   return async function (dispatch) {
     try {
       if (restoreDraft) {
-        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft))
+        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft, null, null, null, navigate))
       } else {
-        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId,navigate))
+        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId, navigate))
       }
       dispatch(setState(SET_NEWJOB_DRAFT_INFO, {}))
     } catch (error) {

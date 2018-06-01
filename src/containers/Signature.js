@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, SafeAreaView } from 'react-native'
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SignatureRemarks from '../components/SignatureRemarks'
@@ -9,7 +10,7 @@ import renderIf from '../lib/renderIf'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import { Container, Content, Header, Left, Body, Icon, StyleProvider, Toast } from 'native-base'
+import { Container, Content, Header, Left, Body, Icon, StyleProvider, Toast, Footer, FooterTab } from 'native-base'
 import { SIGNATURE } from '../lib/AttributeConstants'
 import { OK, IMPROPER_SIGNATURE } from '../lib/ContainerConstants'
 
@@ -110,17 +111,19 @@ class Signature extends PureComponent {
         )
     }
     saveSignButton() {
-        return <TouchableOpacity style={[style.fabButton, { backgroundColor: styles.bgPrimaryColor }]}
-            onPress={this.saveSign} >
-            <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
-        </TouchableOpacity>
+        return (
+            <TouchableOpacity style={[style.fabButton, { backgroundColor: styles.bgPrimaryColor }]}
+                onPress={this.saveSign} >
+                <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
+            </TouchableOpacity>
+        )
     }
     render() {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     {this.headerView()}
-                    <View style={[styles.flex1, styles.row]}>
+                    <View style={[styles.flex1, styles.row, styles.bgWhite]}>
                         <View style={{ borderWidth: 1 }}>
                             {renderIf(this.props.fieldDataList.length > 0,
                                 <SignatureRemarks fieldDataList={this.props.fieldDataList} />
@@ -137,7 +140,11 @@ class Signature extends PureComponent {
                                 showTitleLabel={false}
                                 viewMode={this.state.isLandscape} />
                         </View>
-                        {this.saveSignButton()}
+                        <SafeAreaView style={[styles.bgWhite]}>
+                            <FooterTab>
+                                {this.saveSignButton()}
+                            </FooterTab>
+                        </SafeAreaView>
                     </View>
                 </Container>
             </StyleProvider >

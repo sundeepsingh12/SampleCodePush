@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, FlatList, Modal, SafeAreaView } from 'react-native'
+import { StyleSheet, View, FlatList, Modal } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Body, Icon, Footer, FooterTab, } from 'native-base'
 import { _id, } from '../lib/constants'
 import { SAVE, CONFIRM } from '../lib/ContainerConstants'
@@ -64,7 +65,7 @@ export default class DataStoreItemDetails extends PureComponent {
                         />
                     </Content>
                     <SafeAreaView style={[styles.bgWhite]}>
-                        <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
+                        <Footer style={{ backgroundColor: 'white' }}>
                             <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
                                 <Button success full style={{ backgroundColor: styles.bgPrimaryColor }}
                                     onPress={() => {

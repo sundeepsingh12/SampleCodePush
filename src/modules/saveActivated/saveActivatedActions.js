@@ -17,7 +17,7 @@ import {
     IS_COMPANY_CODE_DHL,
     EMAILID_VIEW_ARRAY,
     SHOULD_RELOAD_START,
-    SET_SAVE_ACTIVATED_DRAFT
+    SET_SAVE_ACTIVATED_DRAFT,
 } from '../../lib/constants'
 import _ from 'lodash'
 import { draftService } from '../../services/classes/DraftService'
@@ -53,7 +53,7 @@ export function addTransactionAndPopulateView(formLayoutState, recurringData, co
     }
 }
 
-export function checkout(previousFormLayoutState, recurringData, jobMasterId, commonData, statusId,navigate) {
+export function checkout(previousFormLayoutState, recurringData, jobMasterId, commonData, statusId, navigate) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_ACTIVE, true))
@@ -76,8 +76,8 @@ export function checkout(previousFormLayoutState, recurringData, jobMasterId, co
                 emailIdInFieldData,
                 contactNumberInFieldData
             },
-            navigate
-        ))
+                navigate
+            ))
             dispatch(fetchJobs());
         } catch (error) {
             showToastAndAddUserExceptionLog(2002, error.message, 'danger', 1)
@@ -124,7 +124,7 @@ export function storeState(saveActivatedState, screenName, jobMasterId, navigati
 }
 
 
-export function clearStateAndStore(jobMasterId,pop) {
+export function clearStateAndStore(jobMasterId, navigate) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_ACTIVE, true))
@@ -136,8 +136,8 @@ export function clearStateAndStore(jobMasterId,pop) {
                 jobId: -1
             }, jobMasterId)
             dispatch(setState(SAVE_ACTIVATED_INITIAL_STATE, {}))
-            // dispatch(navigateToScene(HomeTabNavigatorScreen, {},navigate))
-            pop(2)
+            dispatch(navigateToScene('Home', {}, navigate))
+            // pop(2)
 
         } catch (error) {
             showToastAndAddUserExceptionLog(2006, error.message, 'danger', 1)
@@ -178,7 +178,7 @@ export function checkIfDraftExists(jobMasterId) {
         }
     }
 }
-export function restoreDraft(draft, contactData, recurringData, jobMasterId, navigationFormLayoutStates) {
+export function restoreDraft(draft, contactData, recurringData, jobMasterId, navigationFormLayoutStates, navigate) {
     return async function (dispatch) {
         try {
             let cloneJobTransaction = {}
@@ -188,7 +188,7 @@ export function restoreDraft(draft, contactData, recurringData, jobMasterId, nav
             }
             cloneJobTransaction.jobId = cloneJobTransaction.id = --lastIndex
             cloneJobTransaction.jobMasterId = jobMasterId
-            dispatch(restoreDraftAndNavigateToFormLayout(contactData, cloneJobTransaction, draft, navigationFormLayoutStates))
+            dispatch(restoreDraftAndNavigateToFormLayout(contactData, cloneJobTransaction, draft, navigationFormLayoutStates, null, null, navigate))
             dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, {}))
         } catch (error) {
             console.log(error)

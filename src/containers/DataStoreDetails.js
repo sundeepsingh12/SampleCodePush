@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, FlatList, TouchableOpacity, Modal, SafeAreaView } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Text, Body, Icon, StyleProvider, } from 'native-base'
 import { _id } from '../lib/constants'
 import getTheme from '../../native-base-theme/components'

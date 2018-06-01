@@ -8,12 +8,14 @@ import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
 import DataStoreItemDetails from '../components/DataStoreItemDetails'
-import { StyleSheet, View, TouchableOpacity, FlatList, SafeAreaView } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { SET_DATA_STORE_ATTR_MAP, SET_SEARCH_TEXT, SHOW_DETAILS, _id, SET_INITIAL_STATE, QrCodeScanner, DISABLE_AUTO_START_SCANNER, SHOW_LOADER_DS } from '../lib/constants'
 import { FooterTab, Card, Container, Content, Button, Text, Footer, Toast } from 'native-base'
 import { EXTERNAL_DATA_STORE, } from '../lib/AttributeConstants'
 import _ from 'lodash'
 import { SUGGESTIONS, OK } from '../lib/ContainerConstants'
+import TitleHeader from '../components/TitleHeader'
 function mapStateToProps(state) {
     return {
         isSearchEnabled: state.dataStore.isSearchEnabled,
@@ -43,7 +45,7 @@ function mapDispatchToProps(dispatch) {
 class DataStore extends PureComponent {
 
     static navigationOptions = ({ navigation }) => {
-        return { header: null }
+        return { header: <TitleHeader pageName={navigation.state.params.currentElement.label} goBack={navigation.goBack} /> }
     }
 
     componentDidMount() {
@@ -261,7 +263,7 @@ class DataStore extends PureComponent {
             )
         }
         return (
-            < DataStoreItemDetails
+            <DataStoreItemDetails
                 selectedElement={this.props.dataStoreAttrValueMap[this.props.detailsVisibleFor]}
                 goBack={this.showDetails}
                 onSave={this.onSave} />

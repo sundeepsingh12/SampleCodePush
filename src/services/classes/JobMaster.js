@@ -141,14 +141,15 @@ class JobMaster {
       throw ({ errorCode: MAJOR_VERSION_OUTDATED, downloadUrl: json.androidDownloadUrl })
     }
     const minorPatchVersion = json.minorPatchVersion
-    if (minorPatchVersion) {
+
+     //Check if minor or patch version from server is greater than current minor/patch version installed in phone
+    if (parseInt(json.applicationVersion) == packageJsonMajorVersion && minorPatchVersion) {
       const [minorVersionFromServer, patchVersionFromServer] = minorPatchVersion.split('.')
       const [appMajorVersion, appMinorVersion, appPatchVersion] = APP_VERSION_NUMBER.split('.')
-      //Check if minor or patch version from server is greater than current minor/patch version installed in phone
-      if ((packageJsonMajorVersion == parseInt(json.applicationVersion)) && parseInt(minorVersionFromServer) > parseInt(appMinorVersion) || parseInt(patchVersionFromServer) > parseInt(appPatchVersion)) {
+      if (parseInt(minorVersionFromServer) > parseInt(appMinorVersion) || parseInt(patchVersionFromServer) > parseInt(appPatchVersion)) {
         throw ({ errorCode: MINOR_PATCH_OUTDATED, androidDeploymentKey: json.androidDeployementKey, iosDeploymentKey: json.iosDeployementKey })
-      }
     }
+  }
 
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);

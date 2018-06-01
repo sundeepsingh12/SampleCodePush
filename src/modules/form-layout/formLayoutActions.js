@@ -35,7 +35,7 @@ import { formLayoutService } from '../../services/classes/formLayout/FormLayout.
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 import { NavigationActions } from 'react-navigation'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog,resetNavigationState } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobStatusService } from '../../services/classes/JobStatus'
 
@@ -128,7 +128,7 @@ export function updateFieldData(attributeId, value, formLayoutState, jobTransact
     }
 }
 
-export function updateFieldDataWithChildData(attributeMasterId, formLayoutState, value, fieldDataListObject, jobTransaction, modalPresent, containerValue,goBack) {
+export function updateFieldDataWithChildData(attributeMasterId, formLayoutState, value, fieldDataListObject, jobTransaction, modalPresent, containerValue, goBack) {
     return function (dispatch) {
         try {
             const cloneFormElement = _.cloneDeep(formLayoutState.formElement)
@@ -172,7 +172,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails,navigate,goBack) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack) {
     return async function (dispatch) {
         try {
             let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
@@ -196,15 +196,16 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         dispatch(setState(SET_LANDING_TAB, { landingTabId }))
                         dispatch(pieChartCount())
                         // dispatch(NavigationActions.back({ key: taskListScreenDetails.jobDetailsScreenKey }))
-                        goBack(taskListScreenDetails.jobDetailsScreenKey )
-                        
+                        goBack(taskListScreenDetails.jobDetailsScreenKey)
+                        dispatch(fetchJobs())
+                        dispatch(setState(CLEAR_FORM_LAYOUT))
                     } else if (routeName == TabScreen) {
                         dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
+                        dispatch(fetchJobs())
+                        dispatch(setState(CLEAR_FORM_LAYOUT))
                     } else {
-                        dispatch(navigateToScene(routeName, routeParam,navigate))
+                        dispatch(navigateToScene(routeName, routeParam, navigate))
                     }
-                    dispatch(fetchJobs())
-                    dispatch(setState(CLEAR_FORM_LAYOUT))
                 } else {
                     dispatch(setState(SET_FORM_INVALID_AND_FORM_ELEMENT, {
                         isLoading: false,
@@ -289,7 +290,7 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formLayoutState, v
     }
 }
 
-export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction, draft, navgiationStateForSaveActivated, pageObjectAdditionalParams, jobDetailsScreenKey,navigate) {
+export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction, draft, navgiationStateForSaveActivated, pageObjectAdditionalParams, jobDetailsScreenKey, navigate) {
     return async function (dispatch) {
         try {
             let draftRestored = draftService.getFormLayoutStateFromDraft(draft)
@@ -318,7 +319,7 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                 isDraftRestore: true,
                 pageObjectAdditionalParams,
                 jobDetailsScreenKey
-            },navigate))
+            }, navigate))
         } catch (error) {
             showToastAndAddUserExceptionLog(1013, error.message, 'danger', 1)
         }

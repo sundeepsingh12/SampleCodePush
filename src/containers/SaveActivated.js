@@ -6,7 +6,8 @@ import * as globalActions from '../modules/global/globalActions'
 import * as saveActivatedActions from '../modules/saveActivated/saveActivatedActions'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
-import { StyleSheet, View, TouchableOpacity, FlatList, Alert, SafeAreaView } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, FlatList, Alert } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Body, Right, Icon, List, ListItem, StyleProvider, Footer, FooterTab } from 'native-base';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
@@ -93,7 +94,7 @@ class SaveActivated extends PureComponent {
                 recurringData: this.props.recurringData,
             }
         },
-    this.props.navigation.push)
+            this.props.navigation.push)
     }
 
     navigateToFormLayout = (statusId, statusName) => {
@@ -112,12 +113,12 @@ class SaveActivated extends PureComponent {
             jobMasterId: this.props.navigation.state.params.jobMasterId,
             navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
         },
-        this.props.navigation.push
-    )
+            this.props.navigation.push
+        )
     }
 
     _discard = () => {
-        this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId,this.props.navigation.pop)
+        this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId, this.props.navigation.navigate)
     }
 
     _goBack = () => {
@@ -243,11 +244,11 @@ class SaveActivated extends PureComponent {
             navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
             editableFormLayoutState: this.props.recurringData[itemId].formLayoutState
         },
-        this.props.navigation.navigate
-    )
+            this.props.navigation.navigate
+        )
     }
     draftOkPress = () => {
-        this.props.actions.restoreDraft(this.props.draftStatusInfo, this.props.navigation.state.params.contactData, this.props.recurringData, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.navigationFormLayoutStates)
+        this.props.actions.restoreDraft(this.props.draftStatusInfo, this.props.navigation.state.params.contactData, this.props.recurringData, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.navigationFormLayoutStates, this.props.navigation.push)
     }
     draftModal() {
         if (!_.isEmpty(this.props.draftStatusInfo)) {

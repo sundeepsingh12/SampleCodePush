@@ -4,7 +4,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Alert, SectionList, SafeAreaView } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Alert, SectionList } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import Loader from '../components/Loader'
 import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, Footer, FooterTab, StyleProvider, Toast, Separator } from 'native-base'
 import getTheme from '../../native-base-theme/components'
@@ -60,22 +61,22 @@ class Menu extends PureComponent {
 
   getUnsyncTransactionPresentAlert() {
     if (this.props.isUnsyncTransactionOnLogout) {
-      
+
       return Alert.alert(LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
-        [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, {isUnsyncTransactionOnLogout : false, isLoggingOut : false}), style: 'cancel' },
+        [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, { isUnsyncTransactionOnLogout: false, isLoggingOut: false }), style: 'cancel' },
         {
           text: OK, onPress: () => {
-            this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, {isUnsyncTransactionOnLogout : false, isLoggingOut : true})
+            this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, { isUnsyncTransactionOnLogout: false, isLoggingOut: true })
             this.props.actions.invalidateUserSession(false)
           }
         },],
         { cancelable: false })
     }
   }
-  
+
   renderMenuHeader() {
     return (
-      <SafeAreaView>
+      <SafeAreaView style={[styles.bgWhite]}>
         <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
           <Body>
             <View
@@ -93,7 +94,7 @@ class Menu extends PureComponent {
 
   getPageView(page) {
     return (
-      <TouchableOpacity key={page.id} onPress={() => this.props.actions.navigateToPage(page,this.props.navigation.navigate)}>
+      <TouchableOpacity key={page.id} onPress={() => this.props.actions.navigateToPage(page, this.props.navigation.navigate)}>
         <View style={[styles.bgWhite, styles.borderBottomGray]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             <View style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter]}>
@@ -145,7 +146,7 @@ class Menu extends PureComponent {
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
           {this.getUnsyncTransactionPresentAlert()}
-          {((this.props.isLoggingOut && _.isEmpty(this.props.errorMessage_403_400_Logout)) ?  <Loader /> : 
+          {((this.props.isLoggingOut && _.isEmpty(this.props.errorMessage_403_400_Logout)) ? <Loader /> :
             <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
               {this.getPageListItemsView()}
               {this.renderLogoutView()}

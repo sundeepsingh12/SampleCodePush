@@ -69,8 +69,8 @@ class ArrayFieldAttribute extends PureComponent {
                 jobTransaction={this.props.navigation.state.params.jobTransaction}
                 jobStatusId={this.props.jobStatusId}
                 arrayFieldAttributeMasterId={this.props.navigation.state.params.currentElement.fieldAttributeMasterId}
-                navigate = {this.props.navigation.navigate}
-                goBack = {this.props.navigation.goBack}
+                navigate={this.props.navigation.navigate}
+                goBack={this.props.navigation.goBack}
             />
         )
     }
@@ -152,8 +152,8 @@ class ArrayFieldAttribute extends PureComponent {
                     {renderIf(this.props.errorMessage != '',
                         <CustomAlert title='Alert' message={this.props.errorMessage} onOkPressed={this.backPressed} />
                     )}
-                    {this.getLoader()}
                     <Content style={[styles.flex1, styles.bgWhite]}>
+                        {this.getLoader()}
                         {this.getListView()}
                     </Content>
                     <Footer
