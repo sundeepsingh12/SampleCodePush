@@ -68,7 +68,7 @@ export function hitOtpUrlToGetOtp(contactNumber, walletParameters, selectedWalle
     }
 }
 
-export function hitPaymentUrlforPayment(contactNumber, walletParameters, selectedWalletDetails, actualAmount, jobTransaction, otpNumber, navigationParams) {
+export function hitPaymentUrlforPayment(contactNumber, walletParameters, selectedWalletDetails, actualAmount, jobTransaction, otpNumber, navigationParams,navigate) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 4))
@@ -86,7 +86,7 @@ export function hitPaymentUrlforPayment(contactNumber, walletParameters, selecte
             if (_.isEqual(responseMessage.message, 'Transaction Successfull')) {
                 paymentService.addPaymentObjectToDetailsArray(actualAmount, 14, responseMessage.transId, selectedWalletDetails.code, responseMessage, formLayoutState)
                 Toast.show({ text: 'payment successful', position: 'bottom', buttonText: 'OK', duration: 10000 })
-                dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails))
+                dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails,navigate))
             }
         } catch (error) {
             dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, {

@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, FlatList, TouchableOpacity, Modal, SafeAreaView } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Left, Body, Right, Item, Input, Icon, List, Label, ListItem, StyleProvider, Footer, FooterTab, Toast, } from 'native-base';
 import { Print, Receipt, SMS, TotalAmount, CONTACT_NUMBER_TO_SEND_SMS, SET_SAVE_ACTIVATED_TOAST_MESSAGE, EMAILID_VIEW_ARRAY, USER, RETURN_TO_HOME, } from '../lib/constants'
 import { EMAIL, Return_To_Home, View_SignOff_Summary, View_Parcel_Summary, Sign_Off_Summary, REGEX_TO_CHECK_PHONE_NUMBER } from '../lib/AttributeConstants'
@@ -353,7 +354,7 @@ class CheckoutDetails extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <SafeAreaView>
+                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
                         <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
                             <Body>
                                 <View
@@ -416,11 +417,11 @@ class CheckoutDetails extends PureComponent {
                             </List>
                         </View>)}
                     </Content>
-                    <SafeAreaView>
+                    <SafeAreaView style = {[styles.bgWhite]}>
                         <Footer style={[style.footer]}>
                             <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
                                 <Button onPress={() => {
-                                    this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId)
+                                    this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId, this.props.navigation.navigate)
                                 }}>
                                     <Text style={[{ color: styles.fontPrimaryColor }, styles.fontDefault]}>{Return_To_Home}</Text>
                                 </Button>
@@ -458,7 +459,6 @@ const style = StyleSheet.create({
         padding: 15
     },
     footer: {
-        height: 'auto',
         backgroundColor: '#ffffff',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',

@@ -242,6 +242,7 @@ module.exports = {
     SKIP_SKU_MESSAGE: 'Skipping this attribute, not allowed in new job',
     RESULT_NOT_FOUND: 'No result found for your search',
     ACTUAL_QUANTITY_INPUT_ERROR: 'Please enter valid quantity',
+    SKU: 'SKU',
 
     //Array
     ADD: 'Add',
@@ -380,13 +381,13 @@ module.exports = {
     MOSAMBEE_WALLET: 'Mosambee Wallet',
     PAYMENT: 'Payment',
     SELECT_PREFERRED_METHOD: 'Select Preferred method',
-    ENTER_OTP_SENT_TO_MOBILE_NO:'Enter One Time Password (OTP) Sent to Mobile Number ',
-    CHANGE_MOBILE_NO:'Change Mobile Number',
-    ENTER_OTP_SENT_TO_CUSTOMER:'Enter OTP Sent to Customer',
-    RESEND_OTP:'Resend OTP',
-    ENTER_OTP:'Enter OTP',
-    ENTER_REGISTERED:'Enter Registered ',
-    TOTAL_AMOUNT_FOR_WALLET:'Total Amount',
+    ENTER_OTP_SENT_TO_MOBILE_NO: 'Enter One Time Password (OTP) Sent to Mobile Number ',
+    CHANGE_MOBILE_NO: 'Change Mobile Number',
+    ENTER_OTP_SENT_TO_CUSTOMER: 'Enter OTP Sent to Customer',
+    RESEND_OTP: 'Resend OTP',
+    ENTER_OTP: 'Enter OTP',
+    ENTER_REGISTERED: 'Enter Registered ',
+    TOTAL_AMOUNT_FOR_WALLET: 'Total Amount',
 
     //TaskListCalender
     ALL: 'All',
@@ -445,4 +446,5 @@ module.exports = {
     //FCM
     FCM_REGISTRATION_ERROR: 'FCM Permission Denied',
     APNS_TOKEN_ERROR: 'APNS Token Registration Error',
+    FCM_PERMISSION_DENIED: 'FCM Request Access Denied'
 }

@@ -69,7 +69,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
     }
 }
 
-export function getJobDetails(jobTransactionId) {
+export function getJobDetails(jobTransactionId,navigate) {
     return async function (dispatch) {
         try {
             dispatch(startFetchingJobDetails())
@@ -85,7 +85,7 @@ export function getJobDetails(jobTransactionId) {
             const draftStatusInfo = draftService.getDraftForState(details.jobTransactionDisplay, null)
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, (statusCategory == 1), jobExpiryTime, draftStatusInfo && jobMaster[0].enableLiveJobMaster))
-            if (draftStatusInfo && jobMaster[0].enableLiveJobMaster) dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(null, jobMaster))
+            if (draftStatusInfo && jobMaster[0].enableLiveJobMaster) dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(null, jobMaster,navigate))
         } catch (error) {
             showToastAndAddUserExceptionLog(1101, error.message, 'danger', 0)
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
@@ -118,7 +118,7 @@ export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, j
  *
  */
 
-export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditionalParams) {
+export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditionalParams,goBack) {
     return async function (dispatch) {
         try {
             dispatch(startFetchingJobDetails());
@@ -132,7 +132,8 @@ export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditiona
             dispatch(performSyncService())
             dispatch(pieChartCount())
             dispatch(fetchJobs())
-            dispatch(NavigationActions.back())
+            // dispatch(NavigationActions.back())
+            goBack()
             //} else { dispatch(navigation.goBack()) }
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
         } catch (error) {
@@ -150,7 +151,7 @@ export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditiona
  * It check that user location and job location are far than 100m or less 
  *
  */
-export function checkForLocationMismatch(data, currentStatusCategory) {
+export function checkForLocationMismatch(data, currentStatusCategory,navigate) {
     return async function (dispatch) {
         try {
             const FormLayoutData = { contactData: data.contactData, jobTransactionId: data.jobTransaction.id, jobTransaction: data.jobTransaction, statusId: data.statusList.id, statusName: data.statusList.name, jobMasterId: data.jobTransaction.jobMasterId, pageObjectAdditionalParams: data.pageObjectAdditionalParams, jobDetailsScreenKey: data.jobDetailsScreenKey }
@@ -160,7 +161,7 @@ export function checkForLocationMismatch(data, currentStatusCategory) {
             if ((jobMaster[0].enableLocationMismatch) && currentStatusCategory == 1 && (nextStatusCategory == 2 || nextStatusCategory == 3) && jobDetailsService.checkLatLong(data.jobTransaction.jobId, userSummary.value.lastLat, userSummary.value.lastLng)) {
                 dispatch(setState(IS_MISMATCHING_LOCATION, { id: data.statusList.id, name: data.statusList.name }))
             } else {
-                dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutData, jobMaster))
+                dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutData, jobMaster,navigate))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1104, error.message, 'danger', 1)
@@ -168,7 +169,7 @@ export function checkForLocationMismatch(data, currentStatusCategory) {
     }
 }
 
-export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutData, jobMaster) {
+export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutData, jobMaster,navigate) {
     return async function (dispatch) {
         try {
             const jobMasterValue = (!jobMaster) ? await jobMasterService.getJobMasterFromJobMasterList(FormLayoutData.jobMasterId) : jobMaster
@@ -177,14 +178,14 @@ export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutDa
                 let message = await dispatch(performSyncService())
                 if (message === true) {
                     dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))
-                    if (!_.isEmpty(FormLayoutData)) dispatch(navigateToScene('FormLayout', FormLayoutData))
+                    if (!_.isEmpty(FormLayoutData)) dispatch(navigateToScene('FormLayout', FormLayoutData,navigate))
                 } else {
                     dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT, false))
                     alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
                 }
             }
             else if (!_.isEmpty(FormLayoutData)) {
-                dispatch(navigateToScene('FormLayout', FormLayoutData))
+                dispatch(navigateToScene('FormLayout', FormLayoutData,navigate))
             }
         } catch (error) {
             dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))

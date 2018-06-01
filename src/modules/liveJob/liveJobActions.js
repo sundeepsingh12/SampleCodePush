@@ -2,7 +2,7 @@
 
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { NavigationActions } from 'react-navigation'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '..//global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '..//global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { liveJobService } from '../../services/classes/LiveJobService'
 import * as realm from '../../repositories/realmdb'
@@ -59,7 +59,7 @@ export function endFetchingJobDetails(jobDataList, currentStatus, jobTransaction
         }
     }
 }
-export function acceptOrRejectJob(status, job, liveJobList) {
+export function acceptOrRejectJob(status, job, liveJobList,goBack) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LIVE_JOB_LOADER, true))
@@ -69,7 +69,8 @@ export function acceptOrRejectJob(status, job, liveJobList) {
                 dispatch(setState(SET_MESSAGE, serverResponse.toastMessage))
             }
             dispatch(fetchAllLiveJobsList())
-            dispatch(NavigationActions.back())
+            // dispatch(NavigationActions.back())
+            goBack()
         } catch (error) {
             dispatch(setState(SET_LIVE_JOB_LOADER, false))
             showToastAndAddUserExceptionLog(1202, error.message, 'danger', 1)

@@ -17,11 +17,11 @@ import {
 } from '../../lib/AttributeConstants'
 import { showToastAndAddUserExceptionLog, setState } from '../global/globalActions'
 
-export function saveSignature(result, fieldAttributeMasterId, formLayoutState, jobTransaction) {
+export function saveSignature(result, fieldAttributeMasterId, formLayoutState, jobTransaction,goBack) {
     return async function (dispatch) {
         try {
             const value = await signatureService.saveFile(result, moment())
-            dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
+            dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction,null,null,goBack))
         } catch (error) {
             showToastAndAddUserExceptionLog(2101, error.message, 'danger', 1)
         }
@@ -40,13 +40,13 @@ export function getRemarksList(currentElement, formElement) {
     }
 }
 
-export function saveSignatureAndRating(result, rating, currentElement, formLayoutState, jobTransaction) {
+export function saveSignatureAndRating(result, rating, currentElement, formLayoutState, jobTransaction,goBack) {
     return async function (dispatch) {
         try {
             const signatureValue = await signatureService.saveFile(result, moment())
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             const fieldDataListObject = signatureService.prepareSignAndNpsFieldData(signatureValue, rating, currentElement, fieldAttributeMasterList, jobTransaction.id, formLayoutState.latestPositionId)
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction,null,null,goBack))
         } catch (error) {
             showToastAndAddUserExceptionLog(2104, error.message, 'danger', 1)
         }

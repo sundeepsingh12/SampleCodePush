@@ -71,7 +71,7 @@ import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, setState, showToastAndAddUserExceptionLog, resetNavigationState, resetApp, navigateToScene } from '../global/globalActions'
+import { deleteSessionToken, setState, showToastAndAddUserExceptionLog, resetNavigationState, resetApp } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
 import { NavigationActions } from 'react-navigation'
@@ -116,7 +116,7 @@ export function invalidateUserSession(isPreLoader, calledFromAutoLogout) {
       const isPreLoaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       let response = await authenticationService.logout(calledFromAutoLogout, isPreLoaderComplete) // create backup, hit logout api and delete dataBase
       dispatch(setState(PRE_LOGOUT_SUCCESS))
-      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+      dispatch(resetNavigationState(0,[NavigationActions.navigate({routeName: LoginScreen})]))
       dispatch(deleteSessionToken())
     } catch (error) {
       showToastAndAddUserExceptionLog(1803, error.message, 'danger', 1)
@@ -164,7 +164,7 @@ export function startLoginScreenWithoutLogout() {
       dispatch(setState(PRE_LOGOUT_SUCCESS))
       await logoutService.deleteDataBase()
       dispatch(deleteSessionToken())
-      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+      dispatch(resetNavigationState(0,[NavigationActions.navigate({routeName: LoginScreen})]))
     } catch (error) {
       showToastAndAddUserExceptionLog(1805, error.message, 'danger', 1)
     }
@@ -176,7 +176,8 @@ export function checkForUnsyncBackupFilesAndNavigate(user) {
     try {
       let unsyncBackupFilesList = await backupService.checkForUnsyncBackup(user)
       if (unsyncBackupFilesList.length > 0) {
-        dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
+        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: UnsyncBackupUpload })]))
+        
       } else {
         dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
       }

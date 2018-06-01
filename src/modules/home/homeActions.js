@@ -96,7 +96,7 @@ import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieC
 import { trackingService } from '../../services/classes/Tracking'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { userEventLogService } from '../../services/classes/UserEvent'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog, deleteSessionToken, resetNavigationState } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
 import { NetInfo, Alert, Platform } from 'react-native'
@@ -114,10 +114,11 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions'
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
-import FCM, { NotificationActionType, FCMEvent } from "react-native-fcm"
+import FCM, { NotificationActionType, FCMEvent, NotificationType, RemoteNotificationResult, WillPresentNotificationResult } from "react-native-fcm"
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster';
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR } from '../../lib/ContainerConstants'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR,FCM_PERMISSION_DENIED,OK } from '../../lib/ContainerConstants'
+
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -177,22 +178,22 @@ export function fetchPagesAndPiechart() {
  *  }
 */
 //TODO Move this to Globalfunction if feasible
-export function navigateToPage(pageObject) {
+export function navigateToPage(pageObject, navigationProps) {
   return async function (dispatch) {
     try {
       switch (pageObject.screenTypeId) {
         case PAGE_BACKUP:
-          dispatch(navigateToScene(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' }));
+          dispatch(navigateToScene(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' }, navigationProps));
           break;
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
-          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
+          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING, navigationProps))
           break;
         }
         case PAGE_CUSTOM_WEB_PAGE:
           let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
-          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (customRemarks.length) ? customRemarks[0].customUrl : null })) : dispatch(customAppSelection(customRemarks))
+          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null },navigationProps)) : dispatch(customAppSelection(customRemarks,navigationProps))
           break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -201,41 +202,42 @@ export function navigateToPage(pageObject) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          dispatch(navigateToScene(LiveJobs, { pageObject }));
+          dispatch(navigateToScene(LiveJobs, { pageObject }, navigationProps));
           break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_MSWIPE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_NEW_JOB: {
-          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING))
+          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING, navigationProps))
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
-          dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' }))
+          dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' }, navigationProps))
           break;
         case PAGE_OUTSCAN:
-          dispatch(navigateToScene(PostAssignmentScanner, { pageObject }))
+          dispatch(navigateToScene(PostAssignmentScanner, { pageObject }, navigationProps))
+
           break
         case PAGE_PAYNEAR_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PICKUP:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PROFILE:
-          dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' }))
+          dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' }, navigationProps))
           break;
         case PAGE_SEQUENCING: {
-          dispatch(getRunsheetsForSequence(pageObject));
+          dispatch(getRunsheetsForSequence(pageObject, navigationProps));
           break;
         }
         case PAGE_SORTING_PRINTING:
-          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' }))
+          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' }, navigationProps))
           break;
         case PAGE_STATISTICS:
-          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' }))
+          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' }, navigationProps))
           break;
         case PAGE_TABS:
-          dispatch(navigateToScene(TabScreen, { pageObject }));
+          dispatch(navigateToScene(TabScreen, { pageObject }, navigationProps));
           break;
         default:
           throw new Error("Unknown page type " + pageObject.screenTypeId + ". Contact support");
@@ -246,7 +248,7 @@ export function navigateToPage(pageObject) {
   }
 }
 
-export function customAppSelection(appModule) {
+export function customAppSelection(appModule, navigationProps) {
   return async function (dispatch) {
     try {
       let BUTTONS = appModule.map(id => !(id.title) ? 'URL' : id.title)
@@ -259,7 +261,7 @@ export function customAppSelection(appModule) {
           destructiveButtonIndex: BUTTONS.length - 1
         },
         buttonIndex => {
-          (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? dispatch(navigateToScene(CustomApp, { customUrl: appModule[buttonIndex].customUrl })) : null
+          (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? dispatch(navigateToScene(CustomApp, { customUrl: appModule[buttonIndex].customUrl }, navigationProps)) : null
         }
       )
     } catch (error) {
@@ -288,7 +290,7 @@ export function checkCustomErpPullActivated() {
   }
 }
 
-export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) {
+export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader, navigate) {
   return async function (dispatch) {
     try {
       if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
@@ -297,9 +299,9 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) 
         if (message === true) {
           dispatch(setState(syncLoader, false))
           if (!isBulk) {
-            dispatch(redirectToContainer(pageObject))
+            dispatch(redirectToContainer(pageObject, navigate))
           } else {
-            dispatch(navigateToScene(BulkListing, { pageObject }))
+            dispatch(navigateToScene(BulkListing, { pageObject }, navigate))
           }
         } else {
           dispatch(setState(syncLoader, false))
@@ -308,9 +310,9 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) 
       }
       else {
         if (!isBulk) {
-          dispatch(redirectToContainer(pageObject))
+          dispatch(redirectToContainer(pageObject, navigate))
         } else {
-          dispatch(navigateToScene(BulkListing, { pageObject }))
+          dispatch(navigateToScene(BulkListing, { pageObject }, navigate))
         }
       }
     } catch (error) {
@@ -335,32 +337,12 @@ export function startTracking(trackingServiceStarted) {
 
 export function startFCM() {
   return async function (dispatch) {
+    try{
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (token && token.value) {
-      const userObject = await keyValueDBService.getValueFromStore(USER)
-      const topic = `FE_${userObject.value.id}`
-      await FCM.requestPermissions()
 
-      FCM.getFCMToken().then(async fcmToken => {
-        console.log('fcmToken', fcmToken)
-        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
-        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
-      }, (error) => {
-      }).catch(
-        () => Toast.show({ text: FCM_REGISTRATION_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }))
-
-      if (Platform.OS === 'ios') {
-        FCM.getAPNSToken().then(token => {
-        }).catch(() => Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
-      }
-
-      FCM.getInitialNotification().then(notif => {
-        console.log('notif 111>>' + JSON.stringify(notif))
-      }, (err) => {
-      })
-
+      //these callback will be triggered only when app is foreground or background
       FCM.on(FCMEvent.Notification, notif => {
-
         if (notif.Notification == 'Android push notification') {
           dispatch(performSyncService(true))
         }
@@ -374,22 +356,55 @@ export function startFCM() {
         if (notif.opened_from_tray) {
           return
         }
-
-        if (Platform.OS === 'ios') {
-          switch (notif._notificationType) {
-            case NotificationType.Remote:
-              notif.finish(RemoteNotificationResult.NewData) // other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
-              break
-            case NotificationType.NotificationResponse:
-              notif.finish()
-              break
-            case NotificationType.WillPresent:
-              notif.finish(WillPresentNotificationResult.All) // other types available: WillPresentNotificationResult.None
-              break
+          if (Platform.OS === 'ios') {
+            switch (notif._notificationType) {
+              case NotificationType.Remote:
+                notif.finish(RemoteNotificationResult.NewData) // other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
+                break
+              case NotificationType.NotificationResponse:
+                notif.finish()
+                break
+              case NotificationType.WillPresent:
+                notif.finish(WillPresentNotificationResult.All) // other types available: WillPresentNotificationResult.None
+                break
+            }
           }
-        }
-      })
+        })
+        
+      FCM.enableDirectChannel();
+      FCM.on(FCMEvent.DirectChannelConnectionChanged, (data) => {
+      });
+      setTimeout(function() {
+        FCM.isDirectChannelEstablished().then(d =>  {});
+      }, 1000);
 
+      FCM.getInitialNotification().then(notif => {
+      });
+      try {
+        let result = await FCM.requestPermissions({
+          badge: false,
+          sound: true,
+          alert: true
+        });
+      } catch (e) {
+        showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED, 'danger', 1)
+      }
+      const userObject = await keyValueDBService.getValueFromStore(USER)
+      const topic = `FE_${userObject.value.id}`
+
+      FCM.getFCMToken().then(async fcmToken => {
+        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+
+      }, (error) => {
+      }).catch( () =>  showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR, 'danger', 1))
+      
+          if (Platform.OS === 'ios') {
+            FCM.getAPNSToken().then(token => {
+            }).catch(() =>  showToastAndAddUserExceptionLog(2718, APNS_TOKEN_ERROR, 'danger', 1))
+          }
+
+       // fcm token may not be available on first load, catch it here
       FCM.on(FCMEvent.RefreshToken, async fcmToken => {
         await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
         await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
@@ -400,6 +415,9 @@ export function startFCM() {
     else {
       Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
     }
+  }catch(error){
+    showToastAndAddUserExceptionLog(2715, error.message, 'danger', 1)    
+  }
   }
 }
 
@@ -444,7 +462,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, syncStoreDTO);
         // check if live job module is present
         const isLiveJobModulePresent = syncStoreDTO.pageList ? syncStoreDTO.pageList.filter((module) => module.screenTypeId == PAGE_LIVE_JOB).length > 0 : false
-        if(isLiveJobModulePresent) { 
+        if (isLiveJobModulePresent) {
           await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO)
         }
         if (isJobsPresent) {
@@ -453,9 +471,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
           }
           dispatch(fetchJobs())
         }
-        // if (isLiveJob) {
-        //   dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
-        // }
+
       }
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
         unsyncedTransactionList: [],
@@ -472,7 +488,8 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       }
       return true;
     } catch (error) {
-      showToastAndAddUserExceptionLog(2706, error.message, 'danger', 0)
+      console.log('error', error)
+      showToastAndAddUserExceptionLog(2706, JSON.stringify(error), 'danger', 0)
       let syncStatus = ''
       if (error.code == 500 || error.code == 502) {
         syncStatus = 'INTERNALSERVERERROR'
@@ -503,6 +520,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
         syncRunning: false
       })
     }
+
   }
 }
 
@@ -522,7 +540,6 @@ export function syncService() {
       }, timeInterval * 1000)
     } catch (error) {
       //Update UI here
-      console.log(error)
     }
   }
 }
@@ -562,7 +579,7 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
         }))
         await logoutService.deleteDataBase()
         dispatch(deleteSessionToken())
-        dispatch(navigateToScene(LoginScreen))
+        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: LoginScreen })]))
       } else {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
@@ -642,13 +659,13 @@ export function resetFailCountInStore() {
 }
 
 
-export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
+export function restoreNewJobDraft(draftStatusInfo, restoreDraft, navigate) {
   return async function (dispatch) {
     try {
       if (restoreDraft) {
-        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft))
+        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft, null, null, null, navigate))
       } else {
-        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId))
+        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId, navigate))
       }
       dispatch(setState(SET_NEWJOB_DRAFT_INFO, {}))
     } catch (error) {

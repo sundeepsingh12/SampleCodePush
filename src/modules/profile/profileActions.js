@@ -49,7 +49,7 @@ export function fetchUserList() {
  * @param {*} newPassword // sets new password
  * @param {*} confirmNewPassword // sets confirm new password
  */
-export function checkAndResetPassword(currentPassword, newPassword, confirmNewPassword) {
+export function checkAndResetPassword(currentPassword, newPassword, confirmNewPassword,goBack) {
     return async function (dispatch) {
         try {
             dispatch(setState(IS_PROFILE_LOADING, true))
@@ -61,7 +61,7 @@ export function checkAndResetPassword(currentPassword, newPassword, confirmNewPa
             await keyValueDBService.validateAndSaveData(PASSWORD, sha256(newPassword)) // new password gets saved after the response status is checked
             Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', buttonText: OK, duration: 6000 })
             dispatch(setState(CLEAR_PASSWORD_TEXTINPUT))
-            dispatch(NavigationActions.back())  // automatically goes on the previous screen.
+            goBack()
         } catch (error) {
             showToastAndAddUserExceptionLog(1902, error.message, 'danger', 1)
         } finally {
