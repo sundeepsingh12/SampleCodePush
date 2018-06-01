@@ -336,28 +336,29 @@ export function startTracking(trackingServiceStarted) {
 
 export function startFCM() {
   return async function (dispatch) {
-    try {
-      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-      if (token && token.value) {
-        const userObject = await keyValueDBService.getValueFromStore(USER)
-        const topic = `FE_${userObject.value.id}`
-        FCM.requestPermissions()
-          .then(e => {
-            FCM.getFCMToken().then(async fcmToken => {
-              await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
-              await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
-              if (Platform.OS === 'ios') {
-                FCM.getAPNSToken().then(token => {
-                }).catch(() => Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
-              }
-            }, (error) => {
-            }).catch(
-              () => Toast.show({ text: FCM_REGISTRATION_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }))
-          })
-          .catch(() => Toast.show({ text: FCM_PERMISSION_DENIED, type: 'danger', position: 'bottom', buttonText: OK, duration: 6000 }))
-        FCM.getInitialNotification().then(notif => {
-        }, (err) => {
-        })
+    try{
+    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+    if (token && token.value) {
+      const userObject = await keyValueDBService.getValueFromStore(USER)
+      const topic = `FE_${userObject.value.id}`
+      FCM.requestPermissions()
+      .then(e =>{
+        FCM.getFCMToken().then(async fcmToken => {
+          await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+          await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+          if (Platform.OS === 'ios') {
+            FCM.getAPNSToken().then(token => {
+            }).catch(() => Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
+          }
+        }, (error) => {
+        }).catch(
+          () => Toast.show({ text: FCM_REGISTRATION_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }))
+      } )
+      .catch(() =>  Toast.show({ text: FCM_PERMISSION_DENIED , type: 'danger', position: 'bottom', buttonText: OK, duration: 6000 }))
+      
+      FCM.getInitialNotification().then(notif => {
+      }, (err) => {
+      })
 
         FCM.on(FCMEvent.Notification, notif => {
           console.log('receive noti', notif)
