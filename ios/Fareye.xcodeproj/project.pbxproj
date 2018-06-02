@@ -24,6 +24,7 @@
 		140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		15925B0D560B4327B54D8D34 /* libBVLinearGradient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F5BDB0DBAA64E9DA404CDA8 /* libBVLinearGradient.a */; };
+		1C197DEC20C24BE90080F881 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 1C197DEA20C248D20080F881 /* main.jsbundle */; };
 		1C1D77E71FF7D9B7003594E2 /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C1D77DA1FF68FA3003594E2 /* libRCTPushNotification.a */; };
 		1C90270E20A5546B00742D7E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1C90270D20A5546B00742D7E /* GoogleService-Info.plist */; };
 		1E5E746C01DE4344A905B2F5 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7BAFBD90623D46009E6F04FE /* OFL.txt */; };
@@ -615,7 +616,6 @@
 
 /* Begin PBXFileReference section */
 		008982B26F1B499D8B5103E9 /* libRNFIRMessaging.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFIRMessaging.a; sourceTree = "<group>"; };
-		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTActionSheet.xcodeproj; path = "../node_modules/react-native/Libraries/ActionSheetIOS/RCTActionSheet.xcodeproj"; sourceTree = "<group>"; };
 		00C302B51ABCB90400DB3ED1 /* RCTGeolocation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTGeolocation.xcodeproj; path = "../node_modules/react-native/Libraries/Geolocation/RCTGeolocation.xcodeproj"; sourceTree = "<group>"; };
 		00C302BB1ABCB91800DB3ED1 /* RCTImage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTImage.xcodeproj; path = "../node_modules/react-native/Libraries/Image/RCTImage.xcodeproj"; sourceTree = "<group>"; };
@@ -644,6 +644,7 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Fareye/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		1C1963B71FCEDBC8002AEF2D /* Fareye.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Fareye.entitlements; path = Fareye/Fareye.entitlements; sourceTree = "<group>"; };
+		1C197DEA20C248D20080F881 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		1C1D77D41FF68FA3003594E2 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		1C1D77DD1FF68FDB003594E2 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		1C90270D20A5546B00742D7E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Fareye/GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -883,10 +884,10 @@
 		13B07FAE1A68108700A75B9A /* Fareye */ = {
 			isa = PBXGroup;
 			children = (
+				1C197DEA20C248D20080F881 /* main.jsbundle */,
 				1C90270D20A5546B00742D7E /* GoogleService-Info.plist */,
 				1C1D77D41FF68FA3003594E2 /* RCTPushNotification.xcodeproj */,
 				1C1963B71FCEDBC8002AEF2D /* Fareye.entitlements */,
-				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -2108,6 +2109,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C197DEC20C24BE90080F881 /* main.jsbundle in Resources */,
 				1C90270E20A5546B00742D7E /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
