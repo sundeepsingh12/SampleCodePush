@@ -116,7 +116,8 @@ import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActio
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
 import FCM, { NotificationActionType, FCMEvent, NotificationType, RemoteNotificationResult, WillPresentNotificationResult } from "react-native-fcm"
 import feStyle from '../../themes/FeStyle'
-import { jobMasterService } from '../../services/classes/JobMaster';
+import { jobMasterService } from '../../services/classes/JobMaster'
+import { NavigationActions } from 'react-navigation'
 import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR,FCM_PERMISSION_DENIED,OK } from '../../lib/ContainerConstants'
 
 /**
