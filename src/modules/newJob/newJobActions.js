@@ -35,7 +35,6 @@ export function redirectToFormLayout(status, negativeId, jobMasterId,navigate) {
             navigate))
         } catch (error) {
             //TODO
-            console.log(error)
         }
     }
 }
@@ -65,7 +64,6 @@ export function redirectToContainer(pageObject,navigate) {
             }
         } catch (error) {
             //TODO
-            console.log(error)
         }
     }
 }

@@ -201,7 +201,6 @@ export default class FormLayoutEventImpl {
             await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
             return jobTransaction.jobTransactionDTOList
         } catch (error) {
-            console.log(error)
         }
     }
 
@@ -221,7 +220,6 @@ export default class FormLayoutEventImpl {
                 await this._updateEtaTimeOfJobtransactions(delayInCompletingJobTransaction, runsheetIdToJobTransactionMap)
             }
         } catch (error) {
-            console.log("_getRunsheetIdToUpdateJobTransactions", error.message)
         }
     }
 
@@ -243,7 +241,6 @@ export default class FormLayoutEventImpl {
             }
             realm.saveList(TABLE_JOB_TRANSACTION, jobTransactions)
         } catch (error) {
-            console.log("_updateEtaTimeOfJobtransactions", error.message)
         }
     }
 

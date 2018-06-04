@@ -60,7 +60,6 @@ class Tracking {
                 }).catch((err) => console.log(err))
             } catch (error) {
                 //TODO
-                console.log("An error occurred in my code!", error)
             }
         })
 
@@ -89,10 +88,8 @@ class Tracking {
             //     "auth_token": "maybe_your_server_authenticates_via_token_YES?"
             // }
         }, function (state) {
-            console.log("- BackgroundGeolocation is configured and ready: ", state.enabled);
             if (!state.enabled) {
                 BackgroundGeolocation.start(function () {
-                    console.log("- Start success");
                 });
             }
         });
@@ -119,10 +116,8 @@ class Tracking {
             BackgroundGeolocation.removeGeofence(fenceIdentifier.value.identifier, () => {
                 this.deleteFence() // delete fence identifier
                 this.deleteLatLongAndStatus() // delete fence lat long object and status object
-                console.log("Successfully removed geofence")
             }, (error) => {
                 //TODO
-                console.log("Failed to remove geofence", error)
             })
         }
     }
@@ -135,10 +130,8 @@ class Tracking {
         if (fenceIdentifier && fenceIdentifier.value && fenceIdentifier.value.identifier) {
             BackgroundGeolocation.removeGeofence(fenceIdentifier.value.identifier, () => {
                 this.deleteFence()
-                console.log("Successfully removed geofence")
             }, (error) => {
                 //TODO
-                console.log("Failed to remove geofence", error)
             })
         }
     }
@@ -217,7 +210,6 @@ class Tracking {
             notifyOnExit: true,
         }
         BackgroundGeolocation.addGeofence(fenceObject, () => {
-            console.log('- addGeofence success: ', fenceObject)
             // if status is present then this is not an inital job and another fence is present
             if (status && status.value) {
                 this.storeFence(fenceObject.identifier, status.value)

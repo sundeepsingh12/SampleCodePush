@@ -174,7 +174,6 @@ export function checkIfDraftExists(jobMasterId) {
             const draftStatusInfo = draftService.getDraftForState(null, jobMasterId)
             dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, draftStatusInfo))
         } catch (error) {
-            console.log(error)
         }
     }
 }
@@ -191,7 +190,6 @@ export function restoreDraft(draft, contactData, recurringData, jobMasterId, nav
             dispatch(restoreDraftAndNavigateToFormLayout(contactData, cloneJobTransaction, draft, navigationFormLayoutStates, null, null, navigate))
             dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, {}))
         } catch (error) {
-            console.log(error)
         }
     }
 }
