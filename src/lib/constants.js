@@ -21,7 +21,7 @@ module.exports = keyMirror({
     SET_MODAL_VIEW: null,
     SET_OTP_MODAL_VIEW: null,
     CHANGE_WALLET_MOBILE_NO: null,
-    SET_OTP_FOR_WALLET:null,
+    SET_OTP_FOR_WALLET: null,
     CHANGE_OTP_NUMBER: null,
     SET_LOADER_FOR_WALLET: null,
     RESET_STATE_FOR_WALLET: null,
@@ -227,8 +227,8 @@ module.exports = keyMirror({
     LAT_LONG_GEO_FENCE: null,
     SYNC_RUNNING_AND_TRANSACTION_SAVING: null,
     MDM_POLICIES: null,
-    FCM_TOKEN:null,
-    APP_THEME : null,
+    FCM_TOKEN: null,
+    APP_THEME: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -244,6 +244,7 @@ module.exports = keyMirror({
     TABLE_TRANSACTION_LOGS: null,
     TABLE_DRAFT: null,
     SEND_EMAIL_OR_SMS: null,
+    TABLE_MESSAGE_INTERACTION: null,
 
     //Home Actions
     IS_LAST_PAGE: null,

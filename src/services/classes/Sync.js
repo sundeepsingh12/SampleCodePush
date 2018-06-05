@@ -29,7 +29,8 @@ import {
   CUSTOMIZATION_APP_MODULE,
   POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS,
   LAST_SYNC_WITH_SERVER,
-  PAGES
+  PAGES,
+  TABLE_MESSAGE_INTERACTION
 } from '../../lib/constants'
 import { FAREYE_UPDATES, PAGE_OUTSCAN, PATH_TEMP } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
@@ -177,6 +178,8 @@ class Sync {
           propertyName: 'jobId'
         }
         realm.deleteRecordsInBatch(deleteJobTransactions, deleteJobData)
+      } else if (queryType == 'message') {
+        let numberOfMessages = this.saveMessagesInDb(tdcContentObject)
       }
     }
     return jobMasterIds
@@ -717,6 +720,19 @@ class Sync {
     } catch (error) {
       console.log('error', error)
     }
+  }
+
+  saveMessagesInDb(contentData) {
+    let messageInteractionList = JSON.parse(contentData.query)
+    realm.saveList(TABLE_MESSAGE_INTERACTION, messageInteractionList.messageDataCenters)
+
+    // let allData = realm.getRecordListOnQuery(TABLE_MESSAGE_INTERACTION)
+    // for (let index in allData) {
+    //   let draft = { ...allData[index] }
+    //   if (draft) {
+    //     console.log('messages', index, draft)
+    //   }
+    // }
   }
 }
 
