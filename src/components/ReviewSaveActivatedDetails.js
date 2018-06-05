@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, FlatList, TouchableOpacity, Modal, SafeAreaView } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Edit } from '../lib/constants'
 import { Container, Content, Header, Text, Left, Body, Right, Icon, List, StyleProvider, Footer, } from 'native-base';
 import getTheme from '../../native-base-theme/components';

@@ -96,7 +96,7 @@ class ArrayBasicComponent extends PureComponent {
     }
 
     onSaveDateTime = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, 2, null, this.props.formLayoutState);
+        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, 2, null, this.props.formLayoutState,this.props.goBack);
     }
     onPressModal = (fieldAttributeMasterId) => {
         this.props.actions.showOrDropModal(fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, fieldAttributeMasterId, this.props.isSaveDisabled)
@@ -124,7 +124,8 @@ class ArrayBasicComponent extends PureComponent {
                 isSaveDisabled: this.props.isSaveDisabled,
                 returnData: this._searchForReferenceValue.bind(this),
                 calledFromArray: true
-            })
+            },
+        this.props.navigate)
     }
     getModalView(item) {
         if (!this.props.arrayRow.modalFieldAttributeMasterId || this.props.arrayRow.modalFieldAttributeMasterId !== item.fieldAttributeMasterId) {
@@ -351,7 +352,8 @@ class ArrayBasicComponent extends PureComponent {
                                         rowId: this.props.arrayRow.rowId,
                                         fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
                                         arrayFieldAttributeMasterId: this.props.arrayFieldAttributeMasterId
-                                    })
+                                    },
+                                this.props.navigate)
                             }} />
                     </View>
                 )
@@ -391,7 +393,8 @@ class ArrayBasicComponent extends PureComponent {
                                     calledFromArray: true,
                                     rowId: this.props.arrayRow.rowId,
                                     fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
-                                })
+                                },
+                            this.props.navigate)
                         }} />
                 </View>
                 )

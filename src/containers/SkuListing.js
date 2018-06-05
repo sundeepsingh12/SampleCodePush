@@ -1,6 +1,7 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, FlatList, SectionList, SafeAreaView } from 'react-native'
+import { StyleSheet, View, FlatList, SectionList } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
@@ -15,9 +16,9 @@ import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import * as globalActions from '../modules/global/globalActions'
 import SearchBarV2 from '../components/SearchBarV2'
-import { SEARCH_PLACE_HOLDER } from '../lib/ContainerConstants'
+import { SEARCH_PLACE_HOLDER, PROCEED, SKU } from '../lib/ContainerConstants'
 import { SET_SKU_CODE, SKU_CODE_CHANGE } from '../lib/constants'
-import Title from '../../native-base-theme/components/Title';
+import TitleHeader from '../components/TitleHeader'
 class SkuListing extends PureComponent {
 
   componentDidMount() {
@@ -27,12 +28,12 @@ class SkuListing extends PureComponent {
 
   renderData(item, title) {
     return (
-      <SkuListItem item={item} title={title} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} skuValidationForImageAndReason={this.props.skuValidationForImageAndReason} />
+      <SkuListItem navigate={this.props.navigation.navigate} item={item} title={title} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} skuValidationForImageAndReason={this.props.skuValidationForImageAndReason} />
     )
   }
 
   updateSkuActualQty(value, rowItem, title) {
-    this.props.actions.updateSkuActualQuantityAndOtherData(value, rowItem, this.props.skuListItems, this.props.skuChildItems, this.props.skuValidationForImageAndReason, title)
+    this.props.actions.updateSkuActualQuantityAndOtherData(value, rowItem, this.props.skuListItems, this.props.skuChildItems, this.props.skuValidationForImageAndReason, title, this.props.navigation.goBack)
   }
 
   onChangeSkuCode(skuCode) {
@@ -40,7 +41,7 @@ class SkuListing extends PureComponent {
   }
 
   static navigationOptions = ({ navigation }) => {
-    return { header: null }
+    return { header: <TitleHeader pageName={SKU} goBack={navigation.goBack} /> }
   }
 
   setSearchText = (searchText) => {
@@ -81,20 +82,9 @@ class SkuListing extends PureComponent {
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container>
-            <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-              <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
-                <Body>
-                  <View
-                    style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom5, styles.marginTop15]}>
-                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }} />
-                    <Text
-                      style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>SKU</Text>
-                    <View />
-                  </View>
-                  {!_.isEmpty(this.props.isSearchBarVisible) ? <SearchBarV2 placeholder={SEARCH_PLACE_HOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} /> : null}
-                </Body>
-              </Header>
-            </SafeAreaView>
+            <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+              {!_.isEmpty(this.props.isSearchBarVisible) ? <SearchBarV2 placeholder={SEARCH_PLACE_HOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} /> : null}
+            </View>
 
             <Content style={[styles.flex1, styles.padding10, styles.bgLightGray]}>
               <SectionList
@@ -105,10 +95,10 @@ class SkuListing extends PureComponent {
               />
             </Content>
 
-            <SafeAreaView>
+            <SafeAreaView style={[styles.bgWhite]}>
               <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
                 <Button primary full onPress={this.saveSkuList}>
-                  <Text style={[styles.fontLg, styles.fontWhite]}>Proceed</Text>
+                  <Text style={[styles.fontLg, styles.fontWhite]}>{PROCEED}</Text>
                 </Button>
               </Footer>
             </SafeAreaView>
@@ -146,7 +136,9 @@ class SkuListing extends PureComponent {
       this.props.navigation.state.params.currentElement,
       this.props.navigation.state.params.formLayoutState,
       this.props.skuValidationForImageAndReason,
-      this.props.skuObjectAttributeKey)
+      this.props.skuObjectAttributeKey,
+      this.props.navigation.goBack
+    )
   }
 }
 

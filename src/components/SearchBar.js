@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, SafeAreaView } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Header, Button, Text, Input, Body, Icon, } from 'native-base';
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components';
@@ -32,42 +33,33 @@ export default class SearchBar extends PureComponent {
     render() {
         let scanner = this._startScanner()
         return (
-            <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }]}>
-                <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
-                    <Body>
+            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                <Body>
+                    <View style={[styles.row]}>
                         <View
-                            style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
-                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.paddingRight10, styles.paddingLeft10, styles.fontXxl]} onPress={() => { this.props.goBack() }} />
-                            <Text
-                                style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.title}</Text>
-                            <View />
+                            style={[styles.row, styles.flex1, styles.justifySpaceBetween, styles.relative]}>
+                            <Input
+                                placeholder={'Search'}
+                                onChangeText={(searchText) => {
+                                    this.callDataStoreSearchMethods(searchText)
+                                }}
+                                keyboardAppearance={"dark"}
+                                value={this.props.searchText}
+                                style={[style.headerSearch, styles.bgGray]}
+                                editable={this.props.isDataStoreEditable}
+                            />
+                            {scanner}
                         </View>
-                        <View style={[styles.row,]}>
-                            <View
-                                style={[styles.row, styles.flex1, styles.justifySpaceBetween, styles.relative]}>
-                                <Input
-                                    placeholder={'Search'}
-                                    onChangeText={(searchText) => {
-                                        this.callDataStoreSearchMethods(searchText)
-                                    }}
-                                    keyboardAppearance={"dark"}
-                                    value={this.props.searchText}
-                                    style={[style.headerSearch, styles.bgGray]}
-                                    editable={this.props.isDataStoreEditable}
-                                    />
-                                {scanner}
-                            </View>
-                            {(_.size(this.props.searchText) > 2 && !this.props.isFiltersPresent) &&
-                                <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
-                                    <Text style={[styles.fontDefault, styles.fontWhite, styles.paddingTop10, styles.paddingBottom10]}
-                                        onPress={() => {
-                                            this.props.fetchDataStoreAttrValueMap(this.props.searchText, true)
-                                        }}>{SEARCH}</Text>
-                                </View>}
-                        </View>
-                    </Body>
-                </Header>
-            </SafeAreaView>
+                        {(_.size(this.props.searchText) > 2 && !this.props.isFiltersPresent) &&
+                            <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
+                                <Text style={[styles.fontDefault, styles.fontWhite, styles.paddingTop10, styles.paddingBottom10]}
+                                    onPress={() => {
+                                        this.props.fetchDataStoreAttrValueMap(this.props.searchText, true)
+                                    }}>{SEARCH}</Text>
+                            </View>}
+                    </View>
+                </Body>
+            </Header>
         )
     }
 }

@@ -18,7 +18,7 @@ import { draftService } from '../../services/classes/DraftService'
  * @param {*} negativeId 
  * @param {*} jobMasterId 
  */
-export function redirectToFormLayout(status, negativeId, jobMasterId) {
+export function redirectToFormLayout(status, negativeId, jobMasterId,navigate) {
     return async function (dispatch) {
         try {
             dispatch(navigateToScene(FormLayout, {
@@ -31,7 +31,8 @@ export function redirectToFormLayout(status, negativeId, jobMasterId) {
                     jobMasterId,
                     jobId: negativeId,
                 }
-            }))
+            },
+            navigate))
         } catch (error) {
             //TODO
             console.log(error)
@@ -42,7 +43,7 @@ export function redirectToFormLayout(status, negativeId, jobMasterId) {
 /**
  * This method is called from home container and is use to check which container to navigate to
  */
-export function redirectToContainer(pageObject) {
+export function redirectToContainer(pageObject,navigate) {
     return async function (dispatch) {
         try {
             let jobMasterId = JSON.parse(pageObject.jobMasterIds)[0]
@@ -52,7 +53,7 @@ export function redirectToContainer(pageObject) {
                 const draftStatusInfo = draftService.getDraftForState(null, jobMasterId)
                 const nextStatus = await newJob.getNextPendingStatusForJobMaster(jobMasterId, JSON.parse(pageObject.additionalParams).statusId)
                 if (_.isEmpty(draftStatusInfo)) {
-                    dispatch(redirectToFormLayout(nextStatus, -1, jobMasterId))
+                    dispatch(redirectToFormLayout(nextStatus, -1, jobMasterId,navigate))
                 } else {
                     dispatch(setState(SET_NEWJOB_DRAFT_INFO, { draft: draftStatusInfo, nextStatus }))
                 }
@@ -60,7 +61,7 @@ export function redirectToContainer(pageObject) {
                 if (returnParams.stateParam) { //if state params is present then populate state of saveActivated
                     await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
                 }
-                dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams))
+                dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams,navigate))
             }
         } catch (error) {
             //TODO

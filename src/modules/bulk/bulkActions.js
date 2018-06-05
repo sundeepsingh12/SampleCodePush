@@ -15,7 +15,6 @@ import {
 } from '../../lib/constants'
 import {
     setState,
-    navigateToScene,
     showToastAndAddUserExceptionLog
 } from '../global/globalActions'
 import {

@@ -24,14 +24,14 @@ import {
 import RNFS from 'react-native-fs'
 var PATH_COMPRESS_IMAGES = '/compressImages';
 
-export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction) {
+export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction,goBack) {
     return async function (dispatch) {
         try {
             const value = await signatureService.saveFile(result, moment(), true)
             if (calledFromArray) {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState,goBack))
             } else {
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction,null,null,goBack))
             }
             dispatch(setState(SET_SHOW_VIEW_IMAGE, {
                 imageData: '',
