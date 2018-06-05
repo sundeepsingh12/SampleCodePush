@@ -162,7 +162,7 @@ class ArrayFieldAttribute extends PureComponent {
                             <Text
                                 style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.arrayElements)}</Text>
                             <Button bordered success small onPress={this.addPressed}>
-                                <Text style={[styles.fontSuccess, styles.padding10]}>{ADD}</Text>
+                                <Text style={[styles.fontSuccess, styles.paddingHorizontal10]}>{ADD}</Text>
                             </Button>
                         </View>
                         <View style={[{ backgroundColor: styles.bgPrimaryColor }]}>
