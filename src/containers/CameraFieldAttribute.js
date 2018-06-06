@@ -261,7 +261,7 @@ class CameraFieldAttribute extends PureComponent {
 
     takePicture = async function () {
         if (this.camera) {
-            const options = { quality: 0.5, base64: true };
+            const options = { quality: 0.5, base64: true, fixOrientation: true };
             try {
                 const data = await this.camera.takePictureAsync(options).then((capturedImg) => {
                     const { uri, base64 } = capturedImg;
