@@ -19,6 +19,7 @@ import { Yes_Checkout, Total, } from '../lib/AttributeConstants'
 import { Discard_these_jobs, Do_you_want_to_checkout, EDIT } from '../lib/ContainerConstants'
 import DraftModal from '../components/DraftModal'
 import _ from 'lodash'
+import moment from 'moment'
 
 function mapStateToProps(state) {
     return {
@@ -104,6 +105,7 @@ class SaveActivated extends PureComponent {
             lastIndex = 0
         }
         cloneJobTransaction.jobId = cloneJobTransaction.id = --lastIndex
+        cloneJobTransaction.referenceNumber = cloneJobTransaction.referenceNumber.split('/')[0] +'/'+ cloneJobTransaction.referenceNumber.split('/')[1]+'/' + moment().valueOf()
         this.props.actions.navigateToScene(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: cloneJobTransaction.id,
@@ -233,6 +235,7 @@ class SaveActivated extends PureComponent {
             id: itemId,
             jobMasterId: this.props.navigation.state.params.jobMasterId,
             jobId: itemId,
+            referenceNumber: this.props.recurringData[itemId].referenceNumber
         }
         this.props.actions.navigateToScene(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,

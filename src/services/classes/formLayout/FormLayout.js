@@ -27,7 +27,8 @@ import {
     BACKUP_ALREADY_EXIST,
     TABLE_FIELD_DATA,
     JOB_ATTRIBUTE,
-    USER
+    USER,
+    HUB
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
@@ -54,6 +55,7 @@ class FormLayout {
         const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
         const jobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
         const user = await keyValueDBService.getValueFromStore(USER)
+        const hub = await keyValueDBService.getValueFromStore(HUB)
         const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS);
         const fieldAttributeMasterValidation = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION);
         const fieldAttributeValidationCondition = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION_CONDITION);
@@ -118,7 +120,8 @@ class FormLayout {
             sequenceWiseFormLayout.jobAndFieldAttributesList = {
                 jobAttributes: jobAttributes.value,
                 fieldAttributes: fieldAttributes.value,
-                user: user.value
+                user: user.value,
+                hub: hub.value
             }
             return sequenceWiseFormLayout
         }
@@ -307,12 +310,12 @@ class FormLayout {
         }
     }
 
-    isFormValid(formElement, jobTransaction, fieldAttributeMasterParentIdMap) {
+    isFormValid(formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
         if (!formElement) {
             throw new Error('formElement is missing')
         }
         for (let [id, currentObject] of formElement.entries()) {
-            let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
+            let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
             let uniqueValidationResult = this.checkUniqueValidation(currentObject)
             if (uniqueValidationResult) {
                 currentObject.alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT

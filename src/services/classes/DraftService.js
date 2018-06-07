@@ -12,6 +12,14 @@ class DraftService {
         if (draftObject && draftObject.jobTransactionId) {
             realm.save(TABLE_DRAFT, draftObject)
         }
+
+        // let allData = realm.getRecordListOnQuery(TABLE_DRAFT)
+        // for (let index in allData) {
+        //     let draft = { ...allData[index] }
+        //     if (draft) {
+        //         console.log('draft records', index, draft)
+        //     }
+        // }
     }
     setFormLayoutObjectForSaving(formLayoutState, jobMasterId, navigationFormLayoutStates, jobTransaction) {
         if (!formLayoutState || !formLayoutState.formElement) return
@@ -29,7 +37,8 @@ class DraftService {
             formLayoutObject: JSON.stringify(statusIdToFormLayoutMap),
             jobMasterId,
             navigationFormLayoutStates: JSON.stringify(navigationFormLayoutStatesForDb),
-            statusName: formLayoutState.statusName
+            statusName: formLayoutState.statusName,
+            referenceNumber: jobTransaction.referenceNumber,
         }
         let draftObjectCopy = {}
         if (_.isEmpty(navigationFormLayoutStates)) {

@@ -186,7 +186,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
             } else {
                 dispatch(setState(IS_LOADING, true))
-                let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap)
+                let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
                 if (isFormValidAndFormElement.isFormValid) {
                     const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
                     let { routeName, routeParam } = await formLayoutService.saveAndNavigate(cloneFormLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, taskListScreenDetails)
@@ -303,6 +303,7 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                     id: draftRestored.formLayoutState.jobTransactionId,
                     jobMasterId: draft.jobMasterId,
                     jobId: draftRestored.formLayoutState.jobTransactionId,
+                    referenceNumber: draft.referenceNumber
                 }
             }
             if (!_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore)) {
