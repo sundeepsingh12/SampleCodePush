@@ -199,7 +199,7 @@ export default class FormLayoutEventImpl {
             realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job, serverSmsLogs)
             await keyValueDBService.validateAndSaveData(LAST_JOB_COMPLETED_TIME, moment().format('YYYY-MM-DD HH:mm:ss'))
             await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
-            return jobTransaction.jobTransactionDTOList
+            return jobTransaction.jobTransactionDTOMap
         } catch (error) {
             console.log(error)
         }
@@ -617,7 +617,7 @@ export default class FormLayoutEventImpl {
     }
 
     _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue, amountMap) {
-        let jobTransactionArray = [], jobTransactionDTOList = []
+        let jobTransactionArray = [], jobTransactionDTOMap = [], syncTime = moment().format('YYYY-MM-DD HH:mm:ss');
         let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
         jobTransaction.jobType = jobMaster.code
         jobTransaction.jobStatusId = status.id
@@ -636,21 +636,21 @@ export default class FormLayoutEventImpl {
         jobTransaction.actualAmount = parseFloat(amountMap.actualAmount) ? parseFloat(amountMap.actualAmount) : 0
         jobTransaction.moneyTransactionType = amountMap.moneyTransactionType
         jobTransactionArray.push(jobTransaction)
-        jobTransactionDTOList.push({
+        jobTransactionDTOMap[jobTransaction.id] = {
             id: jobTransaction.id,
             referenceNumber: jobTransaction.referenceNumber,
-            jobId: jobTransaction.jobId
-        })
+            jobId: jobTransaction.jobId,
+            syncTime
+        }
         return {
             tableName: TABLE_JOB_TRANSACTION,
             value: jobTransactionArray,
-            jobTransactionDTOList
+            jobTransactionDTOMap
         }
-        //TODO only basic columns are set, some columns are not set which will be set as codebase progresses further
     }
 
     _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue, amountMap) {
-        let jobTransactionArray = [], jobTransactionDTOList = []
+        let jobTransactionArray = [], jobTransactionDTOMap = {}, syncTime = moment().format('YYYY-MM-DD HH:mm:ss');
         for (let jobTransaction1 in jobTransactionList) {
             let jobTransaction = Object.assign({}, jobTransactionList[jobTransaction1]) // no need to have null checks as it is called from a private method
             jobTransaction.jobType = jobMaster.code
@@ -670,16 +670,17 @@ export default class FormLayoutEventImpl {
             jobTransaction.actualAmount = amountMap[jobTransaction.id] ? parseFloat(amountMap[jobTransaction.id].actualAmount) : parseFloat(amountMap.actualAmount) ? parseFloat(amountMap.actualAmount) : 0
             jobTransaction.moneyTransactionType = amountMap.moneyTransactionType
             jobTransactionArray.push(jobTransaction)
-            jobTransactionDTOList.push({
+            jobTransactionDTOMap[jobTransaction.id] = {
                 id: jobTransaction.id,
                 referenceNumber: jobTransaction.referenceNumber,
-                jobId: jobTransaction.jobId
-            })
+                jobId: jobTransaction.jobId,
+                syncTime
+            }
         }
         return {
             tableName: TABLE_JOB_TRANSACTION,
             value: jobTransactionArray,
-            jobTransactionDTOList
+            jobTransactionDTOMap
         }
     }
 
@@ -825,17 +826,16 @@ export default class FormLayoutEventImpl {
     }
 
     /**
-     * adding jobTransactionId to sync list
+     * /**
+     * adding jobTransactionMap to sync list
      * 
      * syncList is a list which is to be synced with the server
-     * 
-     * @param {*jobTransactionId} jobTransactionId 
+     * @param {*} jobTransactionMap 
      */
-    async addToSyncList(jobTransactionList) {
+    async addToSyncList(jobTransactionMap) {
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
-        let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
-        //UnionWith is used to remove duplicacy ie if same job tarnsaction is present in jobTransactionList and transactionsToSync
-        let totalTransactionsToSync = _.unionWith(transactionsToSync, jobTransactionList, _.isEqual);
+        let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? {} : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
+        let totalTransactionsToSync = { ...transactionsToSync, ...jobTransactionMap }
         await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, totalTransactionsToSync)
         return
     }

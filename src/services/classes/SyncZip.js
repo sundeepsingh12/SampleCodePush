@@ -153,8 +153,9 @@ class SyncZip {
             return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog };
         }
         let fieldDataQuery, jobTransactionQuery, jobQuery, transactionLogQuery
+        let firstIndex = Object.keys(transactionIdList)[0];
         for (let index in transactionIdList) {
-            if (index == 0) {
+            if (index == firstIndex) {
                 fieldDataQuery = `jobTransactionId = ${transactionIdList[index].id}`;
                 jobTransactionQuery = `id = ${transactionIdList[index].id}`;
                 jobQuery = `id = ${transactionIdList[index].jobId}`;

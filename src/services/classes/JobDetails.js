@@ -215,7 +215,7 @@ class JobDetails {
      */
 
     updateTransactionOnRevert(jobTransactionData, previousStatus) {
-        let jobTransactionArray = [];
+        let jobTransactionArray = [], jobTransactionDTO = {};
         let jobTransaction = Object.assign({}, jobTransactionData) // no need to have null checks as it is called from a private method        
         jobTransaction.jobStatusId = previousStatus[0]
         jobTransaction.statusCode = previousStatus[2]
@@ -223,9 +223,16 @@ class JobDetails {
         jobTransaction.originalAmount = 0.00
         jobTransaction.lastUpdatedAtServer = moment().format('YYYY-MM-DD HH:mm:ss')
         jobTransactionArray.push(jobTransaction)
+        jobTransactionDTO[jobTransaction.id] = {
+            id: jobTransaction.id,
+            referenceNumber: jobTransaction.referenceNumber,
+            jobId: jobTransaction.jobId,
+            syncTime: moment().format('YYYY-MM-DD HH:mm:ss')
+        }
         return {
             tableName: TABLE_JOB_TRANSACTION,
             value: jobTransactionArray,
+            jobTransactionDTO
         }
     }
 
@@ -253,7 +260,7 @@ class JobDetails {
         let transactionLog = await formLayoutEventsInterface._updateTransactionLogs([jobTransaction], previousStatus[0], jobTransaction.jobStatusId, jobTransaction.jobMasterId, user, lastTrackLog) // update transaction log on revert
         let runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction.jobStatusId, previousStatus[3], [jobTransaction]) // update runSheet Summary on revert
         let updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction, previousStatus) // update jobTransaction on revert
-        await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.value) // add jobTransaction to sync list
+        await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.jobTransactionDTO) // add jobTransaction to sync list
         realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog) // update jobTransaction, job, runSheet, transactionLog Db in batch
         await draftService.deleteDraftFromDb(jobTransaction)
     }
@@ -268,7 +275,7 @@ class JobDetails {
      * @returns {boolean} - true if distance is greater than 100m else false
      */
     checkLatLong(jobId, userLat, userLong) {
-        if(!jobId) return false
+        if (!jobId) return false
         let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0]; // get jobtransaction on jobId
         if (!jobTransaction.latitude || !jobTransaction.longitude || !userLat || !userLong)
             return false
