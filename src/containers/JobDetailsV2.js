@@ -24,11 +24,13 @@ import {
   YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE,
   SELECT_ADDRESS_NAVIGATION,
   REVERT_STATUS,
-  MORE
+  MORE,
+  PAYMENT_SUCCESSFUL,
+  TRANSACTION_SUCCESSFUL
 } from '../lib/ContainerConstants'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Alert, SafeAreaView } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Alert, SafeAreaView, Image } from 'react-native'
 import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, StyleProvider, List, ListItem, Footer, FooterTab, Card, ActionSheet, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
@@ -42,7 +44,8 @@ import {
   BulkListing,
   SHOW_DROPDOWN,
   SET_JOBDETAILS_DRAFT_INFO,
-  SET_LOADER_FOR_SYNC_IN_JOBDETAIL
+  SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
+  SET_CHECK_TRANSACTION_STATUS
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -78,7 +81,8 @@ function mapStateToProps(state) {
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
     isShowDropdown: state.jobDetails.isShowDropdown,
     jobExpiryTime: state.jobDetails.jobExpiryTime,
-    syncLoading: state.jobDetails.syncLoading
+    syncLoading: state.jobDetails.syncLoading,
+    checkTransactionStatus: state.jobDetails.checkTransactionStatus
   }
 }
 
@@ -95,7 +99,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransaction.id)
+    this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key)
   }
 
   componentWillUnmount() {
@@ -103,6 +107,9 @@ class JobDetailsV2 extends PureComponent {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
     // reset dropdown state only when required
+    if(this.props.checkTransactionStatus){
+      this.props.actions.setState(SET_CHECK_TRANSACTION_STATUS, null)
+    }
     if (this.props.isShowDropdown) {
       this.props.actions.setState(SHOW_DROPDOWN, null)
     }
@@ -412,9 +419,10 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.statusRevertList[0] == 1) {
       { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
     }
-    else if (this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType) {
-      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
-    } else {
+    // else if (!(this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType)) {
+    //   { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
+    // }
+     else {
       this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
     }
   }
@@ -570,6 +578,21 @@ class JobDetailsV2 extends PureComponent {
       </View>
     )
   }
+  showPaymentSuccessfulScreen() {
+    return (
+        <Content>
+            <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
+                <Image
+                    style={style.imageSync}
+                    source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
+                />
+                <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
+                    {PAYMENT_SUCCESSFUL}
+                </Text>
+            </View>
+        </Content>
+    )
+}
 
   showFieldDetails() {
     return (
@@ -629,6 +652,49 @@ class JobDetailsV2 extends PureComponent {
     return null
   }
 
+  showPaymentFailedScreen(actualAmount) {
+    const  {draftStatusInfo, jobTransaction} = this.props
+    const {params, key} = this.props.navigation.state
+    return (
+        <Content>
+            <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
+                <Image
+                    style={style.imageSync}
+                    source={require('../../images/fareye-default-iconset/checkTransactionError.png')}
+                />
+                <Text style={[styles.fontLg, styles.fontBlack, { marginTop: 27 }]}>
+                   { this.props.checkTransactionStatus}
+                </Text>
+                <View>
+                <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 50, width: 200 }, styles.alignCenter, styles.justifyCenter, { marginTop: 183 }]}
+                    onPress={() => {this.props.actions.checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, key)}}  >
+                    <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}> {'CheckTransaction'}</Text>
+                </Button>
+            </View>
+                <Text style={[{ color: '#007AFF', lineHeight: 19, height: 19, width: 53 }, styles.fontWeight500, styles.fontLg, { marginTop: 54 }]}
+                    onPress={() => {this._goToFormLayoutWithoutDraft()}} >
+                    Cancel
+                </Text>
+            </View>
+        </Content>
+    )
+}
+
+_goToFormLayoutWithoutDraft = () => {
+  this.props.actions.deleteDraftAndNavigateToFormLayout({
+    contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+    jobTransactionId: this.props.jobTransaction.id,
+    jobTransaction: this.props.jobTransaction,
+    statusId: this.props.draftStatusInfo.statusId,
+    statusName: this.props.draftStatusInfo.statusName,
+    jobMasterId: this.props.jobTransaction.jobMasterId,
+    pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
+    jobDetailsScreenKey: this.props.navigation.state.key
+  }
+  )
+  this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
+}
+
   _goToFormLayoutWithDraft = () => {
     this.props.actions.restoreDraftAndNavigateToFormLayout(
       this.props.navigation.state.params.jobSwipableDetails.contactData,
@@ -647,8 +713,18 @@ class JobDetailsV2 extends PureComponent {
         <Loader />
       )
     }
+    if(this.props.checkTransactionStatus == TRANSACTION_SUCCESSFUL){
+      return(
+        this.showPaymentSuccessfulScreen()
+      )
+    }
+    if(this.props.checkTransactionStatus){
+      return(
+        this.showPaymentFailedScreen()
+      )
+    }
     else {
-      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
       const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
       return (
         <StyleProvider style={getTheme(platform)}>
@@ -657,7 +733,7 @@ class JobDetailsV2 extends PureComponent {
             {draftAlert}
             {mismatchAlert}
             {this.showHeaderView()}
-            {this.showContentView()}
+            { this.showContentView()}
             {this.showFooterView()}
           </Container>
         </StyleProvider>
@@ -720,7 +796,12 @@ const style = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#f3f3f3',
-  }
+  },
+  imageSync: {
+    width: 116,
+    height: 116,
+    resizeMode: 'contain'
+}
 
 });
 

@@ -26,6 +26,7 @@ module.exports = keyMirror({
     SET_LOADER_FOR_WALLET: null,
     RESET_STATE_FOR_WALLET: null,
     SET_ERROR_FOR_OTP: null,
+    MOSAMBEE_RESET_STATE: null,
 
     //Auth Actions
     LOGOUT: null,
@@ -74,6 +75,7 @@ module.exports = keyMirror({
     SHOW_OTP_MOBILE_LOADER: null,
     IS_SHOW_MOBILE_OTP_SCREEN: null,
     IS_LOGGING_OUT: null,
+    CHECK_TRANSACTION_STATUS_NEW_JOB: null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,
@@ -141,6 +143,7 @@ module.exports = keyMirror({
     SET_JOBDETAILS_DRAFT_INFO: null,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL: null,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT: null,
+    SET_CHECK_TRANSACTION_STATUS: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
@@ -417,6 +420,7 @@ module.exports = keyMirror({
     SHOW_DISCARD_ALERT: null,
     RETURN_TO_HOME: null,
     SET_SAVE_ACTIVATED_DRAFT: null,
+    CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED: null,
 
     //Bulk Module
     START_FETCHING_BULK_TRANSACTIONS: null,

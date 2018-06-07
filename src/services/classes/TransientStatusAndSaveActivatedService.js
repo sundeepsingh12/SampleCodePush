@@ -108,6 +108,7 @@ class TransientStatusAndSaveActivatedService {
         differentData[jobTransaction.id] = {
             id: jobTransaction.id,
             jobId: jobTransaction.jobId,
+            referenceNumber: jobTransaction.referenceNumber,
             textToShow,
             fieldDataArray: elementsArray,
             formLayoutState,
@@ -230,7 +231,7 @@ class TransientStatusAndSaveActivatedService {
             if (!_.isEmpty(returnParams.formattedFormLayoutObject)) {
                 emailTableElement[dataForSingleTransaction.id] = returnParams.formattedFormLayoutObject
             }
-            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, dataForSingleTransaction.id, statusId, jobMasterId, [])
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, dataForSingleTransaction.id, statusId, jobMasterId, {referenceNumber: dataForSingleTransaction.referenceNumber})
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
         }
         return { emailTableElement, emailIdInFieldData, contactNumberInFieldData }

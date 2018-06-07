@@ -26,6 +26,7 @@ class DraftService {
         let draftObject = {
             jobTransactionId: (jobTransaction.id < 0 && jobTransaction.jobId < 0) ? -jobMasterId : formLayoutState.jobTransactionId,
             statusId: formLayoutState.statusId,
+            referenceNumber: jobTransaction.referenceNumber,
             formLayoutObject: JSON.stringify(statusIdToFormLayoutMap),
             jobMasterId,
             navigationFormLayoutStates: JSON.stringify(navigationFormLayoutStatesForDb),

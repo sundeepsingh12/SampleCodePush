@@ -204,6 +204,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                             ]
                         }))
                     } else {
+                        // console.logs("routeName",routeName,routeParam)
                         dispatch(navigateToScene(routeName, routeParam))
                     }
                     dispatch(fetchJobs())
@@ -305,6 +306,7 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                     id: draftRestored.formLayoutState.jobTransactionId,
                     jobMasterId: draft.jobMasterId,
                     jobId: draftRestored.formLayoutState.jobTransactionId,
+                    referenceNumber: draft.referenceNumber
                 }
             }
             if (!_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore)) {

@@ -16,8 +16,6 @@ import Loader from '../components/Loader'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import {
-    OTP_NUMBER_CAN_NOT_BE_BLANK,
-    MOBILE_NO_CAN_NOT_BE_BLANK,
     FAILED,
     TRANSACTION_SUCCESSFUL,
     PAYMENT_FAILED,
@@ -53,15 +51,16 @@ function mapDispatchToProps(dispatch) {
 
 class MosambeeWalletPayment extends PureComponent {
 
-    componentDidMount() {
-        this.props.actions.setWalletParametersAndGetWalletList(this.props.navigation.state.params.contactData[0])
+    componentDidMount() { 
+        const contactNumber  = this.props.navigation.state.params.contactData ? this.props.navigation.state.params.contactData[0] : ''
+        this.props.actions.setWalletParametersAndGetWalletList(contactNumber)
+    }
+    componentWillUnmount() {
+        this.props.actions.setState(RESET_STATE_FOR_WALLET)
     }
 
     _showModalView = (modalStatus, checkForPayment) => {
-        if (this.props.errorMessage && !checkForPayment) {
-            if (modalStatus == 0) this.props.navigation.goBack()
-            this.props.actions.setState(SET_ERROR_MESSAGE_FOR_WALLET, { errorMessage: null, isModalVisible: modalStatus })
-        } else if (!this.props.isLoaderRunning && !checkForPayment) {
+        if (modalStatus <= 4 && !this.props.isLoaderRunning && !checkForPayment) {
             (modalStatus == 1) ? this.props.navigation.goBack() : this.props.actions.setState(SET_MODAL_VIEW, modalStatus - 1)
         }
     }
@@ -76,8 +75,8 @@ class MosambeeWalletPayment extends PureComponent {
     setModal(isModalVisible, actualAmount) {
         switch (isModalVisible) {
             case 1: return <WalletListView walletListData={this.props.walletList} contactNumber={this.props.navigation.state.params.contactData} generateOtpNumber={this.navigateToOtpDetails} />
-            case 2: return <OtpGeneratedView contactNumber={this.props.contactNumber} onChangeMobileNo={this.onChangeMobileNo} selectedWalletDetails={this.props.selectedWalletDetails} actualAmount={actualAmount} message={this.props.errorMessage} />
-            case 3: return <OtpDetailView onResendOtp={this._hitOtpUrlApi} otpNumber={this.props.otpNumber} onChangeOtpNo={this.onChangeOtpNo} contactNumber={this.props.contactNumber} actualAmount={actualAmount} showModalView={this._showModalView} isModalShow={this.props.isModalVisible} message={this.props.errorMessage} />
+            case 2: return <OtpGeneratedView contactNumber={this.props.contactNumber} onChangeMobileNo={this.onChangeMobileNo} selectedWalletDetails={this.props.selectedWalletDetails} actualAmount={actualAmount} />
+            case 3: return <OtpDetailView onResendOtp={this._hitOtpUrlApi} otpNumber={this.props.otpNumber} onChangeOtpNo={this.onChangeOtpNo} contactNumber={this.props.contactNumber} actualAmount={actualAmount} showModalView={this._showModalView} isModalShow={this.props.isModalVisible} />
         }
     }
 
@@ -89,36 +88,27 @@ class MosambeeWalletPayment extends PureComponent {
         this.props.actions.setState(CHANGE_OTP_NUMBER, value)
     }
 
-    checkForOtpNumberForPaymentApi(actualAmount) {
-        (this.props.otpNumber) && _.size(this.props.otpNumber) ?
-            this.props.actions.hitPaymentUrlforPayment(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, actualAmount, this.props.navigation.state.params.jobTransaction, this.props.otpNumber, this.props.navigation.state.params)
-            : this.props.actions.setState(SET_ERROR_FOR_OTP, OTP_NUMBER_CAN_NOT_BE_BLANK)
-    }
-
-    checkForMobileNumberForOtpApi(actualAmount) {
-        (this.props.contactNumber) && _.size(this.props.contactNumber) ?
-            this.props.actions.hitOtpUrlToGetOtp(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, actualAmount, this.props.navigation.state.params.jobTransaction)
-            : this.props.actions.setState(SET_ERROR_FOR_OTP, MOBILE_NO_CAN_NOT_BE_BLANK)
-
+    checkTransactionStatusApi(actualAmount) {
+        this.props.actions.hitCheckTransactionStatusApi("20", this.props.walletParameters, this.props.navigation.state.params.jobTransaction, actualAmount)
     }
 
     _hitOtpUrlApi = (message, checkForPayment, actualAmount) => {
-        if (checkForPayment) {
-            _.isEqual(this.props.errorMessage, FAILED) ? this.props.actions.setState(SET_MODAL_VIEW, 1) : this.stateChangeOnBack()
+        if (this.props.isModalVisible == 2 || _.isEqual(message, RESEND)) {
+            this.props.actions.hitOtpUrlToGetOtp(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, actualAmount, this.props.navigation.state.params)
         } else {
-            (this.props.isModalVisible == 2 || _.isEqual(message, RESEND)) ? this.checkForMobileNumberForOtpApi(actualAmount) : this.checkForOtpNumberForPaymentApi(actualAmount)
+            this.props.actions.hitPaymentUrlforPayment(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, actualAmount, this.props.navigation.state.params.jobTransaction, this.props.otpNumber, this.props.navigation.state.params)
         }
     }
 
-    getFooterView(checkForPayment, actualAmount) {
+    getFooterView(actualAmount) {
         return (
             <SafeAreaView>
                 <Footer style={[style.footer]}>
                     <FooterTab style={[styles.padding10]}>
                         <Button success full
-                            onPress={() => this._hitOtpUrlApi(null, checkForPayment, actualAmount)}
-                        >{checkForPayment ? <Text style={[styles.fontLg, styles.fontWhite]}>{_.isEqual(this.props.errorMessage, TRANSACTION_SUCCESSFUL) ? FINISH : RETRY_PAYMENT}</Text>
-                            : <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.isModalVisible == 2 ? SEND_OTP : SUBMIT}</Text>}
+                            disabled={!_.size(_.trim(this.props.contactNumber)) || (this.props.isModalVisible == 3 && !_.size(_.trim(this.props.otpNumber)))}
+                            onPress={() => this._hitOtpUrlApi(null, null, actualAmount)}>
+                            <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.isModalVisible == 2 ? SEND_OTP : SUBMIT}</Text>
                         </Button>
                     </FooterTab>
                 </Footer>
@@ -126,7 +116,15 @@ class MosambeeWalletPayment extends PureComponent {
         )
     }
 
-    showErrorScreen() {
+    showErrorScreen(actualAmount) {
+        if (this.props.isModalVisible == 5 || this.props.isModalVisible == 6) {
+            return this.showPaymentFailedScreen(actualAmount)
+        } else {
+            return this.dafaultErrorScreen()
+        }
+    }
+
+    dafaultErrorScreen() {
         return (
             <View style={[styles.flex1, styles.justifySpaceBetween]}>
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
@@ -152,7 +150,6 @@ class MosambeeWalletPayment extends PureComponent {
     }
 
     stateChangeOnBack() {
-        this.props.actions.setState(RESET_STATE_FOR_WALLET)
         this.props.navigation.goBack()
     }
 
@@ -171,17 +168,59 @@ class MosambeeWalletPayment extends PureComponent {
             </Content>
         )
     }
-
-    showPaymentFailedScreen() {
+    transactionStatusButtonView(actualAmount) {
+        let checkForRetryButtonView = _.isEqual(this.props.errorMessage, FAILED)
+        return (
+            <View>
+                <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: checkForRetryButtonView ? '#F2F1FF' : '#007AFF', borderWidth: 1 }, { height: 50, width: checkForRetryButtonView ? 200 : 126 }, styles.alignCenter, styles.justifyCenter, { marginTop: 183 }]}
+                    onPress={() => { this.checkTransactionStatusApi(actualAmount) }}  >
+                    <Text style={[{ color: checkForRetryButtonView ? '#212121' : '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}> {checkForRetryButtonView ? 'Transaction Status' : 'Try Again'}</Text>
+                </Button>
+            </View>
+        )
+    }
+    retryButtonView() {
+        return (
+            <View>
+                <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 50, width: 150 }, styles.alignCenter, styles.justifyCenter, { marginTop: 183 }]}
+                    onPress={() => { this.props.actions.setWalletParametersAndGetWalletList(this.props.navigation.state.params.contactData[0]) }}  >
+                    <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}>Retry Payment</Text>
+                </Button>
+            </View>
+        )
+    }
+    showPaymentSuccessfulScreen() {
         return (
             <Content>
                 <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
                     <Image
                         style={style.imageSync}
-                        source={require('../../images/fareye-default-iconset/unable-to-sync.png')}
+                        source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
                     />
                     <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
-                        {PAYMENT_FAILED}
+                        {PAYMENT_SUCCESSFUL}
+                    </Text>
+                </View>
+            </Content>
+        )
+    }
+
+    showPaymentFailedScreen(actualAmount) {
+        let buttonView = (this.props.isModalVisible == 5) ? this.retryButtonView() : this.transactionStatusButtonView(actualAmount)
+        return (
+            <Content>
+                <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
+                    <Image
+                        style={style.imageSync}
+                        source={(this.props.isModalVisible == 4) ? require('../../images/fareye-default-iconset/checkTransactionError.png') : require('../../images/fareye-default-iconset/unable-to-sync.png')}
+                    />
+                    <Text style={[styles.fontLg, styles.fontBlack, { marginTop: 27 }]}>
+                        {(_.isEqual(this.props.errorMessage, FAILED)) ? PAYMENT_FAILED : this.props.errorMessage}
+                    </Text>
+                    {buttonView}
+                    <Text style={[{ color: '#007AFF', lineHeight: 19, height: 19, width: 53 }, styles.fontWeight500, styles.fontLg, { marginTop: 54 }]}
+                        onPress={() => this.stateChangeOnBack()} >
+                        Cancel
                     </Text>
                 </View>
             </Content>
@@ -190,12 +229,10 @@ class MosambeeWalletPayment extends PureComponent {
 
     checkForModalToShow(errorMessage, actualAmount) {
         switch (errorMessage) {
-            case OTP_NUMBER_CAN_NOT_BE_BLANK:
-            case MOBILE_NO_CAN_NOT_BE_BLANK:
             case null: return this.setModal(this.props.isModalVisible, actualAmount)
             case TRANSACTION_SUCCESSFUL: return this.showPaymentSuccessfulScreen()
-            case FAILED: return this.showPaymentFailedScreen()
-            default: return this.showErrorScreen()
+            case FAILED: return this.showPaymentFailedScreen(actualAmount)
+            default: return this.showErrorScreen(actualAmount)
         }
     }
 
@@ -206,12 +243,12 @@ class MosambeeWalletPayment extends PureComponent {
                     <Body>
                         <View
                             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                            {!checkForPayment ? <TouchableOpacity style={[style.headerLeft]} onPress={() => { this._showModalView(this.props.isModalVisible, checkForPayment) }}>
+                            {this.props.isModalVisible < 3 && _.isEqual(this.props.errorMessage, null) ? <TouchableOpacity style={[style.headerLeft]} onPress={() => { this._showModalView(this.props.isModalVisible, checkForPayment) }}>
                                 <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                             </TouchableOpacity> : null}
                             <View style={[style.headerBody]}>
-                                {checkForPayment ? <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, { marginLeft: 100 }, styles.fontWeight500]}>{PAYMENT}</Text>
-                                    : <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>{MOSAMBEE_WALLET}</Text>}
+                                {this.props.isModalVisible > 3 ? <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, { marginLeft: 100 }, styles.fontWeight500]}>{PAYMENT}</Text>
+                                    : <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500, styles.justifySelfCenter, checkForPayment ? { marginLeft: 100 } : null]}>{MOSAMBEE_WALLET}</Text>}
                             </View>
                             <View style={[style.headerRight]}>
                             </View>
@@ -227,8 +264,8 @@ class MosambeeWalletPayment extends PureComponent {
         const paymentAtEnd = this.props.navigation.state.params.paymentAtEnd
         const actualAmount = (paymentAtEnd && paymentAtEnd.currentElement && paymentAtEnd.currentElement.jobTransactionIdAmountMap && paymentAtEnd.currentElement.jobTransactionIdAmountMap.actualAmount) ? paymentAtEnd.currentElement.jobTransactionIdAmountMap.actualAmount : 0
         const viewModal = (this.props.isLoaderRunning) ? <Loader /> : this.checkForModalToShow(this.props.errorMessage, actualAmount)
-        const checkForPayment = _.isEqual(this.props.errorMessage, TRANSACTION_SUCCESSFUL) || _.isEqual(this.props.errorMessage, FAILED)
-        const footerView = (((this.props.isModalVisible == 2 || this.props.isModalVisible == 3) && !this.props.errorMessage) || checkForPayment) && !this.props.isLoaderRunning ? this.getFooterView(checkForPayment, actualAmount) : null
+        const checkForPayment = !_.isEqual(this.props.errorMessage, null) || this.props.isModalVisible == 3
+        const footerView = (((this.props.isModalVisible == 2 || this.props.isModalVisible == 3) && !this.props.errorMessage)) && !this.props.isLoaderRunning ? this.getFooterView(actualAmount) : null
         const headerView = this._headerModal(checkForPayment)
         return (
             <Modal
@@ -271,7 +308,7 @@ const style = StyleSheet.create({
     },
     footer: {
         height: 'auto',
-        backgroundColor: '#ffffff',
+        // backgroundColor: '#ffffff',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',
         paddingTop: 4,

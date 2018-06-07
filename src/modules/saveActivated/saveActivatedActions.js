@@ -17,12 +17,15 @@ import {
     IS_COMPANY_CODE_DHL,
     EMAILID_VIEW_ARRAY,
     SHOULD_RELOAD_START,
-    SET_SAVE_ACTIVATED_DRAFT
+    SET_SAVE_ACTIVATED_DRAFT,
+    CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED
 } from '../../lib/constants'
 import _ from 'lodash'
 import { draftService } from '../../services/classes/DraftService'
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
 import { fetchJobs } from '../taskList/taskListActions';
+import { checkForPaymentAtEnd } from '../job-details/jobDetailsActions' 
+
 
 export function addTransactionAndPopulateView(formLayoutState, recurringData, commonData, statusName, navigationParams, navigationFormLayoutStates) {
     return async function (dispatch) {
@@ -168,7 +171,12 @@ export function checkIfDraftExists(jobMasterId) {
     return async function (dispatch) {
         try {
             const draftStatusInfo = draftService.getDraftForState(null, jobMasterId)
+            if(!_.isEmpty(draftStatusInfo)){
+            let checkTransactionStatus = await dispatch(checkForPaymentAtEnd(draftStatusInfo, null, null, null, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE ))
+            if(checkTransactionStatus !== true){ 
             dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, draftStatusInfo))
+             }
+            }
         } catch (error) {
             console.log(error)
         }

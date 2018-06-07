@@ -32,7 +32,6 @@ export default class OtpGeneratedView extends PureComponent {
                         style={[styles.flexBasis75, styles.fontXl]}
                     />
                     <Text style={[styles.fontWeight100, styles.flex1, { right: 5, position: 'absolute', marginTop: 65, marginRight: 10 }, { color: styles.bgPrimaryColor }]} onPress={() => this.props.onResendOtp(RESEND,false,this.props.actualAmount)}>{RESEND_OTP}</Text>
-                    <Text style={[styles.fontDanger, styles.fontSm, styles.marginLeft5]}>{this.props.message}</Text>
                 </View>
             </Content>
         )

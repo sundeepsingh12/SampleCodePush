@@ -54,6 +54,7 @@ module.exports = {
     CUSTOM_APP_DISPLAY: 'Web URL',
     SORTING_DISPLAY: 'Sort Parcels',
     UNTITLED: 'UNTITLED',
+    DELETE_DRAFT: 'Delete Draft',
 
     //Job Master
     JOB_MASTER_HEADER: 'Job Master List',
@@ -367,8 +368,6 @@ module.exports = {
     SHOW_OTP: 'SHOW_OTP_SCREEN',
 
     //Mosambee Wallet
-    OTP_NUMBER_CAN_NOT_BE_BLANK: 'Otp Number can not be left Blank',
-    MOBILE_NO_CAN_NOT_BE_BLANK: 'Mobile Number can not be left Blank',
     FAILED: 'Failed',
     RESEND: 'reSend',
     TRANSACTION_SUCCESSFUL: 'Transaction Successfull',

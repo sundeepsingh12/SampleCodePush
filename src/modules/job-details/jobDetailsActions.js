@@ -10,15 +10,24 @@ import { performSyncService, pieChartCount } from '../home/homeActions'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { NavigationActions } from 'react-navigation'
 import * as realm from '../../repositories/realmdb'
+import jsSha512 from 'js-sha512'
+import { MosambeeWalletPaymentServices } from '../../services/payment/MosambeeWalletPayment'
 import { NetInfo } from 'react-native'
+import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import _ from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions'
+import { paymentService } from '../../services/payment/Payment'
 import { PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB, UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
+import { saveJobTransaction } from '../form-layout/formLayoutActions'
+import { Toast } from 'native-base'
+
 import {
     Start,
     PENDING,
-    JOB_EXPIRY_TIME
+    JOB_EXPIRY_TIME,
+    MOSAMBEE_WALLET_ID
 } from '../../lib/AttributeConstants'
+import { TRANSACTION_SUCCESSFUL } from '../../lib/ContainerConstants'
 import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
@@ -40,7 +49,9 @@ import {
     SHOULD_RELOAD_START,
     SET_LANDING_TAB,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
-    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT,
+    CUSTOMIZATION_APP_MODULE,
+    SET_CHECK_TRANSACTION_STATUS
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService';
 
@@ -69,10 +80,11 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
     }
 }
 
-export function getJobDetails(jobTransactionId) {
+export function getJobDetails(params, key) {
     return async function (dispatch) {
         try {
             dispatch(startFetchingJobDetails())
+            const jobTransactionId = params.jobTransaction.id
             const { statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, fieldAttributeStatusList, jobAttributeStatusList } = await jobDetailsService.getJobDetailsParameters()
             const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
             if (details.checkForSeenStatus) dispatch(performSyncService())
@@ -84,11 +96,72 @@ export function getJobDetails(jobTransactionId) {
             const parentStatusList = (jobMaster[0].isStatusRevert) && !_.isEqual(_.toLower(details.currentStatus.code), 'seen') ? await jobDetailsService.getParentStatusList(statusList.value, details.currentStatus, jobTransactionId) : []
             const draftStatusInfo = draftService.getDraftForState(details.jobTransactionDisplay, null)
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
+            if (draftStatusInfo) {
+                const checkPayment = await dispatch(checkForPaymentAtEnd(draftStatusInfo, details.jobTransactionDisplay, params, key, SET_CHECK_TRANSACTION_STATUS))
+            }
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, (statusCategory == 1), jobExpiryTime, draftStatusInfo && jobMaster[0].enableLiveJobMaster))
             if (draftStatusInfo && jobMaster[0].enableLiveJobMaster) dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(null, jobMaster))
         } catch (error) {
             showToastAndAddUserExceptionLog(1101, error.message, 'danger', 0)
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
+        }
+    }
+}
+export function checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, key, checkTransactionState, loaderState) {
+    return async function (dispatch) {
+        try {
+            let { formLayoutState, navigationFormLayoutStatesForRestore } = draftService.getFormLayoutStateFromDraft(draftStatusInfo)
+            const paymentAtEnd = formLayoutState.paymentAtEnd
+            if (paymentAtEnd.parameters) {
+                if(loaderState) dispatch(setState(loaderState, true))
+                const walletParameters = paymentAtEnd.parameters
+                let responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndHitCheckTransactionApi(walletParameters, paymentAtEnd.currentElement.jobTransactionIdAmountMap.actualAmount, walletParameters.referenceNo, "20")
+                let transactionId = _.trim(responseMessage.transId)
+                // if (_.isEqual(responseMessage.status, 'FAILURE') || _.isEqual(responseMessage, 'ErrorCredentials') || _.isEmpty(transactionId) || _.isEqual(transactionId, 'NA') || _.isEqual(transactionId, 'N.A.')) {
+                //     dispatch(setState(checkTransactionState, null))
+                //     return
+                // } else if (_.isEqual(responseMessage.status, 'SUCCESS')) {
+                    const taskListScreenDetails = {
+                        jobDetailsScreenKey: key,
+                        pageObjectAdditionalParams: params ? params.pageObjectAdditionalParams : null
+                    }
+                    paymentService.addPaymentObjectToDetailsArray(walletParameters.actualAmount, 14, responseMessage.transId, walletParameters.selectedWalletDetails.code, responseMessage, formLayoutState)
+                    setTimeout(() => {
+                        dispatch(setState(checkTransactionState, TRANSACTION_SUCCESSFUL))
+                    }, 2000);
+                    if (!jobTransaction) {
+                        Toast.show({
+                            text: TRANSACTION_SUCCESSFUL,
+                            position: 'bottom',
+                            buttonText: "OK",
+                            type: 'success',
+                            duration: 5000
+                        })
+                        jobTransaction = {
+                            id: formLayoutState.jobTransactionId,
+                            jobMasterId: draftStatusInfo.jobMasterId,
+                            jobId: formLayoutState.jobTransactionId,
+                            referenceNumber: walletParameters.referenceNo
+                        }
+                    // }
+                   const saveTransaction = await dispatch(saveJobTransaction(formLayoutState, draftStatusInfo.jobMasterId, walletParameters.contactData, jobTransaction, navigationFormLayoutStatesForRestore, null, null, taskListScreenDetails))
+                   return true
+                 }
+            } else {
+                return 
+            }
+        } catch (error) {
+            dispatch(setState(checkTransactionState, error.message))
+        }
+    }
+}
+export function deleteDraftAndNavigateToFormLayout(formLayoutData) {
+    return async function (dispatch) {
+        try {
+            draftService.deleteDraftFromDb(formLayoutData.jobTransaction, formLayoutData.jobMasterId)
+            dispatch(navigateToScene('FormLayout', formLayoutData))
+        } catch (error) {
+            showToastAndAddUserExceptionLog(1108, error.message, 'danger', 1)
         }
     }
 }

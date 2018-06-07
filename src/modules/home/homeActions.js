@@ -127,7 +127,7 @@ import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION
 export function fetchPagesAndPiechart() {
   return async function (dispatch) {
     try {
-      dispatch(setState(PAGES_LOADING, { pagesLoading: true }));
+      dispatch(setState(PAGES_LOADING));
       const user = await keyValueDBService.getValueFromStore(USER);
       //Fetching list of Pages
       const pageList = await keyValueDBService.getValueFromStore(PAGES);
@@ -192,7 +192,7 @@ export function navigateToPage(pageObject) {
         }
         case PAGE_CUSTOM_WEB_PAGE:
           let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
-          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (customRemarks.length) ? customRemarks[0].customUrl : null })) : dispatch(customAppSelection(customRemarks))
+          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null })) : dispatch(customAppSelection(customRemarks))
           break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
