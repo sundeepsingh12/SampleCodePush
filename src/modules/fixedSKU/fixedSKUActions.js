@@ -17,7 +17,7 @@ import {
 
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 
-export function onSave(parentObject, formLayoutState, fixedSKUList, jobTransaction) {
+export function onSave(parentObject, formLayoutState, fixedSKUList, jobTransaction,navigate) {
     return async function (dispatch) {
         try {
             fixedSKUList = await fixedSKUDetailsService.calculateTotalAmount(fixedSKUList)
@@ -27,7 +27,7 @@ export function onSave(parentObject, formLayoutState, fixedSKUList, jobTransacti
                 fixedSKUList,
                 isLoaderRunning: false
             }))
-            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
+            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction,null,null,navigate))
         } catch (error) {
             showToastAndAddUserExceptionLog(901, error.message, 'danger', 1)
         }

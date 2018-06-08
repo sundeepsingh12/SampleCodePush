@@ -37,7 +37,6 @@ class NewJob {
         if (!jobMasterId) {
             throw new Error(JOB_MASTER_MISSING)
         }
-        console.logs("saveActivatedData", saveActivatedData)
         let navigationParams, stateParam, screenName
         //if save activated data is not present or save activated data is present but not with that jobMaster which is been clicked than form layout is the next container
         if (!saveActivatedData || !saveActivatedData.value[jobMasterId]) {

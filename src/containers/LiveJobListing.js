@@ -7,7 +7,8 @@ import * as liveJobActions from '../modules/liveJob/liveJobActions'
 import Loader from '../components/Loader'
 import moment from 'moment'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, Alert, FlatList, Vibration, TouchableOpacity, TextInput, ScrollView, SafeAreaView } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, Alert, FlatList, Vibration, TouchableOpacity, TextInput, ScrollView } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import _ from 'lodash'
 import { Container, Content, Header, Button, Text, List, ListItem, Left, Body, Right, Icon, Title, Footer, FooterTab, StyleProvider, Spinner, ActionSheet, Toast, Input } from 'native-base'
 import getTheme from '../../native-base-theme/components'
@@ -71,7 +72,8 @@ class LiveJobListing extends PureComponent {
                     job: item,
                     liveJobList: this.props.liveJobList,
                     displayName: this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS
-                }
+                },
+                this.props.navigation.navigate
             )
         } else {
             this.toggleLiveJobSelection(item.id)

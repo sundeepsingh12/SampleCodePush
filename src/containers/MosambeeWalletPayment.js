@@ -1,7 +1,8 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, Platform, TextInput, Modal, TouchableOpacity, Image, SafeAreaView } from 'react-native'
+import { StyleSheet, View, Text, Platform, TextInput, Modal, TouchableOpacity, Image } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { SET_MODAL_VIEW, SET_OTP_MODAL_VIEW, CHANGE_WALLET_MOBILE_NO, SET_ERROR_MESSAGE_FOR_WALLET, CHANGE_OTP_NUMBER, RESET_STATE_FOR_WALLET, SET_ERROR_FOR_OTP } from '../lib/constants'
 import { Container, Content, Footer, FooterTab, Button, Icon, Body, Header, Toast, StyleProvider } from 'native-base';
 import styles from '../themes/FeStyle'
@@ -96,7 +97,7 @@ class MosambeeWalletPayment extends PureComponent {
         if (this.props.isModalVisible == 2 || _.isEqual(message, RESEND)) {
             this.props.actions.hitOtpUrlToGetOtp(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, actualAmount, this.props.navigation.state.params)
         } else {
-            this.props.actions.hitPaymentUrlforPayment(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, actualAmount, this.props.navigation.state.params.jobTransaction, this.props.otpNumber, this.props.navigation.state.params)
+            this.props.actions.hitPaymentUrlforPayment(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, actualAmount, this.props.otpNumber, this.props.navigation.state.params, this.props.navigation.push, this.props.navigation.goBack, this.props.navigation.state.key)
         }
     }
 
@@ -308,7 +309,7 @@ const style = StyleSheet.create({
     },
     footer: {
         height: 'auto',
-        // backgroundColor: '#ffffff',
+        backgroundColor: '#ffffff',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',
         paddingTop: 4,

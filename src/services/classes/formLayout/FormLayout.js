@@ -262,7 +262,6 @@ class FormLayout {
         let routeName, routeParam
         const currentStatus = await transientStatusAndSaveActivatedService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
-            console.logs("currentStatus",currentStatus, formLayoutState)
             routeName = SaveActivated
             routeParam = {
                 formLayoutState, contactData, currentStatus, jobTransaction, jobMasterId, navigationFormLayoutStates

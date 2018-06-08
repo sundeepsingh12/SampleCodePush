@@ -2,6 +2,7 @@
 'use strict';
 import React, { PureComponent } from 'react';
 import { AppRegistry, StyleSheet, Text, View, Image } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Left, Body, Right, Icon, Footer, StyleProvider, Button, } from 'native-base';
 import * as cameraActions from '../modules/camera/cameraActions'
 import { connect } from 'react-redux'
@@ -57,14 +58,16 @@ class ImageDetailsView extends PureComponent {
                 <Container>
                     <View style={{ flex: 1 }}>
                         {this.getImageView()}
-                        <View style={[styles.absolute, styles.padding10, { top: 0, left: 0, flex: 2 }]}>
-                            <Icon
-                                name="md-close"
-                                style={[styles.fontXxxl, styles.fontDarkGray]}
-                                onPress={() => {
-                                    this.props.navigation.goBack()
-                                }} />
-                        </View>
+                        <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, flex: 2 }]}>
+                            <View>
+                                <Icon
+                                    name="md-close"
+                                    style={[styles.fontXxxl, styles.fontDarkGray]}
+                                    onPress={() => {
+                                        this.props.navigation.goBack()
+                                    }} />
+                            </View>
+                        </SafeAreaView>
                     </View>
                 </Container>
             </StyleProvider>

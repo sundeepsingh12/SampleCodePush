@@ -109,6 +109,7 @@ module.exports = keyMirror({
     ERP_SYNC_STATUS: null,
     SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE: null,
     SET_NEWJOB_DRAFT_INFO: null,
+    SET_CHECK_TRANSACTION_AND_DRAFT: null,
     SET_LANDING_TAB: null,
     TABS_LOADING: null,
     SET_SELECTED_DATE: null,
@@ -274,6 +275,7 @@ module.exports = keyMirror({
     CLEAR_FORM_LAYOUT: null,
     SET_UPDATE_DRAFT: null,
     SET_ARRAY_DATA_STORE_FILTER_MAP: null,
+    CLEAR_FORM_LAYOUT_WITH_LOADER: null,
 
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
@@ -421,6 +423,7 @@ module.exports = keyMirror({
     RETURN_TO_HOME: null,
     SET_SAVE_ACTIVATED_DRAFT: null,
     CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED: null,
+    SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED: null,
 
     //Bulk Module
     START_FETCHING_BULK_TRANSACTIONS: null,

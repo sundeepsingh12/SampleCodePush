@@ -16,7 +16,8 @@ import {
     SHOW_DISCARD_ALERT,
     RETURN_TO_HOME,
     SET_SAVE_ACTIVATED_DRAFT,
-    CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED
+    CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED,
+    SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED
 } from '../../lib/constants'
 
 import{ TRANSACTION_SUCCESSFUL, DELETE_DRAFT} from '../../lib/ContainerConstants'
@@ -67,6 +68,10 @@ export default function saveActivatedReducer(state = initialState, action) {
             }
         }
 
+        case SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED: 
+            return state.set('draftStatusInfo', {})
+                        .set('checkTransactionSaveActivated', null)
+   
         case SHOW_DISCARD_ALERT:
             return state.set('showDiscardAlert', action.payload)
 

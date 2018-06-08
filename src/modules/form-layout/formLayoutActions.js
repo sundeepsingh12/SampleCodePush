@@ -23,7 +23,8 @@ import {
     ADD_FORM_LAYOUT_STATE,
     SET_FORM_INVALID_AND_FORM_ELEMENT,
     SYNC_RUNNING_AND_TRANSACTION_SAVING,
-    SET_LANDING_TAB
+    SET_LANDING_TAB,
+    CLEAR_FORM_LAYOUT_WITH_LOADER
 } from '../../lib/constants'
 
 import {
@@ -35,7 +36,7 @@ import { formLayoutService } from '../../services/classes/formLayout/FormLayout.
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 import { NavigationActions } from 'react-navigation'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobStatusService } from '../../services/classes/JobStatus'
 
@@ -52,7 +53,7 @@ import { fetchJobs } from '../taskList/taskListActions';
 export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
     return async function (dispatch) {
         try {
-            dispatch(setState(IS_LOADING, true))
+            dispatch(setState(CLEAR_FORM_LAYOUT_WITH_LOADER))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
             let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
@@ -128,7 +129,7 @@ export function updateFieldData(attributeId, value, formLayoutState, jobTransact
     }
 }
 
-export function updateFieldDataWithChildData(attributeMasterId, formLayoutState, value, fieldDataListObject, jobTransaction, modalPresent, containerValue) {
+export function updateFieldDataWithChildData(attributeMasterId, formLayoutState, value, fieldDataListObject, jobTransaction, modalPresent, containerValue, goBack) {
     return function (dispatch) {
         try {
             const cloneFormElement = _.cloneDeep(formLayoutState.formElement)
@@ -154,7 +155,8 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
                 draftService.saveDraftInDb(formLayoutState, formLayoutState.jobMasterId, null, jobTransaction)
             }
             if (validationsResult && !modalPresent) {
-                dispatch(NavigationActions.back())
+                // dispatch(NavigationActions.back())
+                goBack()
             }
             if (!validationsResult && cloneFormElement.get(attributeMasterId).alertMessage) {
                 if (modalPresent) {
@@ -171,7 +173,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack, key) {
     return async function (dispatch) {
         try {
             let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
@@ -194,21 +196,20 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         let landingTabId = JSON.parse(taskListScreenDetails.pageObjectAdditionalParams).landingTabAfterJobCompletion ? jobStatusService.getTabIdOnStatusId(statusList.value, cloneFormLayoutState.statusId) : null
                         dispatch(setState(SET_LANDING_TAB, { landingTabId }))
                         dispatch(pieChartCount())
-                        dispatch(NavigationActions.back({ key: taskListScreenDetails.jobDetailsScreenKey }))
+                        // dispatch(NavigationActions.back({ key: taskListScreenDetails.jobDetailsScreenKey }))
+                        goBack(taskListScreenDetails.jobDetailsScreenKey)
+                        dispatch(fetchJobs())
+                        dispatch(setState(CLEAR_FORM_LAYOUT))
                     } else if (routeName == TabScreen) {
-                        dispatch(NavigationActions.reset({
-                            index: 0,
-                            actions: [
-                                NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                                //NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: landingId } })
-                            ]
-                        }))
+                        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
+                        dispatch(fetchJobs())
+                        dispatch(setState(CLEAR_FORM_LAYOUT))
                     } else {
-                        // console.logs("routeName",routeName,routeParam)
-                        dispatch(navigateToScene(routeName, routeParam))
+                        if(key){
+                           goBack(key)
+                        }
+                        dispatch(navigateToScene(routeName, routeParam, navigate))
                     }
-                    dispatch(fetchJobs())
-                    dispatch(setState(CLEAR_FORM_LAYOUT))
                 } else {
                     dispatch(setState(SET_FORM_INVALID_AND_FORM_ELEMENT, {
                         isLoading: false,
@@ -293,7 +294,7 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formLayoutState, v
     }
 }
 
-export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction, draft, navgiationStateForSaveActivated, pageObjectAdditionalParams, jobDetailsScreenKey) {
+export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction, draft, navgiationStateForSaveActivated, pageObjectAdditionalParams, jobDetailsScreenKey, navigate) {
     return async function (dispatch) {
         try {
             let draftRestored = draftService.getFormLayoutStateFromDraft(draft)
@@ -323,7 +324,7 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                 isDraftRestore: true,
                 pageObjectAdditionalParams,
                 jobDetailsScreenKey
-            }))
+            }, navigate))
         } catch (error) {
             showToastAndAddUserExceptionLog(1013, error.message, 'danger', 1)
         }

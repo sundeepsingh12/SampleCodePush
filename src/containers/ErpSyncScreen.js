@@ -2,7 +2,8 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Image, Modal, SafeAreaView } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Image, Modal } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, Footer, FooterTab, StyleProvider } from 'native-base';
 import {
   AUTHENTICATING,

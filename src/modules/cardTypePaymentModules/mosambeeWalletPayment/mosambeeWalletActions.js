@@ -32,19 +32,13 @@ export function setWalletParametersAndGetWalletList(contactNumber) {
             const walletModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomization.value, MOSAMBEE_WALLET_ID)[0]
             const walletParameters = walletModule && walletModule.remark ? JSON.parse(walletModule.remark) : null
             const walletList = (walletParameters && walletParameters.partnerId && walletParameters.secretKey && walletParameters.apiPassword && walletParameters.PayProMID) ? await MosambeeWalletPaymentServices.hitWalletUrlToGetWalletList(walletParameters) : null
-            dispatch(setState(SET_MOSAMBEE_WALLET_PARAMETERS, {
-                walletParameters,
-                walletList,
-                contactNumber,
-                isModalVisible: 1
-            }))
+            dispatch(setState(SET_MOSAMBEE_WALLET_PARAMETERS, { walletParameters, walletList, contactNumber, isModalVisible: 1 }))
         } catch (error) {
             dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, {
                 errorMessage: error.message,
                 isModalVisible: 1
             }))
         }
-
     }
 }
 
@@ -52,28 +46,14 @@ export function hitOtpUrlToGetOtp(contactNumber, walletParameters, selectedWalle
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 3))
-            let { formLayoutState, jobMasterId, jobTransaction } = navigationParams
-            console.logs("jobTransaction",jobTransaction)
-
-            let referenceNoActualAmountMap = jobTransaction.referenceNumber + ':' + actualAmount
-            let requestBody = walletParameters.secretKey + contactNumber + Number(actualAmount).toFixed(2) + walletParameters.PayProMID +
-                jobTransaction.id + referenceNoActualAmountMap + selectedWalletDetails.code
-            let checkSum = jsSha512.update(requestBody + walletParameters.apiPassword)
-            const requestJSON = "{\"apiPassword\":" + "\"" + walletParameters.secretKey + "\"" + ",\"customerMobileNo\":" + "\"" + contactNumber + "\"" + ",\"amount\":" + "\"" + Number(actualAmount).toFixed(2) + "\"" + ",\"PayProMID\":" + "\"" + walletParameters.PayProMID + "\""
-                + ",\"transRefId\":" + "\"" + jobTransaction.id + "\"" + ",\"walletProvider\":" + "\"" + selectedWalletDetails.code + "\"" + ",\"comment\":" + "\"" + referenceNoActualAmountMap + "\"" + ",\"checksum\":" + "\"" + checkSum + "\"" + "}"
-            let responseMessage = await MosambeeWalletPaymentServices.fetchDatafromWalletApi(walletParameters.partnerId, walletParameters.otpURL, requestJSON)
-            // if (_.isEqual(responseMessage.message, 'One-time password (OTP) is sent')) {
+            let { formLayoutState, jobMasterId, jobTransaction, contactData } = navigationParams
+            const responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndGenerateOtp(jobTransaction, actualAmount, walletParameters, contactNumber, selectedWalletDetails.code)
+            if (_.isEqual(responseMessage.message, 'One-time password (OTP) is sent') && _.isEqual(responseMessage.status, 'SUCCESS')) {
                 dispatch(setState(SET_MODAL_VIEW, 3))
-                walletParameters.contactNo= contactNumber
-                walletParameters.referenceNo = jobTransaction.referenceNumber
-                walletParameters.actualAmount = actualAmount
-                walletParameters.selectedWalletDetails = selectedWalletDetails
-                formLayoutState.paymentAtEnd.parameters = walletParameters
-                draftService.saveDraftInDb(formLayoutState, jobMasterId, null, jobTransaction)
-            // }
-            //  else {
-                // throw new Error(responseMessage.message)
-            // }
+                MosambeeWalletPaymentServices.updateDraftInMosambee(walletParameters, contactData, actualAmount, selectedWalletDetails, formLayoutState, jobMasterId, jobTransaction)
+            }else {
+                throw new Error(responseMessage.message)
+            }
         } catch (error) {
             dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, {
                 errorMessage: error.message,
@@ -83,33 +63,19 @@ export function hitOtpUrlToGetOtp(contactNumber, walletParameters, selectedWalle
     }
 }
 
-export function hitPaymentUrlforPayment(contactNumber, walletParameters, selectedWalletDetails, actualAmount, jobTransaction, otpNumber, navigationParams) {
+export function hitPaymentUrlforPayment(contactNumber, walletParameters, selectedWalletDetails, actualAmount, otpNumber, navigationParams, navigate, goBack, key) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 4))
             let { formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails } = navigationParams
-            let referenceNoActualAmountMap = jobTransaction.referenceNumber + ':' + actualAmount
-            let requestBody = walletParameters.secretKey + contactNumber + otpNumber + Number(actualAmount).toFixed(2) + walletParameters.PayProMID +
-                jobTransaction.id + selectedWalletDetails.code
-            let checkSum = jsSha512.update(requestBody + walletParameters.apiPassword)
-            let requestJSON = "{\"apiPassword\":" + "\"" + walletParameters.secretKey + "\"" + ",\"customerMobileNo\":" + "\"" + contactNumber + "\"" + ",\"amount\":" + "\"" + Number(actualAmount).toFixed(2) + "\"" + ",\"PayProMID\":" + "\"" + walletParameters.PayProMID + "\""
-                + ",\"transRefId\":" + "\"" + jobTransaction.id + "\"" + ",\"otp\":" + "\"" + otpNumber + "\"" + ",\"walletProvider\":" + "\"" + selectedWalletDetails.code + "\"" + ",\"checksum\":" + "\"" + checkSum + "\"" + "}";
-            let responseMessage = await MosambeeWalletPaymentServices.fetchDatafromWalletApi(walletParameters.partnerId, walletParameters.paymentURL, requestJSON)
-            // if (_.isEqual(responseMessage.status, 'FAILURE')) {
-            //     throw new Error('Failed')
-            // }
-            // if (_.isEqual(responseMessage.message, 'Transaction Successfull')) {
-                await paymentService.addPaymentObjectToDetailsArray(actualAmount, 14, responseMessage.transId, selectedWalletDetails.code, responseMessage, formLayoutState)
-                // setTimeout(() => {
-                //     dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, {
-                //         errorMessage: TRANSACTION_SUCCESSFUL,
-                //         isModalVisible: 4
-                //     }))
-                // }, 2000);
-                dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails))
-                dispatch(NavigationActions.back())
-                // }
-
+            const responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndHitPaymentUrl(walletParameters, contactNumber, otpNumber, actualAmount, jobTransaction, selectedWalletDetails.code)
+            if (_.isEqual(responseMessage.message, 'Transaction Successfull') && _.isEqual(responseMessage.status, 'SUCCESS')) {
+                paymentService.addPaymentObjectToDetailsArray(actualAmount, 14, responseMessage.transId, selectedWalletDetails.code, responseMessage, formLayoutState)
+                setTimeout(() => { dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, { errorMessage: TRANSACTION_SUCCESSFUL, isModalVisible: 4 })) }, 1000);
+                dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack, key))
+            }else{
+                throw new Error('Failed')
+            }
         } catch (error) {
             dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, {
                 errorMessage: error.message,

@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import { Container, Content, Header, Left, Body, Icon, StyleProvider, Toast } from 'native-base';
+import { Container, Content, Header, Left, Body, Icon, StyleProvider, Toast, FooterTab } from 'native-base';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SignatureRemarks from '../components/SignatureRemarks'
@@ -52,6 +53,7 @@ class SignatureAndNps extends PureComponent {
             this.props.navigation.state.params.currentElement,
             this.props.navigation.state.params.formLayoutState,
             this.props.navigation.state.params.jobTransaction,
+            this.props.navigation.goBack
         )
     }
 
@@ -112,17 +114,19 @@ class SignatureAndNps extends PureComponent {
         )
     }
     saveSignButton() {
-        return <TouchableOpacity style={[style.fabButton, { backgroundColor: styles.bgPrimaryColor }]}
-            onPress={this.saveSign} >
-            <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
-        </TouchableOpacity>
+        return (
+            <TouchableOpacity style={[style.fabButton, { backgroundColor: styles.bgPrimaryColor }]}
+                onPress={this.saveSign} >
+                <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
+            </TouchableOpacity>
+        )
     }
     render() {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     {this.headerView()}
-                    <View style={[styles.flex1, styles.row]}>
+                    <View style={[styles.flex1, styles.row, styles.bgWhite]}>
                         {renderIf(this.props.fieldDataList.length > 0,
                             <View style={{ borderWidth: 1 }}>
                                 <SignatureRemarks fieldDataList={this.props.fieldDataList} />
@@ -139,12 +143,16 @@ class SignatureAndNps extends PureComponent {
                                 showTitleLabel={false}
                                 viewMode={this.state.isLandscape} />
                         </View>
-                        <View style={[style.feedback]}>
-                            <View style={[{ paddingLeft: 150, paddingRight: 150 }]}>
-                                <NPSFeedback onStarPress={this.onStarRatingPress} showSave={true} />
-                            </View>
-                        </View>
-                        {this.saveSignButton()}
+                        <SafeAreaView style={[style.feedback]}>
+                            <FooterTab>
+                                <View style={[style.feedback]}>
+                                    <View style={[{ paddingLeft: 150, paddingRight: 150 }]}>
+                                        <NPSFeedback onStarPress={this.onStarRatingPress} showSave={true} />
+                                    </View>
+                                </View>
+                                {this.saveSignButton()}
+                            </FooterTab>
+                        </SafeAreaView>
                     </View>
                 </Container>
             </StyleProvider >
@@ -185,7 +193,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         bottom: 10,
-        right: 10
+        right: 10,
     },
 
     feedback: {

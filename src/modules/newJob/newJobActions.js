@@ -23,7 +23,7 @@ import { DELETE_DRAFT } from '../../lib/ContainerConstants'
  * @param {*} negativeId 
  * @param {*} jobMasterId 
  */
-export function redirectToFormLayout(status, negativeId, jobMasterId, deleteDraft, action) {
+export function redirectToFormLayout(status, negativeId, jobMasterId, navigate, deleteDraft, action) {
     return async function (dispatch) {
         try {
             const user = await keyValueDBService.getValueFromStore(USER)
@@ -43,7 +43,8 @@ export function redirectToFormLayout(status, negativeId, jobMasterId, deleteDraf
                     jobId: negativeId,
                     referenceNumber
                 }
-            }))
+            },
+            navigate))
         } catch (error) {
             //TODO
             console.log(error)
@@ -54,7 +55,7 @@ export function redirectToFormLayout(status, negativeId, jobMasterId, deleteDraf
 /**
  * This method is called from home container and is use to check which container to navigate to
  */
-export function redirectToContainer(pageObject) {
+export function redirectToContainer(pageObject,navigate) {
     return async function (dispatch) {
         try {
             let jobMasterId = JSON.parse(pageObject.jobMasterIds)[0]
@@ -64,18 +65,18 @@ export function redirectToContainer(pageObject) {
                 const draftStatusInfo = draftService.getDraftForState(null, jobMasterId)
                 const nextStatus = await newJob.getNextPendingStatusForJobMaster(jobMasterId, JSON.parse(pageObject.additionalParams).statusId)
                 if (_.isEmpty(draftStatusInfo)) {
-                    dispatch(redirectToFormLayout(nextStatus, -1, jobMasterId))
+                    dispatch(redirectToFormLayout(nextStatus, -1, jobMasterId,navigate))
                 } else {
-                    let checkTransactionStatus = await dispatch(checkForPaymentAtEnd(draftStatusInfo, null, null, null, CHECK_TRANSACTION_STATUS_NEW_JOB, PAGES_LOADING ))
+                    let checkTransactionStatus = await dispatch(checkForPaymentAtEnd(draftStatusInfo, null, null, null, CHECK_TRANSACTION_STATUS_NEW_JOB, PAGES_LOADING , navigate))
                     if(checkTransactionStatus !== true){ 
                         dispatch(setState(SET_NEWJOB_DRAFT_INFO, { draft: draftStatusInfo, nextStatus }))
                     }
                 }
-            } else { //this is the case of saveActivated data which is present so navigate to saveActivated container or CheckoutDetails container depending upon screeName
+            }else { //this is the case of saveActivated data which is present so navigate to saveActivated container or CheckoutDetails container depending upon screeName
                 if (returnParams.stateParam) { //if state params is present then populate state of saveActivated
                     await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
                 }
-                dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams))
+                dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams,navigate))
             }
         } catch (error) {
             //TODO
