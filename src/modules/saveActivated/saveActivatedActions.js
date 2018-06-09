@@ -188,6 +188,7 @@ export function restoreDraft(draft, contactData, recurringData, jobMasterId, nav
             }
             cloneJobTransaction.jobId = cloneJobTransaction.id = --lastIndex
             cloneJobTransaction.jobMasterId = jobMasterId
+            cloneJobTransaction.referenceNumber = draft.referenceNumber
             dispatch(restoreDraftAndNavigateToFormLayout(contactData, cloneJobTransaction, draft, navigationFormLayoutStates, null, null, navigate))
             dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, {}))
         } catch (error) {

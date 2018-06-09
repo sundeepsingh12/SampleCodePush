@@ -284,7 +284,7 @@ class Tracking {
         }
 
         FCM.presentLocalNotification({
-            id: 1,
+            id: '1',
             title: FAREYE_UPDATES,
             body: message,
             priority: "high",

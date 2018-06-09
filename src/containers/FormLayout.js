@@ -144,7 +144,8 @@ class FormLayout extends PureComponent {
       errorMessage: this.props.errorMessage,
       currentElement: this.props.currentElement,
       fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
-      noFieldAttributeMappedWithStatus:this.props.noFieldAttributeMappedWithStatus
+      noFieldAttributeMappedWithStatus: this.props.noFieldAttributeMappedWithStatus,
+      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList
     }
 
     let taskListScreenDetails = {

@@ -1,8 +1,6 @@
 'use strict'
 import * as realm from '../../repositories/realmdb'
-import {
-    TABLE_JOB_DATA
-} from '../../lib/constants'
+import { TABLE_JOB_DATA } from '../../lib/constants'
 import moment from 'moment'
 import { fieldAttributeMasterService } from './FieldAttributeMaster'
 import { jobDataService } from './JobData'
@@ -125,7 +123,7 @@ class FieldValidation {
     evaluateValidationMap(validationStringMap, validationMap, formElement, jobTransaction, timeOfExecution, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
         let validationActionList, returnValue = true
         for (let index in validationStringMap) {
-            if (this.evaluateValidation(validationStringMap[index], validationMap, '||', formElement, jobTransaction, fieldAttributeMasterParentIdMap)) {
+            if (this.evaluateValidation(validationStringMap[index], validationMap, '||', formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)) {
                 validationActionList = validationMap[index].conditions ? validationMap[index].conditions.filter(validationAction => validationAction.conditionType == THEN) : null
             } else {
                 validationActionList = validationMap[index].conditions ? validationMap[index].conditions.filter(validationAction => validationAction.conditionType == ELSE) : null
@@ -144,20 +142,20 @@ class FieldValidation {
      * @param {*} formElement 
      * @param {*} jobTransaction 
      */
-    evaluateValidation(validationString, validationMap, splitOperator, formElement, jobTransaction, fieldAttributeMasterParentIdMap) {
+    evaluateValidation(validationString, validationMap, splitOperator, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
         if (!splitOperator) {
-            return this.evaluateCondition(this.parseKey(validationMap[validationString].leftKey, formElement, jobTransaction, fieldAttributeMasterParentIdMap), this.parseKey(validationMap[validationString].rightKey, formElement, jobTransaction, fieldAttributeMasterParentIdMap), validationMap[validationString].condition)
+            return this.evaluateCondition(this.parseKey(validationMap[validationString].leftKey, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList), this.parseKey(validationMap[validationString].rightKey, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList), validationMap[validationString].condition)
         }
         let result
         let validationList = validationString.split(splitOperator)
         for (let index in validationList) {
             if (splitOperator == '||') {
-                result = this.evaluateValidation(validationList[index], validationMap, '&&', formElement, jobTransaction, fieldAttributeMasterParentIdMap)
+                result = this.evaluateValidation(validationList[index], validationMap, '&&', formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 if (result) {
                     break;
                 }
             } else if (splitOperator == '&&') {
-                result = this.evaluateValidation(validationList[index], validationMap, null, formElement, jobTransaction, fieldAttributeMasterParentIdMap)
+                result = this.evaluateValidation(validationList[index], validationMap, null, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 if (!result) {
                     break
                 }
@@ -172,9 +170,9 @@ class FieldValidation {
      * @param {*} formElement 
      * @param {*} jobTransaction 
      */
-    parseKey(key, formElement, jobTransaction, fieldAttributeMasterParentIdMap) {
+    parseKey(key, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
         //TODO cross status validations and other child validations working on parent like mode type of money collect
-        if (key[0] == 'F') {
+        if (key.startsWith('F[')) {
             let id = this.splitKey(key, false)
             let fieldAttributeMasterId = parseInt(id)
             fieldAttributeMasterId = fieldAttributeMasterId != NaN ? fieldAttributeMasterId : id
@@ -185,12 +183,16 @@ class FieldValidation {
                 return childList
             }
             return formElement.get(fieldAttributeMasterId) ? formElement.get(fieldAttributeMasterId).displayValue : null
-        } else if (key[0] == 'J') {
+        } else if (key.startsWith('J[')) {
             let jobAttributeMasterId = this.splitKey(key, true)
             let jobDataQuery = `jobId = ${jobTransaction.jobId} AND jobAttributeMasterId = ${jobAttributeMasterId} AND parentId = 0`
             const jobData = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
             return jobData[0] ? jobData[0].value : null
-        } else {
+        } else if (key.includes('_') && key.split('_')[0] == 'fixed') {
+            let fixedAttribute = key.split('_')[1];
+            return (this.getFixedAttributeValue(fixedAttribute, jobTransaction, jobAndFieldAttributesList, key));
+        }
+        else {
             return key
         }
     }
@@ -258,17 +260,17 @@ class FieldValidation {
                 }
                 case ASSIGN: {
                     let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
-                    if(!formElement.get(parseInt(fieldAttributeMasterId))){
+                    if (!formElement.get(parseInt(fieldAttributeMasterId))) {
                         break
                     }
                     let valueToBeAssigned = null
                     if (validationActionList[index].actionOnAssignFrom) {
                         valueToBeAssigned = this.actionOnAssignFrom(fieldAttributeMasterId, jobTransaction, formElement, validationActionList[index], fieldAttributeMasterParentIdMap)
                     } else {
-                            valueToBeAssigned = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction, fieldAttributeMasterParentIdMap)
+                        valueToBeAssigned = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                     }
-                        formElement.get(parseInt(fieldAttributeMasterId)).displayValue = formElement.get(parseInt(fieldAttributeMasterId)).value = valueToBeAssigned || valueToBeAssigned === 0 ? valueToBeAssigned + '' : null
-                        formElement.get(parseInt(fieldAttributeMasterId)).editable = true
+                    formElement.get(parseInt(fieldAttributeMasterId)).displayValue = formElement.get(parseInt(fieldAttributeMasterId)).value = valueToBeAssigned || valueToBeAssigned === 0 ? valueToBeAssigned + '' : null
+                    formElement.get(parseInt(fieldAttributeMasterId)).editable = true
                     break
                 }
                 case ASSIGN_BY_MATHEMATICAL_FORMULA: {
@@ -283,7 +285,7 @@ class FieldValidation {
                 case ASSIGN_DATE_TIME: {
                     let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
                     if (formElement.get(parseInt(fieldAttributeMasterId))) {
-                        let value = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction, fieldAttributeMasterParentIdMap)
+                        let value = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                         if (formElement.get(parseInt(fieldAttributeMasterId)).attributeTypeId == TIME) {
                             let tobeassign = moment()
                             tobeassign.add(parseInt(value), 'h')
@@ -553,6 +555,25 @@ class FieldValidation {
             }
         }
         return { keyToJobAttributeMap, keyToFieldAttributeMap }
+    }
+
+    getFixedAttributeValue(fixedAttribute, jobTransaction, jobAndFieldAttributesList, key) {
+        switch (fixedAttribute) {
+            case 'referenceNumber':
+                return (jobTransaction && jobTransaction.referenceNumber) ? jobTransaction.referenceNumber : key;
+
+            case 'userHubName':
+                return (jobAndFieldAttributesList && jobAndFieldAttributesList.hub) ? jobAndFieldAttributesList.hub.name : key;
+
+            case 'userHubCode':
+                return (jobAndFieldAttributesList && jobAndFieldAttributesList.hub) ? jobAndFieldAttributesList.hub.code : key;
+
+            case 'userCityId':
+                return (jobAndFieldAttributesList && jobAndFieldAttributesList.user) ? jobAndFieldAttributesList.user.cityId : key;
+
+            case 'userEmpCode':
+                return (jobAndFieldAttributesList && jobAndFieldAttributesList.user) ? jobAndFieldAttributesList.user.employeeCode : key;
+        }
     }
 
 }
