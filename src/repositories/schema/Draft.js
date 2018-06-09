@@ -14,5 +14,6 @@ Draft.schema = {
         jobMasterId: 'int',
         navigationFormLayoutStates: { type: 'string', default: '{}' },
         statusName: 'string',
+        referenceNumber: 'string',
     }
 }

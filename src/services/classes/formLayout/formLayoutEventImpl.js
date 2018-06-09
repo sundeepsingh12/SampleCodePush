@@ -25,7 +25,7 @@ export default class FormLayoutEventImpl {
      * @param {*isSaveDisabled} isSaveDisabled 
      * @param {*fieldAttribute value} value 
      */
-    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap) {
+    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
         let isAllAttributeHidden = true //this is a check if there are all hidden attribute or not
         if (attributeMasterId && formLayoutObject.get(attributeMasterId)) {
             this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
@@ -56,7 +56,7 @@ export default class FormLayoutEventImpl {
                 }
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
-                let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap)
+                let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 let valueAfterValidation = formLayoutObject.get(value.fieldAttributeMasterId).value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
                     if (value.required) {
@@ -67,7 +67,7 @@ export default class FormLayoutEventImpl {
                         continue
                     }
                 }
-                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
+                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 if (!afterValidationResult && value.required) {
                     break
                 } else {
@@ -600,9 +600,9 @@ export default class FormLayoutEventImpl {
         }
         else {
             //JobTransactionId > 0 for Normal Job && <0 for New Job
-            jobTransactionDBObject = (jobTransactionId > 0 || (jobTransactionId < 0 && jobTransactionList && jobTransactionList.referenceNumber)) ?
+            jobTransactionDBObject = (jobTransactionId > 0 || (jobTransactionId < 0 && jobTransactionList && jobTransactionList.jobId > 0)) ?
                 realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, 'id = ' + jobTransactionId, false)[0] // to get the first transaction, as query is on id and it returns list
-                : this._getDefaultValuesForJobTransaction(jobTransactionId, status[0], jobMaster[0], user.value, hub.value, imei.value, currentTime)
+                : this._getDefaultValuesForJobTransaction(jobTransactionId, status[0], jobMaster[0], user.value, hub.value, imei.value, currentTime, jobTransactionList.referenceNumber)
             jobTransaction = { ...jobTransactionDBObject }
         }
         //TODO add more db objects
@@ -775,7 +775,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei, currentTime) {
+    _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei, currentTime, referenceNumber) {
         //TODO some values like lat/lng and battery are not valid values, update them as their library is added
         return jobTransaction = {
             id,
@@ -788,7 +788,7 @@ export default class FormLayoutEventImpl {
             actualAmount: 0.0,
             originalAmount: 0.0,
             moneyTransactionType: '',
-            referenceNumber: user.id + "/" + hub.id + "/" + moment().valueOf(),
+            referenceNumber,
             runsheetId: null,
             hubId: hub.id,
             cityId: user.cityId,
@@ -846,7 +846,7 @@ export default class FormLayoutEventImpl {
      * @param {*} jobTransactionList 
      */
     changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList) {
-        return (jobTransactionId < 0 && jobTransactionList && !jobTransactionList.referenceNumber) ? this.makeNegativeJobTransactionId() : jobTransactionId//if it is not a case of new job then return jobTransactionId
+        return (jobTransactionId < 0 && jobTransactionList && (jobTransactionList.jobId < 0)) ? this.makeNegativeJobTransactionId() : jobTransactionId//if it is not a case of new job then return jobTransactionId
     }
 
     /**
