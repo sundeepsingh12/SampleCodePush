@@ -25,7 +25,7 @@ export default class FormLayoutEventImpl {
      * @param {*isSaveDisabled} isSaveDisabled 
      * @param {*fieldAttribute value} value 
      */
-    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap) {
+    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
         let isAllAttributeHidden = true //this is a check if there are all hidden attribute or not
         if (attributeMasterId && formLayoutObject.get(attributeMasterId)) {
             this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
@@ -56,7 +56,7 @@ export default class FormLayoutEventImpl {
                 }
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
-                let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap)
+                let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 let valueAfterValidation = formLayoutObject.get(value.fieldAttributeMasterId).value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
                     if (value.required) {
@@ -67,7 +67,7 @@ export default class FormLayoutEventImpl {
                         continue
                     }
                 }
-                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
+                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 if (!afterValidationResult && value.required) {
                     break
                 } else {

@@ -1,8 +1,6 @@
 'use strict'
 import * as realm from '../../repositories/realmdb'
-import {
-    TABLE_JOB_DATA
-} from '../../lib/constants'
+import { TABLE_JOB_DATA } from '../../lib/constants'
 import moment from 'moment'
 import { fieldAttributeMasterService } from './FieldAttributeMaster'
 import { jobDataService } from './JobData'
@@ -191,23 +189,8 @@ class FieldValidation {
             const jobData = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
             return jobData[0] ? jobData[0].value : null
         } else if (key.includes('_') && key.split('_')[0] == 'fixed') {
-            let fixedAttribute = key.split('_')[1]
-            switch (fixedAttribute) {
-                case 'referenceNumber':
-                    return (jobTransaction && jobTransaction.referenceNumber) ? jobTransaction.referenceNumber : key;
-
-                case 'userHubName':
-                    return (jobAndFieldAttributesList && jobAndFieldAttributesList.hub) ? jobAndFieldAttributesList.hub.name : key;
-
-                case 'userHubCode':
-                    return (jobAndFieldAttributesList && jobAndFieldAttributesList.hub) ? jobAndFieldAttributesList.hub.code : key;
-
-                case 'userCityId':
-                    return (jobAndFieldAttributesList && jobAndFieldAttributesList.user) ? jobAndFieldAttributesList.user.cityId : key;
-
-                case 'userEmpCode':
-                    return (jobAndFieldAttributesList && jobAndFieldAttributesList.user) ? jobAndFieldAttributesList.user.employeeCode : key;
-            }
+            let fixedAttribute = key.split('_')[1];
+            return (this.getFixedAttributeValue(fixedAttribute, jobTransaction, jobAndFieldAttributesList, key));
         }
         else {
             return key
@@ -572,6 +555,25 @@ class FieldValidation {
             }
         }
         return { keyToJobAttributeMap, keyToFieldAttributeMap }
+    }
+
+    getFixedAttributeValue(fixedAttribute, jobTransaction, jobAndFieldAttributesList, key) {
+        switch (fixedAttribute) {
+            case 'referenceNumber':
+                return (jobTransaction && jobTransaction.referenceNumber) ? jobTransaction.referenceNumber : key;
+
+            case 'userHubName':
+                return (jobAndFieldAttributesList && jobAndFieldAttributesList.hub) ? jobAndFieldAttributesList.hub.name : key;
+
+            case 'userHubCode':
+                return (jobAndFieldAttributesList && jobAndFieldAttributesList.hub) ? jobAndFieldAttributesList.hub.code : key;
+
+            case 'userCityId':
+                return (jobAndFieldAttributesList && jobAndFieldAttributesList.user) ? jobAndFieldAttributesList.user.cityId : key;
+
+            case 'userEmpCode':
+                return (jobAndFieldAttributesList && jobAndFieldAttributesList.user) ? jobAndFieldAttributesList.user.employeeCode : key;
+        }
     }
 
 }
