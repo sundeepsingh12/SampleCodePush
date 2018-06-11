@@ -20,14 +20,14 @@ allprojects {
                 force "com.google.android.gms:play-services-gcm:12.0.1"
             }
        }
+       maven {
+            url 'https://maven.google.com'
+        }
         mavenLocal()
         jcenter()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"
-        }
-        maven {
-            url 'https://maven.google.com'
         }
          maven {
           url "$rootDir/../node_modules/react-native-background-geolocation/android/libs"

@@ -193,7 +193,7 @@ class Sync {
     for (let jobs of query.job) {
       let jobMaster = jobMasterMapWithAssignOrderToHubEnabled[jobs.jobMasterId]
       //Make transactions for those whose job transaction node is null
-      if (jobMaster && (!jobIdJobIdMap[jobs.id])) {
+      if (jobMaster && (!jobIdJobIdMap[jobs.id]) && jobs.status == 1) {
         let unassignedTransactions = this.createTransactionsOfUnassignedJobs(jobs, syncStoreDTO, jobMaster, jobMasterIdJobStatusIdOfPendingCodeMap)
         allJobsToTransactions.push(unassignedTransactions)
       }
