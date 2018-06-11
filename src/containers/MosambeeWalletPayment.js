@@ -54,7 +54,7 @@ class MosambeeWalletPayment extends PureComponent {
 
     componentDidMount() { 
         const contactNumber  = this.props.navigation.state.params.contactData ? this.props.navigation.state.params.contactData[0] : ''
-        this.props.actions.setWalletParametersAndGetWalletList(contactNumber)
+        this.props.actions.setWalletParametersAndGetWalletList(contactNumber, this.props.navigation.state.params.jobTransaction ,this.props.navigation.state.params.paymentAtEnd.currentElement.jobTransactionIdAmountMap)
     }
     componentWillUnmount() {
         this.props.actions.setState(RESET_STATE_FOR_WALLET)
@@ -73,11 +73,11 @@ class MosambeeWalletPayment extends PureComponent {
         })
     }
 
-    setModal(isModalVisible, actualAmount) {
+    setModal(isModalVisible) {
         switch (isModalVisible) {
             case 1: return <WalletListView walletListData={this.props.walletList} contactNumber={this.props.navigation.state.params.contactData} generateOtpNumber={this.navigateToOtpDetails} />
-            case 2: return <OtpGeneratedView contactNumber={this.props.contactNumber} onChangeMobileNo={this.onChangeMobileNo} selectedWalletDetails={this.props.selectedWalletDetails} actualAmount={actualAmount} />
-            case 3: return <OtpDetailView onResendOtp={this._hitOtpUrlApi} otpNumber={this.props.otpNumber} onChangeOtpNo={this.onChangeOtpNo} contactNumber={this.props.contactNumber} actualAmount={actualAmount} showModalView={this._showModalView} isModalShow={this.props.isModalVisible} />
+            case 2: return <OtpGeneratedView contactNumber={this.props.contactNumber} onChangeMobileNo={this.onChangeMobileNo} selectedWalletDetails={this.props.selectedWalletDetails} actualAmount={this.props.walletParameters.actualAmount} />
+            case 3: return <OtpDetailView onResendOtp={this._hitOtpUrlApi} otpNumber={this.props.otpNumber} onChangeOtpNo={this.onChangeOtpNo} contactNumber={this.props.contactNumber} showModalView={this._showModalView} isModalShow={this.props.isModalVisible} />
         }
     }
 
@@ -89,26 +89,26 @@ class MosambeeWalletPayment extends PureComponent {
         this.props.actions.setState(CHANGE_OTP_NUMBER, value)
     }
 
-    checkTransactionStatusApi(actualAmount) {
-        this.props.actions.hitCheckTransactionStatusApi("20", this.props.walletParameters, this.props.navigation.state.params.jobTransaction, actualAmount)
+    checkTransactionStatusApi() {
+        this.props.actions.hitCheckTransactionStatusApi("20", this.props.walletParameters)
     }
 
-    _hitOtpUrlApi = (message, checkForPayment, actualAmount) => {
+    _hitOtpUrlApi = (message) => {
         if (this.props.isModalVisible == 2 || _.isEqual(message, RESEND)) {
-            this.props.actions.hitOtpUrlToGetOtp(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, actualAmount, this.props.navigation.state.params)
+            this.props.actions.hitOtpUrlToGetOtp(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, this.props.navigation.state.params)
         } else {
-            this.props.actions.hitPaymentUrlforPayment(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, actualAmount, this.props.otpNumber, this.props.navigation.state.params, this.props.navigation.push, this.props.navigation.goBack, this.props.navigation.state.key)
+            this.props.actions.hitPaymentUrlforPayment(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, this.props.otpNumber, this.props.navigation.state.params, this.props.navigation.push, this.props.navigation.goBack, this.props.navigation.state.key)
         }
     }
 
-    getFooterView(actualAmount) {
+    getFooterView() {
         return (
             <SafeAreaView>
                 <Footer style={[style.footer]}>
                     <FooterTab style={[styles.padding10]}>
                         <Button success full
                             disabled={!_.size(_.trim(this.props.contactNumber)) || (this.props.isModalVisible == 3 && !_.size(_.trim(this.props.otpNumber)))}
-                            onPress={() => this._hitOtpUrlApi(null, null, actualAmount)}>
+                            onPress={() => this._hitOtpUrlApi()}>
                             <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.isModalVisible == 2 ? SEND_OTP : SUBMIT}</Text>
                         </Button>
                     </FooterTab>
@@ -117,9 +117,9 @@ class MosambeeWalletPayment extends PureComponent {
         )
     }
 
-    showErrorScreen(actualAmount) {
+    showErrorScreen() {
         if (this.props.isModalVisible == 5 || this.props.isModalVisible == 6) {
-            return this.showPaymentFailedScreen(actualAmount)
+            return this.showPaymentFailedScreen()
         } else {
             return this.dafaultErrorScreen()
         }
@@ -169,22 +169,23 @@ class MosambeeWalletPayment extends PureComponent {
             </Content>
         )
     }
-    transactionStatusButtonView(actualAmount) {
+    transactionStatusButtonView() {
         let checkForRetryButtonView = _.isEqual(this.props.errorMessage, FAILED)
         return (
             <View>
                 <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: checkForRetryButtonView ? '#F2F1FF' : '#007AFF', borderWidth: 1 }, { height: 50, width: checkForRetryButtonView ? 200 : 126 }, styles.alignCenter, styles.justifyCenter, { marginTop: 183 }]}
-                    onPress={() => { this.checkTransactionStatusApi(actualAmount) }}  >
+                    onPress={() => { this.checkTransactionStatusApi() }}  >
                     <Text style={[{ color: checkForRetryButtonView ? '#212121' : '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}> {checkForRetryButtonView ? 'Transaction Status' : 'Try Again'}</Text>
                 </Button>
             </View>
         )
     }
     retryButtonView() {
+        const contactNumber  = this.props.navigation.state.params.contactData ? this.props.navigation.state.params.contactData[0] : ''
         return (
             <View>
                 <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 50, width: 150 }, styles.alignCenter, styles.justifyCenter, { marginTop: 183 }]}
-                    onPress={() => { this.props.actions.setWalletParametersAndGetWalletList(this.props.navigation.state.params.contactData[0]) }}  >
+                    onPress={() => { this.props.actions.setWalletParametersAndGetWalletList(contactNumber, this.props.navigation.state.params.jobTransaction ,this.props.navigation.state.params.paymentAtEnd.currentElement.jobTransactionIdAmountMap) }}  >
                     <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}>Retry Payment</Text>
                 </Button>
             </View>
@@ -206,8 +207,8 @@ class MosambeeWalletPayment extends PureComponent {
         )
     }
 
-    showPaymentFailedScreen(actualAmount) {
-        let buttonView = (this.props.isModalVisible == 5) ? this.retryButtonView() : this.transactionStatusButtonView(actualAmount)
+    showPaymentFailedScreen() {
+        let buttonView = (this.props.isModalVisible == 5) ? this.retryButtonView() : this.transactionStatusButtonView()
         return (
             <Content>
                 <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
@@ -228,12 +229,12 @@ class MosambeeWalletPayment extends PureComponent {
         )
     }
 
-    checkForModalToShow(errorMessage, actualAmount) {
+    checkForModalToShow(errorMessage) {
         switch (errorMessage) {
-            case null: return this.setModal(this.props.isModalVisible, actualAmount)
+            case null: return this.setModal(this.props.isModalVisible)
             case TRANSACTION_SUCCESSFUL: return this.showPaymentSuccessfulScreen()
-            case FAILED: return this.showPaymentFailedScreen(actualAmount)
-            default: return this.showErrorScreen(actualAmount)
+            case FAILED: return this.showPaymentFailedScreen()
+            default: return this.showErrorScreen()
         }
     }
 
@@ -262,11 +263,9 @@ class MosambeeWalletPayment extends PureComponent {
     }
 
     render() {
-        const paymentAtEnd = this.props.navigation.state.params.paymentAtEnd
-        const actualAmount = (paymentAtEnd && paymentAtEnd.currentElement && paymentAtEnd.currentElement.jobTransactionIdAmountMap && paymentAtEnd.currentElement.jobTransactionIdAmountMap.actualAmount) ? paymentAtEnd.currentElement.jobTransactionIdAmountMap.actualAmount : 0
-        const viewModal = (this.props.isLoaderRunning) ? <Loader /> : this.checkForModalToShow(this.props.errorMessage, actualAmount)
+        const viewModal = (this.props.isLoaderRunning) ? <Loader /> : this.checkForModalToShow(this.props.errorMessage)
         const checkForPayment = !_.isEqual(this.props.errorMessage, null) || this.props.isModalVisible == 3
-        const footerView = (((this.props.isModalVisible == 2 || this.props.isModalVisible == 3) && !this.props.errorMessage)) && !this.props.isLoaderRunning ? this.getFooterView(actualAmount) : null
+        const footerView = (((this.props.isModalVisible == 2 || this.props.isModalVisible == 3) && !this.props.errorMessage)) && !this.props.isLoaderRunning ? this.getFooterView() : null
         const headerView = this._headerModal(checkForPayment)
         return (
             <Modal

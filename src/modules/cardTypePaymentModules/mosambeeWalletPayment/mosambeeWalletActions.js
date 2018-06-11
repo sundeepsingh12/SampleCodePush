@@ -24,14 +24,11 @@ import { draftService } from '../../../services/classes/DraftService'
 import { NavigationActions } from 'react-navigation'
 
 
-export function setWalletParametersAndGetWalletList(contactNumber) {
+export function setWalletParametersAndGetWalletList(contactNumber, jobTransaction, jobTransactionIdAmountMap) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 1))
-            const modulesCustomization = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
-            const walletModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomization.value, MOSAMBEE_WALLET_ID)[0]
-            const walletParameters = walletModule && walletModule.remark ? JSON.parse(walletModule.remark) : null
-            const walletList = (walletParameters && walletParameters.partnerId && walletParameters.secretKey && walletParameters.apiPassword && walletParameters.PayProMID) ? await MosambeeWalletPaymentServices.hitWalletUrlToGetWalletList(walletParameters) : null
+            const { walletParameters, walletList} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap)
             dispatch(setState(SET_MOSAMBEE_WALLET_PARAMETERS, { walletParameters, walletList, contactNumber, isModalVisible: 1 }))
         } catch (error) {
             dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, {
@@ -42,15 +39,15 @@ export function setWalletParametersAndGetWalletList(contactNumber) {
     }
 }
 
-export function hitOtpUrlToGetOtp(contactNumber, walletParameters, selectedWalletDetails, actualAmount, navigationParams) {
+export function hitOtpUrlToGetOtp(contactNumber, walletParameters, selectedWalletDetails, navigationParams) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 3))
             let { formLayoutState, jobMasterId, jobTransaction, contactData } = navigationParams
-            const responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndGenerateOtp(jobTransaction, actualAmount, walletParameters, contactNumber, selectedWalletDetails.code)
-            if (_.isEqual(responseMessage.message, 'One-time password (OTP) is sent') && _.isEqual(responseMessage.status, 'SUCCESS')) {
+            const responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndGenerateOtp(jobTransaction, walletParameters, contactNumber, selectedWalletDetails.code)
+            if ( _.isEqual(responseMessage.message, 'One-time password (OTP) is sent') && _.isEqual(responseMessage.status, 'SUCCESS')) {
                 dispatch(setState(SET_MODAL_VIEW, 3))
-                MosambeeWalletPaymentServices.updateDraftInMosambee(walletParameters, contactData, actualAmount, selectedWalletDetails, formLayoutState, jobMasterId, jobTransaction)
+                MosambeeWalletPaymentServices.updateDraftInMosambee(walletParameters, contactData, selectedWalletDetails, formLayoutState, jobMasterId, jobTransaction)
             }else {
                 throw new Error(responseMessage.message)
             }
@@ -63,14 +60,14 @@ export function hitOtpUrlToGetOtp(contactNumber, walletParameters, selectedWalle
     }
 }
 
-export function hitPaymentUrlforPayment(contactNumber, walletParameters, selectedWalletDetails, actualAmount, otpNumber, navigationParams, navigate, goBack, key) {
+export function hitPaymentUrlforPayment(contactNumber, walletParameters, selectedWalletDetails, otpNumber, navigationParams, navigate, goBack, key) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 4))
             let { formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails } = navigationParams
-            const responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndHitPaymentUrl(walletParameters, contactNumber, otpNumber, actualAmount, jobTransaction, selectedWalletDetails.code)
-            if (_.isEqual(responseMessage.message, 'Transaction Successfull') && _.isEqual(responseMessage.status, 'SUCCESS')) {
-                paymentService.addPaymentObjectToDetailsArray(actualAmount, 14, responseMessage.transId, selectedWalletDetails.code, responseMessage, formLayoutState)
+            const responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndHitPaymentUrl(walletParameters, contactNumber, otpNumber, jobTransaction, selectedWalletDetails.code)
+            if ( _.isEqual(responseMessage.message, 'Transaction Successfull') && _.isEqual(responseMessage.status, 'SUCCESS')) {
+                paymentService.addPaymentObjectToDetailsArray(walletParameters.actualAmount, 14, responseMessage.transId, selectedWalletDetails.code, responseMessage, formLayoutState)
                 setTimeout(() => { dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, { errorMessage: TRANSACTION_SUCCESSFUL, isModalVisible: 4 })) }, 1000);
                 dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack, key))
             }else{
@@ -85,11 +82,11 @@ export function hitPaymentUrlforPayment(contactNumber, walletParameters, selecte
     }
 }
 
-export function hitCheckTransactionStatusApi(transactionType, walletParameters, jobTransaction, actualAmount) {
+export function hitCheckTransactionStatusApi(transactionType, walletParameters) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 5))
-            let responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndHitCheckTransactionApi(walletParameters, actualAmount, jobTransaction.referenceNumber, transactionType)
+            let responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndHitCheckTransactionApi(walletParameters, transactionType)
             dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, {
                 errorMessage: responseMessage.message ,
                 isModalVisible:  5 
