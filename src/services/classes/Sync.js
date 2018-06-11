@@ -643,7 +643,7 @@ class Sync {
     const body = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
     const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${body} jobs` : body
     FCM.presentLocalNotification({
-      id: 1,
+      id: '1',
       title: FAREYE_UPDATES,
       body: message,
       priority: "high",

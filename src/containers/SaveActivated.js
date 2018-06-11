@@ -22,6 +22,7 @@ import _ from 'lodash'
 import { redirectToFormLayout } from '../modules/newJob/newJobActions'
 import { checkForPaymentAtEnd } from '../modules/job-details/jobDetailsActions'
 import TransactionAlert from '../components/TransactionAlert'
+import moment from 'moment'
 
 function mapStateToProps(state) {
     return {
@@ -109,7 +110,7 @@ class SaveActivated extends PureComponent {
             lastIndex = 0
         }
         cloneJobTransaction.jobId = cloneJobTransaction.id = --lastIndex
-        cloneJobTransaction.referenceNumber = userHubId[0] + '/' + userHubId[1] + '/' + Date.now()
+        cloneJobTransaction.referenceNumber = userHubId[0] + '/' + userHubId[1] + '/' + moment().valueOf()
         this.props.actions.navigateToScene(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: cloneJobTransaction.id,

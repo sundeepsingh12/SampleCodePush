@@ -214,7 +214,7 @@ class JobDetailsV2 extends PureComponent {
       jobDetailsScreenKey: this.props.navigation.state.key
     },
       null,
-      this.props.navigation)
+      this.props.navigation.navigate)
     this._onCancel()
   }
   _onCancel = () => {
