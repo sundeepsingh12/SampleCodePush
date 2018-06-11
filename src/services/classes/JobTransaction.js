@@ -45,11 +45,19 @@ class JobTransaction {
     }
 
     getJobTransactionsForDeleteSync(statusIds, postOrderList) {
-        let query = statusIds ? statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ') : ''
-        let postOrderQuery = postOrderList ? postOrderList.map(referenceNumber => `referenceNumber = "${referenceNumber}"`).join(' OR ') : ''
-        query = query && query.trim() !== '' ? query + ' OR ' + postOrderQuery : postOrderQuery
-        const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
-        return transactionList
+        let query = statusIds ? statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ') : '';
+        let postOrderQuery = '';
+        let firstIndex = Object.keys(postOrderList)[0];
+        for (let index in postOrderList) {
+            if (index == firstIndex) {
+                postOrderQuery += `referenceNumber = "${postOrderList[index].referenceNumber}"`;
+            } else {
+                postOrderQuery += ` OR referenceNumber = "${postOrderList[index].referenceNumber}"`;
+            }
+        }
+        query = query && query.trim() !== '' ? query + ' OR ' + postOrderQuery : postOrderQuery;
+        const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query);
+        return transactionList;
     }
 
     /**Sample Return type
@@ -335,7 +343,7 @@ class JobTransaction {
             jobTransactionCustomization.runsheetDate = runsheetMap[jobTransaction.runsheetId] ? runsheetMap[jobTransaction.runsheetId].startDate : null;
             jobTransactionCustomization.jobStartTime = job.jobStartTime;
             jobTransactionCustomization.jobEndTime = job.jobEndTime;
-            jobTransactionCustomization.isNextStatusPresent = jobTransaction.jobStatusId ? jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList && jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList.length > 0 : null; 
+            jobTransactionCustomization.isNextStatusPresent = jobTransaction.jobStatusId ? jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList && jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList.length > 0 : null;
             jobTransactionCustomization.jobPriority = jobTransactionCustomizationListParametersMaps.jobMasterIdMap[jobMasterId].enableJobPriority ? job.jobPriority : 0;
             jobTransactionCustomizationList.push(jobTransactionCustomization);
         }
