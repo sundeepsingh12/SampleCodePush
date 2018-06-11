@@ -5,12 +5,15 @@ import {
     POPULATE_DATA,
     FormLayout,
     SET_NEWJOB_DRAFT_INFO,
+    USER,
+    HUB
 } from '../../lib/constants'
 import { newJob } from '../../services/classes/NewJob'
 import { setState, navigateToScene } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import _ from 'lodash'
 import { draftService } from '../../services/classes/DraftService'
+import moment from 'moment';
 
 /**
  * It will navigate to FormLayout container
@@ -18,9 +21,12 @@ import { draftService } from '../../services/classes/DraftService'
  * @param {*} negativeId 
  * @param {*} jobMasterId 
  */
-export function redirectToFormLayout(status, negativeId, jobMasterId,navigate) {
+export function redirectToFormLayout(status, negativeId, jobMasterId, navigate) {
     return async function (dispatch) {
         try {
+            let user = await keyValueDBService.getValueFromStore(USER)
+            let hub = await keyValueDBService.getValueFromStore(HUB)
+            let referenceNumber = user.value.id + "/" + hub.value.id + "/" + moment().valueOf()
             dispatch(navigateToScene(FormLayout, {
                 statusId: status.id,
                 statusName: status.name,
@@ -30,9 +36,10 @@ export function redirectToFormLayout(status, negativeId, jobMasterId,navigate) {
                     id: negativeId,
                     jobMasterId,
                     jobId: negativeId,
+                    referenceNumber
                 }
             },
-            navigate))
+                navigate))
         } catch (error) {
             //TODO
         }
@@ -42,7 +49,7 @@ export function redirectToFormLayout(status, negativeId, jobMasterId,navigate) {
 /**
  * This method is called from home container and is use to check which container to navigate to
  */
-export function redirectToContainer(pageObject,navigate) {
+export function redirectToContainer(pageObject, navigate) {
     return async function (dispatch) {
         try {
             let jobMasterId = JSON.parse(pageObject.jobMasterIds)[0]
@@ -52,7 +59,7 @@ export function redirectToContainer(pageObject,navigate) {
                 const draftStatusInfo = draftService.getDraftForState(null, jobMasterId)
                 const nextStatus = await newJob.getNextPendingStatusForJobMaster(jobMasterId, JSON.parse(pageObject.additionalParams).statusId)
                 if (_.isEmpty(draftStatusInfo)) {
-                    dispatch(redirectToFormLayout(nextStatus, -1, jobMasterId,navigate))
+                    dispatch(redirectToFormLayout(nextStatus, -1, jobMasterId, navigate))
                 } else {
                     dispatch(setState(SET_NEWJOB_DRAFT_INFO, { draft: draftStatusInfo, nextStatus }))
                 }
@@ -60,7 +67,7 @@ export function redirectToContainer(pageObject,navigate) {
                 if (returnParams.stateParam) { //if state params is present then populate state of saveActivated
                     await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
                 }
-                dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams,navigate))
+                dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams, navigate))
             }
         } catch (error) {
             //TODO
