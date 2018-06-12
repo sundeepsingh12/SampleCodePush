@@ -91,7 +91,9 @@ android {
     defaultConfig {
         applicationId "com.fareyereact"
         minSdkVersion 16
-        targetSdkVersion 22
+        vectorDrawables.useSupportLibrary = true
+        targetSdkVersion 27
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
         ndk {
@@ -142,6 +144,7 @@ repositories {
 }
 
 dependencies {
+    compile project(':react-native-image-crop-picker')
     compile project(':react-native-compress-image') 
     compile project(':react-native-apk-installer')
     compile project(':react-native-fcm')

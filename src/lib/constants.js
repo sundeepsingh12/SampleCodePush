@@ -492,7 +492,6 @@ module.exports = keyMirror({
     JOB_ASSIGNMENT: null,
 
     //Camera Actions
-    SET_SHOW_IMAGE: null,
     SET_IMAGE_DATA: null,
     VIEW_IMAGE_DATA: null,
     SET_SHOW_VIEW_IMAGE: null,

@@ -11,7 +11,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import * as cameraActions from '../modules/camera/cameraActions'
-import { SET_IMAGE_DATA, SET_SHOW_IMAGE, SET_SHOW_IMAGE_AND_DATA, SET_CAMERA_LOADER } from '../lib/constants'
+import { SET_IMAGE_DATA, SET_SHOW_IMAGE_AND_DATA, SET_CAMERA_LOADER } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
 import ImagePicker from 'react-native-image-picker'
@@ -19,6 +19,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import platform from '../../native-base-theme/variables/platform'
 import { CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, SKU_PHOTO } from '../lib/AttributeConstants'
 import { OPEN_CAMERA } from '../lib/ContainerConstants'
+import ImageCropPicker from 'react-native-image-crop-picker';
 
 function mapStateToProps(state) {
     return {
@@ -109,6 +110,31 @@ class CameraFieldAttribute extends PureComponent {
         })
     }
 
+    // getImageGallery = () => {
+    //     const options = {
+    //         width: 300,
+    //   height: 300,
+    //   includeBase64: true,
+    //   mediaType: 'photo',
+    //   compressImageQuality: 0.5,
+    //   loadingLabelText: 'Processing assets...',
+    //   enableRotationGesture : true
+    //     }
+    //     ImagePicker.openPicker(options).then(image => {
+    //         if (image.data) {
+    //             if(Platform.OS === 'ios') {
+    //                 this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
+    //                     data: {data: image.data, uri : image.path},
+    //                     showImage: true
+    //                 })
+    //             } else {
+    //                 this.props.actions.compressImages(image.path);
+    //             }
+    //         } 
+    //     }).catch(e => {
+    //         alert(e.message ? e.message : e);
+    //       });
+    // }
     getImageGallery = () => {
         const options = {
             title: 'Photo Picker',
@@ -136,6 +162,33 @@ class CameraFieldAttribute extends PureComponent {
                 }
             }
         })
+    }
+
+    cropImage = () => {
+        ImageCropPicker.openCropper({
+            path: this.props.imageData.uri,
+            width: 300,
+            height: 300,
+            enableRotationGesture: true,
+            showCropGuidelines: true,
+            freeStyleCropEnabled: true,
+            cropping: true
+        }).then(image => {
+            if (image.path) {
+                if (Platform.OS === 'ios') {
+                    ImageStore.getBase64ForTag(image.path, (base64Data) => {
+                        dispatch(setState(SET_SHOW_IMAGE_AND_DATA, {
+                            data: { data: base64Data, uri: image.path },
+                            showImage: true
+                        }))
+                    })
+                } else {
+                    this.props.actions.compressImages(image.path);
+                }
+            }
+        }).catch(e => {
+            alert(e.message ? e.message : e);
+        });
     }
 
     renderTorch() {
@@ -201,7 +254,7 @@ class CameraFieldAttribute extends PureComponent {
         </StyleProvider>
     }
 
-    showImageView() {
+    showImageView(getValidationObject) {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
@@ -210,7 +263,7 @@ class CameraFieldAttribute extends PureComponent {
                             resizeMethod={'resize'}
                             source={{
                                 isStatic: true,
-                                uri: 'data:image/jpeg;base64,' + this.props.imageData,
+                                uri: 'data:image/jpeg;base64,' + this.props.imageData.data,
                             }}
                             style={[styles.flex1]}
                         />
@@ -228,14 +281,21 @@ class CameraFieldAttribute extends PureComponent {
                             </View>
                         </SafeAreaView>
                     </View>
-                    <SafeAreaView style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, { bottom: 0 }]}>
+                    <SafeAreaView style={[styles.width100, styles.absolute, styles.row, styles.heightAuto, styles.justifyCenter, styles.alignCenter, styles.padding10, { bottom: 0 }]}>
+                        {(getValidationObject && getValidationObject.cropImageValidation) ?
+                            <View style={[styles.justifyCenter, styles.alignCenter, { marginRight: 46 }]}>
+                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.cropImage()}>
+                                    <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
+                                </TouchableOpacity>
+                            </View>
+                            : null}
                         <View>
-                            <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
+                            <View style={[styles.justifyCenter, styles.alignCenter]}>
                                 <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
                                     if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
-                                        this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData, this.props.navigation.state.params.currentElement)
+                                        this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData.data, this.props.navigation.state.params.currentElement)
                                     } else {
-                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction, this.props.navigation.goBack)
+                                        this.props.actions.saveImage(this.props.imageData.data, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction, this.props.navigation.goBack)
                                     }
                                 }}>
                                     <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
@@ -253,7 +313,7 @@ class CameraFieldAttribute extends PureComponent {
         if (this.props.cameraLoader)
             return <Loader />
         if (((item.value && item.value != '' && item.value != OPEN_CAMERA) || this.props.imageData) && this.props.showImage) {
-            return this.showImageView()
+            return this.showImageView(this.props.validation)
         } else {
             return this.imageCaptureView(this.props.validation)
         }
@@ -267,7 +327,7 @@ class CameraFieldAttribute extends PureComponent {
                     const { uri, base64 } = capturedImg;
                     if (Platform.OS == 'ios') {
                         this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-                            data: base64,
+                            data: { data: base64, uri },
                             showImage: true
                         })
                     } else {

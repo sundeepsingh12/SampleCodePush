@@ -3,7 +3,6 @@ import {
     NEXT_FOCUS,
     SET_IMAGE_DATA,
     VIEW_IMAGE_DATA,
-    SET_SHOW_IMAGE,
     SET_SHOW_VIEW_IMAGE,
     SET_VALIDATION_FOR_CAMERA,
     SET_CAMERA_LOADER,
@@ -21,6 +20,8 @@ import CONFIG from '../../lib/config'
 import {
     ImageStore,
 } from 'react-native';
+
+import { PATH_CUSTOMER_IMAGES } from '../../lib/AttributeConstants'
 import RNFS from 'react-native-fs'
 var PATH_COMPRESS_IMAGES = '/compressImages';
 
@@ -72,10 +73,10 @@ export function compressImages(uri) {
             CompressImage.createCompressedImage(uri, PATH_COMPRESS_IMAGES).then((resizedImage) => {
                 ImageStore.getBase64ForTag(resizedImage.uri, (base64Data) => {
                     dispatch(setState(SET_SHOW_IMAGE_AND_DATA, {
-                        data: base64Data,
+                        data: {data: base64Data, uri : resizedImage.uri},
                         showImage: true
                     }))
-                    RNFS.unlink(resizedImage.path).then(() => { }).catch((error) => { })
+                    // RNFS.unlink(resizedImage.path).then(() => { }).catch((error) => { })
                 }, (reason) => {
                     dispatch(setState(SET_CAMERA_LOADER, false))
                     showToastAndAddUserExceptionLog(306, reason.message, 'danger', 1)
@@ -108,8 +109,8 @@ export function setExistingImage(item) {
             }
             const result = await signatureService.getImageData(item.value)
             if (result) {
-                dispatch(setState(SET_IMAGE_DATA, result))
-                dispatch(setState(SET_SHOW_IMAGE, true))
+                let imageName = item.value.split('/')
+                dispatch(setState(SET_IMAGE_DATA, {data: result, uri: 'file://' + PATH_CUSTOMER_IMAGES + imageName[imageName.length - 1]}))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(304, error.message, 'danger', 1)
