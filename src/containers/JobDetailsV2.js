@@ -206,9 +206,10 @@ class JobDetailsV2 extends PureComponent {
       jobDetailsScreenKey: this.props.navigation.state.key
     },
       null,
-      this.props.navigation)
+      this.props.navigation.navigate)
     this._onCancel()
   }
+  
   _onCancel = () => {
     this.props.actions.setState(IS_MISMATCHING_LOCATION, null)
   }

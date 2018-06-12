@@ -47,11 +47,19 @@ class JobTransaction {
     }
 
     getJobTransactionsForDeleteSync(statusIds, postOrderList) {
-        let query = statusIds ? statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ') : ''
-        let postOrderQuery = postOrderList ? postOrderList.map(referenceNumber => `referenceNumber = "${referenceNumber}"`).join(' OR ') : ''
-        query = query && query.trim() !== '' ? query + ' OR ' + postOrderQuery : postOrderQuery
-        const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
-        return transactionList
+        let query = statusIds ? statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ') : '';
+        let postOrderQuery = '';
+        let firstIndex = Object.keys(postOrderList)[0];
+        for (let index in postOrderList) {
+            if (index == firstIndex) {
+                postOrderQuery += `referenceNumber = "${postOrderList[index].referenceNumber}"`;
+            } else {
+                postOrderQuery += ` OR referenceNumber = "${postOrderList[index].referenceNumber}"`;
+            }
+        }
+        query = query && query.trim() !== '' ? query + ' OR ' + postOrderQuery : postOrderQuery;
+        const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query);
+        return transactionList;
     }
 
     /**Sample Return type

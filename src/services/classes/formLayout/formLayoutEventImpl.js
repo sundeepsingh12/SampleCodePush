@@ -25,7 +25,7 @@ export default class FormLayoutEventImpl {
      * @param {*isSaveDisabled} isSaveDisabled 
      * @param {*fieldAttribute value} value 
      */
-    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap) {
+    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
         let isAllAttributeHidden = true //this is a check if there are all hidden attribute or not
         if (attributeMasterId && formLayoutObject.get(attributeMasterId)) {
             this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
@@ -56,7 +56,7 @@ export default class FormLayoutEventImpl {
                 }
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
-                let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap)
+                let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 let valueAfterValidation = formLayoutObject.get(value.fieldAttributeMasterId).value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
                     if (value.required) {
@@ -67,7 +67,7 @@ export default class FormLayoutEventImpl {
                         continue
                     }
                 }
-                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
+                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 if (!afterValidationResult && value.required) {
                     break
                 } else {
@@ -155,54 +155,50 @@ export default class FormLayoutEventImpl {
      * @param {*jobMasterId} jobMasterId
      */
     async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionList) {
-        try {
-            let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
-            let user = await keyValueDBService.getValueFromStore(USER)
-            let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
-            let previouslyTravelledDistance = await keyValueDBService.getValueFromStore(PREVIOUSLY_TRAVELLED_DISTANCE)
-            previouslyTravelledDistance = (!parseFloat(previouslyTravelledDistance)) ? 0 : previouslyTravelledDistance.value
-            let trackKms = userSummary.value.gpsKms - previouslyTravelledDistance
-            let trackTransactionTimeSpent = await keyValueDBService.getValueFromStore(TRANSACTION_TIME_SPENT)
-            trackTransactionTimeSpent = moment().diff(trackTransactionTimeSpent.value, 'seconds')
-            let trackBattery = await keyValueDBService.getValueFromStore(TRACK_BATTERY)
-            let gpsKms = (!userSummary.value.gpsKms) ? "0" : userSummary.value.gpsKms
-            await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, gpsKms)
-            let lastTrackLog = {
-                latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
-                longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
-            }
-            let fieldData, jobTransaction, job, dbObjects
-            if (jobTransactionList && jobTransactionList.length) { //Case of bulk
-                fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionList, currentTime)
-                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
-                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap) // to edit later 
-                job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value, fieldData.reAttemptDate)
-            }
-            else {
-                jobTransactionId = await this.changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList)//In case of new job change jobTransactionId
-                fieldData = this._saveFieldData(formLayoutObject, jobTransactionId, null, currentTime)
-                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
-                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap) //to edit later
-                job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, lastTrackLog)
-            }
-            //TODO add other dbs which needs updation
-            const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
-            if (customNaming && customNaming.value && customNaming.value.updateEta) {
-                await this._getRunsheetIdToUpdateJobTransactions(jobTransaction.value, currentTime, dbObjects.status[0].statusCategory)
-            }
-            const prevStatusId = (jobTransactionList && jobTransactionList.length) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
-            const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, lastTrackLog)
-            const runSheet = (jobTransactionId >= 0 || (jobTransactionList && jobTransactionList.length)) ? await this._updateRunsheetSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value) : []
-            await this._updateUserSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value, userSummary.value, dbObjects.status[0].id)
-            await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionList)
-            let serverSmsLogs = await addServerSmsService.addServerSms(statusId, jobMasterId, fieldData, jobTransaction.value)
-            realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job, serverSmsLogs)
-            await keyValueDBService.validateAndSaveData(LAST_JOB_COMPLETED_TIME, moment().format('YYYY-MM-DD HH:mm:ss'))
-            await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
-            return jobTransaction.jobTransactionDTOList
-        } catch (error) {
-            console.log(error)
+        let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
+        let user = await keyValueDBService.getValueFromStore(USER)
+        let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+        let previouslyTravelledDistance = await keyValueDBService.getValueFromStore(PREVIOUSLY_TRAVELLED_DISTANCE)
+        previouslyTravelledDistance = (!parseFloat(previouslyTravelledDistance)) ? 0 : previouslyTravelledDistance.value
+        let trackKms = userSummary.value.gpsKms - previouslyTravelledDistance
+        let trackTransactionTimeSpent = await keyValueDBService.getValueFromStore(TRANSACTION_TIME_SPENT)
+        trackTransactionTimeSpent = moment().diff(trackTransactionTimeSpent.value, 'seconds')
+        let trackBattery = await keyValueDBService.getValueFromStore(TRACK_BATTERY)
+        let gpsKms = (!userSummary.value.gpsKms) ? "0" : userSummary.value.gpsKms
+        await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, gpsKms)
+        let lastTrackLog = {
+            latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
+            longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
         }
+        let fieldData, jobTransaction, job, dbObjects
+        if (jobTransactionList && jobTransactionList.length) { //Case of bulk
+            fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionList, currentTime)
+            dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
+            jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap) // to edit later 
+            job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value, fieldData.reAttemptDate)
+        }
+        else {
+            jobTransactionId = await this.changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList)//In case of new job change jobTransactionId
+            fieldData = this._saveFieldData(formLayoutObject, jobTransactionId, null, currentTime)
+            dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
+            jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap) //to edit later
+            job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, lastTrackLog)
+        }
+        //TODO add other dbs which needs updation
+        const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
+        if (customNaming && customNaming.value && customNaming.value.updateEta) {
+            await this._getRunsheetIdToUpdateJobTransactions(jobTransaction.value, currentTime, dbObjects.status[0].statusCategory)
+        }
+        const prevStatusId = (jobTransactionList && jobTransactionList.length) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
+        const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, lastTrackLog)
+        const runSheet = (jobTransactionId >= 0 || (jobTransactionList && jobTransactionList.length && jobTransactionList[0].jobTransactionId > 0)) ? await this._updateRunsheetSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value) : []
+        await this._updateUserSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value, userSummary.value, dbObjects.status[0].id)
+        await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionList)
+        let serverSmsLogs = await addServerSmsService.addServerSms(statusId, jobMasterId, fieldData, jobTransaction.value)
+        realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job, serverSmsLogs)
+        await keyValueDBService.validateAndSaveData(LAST_JOB_COMPLETED_TIME, moment().format('YYYY-MM-DD HH:mm:ss'))
+        await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
+        return jobTransaction.jobTransactionDTOMap
     }
 
     async _getRunsheetIdToUpdateJobTransactions(jobTransaction, currentTime, statusCategory) {
@@ -600,9 +596,9 @@ export default class FormLayoutEventImpl {
         }
         else {
             //JobTransactionId > 0 for Normal Job && <0 for New Job
-            jobTransactionDBObject = (jobTransactionId > 0 || (jobTransactionId < 0 && jobTransactionList && jobTransactionList.referenceNumber)) ?
+            jobTransactionDBObject = (jobTransactionId > 0 || (jobTransactionId < 0 && jobTransactionList && jobTransactionList.jobId > 0)) ?
                 realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, 'id = ' + jobTransactionId, false)[0] // to get the first transaction, as query is on id and it returns list
-                : this._getDefaultValuesForJobTransaction(jobTransactionId, status[0], jobMaster[0], user.value, hub.value, imei.value, currentTime)
+                : this._getDefaultValuesForJobTransaction(jobTransactionId, status[0], jobMaster[0], user.value, hub.value, imei.value, currentTime, jobTransactionList.referenceNumber)
             jobTransaction = { ...jobTransactionDBObject }
         }
         //TODO add more db objects
@@ -617,7 +613,7 @@ export default class FormLayoutEventImpl {
     }
 
     _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue, amountMap) {
-        let jobTransactionArray = [], jobTransactionDTOList = []
+        let jobTransactionArray = [], jobTransactionDTOMap = {}, syncTime = moment().format('YYYY-MM-DD HH:mm:ss');
         let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
         jobTransaction.jobType = jobMaster.code
         jobTransaction.jobStatusId = status.id
@@ -636,21 +632,21 @@ export default class FormLayoutEventImpl {
         jobTransaction.actualAmount = parseFloat(amountMap.actualAmount) ? parseFloat(amountMap.actualAmount) : 0
         jobTransaction.moneyTransactionType = amountMap.moneyTransactionType
         jobTransactionArray.push(jobTransaction)
-        jobTransactionDTOList.push({
+        jobTransactionDTOMap[jobTransaction.id] = {
             id: jobTransaction.id,
             referenceNumber: jobTransaction.referenceNumber,
-            jobId: jobTransaction.jobId
-        })
+            jobId: jobTransaction.jobId,
+            syncTime
+        }
         return {
             tableName: TABLE_JOB_TRANSACTION,
             value: jobTransactionArray,
-            jobTransactionDTOList
+            jobTransactionDTOMap
         }
-        //TODO only basic columns are set, some columns are not set which will be set as codebase progresses further
     }
 
     _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue, amountMap) {
-        let jobTransactionArray = [], jobTransactionDTOList = []
+        let jobTransactionArray = [], jobTransactionDTOMap = {}, syncTime = moment().format('YYYY-MM-DD HH:mm:ss');
         for (let jobTransaction1 in jobTransactionList) {
             let jobTransaction = Object.assign({}, jobTransactionList[jobTransaction1]) // no need to have null checks as it is called from a private method
             jobTransaction.jobType = jobMaster.code
@@ -670,16 +666,17 @@ export default class FormLayoutEventImpl {
             jobTransaction.actualAmount = amountMap[jobTransaction.id] ? parseFloat(amountMap[jobTransaction.id].actualAmount) : parseFloat(amountMap.actualAmount) ? parseFloat(amountMap.actualAmount) : 0
             jobTransaction.moneyTransactionType = amountMap.moneyTransactionType
             jobTransactionArray.push(jobTransaction)
-            jobTransactionDTOList.push({
+            jobTransactionDTOMap[jobTransaction.id] = {
                 id: jobTransaction.id,
                 referenceNumber: jobTransaction.referenceNumber,
-                jobId: jobTransaction.jobId
-            })
+                jobId: jobTransaction.jobId,
+                syncTime
+            }
         }
         return {
             tableName: TABLE_JOB_TRANSACTION,
             value: jobTransactionArray,
-            jobTransactionDTOList
+            jobTransactionDTOMap
         }
     }
 
@@ -775,7 +772,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei, currentTime) {
+    _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei, currentTime, referenceNumber) {
         //TODO some values like lat/lng and battery are not valid values, update them as their library is added
         return jobTransaction = {
             id,
@@ -788,7 +785,7 @@ export default class FormLayoutEventImpl {
             actualAmount: 0.0,
             originalAmount: 0.0,
             moneyTransactionType: '',
-            referenceNumber: user.id + "/" + hub.id + "/" + moment().valueOf(),
+            referenceNumber,
             runsheetId: null,
             hubId: hub.id,
             cityId: user.cityId,
@@ -825,17 +822,19 @@ export default class FormLayoutEventImpl {
     }
 
     /**
-     * adding jobTransactionId to sync list
+     * /**
+     * adding jobTransactionMap to sync list
      * 
      * syncList is a list which is to be synced with the server
-     * 
-     * @param {*jobTransactionId} jobTransactionId 
+     * @param {*} jobTransactionMap 
      */
-    async addToSyncList(jobTransactionList) {
+    async addToSyncList(jobTransactionMap) {
+        if (!jobTransactionMap || _.size(jobTransactionMap) == 0) {
+            return
+        }
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
-        let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
-        //UnionWith is used to remove duplicacy ie if same job tarnsaction is present in jobTransactionList and transactionsToSync
-        let totalTransactionsToSync = _.unionWith(transactionsToSync, jobTransactionList, _.isEqual);
+        let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? {} : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
+        let totalTransactionsToSync = { ...transactionsToSync, ...jobTransactionMap }
         await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, totalTransactionsToSync)
         return
     }
@@ -846,7 +845,7 @@ export default class FormLayoutEventImpl {
      * @param {*} jobTransactionList 
      */
     changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList) {
-        return (jobTransactionId < 0 && jobTransactionList && !jobTransactionList.referenceNumber) ? this.makeNegativeJobTransactionId() : jobTransactionId//if it is not a case of new job then return jobTransactionId
+        return (jobTransactionId < 0 && jobTransactionList && (jobTransactionList.jobId < 0)) ? this.makeNegativeJobTransactionId() : jobTransactionId//if it is not a case of new job then return jobTransactionId
     }
 
     /**

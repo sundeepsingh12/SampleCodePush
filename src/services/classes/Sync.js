@@ -39,20 +39,21 @@ import { JOBS_DELETED } from '../../lib/ContainerConstants'
 import { geoFencingService } from './GeoFencingService'
 import FCM from "react-native-fcm"
 import RNFS from 'react-native-fs'
+import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
 
 class Sync {
 
   async createAndUploadZip(syncStoreDTO, currentDate) {
     let isFileExists = await RNFS.exists(PATH_TEMP);
     if (isFileExists) {
-      await RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
+      await RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { showToastAndAddUserExceptionLog(2901, JSON.stringify(error), 'danger', 0) })
     }
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
     }
     await syncZipService.createZip(syncStoreDTO)
-    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate)
+    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO)
     return responseBody
   }
 
@@ -195,7 +196,7 @@ class Sync {
     for (let jobs of query.job) {
       let jobMaster = jobMasterMapWithAssignOrderToHubEnabled[jobs.jobMasterId]
       //Make transactions for those whose job transaction node is null
-      if (jobMaster && (!jobIdJobIdMap[jobs.id])) {
+      if (jobMaster && (!jobIdJobIdMap[jobs.id]) && jobs.status == 1) {
         let unassignedTransactions = this.createTransactionsOfUnassignedJobs(jobs, syncStoreDTO, jobMaster, jobMasterIdJobStatusIdOfPendingCodeMap)
         allJobsToTransactions.push(unassignedTransactions)
       }
@@ -603,12 +604,14 @@ class Sync {
           isJobsPresent = true
           const postOrderList = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
 
-          const unseenTransactions = postOrderList ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
+          const unseenTransactions = postOrderList && _.size(postOrderList.value) > 0 ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
           const jobMasterIdJobStatusIdTransactionIdDtoObject = jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap)
           const messageIdDTOs = []
           if (!isLiveJob) {
             await this.deleteDataFromServer(successSyncIds, messageIdDTOs, jobMasterIdJobStatusIdTransactionIdDtoObject.transactionIdDtos, jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries)
-            await keyValueDBService.deleteValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
+            if (postOrderList) {
+              await this.deleteSpecificTransactionFromStoreList(postOrderList.value, POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS, moment().format('YYYY-MM-DD HH:mm:ss'))
+            }
           }
           realm.saveList(TABLE_JOB_TRANSACTION, jobMasterIdJobStatusIdTransactionIdDtoObject.updatedTransactonsList)
           jobMasterTitleList = jobMasterTitleList.concat(jobMasterService.getJobMasterTitleListFromIds(jobMasterIdsAndNumberOfMessages.jobMasterIds, syncStoreDTO.jobMasterList))
@@ -658,7 +661,7 @@ class Sync {
 
   showNotification(title, message) {
     FCM.presentLocalNotification({
-      id: new Date().valueOf().toString(),
+      id: '1',
       title: title,
       body: message,
       priority: "high",
@@ -744,13 +747,27 @@ class Sync {
 
     realm.saveList(TABLE_MESSAGE_INTERACTION, messageInteractionList.messageDataCenters)
     return messageInteractionList.messageDataCenters.length
-    //let allData = realm.getRecordListOnQuery(TABLE_MESSAGE_INTERACTION)
-    // for (let index in allData) {
-    //   let draft = { ...allData[index] }
-    //   if (draft) {
-    //     console.log('messages', index, draft)
-    //   }
-    // }
+  }
+  /**
+   * This function deletes transaction list from schema that has been synced successfully with server.
+   * This handles cases when api response comes late and other transactions are added in schema.
+   * @param {*} transactionIdsSynced
+   * @param {*} schemaName
+   * @param {*} date
+   */
+  async deleteSpecificTransactionFromStoreList(transactionIdsSynced, schemaName, date) {
+    let transactionToBeSynced = await keyValueDBService.getValueFromStore(schemaName);
+    let originalTransactionsToBeSynced = transactionToBeSynced ? transactionToBeSynced.value : {}
+    for (let index in transactionIdsSynced) {
+      if (moment(originalTransactionsToBeSynced[index].syncTime).isBefore(moment(date).format('YYYY-MM-DD HH:mm:ss'))) {
+        delete originalTransactionsToBeSynced[index]
+      }
+    }
+    if (originalTransactionsToBeSynced && _.size(originalTransactionsToBeSynced) > 0) {
+      await keyValueDBService.validateAndSaveData(schemaName, originalTransactionsToBeSynced);
+    } else {
+      await keyValueDBService.deleteValueFromStore(schemaName);
+    }
   }
 }
 

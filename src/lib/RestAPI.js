@@ -16,12 +16,9 @@ import _ from 'lodash'
 import RNFS from 'react-native-fs'
 import RNFetchBlob from 'react-native-fetch-blob'
 import { keyValueDBService } from '../services/classes/KeyValueDBService.js'
-import {
-  PENDING_SYNC_TRANSACTION_IDS,
-  LAST_SYNC_WITH_SERVER,
-  DOMAIN_URL
-} from './constants'
+import { PENDING_SYNC_TRANSACTION_IDS, LAST_SYNC_WITH_SERVER, DOMAIN_URL } from './constants'
 import moment from 'moment'
+import { sync } from '../services/classes/Sync'
 const fetch = require('react-native-cancelable-fetch');
 class RestAPI {
   /**
@@ -190,7 +187,7 @@ class RestAPI {
     });
   }
 
-  async uploadZipFile(path, fileName, currenDate) {
+  async uploadZipFile(path, fileName, currenDate, syncStoreDTO) {
     // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
     var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
     var filePath = (!path) ? PATH + '/sync.zip' : PATH
@@ -209,7 +206,10 @@ class RestAPI {
           if (currenDate) {
             await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
           }
-          await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+          if (syncStoreDTO) {
+            await sync.deleteSpecificTransactionFromStoreList(syncStoreDTO.transactionIdToBeSynced, PENDING_SYNC_TRANSACTION_IDS, currenDate)
+          }
+          // await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         }
         else if (message != 'success') {
           throw new Error(responseBody)

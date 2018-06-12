@@ -2,8 +2,8 @@ import FormLayoutEventImpl from './formLayoutEventImpl.js'
 
 class FormLayoutEventsInterface extends FormLayoutEventImpl {
 
-    findNextFocusableAndEditableElement(attributeMasterId, formElement, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap) {
-        return this.findNextFocusableAndEditableElements(attributeMasterId, formElement, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap);
+    findNextFocusableAndEditableElement(attributeMasterId, formElement, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
+        return this.findNextFocusableAndEditableElements(attributeMasterId, formElement, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList);
     }
 
     disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value) {

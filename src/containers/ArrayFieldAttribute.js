@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as arrayActions from '../modules/array/arrayActions'
@@ -156,21 +157,23 @@ class ArrayFieldAttribute extends PureComponent {
                         {this.getLoader()}
                         {this.getListView()}
                     </Content>
-                    <Footer
-                        style={[style.footer, styles.bgWhite]}>
-                        <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
-                            <Text
-                                style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.arrayElements)}</Text>
-                            <Button bordered success small onPress={this.addPressed}>
-                                <Text style={[styles.fontSuccess, styles.padding10]}>{ADD}</Text>
-                            </Button>
-                        </View>
-                        <View style={[{ backgroundColor: styles.bgPrimaryColor }]}>
-                            <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
-                                <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
-                            </Button>
-                        </View>
-                    </Footer>
+                    <SafeAreaView style={[styles.bgWhite]}>
+                        <Footer
+                            style={[style.footer, styles.bgWhite]}>
+                            <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
+                                <Text
+                                    style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.arrayElements)}</Text>
+                                <Button bordered success small onPress={this.addPressed}>
+                                    <Text style={[styles.fontSuccess, styles.padding10]}>{ADD}</Text>
+                                </Button>
+                            </View>
+                            <View style={[{ backgroundColor: styles.bgPrimaryColor }]}>
+                                <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
+                                    <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
+                                </Button>
+                            </View>
+                        </Footer>
+                    </SafeAreaView>
                 </Container >
             </StyleProvider >
         )

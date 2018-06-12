@@ -17,6 +17,7 @@ import { createReduxBoundAddListener, createReactNavigationReduxMiddleware, init
 import { setState } from '../global/globalActions'
 import PropTypes from 'prop-types'
 
+
 class AppWithNavigationState extends React.PureComponent {
 
   static propTypes = {
