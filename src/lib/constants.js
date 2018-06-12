@@ -541,7 +541,12 @@ module.exports = keyMirror({
     USER_EXCEPTION_LOGS: null,
 
     //ApplicationVersion
-    APP_VERSION: null
+    APP_VERSION: null,
+
+    //Message Actions
+    SET_MESSAGE_LIST: null,
+    SET_MESSAGE_LOADER: null,
+
 })
 
 

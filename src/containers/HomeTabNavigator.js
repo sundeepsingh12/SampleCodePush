@@ -4,7 +4,7 @@ import React, { PureComponent } from 'react'
 import { Platform, BackHandler, View, StyleSheet, Text } from 'react-native'
 import { Icon, Header, Body, Image } from 'native-base'
 import { connect } from 'react-redux'
-import { createBottomTabNavigator,createStackNavigator } from 'react-navigation'
+import { createBottomTabNavigator, createStackNavigator } from 'react-navigation'
 import SyncScreen from './SyncScreen'
 import ErpSyncScreen from './ErpSyncScreen'
 import Home from './Home'
@@ -52,6 +52,7 @@ import MosambeeWalletPayment from './MosambeeWalletPayment'
 import SplitPayment from './SplitPayment'
 import CameraFieldAttribute from './CameraFieldAttribute'
 import QrCodeScanner from './QrCodeScanner'
+import MessageBox from './MessageBox'
 
 
 function mapStateToProps(state) {
@@ -78,8 +79,8 @@ class HomeTabNavigator extends PureComponent {
         const MenuStack = createStackNavigator({
             MenuScreen: {
                 screen: Menu,
-                navigationOptions:{
-                    header:null
+                navigationOptions: {
+                    header: null
                 }
             },
             Backup: {
@@ -103,23 +104,29 @@ class HomeTabNavigator extends PureComponent {
                     header: null,
                 }
             },
-        }, 
+            MessageBox: {
+                screen: MessageBox,
+            },
+            JobDetailsV2: {
+                screen: JobDetailsV2,
+            },
+        },
         )
         MenuStack.navigationOptions = ({ navigation }) => {
             let tabBarVisible = true;
             if (navigation.state.index > 0) {
-              tabBarVisible = false;
+                tabBarVisible = false;
             }
             return {
-              tabBarVisible,
+                tabBarVisible,
             };
-          };
+        };
 
         const HomeStack = createStackNavigator({
             Home: {
                 screen: Home,
-                navigationOptions:{
-                    header:null
+                navigationOptions: {
+                    header: null
                 }
             },
             TabScreen: {
@@ -130,146 +137,146 @@ class HomeTabNavigator extends PureComponent {
             },
             FormLayout: {
                 screen: FormLayout,
-              },
-              ArrayFieldAttribute: {
+            },
+            ArrayFieldAttribute: {
                 screen: ArrayFieldAttribute
-              },
-              DataStore: {
+            },
+            DataStore: {
                 screen: DataStore,
-              },
-              SaveActivated: {
+            },
+            SaveActivated: {
                 screen: SaveActivated,
                 navigationOptions: {
-                  gesturesEnabled: false,
+                    gesturesEnabled: false,
                 }
-              },
-              Transient: {
+            },
+            Transient: {
                 screen: Transient,
                 navigationOptions: {
-                  gesturesEnabled: false,
+                    gesturesEnabled: false,
                 }
-              },
-              CheckoutDetails: {
+            },
+            CheckoutDetails: {
                 screen: CheckoutDetails,
                 navigationOptions: {
-                  gesturesEnabled: false,
+                    gesturesEnabled: false,
                 }
-              },
-              SignatureAndNps: {
+            },
+            SignatureAndNps: {
                 screen: SignatureAndNps
-              },
-              BulkListing: {
+            },
+            BulkListing: {
                 screen: BulkListing,
-              },
-              CashTendering: {
+            },
+            CashTendering: {
                 screen: CashTendering,
                 navigationOptions: {
-                  header: null
+                    header: null
                 }
-              },
-              LiveJobs: {
+            },
+            LiveJobs: {
                 screen: LiveJobListing
-              },
-              LiveJob: {
+            },
+            LiveJob: {
                 screen: LiveJob
-              },
-              PostAssignmentScanner: {
+            },
+            PostAssignmentScanner: {
                 screen: PostAssignmentScanner
-              },
-              DataStoreDetails: {
+            },
+            DataStoreDetails: {
                 screen: DataStoreDetails
-              },
-              SplitPayment: {
+            },
+            SplitPayment: {
                 screen: SplitPayment,
-              },
-              SequenceRunsheetList: {
+            },
+            SequenceRunsheetList: {
                 screen: SequenceRunsheetList
-              },
-              Sequence: {
+            },
+            Sequence: {
                 screen: Sequence,
-              },
-              CameraAttribute: {
+            },
+            CameraAttribute: {
                 screen: CameraFieldAttribute,
-              },
-              ImageDetailsView: {
+            },
+            ImageDetailsView: {
                 screen: ImageDetailsView,
-              },
-              CustomApp: {
+            },
+            CustomApp: {
                 screen: CustomApp
-              },
-              FixedSKUListing: {
+            },
+            FixedSKUListing: {
                 screen: FixedSKUListing,
                 navigationOptions: {
-                  header: null
+                    header: null
                 }
-              },
-              Sorting: {
+            },
+            Sorting: {
                 screen: Sorting,
                 navigationOptions: {
-                  title: 'Sorting',
-                  header: null,
+                    title: 'Sorting',
+                    header: null,
                 }
-              },
-              Signature: {
+            },
+            Signature: {
                 screen: Signature,
                 navigationOptions: {
-                  header: null
+                    header: null
                 }
-              },
-              SkuListing: {
+            },
+            SkuListing: {
                 screen: SkuListing,
                 navigationOptions: {
-                  title: 'SKU Listing',
+                    title: 'SKU Listing',
                 }
-              },
-              Summary: {
+            },
+            Summary: {
                 screen: Summary,
-              },
-              Payment: {
+            },
+            Payment: {
                 screen: Payment
-              },
-              UPIPayment: {
+            },
+            UPIPayment: {
                 screen: UPIPayment
-              },
-              PayByLink: {
+            },
+            PayByLink: {
                 screen: PayByLink
-              },
-              MosamBeeWalletPayment:{
+            },
+            MosamBeeWalletPayment: {
                 screen: MosambeeWalletPayment,
                 navigationOptions: {
-                  header: null
+                    header: null
                 }
-              },
-              QrCodeScanner: {
+            },
+            QrCodeScanner: {
                 screen: QrCodeScanner,
                 navigationOptions: {
-                  title: 'Scanner',
-                  header: null,
+                    title: 'Scanner',
+                    header: null,
                 }
-              },
+            },
         })
 
         HomeStack.navigationOptions = ({ navigation }) => {
             let tabBarVisible = true;
             if (navigation.state.index > 0) {
-              tabBarVisible = false;
+                tabBarVisible = false;
             }
             return {
-              tabBarVisible,
+                tabBarVisible,
             };
-          };
+        };
         const Tabs = {
-            Home:{
-                screen:HomeStack,
-                navigationOptions:{ 
-                    header:null,
+            Home: {
+                screen: HomeStack,
+                navigationOptions: {
+                    header: null,
                     tabBarIcon: ({ tintColor }) => (
-                    <Icon
-                        name='ios-home'
-                        style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
-                    />
-                ),
-            }
+                        <Icon
+                            name='ios-home'
+                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
+                        />
+                    ),
+                }
             },
             SyncScreen: {
                 screen: SyncScreen,
@@ -297,17 +304,17 @@ class HomeTabNavigator extends PureComponent {
                     ),
                 }
             },
-            Menu:{
-                screen:MenuStack,
-                navigationOptions:{ 
-                    header:null,
+            Menu: {
+                screen: MenuStack,
+                navigationOptions: {
+                    header: null,
                     tabBarIcon: ({ tintColor }) => (
-                    <Icon
-                        name='md-menu'
-                        style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
-                    />
-                ),
-            }
+                        <Icon
+                            name='md-menu'
+                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
+                        />
+                    ),
+                }
             }
         }
         const tabStyle = {
@@ -353,7 +360,7 @@ class HomeTabNavigator extends PureComponent {
             );
         } else {
             HomeTabNavigatorOptions = createBottomTabNavigator({
-                Home:Tabs.Home,
+                Home: Tabs.Home,
                 SyncScreen: Tabs.SyncScreen,
                 Menu: Tabs.Menu,
             },

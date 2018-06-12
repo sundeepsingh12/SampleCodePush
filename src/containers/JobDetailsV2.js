@@ -79,7 +79,7 @@ function mapStateToProps(state) {
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
     isShowDropdown: state.jobDetails.isShowDropdown,
     jobExpiryTime: state.jobDetails.jobExpiryTime,
-    syncLoading: state.jobDetails.syncLoading
+    syncLoading: state.jobDetails.syncLoading,
   }
 }
 
@@ -556,7 +556,7 @@ class JobDetailsV2 extends PureComponent {
           {etaTimer}
           {statusView}
         </View>
-
+        {this.showMessages()}
         {/*Basic Details*/}
         {this.showJobDetails()}
 
@@ -565,7 +565,18 @@ class JobDetailsV2 extends PureComponent {
       </Content>
     )
   }
-
+  showMessages() {
+    if (!_.isEmpty(this.props.messageList)) {
+      return (
+        <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
+          <ExpandableHeader
+            title={'Messages'}
+            dataList={this.props.messageList}
+          />
+        </View>
+      )
+    }
+  }
   showJobDetails() {
     return (
       <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
@@ -573,6 +584,7 @@ class JobDetailsV2 extends PureComponent {
           title={'Basic Details'}
           navigateToDataStoreDetails={this.navigateToDataStoreDetails}
           dataList={this.props.jobDataList}
+          showDetailsList={true}
         />
       </View>
     )
@@ -585,7 +597,8 @@ class JobDetailsV2 extends PureComponent {
           title={'Field Details'}
           dataList={this.props.fieldDataList}
           navigateToDataStoreDetails={this.navigateToDataStoreDetails}
-          navigateToCameraDetails={this.navigateToCameraDetails} />
+          navigateToCameraDetails={this.navigateToCameraDetails}
+          showDetailsList={true} />
       </View>
     )
   }

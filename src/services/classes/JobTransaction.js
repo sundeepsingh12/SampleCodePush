@@ -11,7 +11,8 @@ import {
     TAB,
     JOB_ATTRIBUTE,
     TABLE_RUNSHEET,
-    PENDING_SYNC_TRANSACTION_IDS
+    PENDING_SYNC_TRANSACTION_IDS,
+    TABLE_MESSAGE_INTERACTION
 } from '../../lib/constants'
 
 import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE, SEQ_SELECTED, JOB_EXPIRY_TIME } from '../../lib/AttributeConstants'
@@ -30,6 +31,7 @@ import _ from 'lodash'
 import moment from 'moment'
 import { formLayoutEventsInterface } from './formLayout/FormLayoutEventInterface'
 import { runSheetService } from './RunSheet';
+import { messageService } from '../../services/classes/MessageService'
 
 class JobTransaction {
 
@@ -335,7 +337,7 @@ class JobTransaction {
             jobTransactionCustomization.runsheetDate = runsheetMap[jobTransaction.runsheetId] ? runsheetMap[jobTransaction.runsheetId].startDate : null;
             jobTransactionCustomization.jobStartTime = job.jobStartTime;
             jobTransactionCustomization.jobEndTime = job.jobEndTime;
-            jobTransactionCustomization.isNextStatusPresent = jobTransaction.jobStatusId ? jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList && jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList.length > 0 : null; 
+            jobTransactionCustomization.isNextStatusPresent = jobTransaction.jobStatusId ? jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList && jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList.length > 0 : null;
             jobTransactionCustomization.jobPriority = jobTransactionCustomizationListParametersMaps.jobMasterIdMap[jobMasterId].enableJobPriority ? job.jobPriority : 0;
             jobTransactionCustomizationList.push(jobTransactionCustomization);
         }
@@ -652,7 +654,7 @@ class JobTransaction {
         }
         let currentStatus = statusIdStatusMap[jobStatusId]
         jobDataObject.dataList = Object.values(jobDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
-
+        let messageList = messageService.getMessagesForParticularTransaction(jobTransactionId)
         if (callingActivity != 'LiveJob') {
             fieldDataObject.dataList = Object.values(fieldDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
             const jobTransactionDisplay = {
@@ -682,7 +684,8 @@ class JobTransaction {
                 jobTransactionDisplay,
                 seqSelected,
                 jobTime,
-                checkForSeenStatus
+                checkForSeenStatus,
+                messageList
             }
         }
         else {

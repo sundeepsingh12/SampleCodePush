@@ -138,7 +138,7 @@ class Sync {
    * @param {*} tdcResponse 
    */
   async processTdcResponse(tdcContentArray, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
-    let tdcContentObject, jobMasterIds
+    let tdcContentObject, jobMasterIds, numberOfMessages
     //Prepare jobMasterWithAssignOrderToHubEnabledhere only and if it is non empty,then only hit store for below 4 lines
     // const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const { jobMasterList } = syncStoreDTO
@@ -179,10 +179,10 @@ class Sync {
         }
         realm.deleteRecordsInBatch(deleteJobTransactions, deleteJobData)
       } else if (queryType == 'message') {
-        let numberOfMessages = this.saveMessagesInDb(tdcContentObject)
+        numberOfMessages = this.saveMessagesInDb(tdcContentObject)
       }
     }
-    return jobMasterIds
+    return { jobMasterIds, numberOfMessages }
   }
 
   getAssignOrderTohubEnabledJobs(query, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
@@ -576,7 +576,7 @@ class Sync {
   async downloadAndDeleteDataFromServer(isLiveJob, erpPull, syncStoreDTO) {
     let pageNumber = 0, currentPage, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap
     let pageSize = isLiveJob ? 200 : 3
-    let isLastPageReached = false, json, isJobsPresent = false, jobMasterIds
+    let isLastPageReached = false, json, isJobsPresent = false, jobMasterIdsAndNumberOfMessages
     const pagesList = await keyValueDBService.getValueFromStore(PAGES)
     let outScanModuleJobMasterIds = pages.getJobMasterIdListForScreenTypeId(pagesList.value, PAGE_OUTSCAN)
     const unseenStatusIds = !_.isEmpty(outScanModuleJobMasterIds) ? jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(syncStoreDTO.statusList, outScanModuleJobMasterIds, UNSEEN) : jobStatusService.getAllIdsForCode(syncStoreDTO.statusList, UNSEEN)
@@ -591,7 +591,7 @@ class Sync {
           jobMasterMapWithAssignOrderToHubEnabled = jobMasterService.getJobMasterMapWithAssignOrderToHub(syncStoreDTO.jobMasterList)
           jobMasterIdJobStatusIdOfPendingCodeMap = jobStatusService.getStatusIdForJobMasterIdFilteredOnCodeMap(syncStoreDTO.statusList, PENDING)
           jobStatusIdJobSummaryMap = jobSummaryService.getJobStatusIdJobSummaryMap(syncStoreDTO.jobSummaryList)
-          jobMasterIds = await this.processTdcResponse(json.content, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap)
+          jobMasterIdsAndNumberOfMessages = await this.processTdcResponse(json.content, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap)
         } else {
           isLastPageReached = true
         }
@@ -611,7 +611,7 @@ class Sync {
             await keyValueDBService.deleteValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
           }
           realm.saveList(TABLE_JOB_TRANSACTION, jobMasterIdJobStatusIdTransactionIdDtoObject.updatedTransactonsList)
-          jobMasterTitleList = jobMasterTitleList.concat(jobMasterService.getJobMasterTitleListFromIds(jobMasterIds, syncStoreDTO.jobMasterList))
+          jobMasterTitleList = jobMasterTitleList.concat(jobMasterService.getJobMasterTitleListFromIds(jobMasterIdsAndNumberOfMessages.jobMasterIds, syncStoreDTO.jobMasterList))
           await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.updatedTransactonsList)
           if (erpPull) {
             user.lastERPSyncWithServer = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -633,8 +633,11 @@ class Sync {
     }
     let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB');
     if (!_.isEmpty(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value))) {
-      this.showNotification(_.uniq(jobMasterTitleList))
+      this.showJobMasterNotification(_.uniq(jobMasterTitleList))
       await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+    }
+    if (jobMasterIdsAndNumberOfMessages && jobMasterIdsAndNumberOfMessages.numberOfMessages && jobMasterIdsAndNumberOfMessages.numberOfMessages > 0) {
+      this.showMessageNotification(jobMasterIdsAndNumberOfMessages.numberOfMessages)
     }
     if (isJobsPresent) {
       await runSheetService.updateRunSheetUserAndJobSummary()
@@ -642,20 +645,27 @@ class Sync {
     return isJobsPresent
   }
 
-  showNotification(jobMasterTitleList) {
+  showJobMasterNotification(jobMasterTitleList) {
     const body = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
     const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${body} jobs` : body
+    this.showNotification(FAREYE_UPDATES, message)
+  }
+
+  showMessageNotification(numberOfMessages) {
+    const message = `You have ${numberOfMessages} new messages`
+    this.showNotification(FAREYE_UPDATES, message)
+  }
+
+  showNotification(title, message) {
     FCM.presentLocalNotification({
       id: new Date().valueOf().toString(),
-      title: FAREYE_UPDATES,
+      title: title,
       body: message,
       priority: "high",
       sound: "default",
       show_in_foreground: true
     });
-
   }
-
   async calculateDifference() {
     const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
     const differenceInDays = moment().diff(lastSyncTime.value, 'days')
@@ -724,9 +734,17 @@ class Sync {
 
   saveMessagesInDb(contentData) {
     let messageInteractionList = JSON.parse(contentData.query)
-    realm.saveList(TABLE_MESSAGE_INTERACTION, messageInteractionList.messageDataCenters)
 
-    // let allData = realm.getRecordListOnQuery(TABLE_MESSAGE_INTERACTION)
+    let currentFieldDataObject = {}; // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
+    currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_MESSAGE_INTERACTION, null, true, 'id').length;
+    for (let message of messageInteractionList.messageDataCenters) {
+      message.id = currentFieldDataObject.currentFieldDataId
+      currentFieldDataObject.currentFieldDataId++
+    }
+
+    realm.saveList(TABLE_MESSAGE_INTERACTION, messageInteractionList.messageDataCenters)
+    return messageInteractionList.messageDataCenters.length
+    //let allData = realm.getRecordListOnQuery(TABLE_MESSAGE_INTERACTION)
     // for (let index in allData) {
     //   let draft = { ...allData[index] }
     //   if (draft) {
