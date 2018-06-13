@@ -651,17 +651,17 @@ class Sync {
   showJobMasterNotification(jobMasterTitleList) {
     const body = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
     const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${body} jobs` : body
-    this.showNotification(FAREYE_UPDATES, message)
+    this.showNotification(FAREYE_UPDATES, message, '1')
   }
 
   showMessageNotification(numberOfMessages) {
     const message = `You have ${numberOfMessages} new messages`
-    this.showNotification(FAREYE_UPDATES, message)
+    this.showNotification(FAREYE_UPDATES, message, '2')
   }
 
-  showNotification(title, message) {
+  showNotification(title, message, id) {
     FCM.presentLocalNotification({
-      id: '1',
+      id: id,
       title: title,
       body: message,
       priority: "high",
