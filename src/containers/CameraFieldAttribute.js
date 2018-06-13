@@ -19,7 +19,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import platform from '../../native-base-theme/variables/platform'
 import { CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, SKU_PHOTO } from '../lib/AttributeConstants'
 import { OPEN_CAMERA } from '../lib/ContainerConstants'
-import ImageCropPicker from 'react-native-image-crop-picker';
 
 function mapStateToProps(state) {
     return {
@@ -99,37 +98,9 @@ class CameraFieldAttribute extends PureComponent {
                 this._setToastForError(response.error)
             }
             else if (response.data) {
-                if (Platform.OS === 'ios') {
-                    this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data : response.data, uri: response.uri})
-                } else {
-                    this.props.actions.compressImages(response.uri);
-                }
+                this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data : response.data, uri: response.uri}) 
             }
         })
-    }
-
-    cropImage = () => {
-        ImageCropPicker.openCropper({
-            path: this.props.imageData.uri,
-            width: 300,
-            height: 300,
-            enableRotationGesture: true,
-            showCropGuidelines: true,
-            freeStyleCropEnabled: true,
-            cropping: true
-        }).then(image => {
-            if (image.path) {
-                if (Platform.OS === 'ios') {
-                    ImageStore.getBase64ForTag(image.path, (base64Data) => {
-                        dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64Data, uri: image.path }))
-                    })
-                } else {
-                    this.props.actions.compressImages(image.path);
-                }
-            }
-        }).catch(e => {
-            alert(e.message ? e.message : e);
-        });
     }
 
     renderTorch() {
@@ -182,7 +153,7 @@ class CameraFieldAttribute extends PureComponent {
                         <View style={[styles.flexBasis33_3, styles.alignCenter, styles.marginTop10]}>
                             <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
                                 <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }}>
-                                    <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={this.takePicture.bind(this)} />
+                                    <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={() => this.takePicture()} />
                                 </View>
                             </View>
                         </View>
@@ -222,7 +193,7 @@ class CameraFieldAttribute extends PureComponent {
                     <SafeAreaView style={[styles.width100, styles.absolute, styles.row, styles.heightAuto, styles.justifyCenter, styles.alignCenter, styles.padding10, { bottom: 0 }]}>
                         {(getValidationObject && getValidationObject.cropImageValidation) ?
                             <View style={[styles.justifyCenter, styles.alignCenter, { marginRight: 46 }]}>
-                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.cropImage()}>
+                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.props.imageData.uri)}>
                                     <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
                                 </TouchableOpacity>
                             </View>
@@ -233,7 +204,7 @@ class CameraFieldAttribute extends PureComponent {
                                     if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
                                         this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData.data, this.props.navigation.state.params.currentElement)
                                     } else {
-                                        this.props.actions.saveImage(this.props.imageData.data, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction, this.props.navigation.goBack)
+                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction, this.props.navigation.goBack)
                                     }
                                 }}>
                                     <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
@@ -258,22 +229,9 @@ class CameraFieldAttribute extends PureComponent {
         }
     }
 
-    takePicture = async function () {
+    takePicture =  () => {
         if (this.camera) {
-            const options = { quality: 0.5, base64: true, fixOrientation: true };
-            try {
-                const data = await this.camera.takePictureAsync(options).then((capturedImg) => {
-                    const { uri, base64 } = capturedImg;
-                    if (Platform.OS == 'ios') {
-                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data: base64, uri })
-                    } else {
-                        this.props.actions.compressImages(uri);
-                    }
-                })
-            } catch (error) {
-                this._setToastForError(error.message)
-                this.props.actions.setState(SET_CAMERA_LOADER, false)
-            }
+            this.props.actions.takePicture(this.camera)
         }
     };
 }
