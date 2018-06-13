@@ -33,7 +33,7 @@ class SkuListing extends PureComponent {
   }
 
   updateSkuActualQty(value, rowItem, title) {
-    this.props.actions.updateSkuActualQuantityAndOtherData(value, rowItem, this.props.skuListItems, this.props.skuChildItems, this.props.skuValidationForImageAndReason, title, this.props.navigation.goBack)
+    this.props.actions.updateSkuActualQuantityAndOtherData(value, rowItem, this.props.skuListItems, this.props.skuChildItems, this.props.skuValidationForImageAndReason, title, this.props.navigation)
   }
 
   onChangeSkuCode(skuCode) {
