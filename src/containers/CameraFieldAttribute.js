@@ -11,7 +11,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import * as cameraActions from '../modules/camera/cameraActions'
-import { SET_IMAGE_DATA, SET_SHOW_IMAGE_AND_DATA, SET_CAMERA_LOADER } from '../lib/constants'
+import { SET_SHOW_IMAGE_AND_DATA, SET_CAMERA_LOADER } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
 import ImagePicker from 'react-native-image-picker'
@@ -24,7 +24,6 @@ import ImageCropPicker from 'react-native-image-crop-picker';
 function mapStateToProps(state) {
     return {
         imageData: state.cameraReducer.imageData,
-        showImage: state.cameraReducer.showImage,
         validation: state.cameraReducer.validation,
         cameraLoader: state.cameraReducer.cameraLoader
     }
@@ -41,7 +40,6 @@ class CameraFieldAttribute extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            quality: '',
             torchOff: '',
             cameraType: 'back',
         }
@@ -51,33 +49,8 @@ class CameraFieldAttribute extends PureComponent {
         return { header: null }
     }
 
-    componentWillUnmount() {
-        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-            data: '',
-            showImage: true
-        })
-    }
-
     componentDidMount() {
-        let item = this.props.navigation.state.params.currentElement
-        if (!_.isEmpty(item.validation)) this.props.actions.getValidation(item.validation)
-        switch (item.attributeTypeId) {
-            case CAMERA: this.setState({ quality: 'low' })
-                break
-            case CAMERA_MEDIUM: this.setState({ quality: 'medium' })
-                break
-            case CAMERA_HIGH: this.setState({ quality: 'high' })
-                break
-            case SKU_PHOTO: this.setState({ quality: 'high' })
-                break
-            default: {
-
-            }
-        }
-        this.setState({ torchOff: RNCamera.Constants.FlashMode.off })
-        if (item.value && item.value != '' && item.value != OPEN_CAMERA) {
-            this.props.actions.setExistingImage(item)
-        }
+        this.props.actions.setCameraInitialView(this.props.navigation.state.params.currentElement)
     }
 
     _setTorchOn = () => {
@@ -103,38 +76,12 @@ class CameraFieldAttribute extends PureComponent {
                 return {
                     cameraType: 'front'
                 }
-            }
-            else {
+            }else {
                 return { cameraType: 'back' }
             }
         })
     }
 
-    // getImageGallery = () => {
-    //     const options = {
-    //         width: 300,
-    //   height: 300,
-    //   includeBase64: true,
-    //   mediaType: 'photo',
-    //   compressImageQuality: 0.5,
-    //   loadingLabelText: 'Processing assets...',
-    //   enableRotationGesture : true
-    //     }
-    //     ImagePicker.openPicker(options).then(image => {
-    //         if (image.data) {
-    //             if(Platform.OS === 'ios') {
-    //                 this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-    //                     data: {data: image.data, uri : image.path},
-    //                     showImage: true
-    //                 })
-    //             } else {
-    //                 this.props.actions.compressImages(image.path);
-    //             }
-    //         } 
-    //     }).catch(e => {
-    //         alert(e.message ? e.message : e);
-    //       });
-    // }
     getImageGallery = () => {
         const options = {
             title: 'Photo Picker',
@@ -153,10 +100,7 @@ class CameraFieldAttribute extends PureComponent {
             }
             else if (response.data) {
                 if (Platform.OS === 'ios') {
-                    this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-                        data: response.data,
-                        showImage: true
-                    })
+                    this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data : response.data, uri: response.uri})
                 } else {
                     this.props.actions.compressImages(response.uri);
                 }
@@ -177,10 +121,7 @@ class CameraFieldAttribute extends PureComponent {
             if (image.path) {
                 if (Platform.OS === 'ios') {
                     ImageStore.getBase64ForTag(image.path, (base64Data) => {
-                        dispatch(setState(SET_SHOW_IMAGE_AND_DATA, {
-                            data: { data: base64Data, uri: image.path },
-                            showImage: true
-                        }))
+                        dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64Data, uri: image.path }))
                     })
                 } else {
                     this.props.actions.compressImages(image.path);
@@ -203,7 +144,7 @@ class CameraFieldAttribute extends PureComponent {
         return view
     }
 
-    imageCaptureView(getValidationObject) {
+    imageCaptureView(getValidationObject, quality) {
         let torchView = this.renderTorch()
         return <StyleProvider style={getTheme(platform)}>
             <Container>
@@ -212,7 +153,7 @@ class CameraFieldAttribute extends PureComponent {
                         ref={(cam) => {
                             this.camera = cam;
                         }}
-                        captureQuality={this.state.quality}
+                        captureQuality={quality}
                         style={style.preview}
                         flashMode={this.state.torchOff}
                         type={this.state.cameraType}>
@@ -273,10 +214,7 @@ class CameraFieldAttribute extends PureComponent {
                                     name="md-close"
                                     style={[styles.fontXxxl, styles.fontWhite]}
                                     onPress={() => {
-                                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-                                            data: '',
-                                            showImage: false
-                                        })
+                                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA,'')
                                     }} />
                             </View>
                         </SafeAreaView>
@@ -310,12 +248,13 @@ class CameraFieldAttribute extends PureComponent {
 
     render() {
         let item = this.props.navigation.state.params.currentElement
+        const quality = { 20 : 'low', 42: 'high', 43: 'medium', 55: 'high' }
         if (this.props.cameraLoader)
             return <Loader />
-        if (((item.value && item.value != '' && item.value != OPEN_CAMERA) || this.props.imageData) && this.props.showImage) {
+        if ((!_.isEmpty(this.props.imageData))) {
             return this.showImageView(this.props.validation)
         } else {
-            return this.imageCaptureView(this.props.validation)
+            return this.imageCaptureView(this.props.validation, quality[item.attributeTypeId])
         }
     }
 
@@ -326,10 +265,7 @@ class CameraFieldAttribute extends PureComponent {
                 const data = await this.camera.takePictureAsync(options).then((capturedImg) => {
                     const { uri, base64 } = capturedImg;
                     if (Platform.OS == 'ios') {
-                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-                            data: { data: base64, uri },
-                            showImage: true
-                        })
+                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data: base64, uri })
                     } else {
                         this.props.actions.compressImages(uri);
                     }

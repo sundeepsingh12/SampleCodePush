@@ -6,7 +6,6 @@ import {
     SHOW_SEARCH_BAR,
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
-    SET_SHOW_VIEW_IMAGE,
     UPDATE_SKU_LIST_ITEMS,
     SkuListing,
     NEXT_FOCUS,
@@ -109,7 +108,6 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
                     value = await signatureService.saveFile(value, moment(), true)
                     // dispatch(NavigationActions.back())
                     goBack()
-                    dispatch(setState(SET_SHOW_VIEW_IMAGE, { imageData: '', showImage: false, viewData: '' }))
                 }
                 let copyOfskuListItems = _.cloneDeep(skuListItems)
                 copyOfskuListItems[jobId][rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value

@@ -1,12 +1,12 @@
 'use strict'
 import {
     NEXT_FOCUS,
-    SET_IMAGE_DATA,
     VIEW_IMAGE_DATA,
-    SET_SHOW_VIEW_IMAGE,
     SET_VALIDATION_FOR_CAMERA,
     SET_CAMERA_LOADER,
-    SET_SHOW_IMAGE_AND_DATA
+    SET_SHOW_IMAGE_AND_DATA,
+    SET_SHOW_IMAGE_AND_VALIDATION,
+    SET_CAMERA_LOADER_INITIAL_SET_UP,
 } from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
@@ -21,9 +21,10 @@ import {
     ImageStore,
 } from 'react-native';
 
-import { PATH_CUSTOMER_IMAGES } from '../../lib/AttributeConstants'
+import { PATH_CUSTOMER_IMAGES} from '../../lib/AttributeConstants'
+import {OPEN_CAMERA} from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
-var PATH_COMPRESS_IMAGES = '/compressImages';
+var PATH_COMPRESS_IMAGE = '/compressImages';
 
 export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction,goBack) {
     return async function (dispatch) {
@@ -34,11 +35,6 @@ export function saveImage(result, fieldAttributeMasterId, formLayoutState, calle
             } else {
                 dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction,null,null,goBack))
             }
-            dispatch(setState(SET_SHOW_VIEW_IMAGE, {
-                imageData: '',
-                showImage: false,
-                viewData: ''
-            }))
         } catch (error) {
             showToastAndAddUserExceptionLog(301, error.message, 'danger', 1)
         }
@@ -55,11 +51,20 @@ export function getImageData(value) {
     }
 }
 
-export function getValidation(value) {
+export function setCameraInitialView(item) {
     return async function (dispatch) {
         try {
-            const result = await signatureService.getValidations(value)
-            dispatch(setState(SET_VALIDATION_FOR_CAMERA, result))
+            dispatch(setState(SET_CAMERA_LOADER_INITIAL_SET_UP))
+            const validation = null, data = null
+            if (!_.isEmpty(item.validation)) {
+                 validation = await signatureService.getValidations(item.validation)
+            }
+            if (item.value && item.value != '' && item.value != OPEN_CAMERA) {
+                const base64Data = await signatureService.getImageData(item.value)
+                let imageName = item.value.split('/')
+                data = (base64Data) ? {data: base64Data, uri: 'file://' + PATH_CUSTOMER_IMAGES + imageName[imageName.length - 1]} : null
+            }
+            dispatch(setState(SET_SHOW_IMAGE_AND_VALIDATION,{data, validation}))
         } catch (error) {
             showToastAndAddUserExceptionLog(305, error.message, 'danger', 1)
         }
@@ -70,13 +75,9 @@ export function compressImages(uri) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_CAMERA_LOADER, true))
-            CompressImage.createCompressedImage(uri, PATH_COMPRESS_IMAGES).then((resizedImage) => {
-                ImageStore.getBase64ForTag(resizedImage.uri, (base64Data) => {
-                    dispatch(setState(SET_SHOW_IMAGE_AND_DATA, {
-                        data: {data: base64Data, uri : resizedImage.uri},
-                        showImage: true
-                    }))
-                    // RNFS.unlink(resizedImage.path).then(() => { }).catch((error) => { })
+            CompressImage.createCompressedImage(uri, PATH_COMPRESS_IMAGE).then((resizedImage) => {
+                ImageStore.getBase64ForTag(resizedImage.uri, (base64Data) => { 
+                    dispatch(setState(SET_SHOW_IMAGE_AND_DATA, {data: base64Data, uri : resizedImage.uri}))
                 }, (reason) => {
                     dispatch(setState(SET_CAMERA_LOADER, false))
                     showToastAndAddUserExceptionLog(306, reason.message, 'danger', 1)
@@ -98,22 +99,6 @@ export function setInitialState() {
             dispatch(setState(VIEW_IMAGE_DATA, ''))
         } catch (error) {
             showToastAndAddUserExceptionLog(303, error.message, 'danger', 1)
-        }
-    }
-}
-export function setExistingImage(item) {
-    return async function (dispatch) {
-        try {
-            if (!item || !item.value || item.value == '') {
-                throw new Error('No image found')
-            }
-            const result = await signatureService.getImageData(item.value)
-            if (result) {
-                let imageName = item.value.split('/')
-                dispatch(setState(SET_IMAGE_DATA, {data: result, uri: 'file://' + PATH_CUSTOMER_IMAGES + imageName[imageName.length - 1]}))
-            }
-        } catch (error) {
-            showToastAndAddUserExceptionLog(304, error.message, 'danger', 1)
         }
     }
 }
