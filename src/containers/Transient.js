@@ -6,12 +6,10 @@ import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
-import { View, TouchableOpacity, FlatList, StyleSheet } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
+import { View, FlatList, StyleSheet, BackHandler } from 'react-native'
 import { SET_FORM_LAYOUT_STATE, FormLayout, SET_TRANSIENT_BACK_PRESSED } from '../lib/constants'
 import { Select_Next_Status } from '../lib/AttributeConstants'
-import { Container, Header, Text, Body, Icon, Content, List, ListItem, Right, } from 'native-base'
-import _ from 'lodash'
+import { Container, Text, Icon, Content, List, ListItem, Right, } from 'native-base'
 import TitleHeader from '../components/TitleHeader'
 
 function mapStateToProps(state) {
@@ -29,11 +27,20 @@ function mapDispatchToProps(dispatch) {
 }
 
 class Transient extends PureComponent {
+    _didFocusSubscription;
+    _willBlurSubscription;
 
     static navigationOptions = ({ navigation }) => {
         return {
             header: <TitleHeader pageName={navigation.state.params.currentStatus.name} goBack={navigation.state.params.backForTransient} />
         }
+    }
+
+    constructor(props) {
+        super(props);
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
+          BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
 
     componentDidMount() {
@@ -43,7 +50,21 @@ class Transient extends PureComponent {
             this.props.formLayoutStates,
             this.props.navigation.push
         )
+
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
+
+    componentWillUnmount() {
+        this._didFocusSubscription && this._didFocusSubscription.remove();
+        this._willBlurSubscription && this._willBlurSubscription.remove();
+    }
+
+    onBackButtonPressAndroid = () => {
+        this.props.actions.setState(SET_TRANSIENT_BACK_PRESSED, true)
+        return true;
+    };
 
     navigateToFormLayout(statusId, statusName) {
         this.props.actions.navigateToScene(FormLayout, {

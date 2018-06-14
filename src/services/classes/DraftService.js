@@ -85,7 +85,7 @@ class DraftService {
         // for (let index in allData) {
         //     let draft = { ...allData[index] }
         //     if (draft) {
-        //         console.logs('draft records', index, draft)
+        //         console.log('draft records', index, draft)
         //     }
         // }
     }

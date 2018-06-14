@@ -1,12 +1,11 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, Platform, View, Image, Text, WebView } from 'react-native'
+import { Platform, View, Text, WebView, BackHandler } from 'react-native'
 import CustomAlert from "../components/CustomAlert"
 import styles from '../themes/FeStyle'
-import { Container, Button } from 'native-base'
+import { Container } from 'native-base'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import ServiceStatusIcon from "../components/ServiceStatusIcon"
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import renderIf from '../lib/renderIf'
 import MobileOtpScreen from './MobileOtpScreen'
@@ -14,7 +13,6 @@ import InitialSetup from './InitialSetup'
 import * as globalActions from '../modules/global/globalActions'
 import RNFS from 'react-native-fs'
 import ApkInstaller from 'react-native-apk-installer'
-import getTheme from '../../native-base-theme/components'
 import DownloadProgressBar from '../components/DownloadProgressBar'
 import ErrorScreen from '../components/ErrorScreen'
 import * as appDownloadActions from '../modules/appDownload/appDownloadActions'
@@ -22,7 +20,7 @@ import AppOutdated from '../components/AppOutdated'
 import { LATEST_APK_PATH } from '../lib/AttributeConstants'
 import CodePushUpdate from './CodePushUpdate'
 import Loader from '../components/Loader'
-import { DOWNLOADING_LATEST_VERSION, HANG_ON, PLEASE_WAIT_FOR_IOS_LINK_URL } from '../lib/ContainerConstants'
+import { HANG_ON, PLEASE_WAIT_FOR_IOS_LINK_URL } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -42,6 +40,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class Preloader extends PureComponent {
+    _didFocusSubscription;
+    _willBlurSubscription;
 
     constructor(props) {
         super(props)
@@ -50,10 +50,29 @@ class Preloader extends PureComponent {
             showDownloadProgressBar: false,
             errorInDownload: false,
         }
+        BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid);
+        this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload =>{
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+            BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        });
     }
 
     componentDidMount() {
         this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
+    }
+
+    onBackButtonPressAndroid = () => {
+        BackHandler.exitApp()
+        return true;
+    };
+    
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        this._didFocusSubscription && this._didFocusSubscription.remove();
+        this._willBlurSubscription && this._willBlurSubscription.remove();
     }
 
     startLoginScreenWithoutLogout = () => {

@@ -6,13 +6,12 @@ import * as globalActions from '../modules/global/globalActions'
 import * as saveActivatedActions from '../modules/saveActivated/saveActivatedActions'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
-import { StyleSheet, View, TouchableOpacity, FlatList, Alert } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, FlatList, Alert, BackHandler } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Body, Right, Icon, List, ListItem, StyleProvider, Footer, FooterTab } from 'native-base';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import CheckoutDetails from '../containers/CheckoutDetails'
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
 import { FormLayout, Discard, Keep, Cancel, Checkout, SHOW_DISCARD_ALERT, SET_SAVE_ACTIVATED_DRAFT } from '../lib/constants'
 import { Yes_Checkout, Total, } from '../lib/AttributeConstants'
@@ -41,6 +40,9 @@ function mapDispatchToProps(dispatch) {
 
 class SaveActivated extends PureComponent {
 
+    _didFocusSubscription;
+    _willBlurSubscription;
+
     constructor(props) {
         super(props)
         this.state = {
@@ -50,6 +52,10 @@ class SaveActivated extends PureComponent {
             headerTitle: '',
             itemId: 0
         }
+
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
+            BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -79,7 +85,21 @@ class SaveActivated extends PureComponent {
             )
         }
         this.props.actions.checkIfDraftExists(this.props.navigation.state.params.jobMasterId)
+
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
+
+    componentWillUnmount() {
+        this._didFocusSubscription && this._didFocusSubscription.remove();
+        this._willBlurSubscription && this._willBlurSubscription.remove();
+    }
+
+    onBackButtonPressAndroid = () => {
+        this.props.actions.setState(SHOW_DISCARD_ALERT, true)
+        return true;
+    };
 
     signOff = (statusId) => {
         this.props.actions.navigateToScene(FormLayout, {

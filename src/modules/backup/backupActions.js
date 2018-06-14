@@ -14,24 +14,19 @@ import {
     PRE_LOGOUT_START,
     PRE_LOGOUT_SUCCESS
 } from '../../lib/constants'
-import _ from 'lodash'
 import { setState, deleteSessionToken, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { backupService } from '../../services/classes/BackupService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
-import { logoutService } from '../../services/classes/Logout'
 import { NavigationActions } from 'react-navigation'
+import { navDispatch } from '../navigators/NavigationService';
 import { authenticationService } from '../../services/classes/Authentication'
 import {
     USER_MISSING,
     TOKEN_MISSING,
     FILE_MISSING,
-    LOGOUT_UNSUCCESSFUL,
-    OK,
     TRY_AFTER_CLEARING_YOUR_STORAGE_DATA,
 } from '../../lib/ContainerConstants'
-import { Toast } from 'native-base'
-import moment from 'moment'
 
 /** This method creates backup manually when button is pressed.
  * 
@@ -142,7 +137,7 @@ export function autoLogoutAfterUpload(calledFromHome) {
             dispatch(setState(PRE_LOGOUT_START))
             let response = await authenticationService.logout(true, {value : true}) // hit logout api
             dispatch(setState(PRE_LOGOUT_SUCCESS))
-            dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+            navDispatch(NavigationActions.navigate({ routeName: LoginScreen }))
             dispatch(deleteSessionToken())
         } catch (error) {
             showToastAndAddUserExceptionLog(205, error.message, 'danger', 1)

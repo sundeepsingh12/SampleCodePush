@@ -8,20 +8,9 @@ import {
   PAGES_ADDITIONAL_UTILITY,
   //ROUTE NAME FOR NAVIGATION
   TabScreen,
-  CUSTOMIZATION_APP_MODULE,
-  HOME_LOADING,
   CHART_LOADING,
-  JOB_DOWNLOADING_STATUS,
-  PENDING_SYNC_TRANSACTION_IDS,
   USER,
-  SET_MODULES,
-  UNSEEN,
-  JOB_SUMMARY,
-  SYNC_ERROR,
   SYNC_STATUS,
-  PENDING,
-  PIECHART,
-  LAST_SYNC_WITH_SERVER,
   LAST_SYNC_TIME,
   USERNAME,
   PASSWORD,
@@ -36,10 +25,6 @@ import {
   SET_ERP_PULL_ACTIVATED,
   ERP_SYNC_STATUS,
   SET_NEWJOB_DRAFT_INFO,
-  JOB_MASTER,
-  SAVE_ACTIVATED,
-  POPULATE_DATA,
-  NewJob,
   BulkListing,
   SET_TRANSACTION_SERVICE_STARTED,
   SYNC_RUNNING_AND_TRANSACTION_SAVING,
@@ -83,23 +68,20 @@ import {
   PAGE_MESSAGING,
   PAGE_SUMMARY_PIECHART,
   //ERROR MESSAGES
-  UNKNOWN_PAGE_TYPE,
   //Others
   SERVER_REACHABLE,
   SERVER_UNREACHABLE,
   Piechart,
-  SERVICE_ALREADY_SCHEDULED
 } from '../../lib/AttributeConstants'
 import { Toast, ActionSheet, } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import { trackingService } from '../../services/classes/Tracking'
-import { jobStatusService } from '../../services/classes/JobStatus'
 import { userEventLogService } from '../../services/classes/UserEvent'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog, deleteSessionToken, resetNavigationState } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog, deleteSessionToken } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
-import { NetInfo, Alert, Platform } from 'react-native'
+import { Platform } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -114,10 +96,11 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions'
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
-import FCM, { NotificationActionType, FCMEvent, NotificationType, RemoteNotificationResult, WillPresentNotificationResult } from "react-native-fcm"
+import FCM, { FCMEvent, NotificationType, RemoteNotificationResult, WillPresentNotificationResult } from "react-native-fcm"
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
+import { navDispatch } from '../navigators/NavigationService';
 import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR,FCM_PERMISSION_DENIED,OK } from '../../lib/ContainerConstants'
 
 /**
@@ -580,7 +563,7 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
         }))
         await logoutService.deleteDataBase()
         dispatch(deleteSessionToken())
-        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: LoginScreen })]))
+        navDispatch(NavigationActions.navigate({ routeName: LoginScreen }));
       } else {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
@@ -653,6 +636,15 @@ export function resetFailCountInStore() {
   return async function (dispatch) {
     try {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
+      const { value: { company: { customErpPullActivated: ErpCheck }}} = await keyValueDBService.getValueFromStore(USER)
+      if(ErpCheck) {
+        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','LoggedInERP')
+        navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
+      }
+      else {
+        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','LoggedIn')
+        navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+      }
     } catch (error) {
       showToastAndAddUserExceptionLog(2711, error.message, 'danger', 1)
     }

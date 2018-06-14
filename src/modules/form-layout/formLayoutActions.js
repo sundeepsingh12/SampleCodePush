@@ -1,22 +1,16 @@
 'use strict'
 
 import {
-    FIELD_ATTRIBUTE,
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
     UPDATE_FIELD_DATA,
     SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT,
     IS_LOADING,
-    ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
     JOB_STATUS,
     NEXT_FOCUS,
     TabScreen,
-    HomeTabNavigatorScreen,
     CLEAR_FORM_LAYOUT,
     SET_FORM_LAYOUT_STATE,
-    SET_UPDATE_DRAFT,
-    CLEAR_BULK_STATE,
-    SET_FORM_TO_INVALID,
     USER,
     AutoLogoutScreen,
     SET_OPTION_ATTRIBUTE_ERROR,
@@ -28,14 +22,14 @@ import {
 
 import {
     AFTER,
-    Start,
 } from '../../lib/AttributeConstants'
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions, StackActions } from 'react-navigation'
+import { navDispatch } from '../navigators/NavigationService';
 import { fieldValidationService } from '../../services/classes/FieldValidation'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobStatusService } from '../../services/classes/JobStatus'
 
@@ -154,7 +148,6 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
                 draftService.saveDraftInDb(formLayoutState, formLayoutState.jobMasterId, null, jobTransaction)
             }
             if (validationsResult && !modalPresent) {
-                // dispatch(NavigationActions.back())
                 goBack()
             }
             if (!validationsResult && cloneFormElement.get(attributeMasterId).alertMessage) {
@@ -183,7 +176,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
             let cloneFormLayoutState = _.cloneDeep(formLayoutState)
             const userData = await keyValueDBService.getValueFromStore(USER)
             if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
-                dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
+                navDispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
             } else {
                 dispatch(setState(IS_LOADING, true))
                 let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
@@ -195,12 +188,11 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         let landingTabId = JSON.parse(taskListScreenDetails.pageObjectAdditionalParams).landingTabAfterJobCompletion ? jobStatusService.getTabIdOnStatusId(statusList.value, cloneFormLayoutState.statusId) : null
                         dispatch(setState(SET_LANDING_TAB, { landingTabId }))
                         dispatch(pieChartCount())
-                        // dispatch(NavigationActions.back({ key: taskListScreenDetails.jobDetailsScreenKey }))
                         goBack(taskListScreenDetails.jobDetailsScreenKey)
                         dispatch(fetchJobs())
                         dispatch(setState(CLEAR_FORM_LAYOUT))
                     } else if (routeName == TabScreen) {
-                        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
+                        navDispatch(StackActions.popToTop());
                         dispatch(fetchJobs())
                         dispatch(setState(CLEAR_FORM_LAYOUT))
                     } else {

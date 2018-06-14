@@ -25,8 +25,6 @@ import {
   PRE_LOGOUT_SUCCESS,
   ERROR_400_403_LOGOUT,
   PRELOADER_SUCCESS,
-  Home,
-  Login,
   AutoLogoutScreen,
   JOB_MASTER,
   JOB_ATTRIBUTE,
@@ -49,8 +47,6 @@ import {
   CUSTOMIZATION_LIST_MAP,
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
-  HomeTabNavigatorScreen,
-  LoginScreen,
   OTP_SUCCESS,
   PENDING_SYNC_TRANSACTION_IDS,
   SET_UNSYNC_TRANSACTION_PRESENT,
@@ -62,7 +58,6 @@ import {
   APP_THEME,
   SET_APP_UPDATE_BY_CODEPUSH,
   SET_APP_UPDATE_STATUS,
-  FCM_TOKEN,
   IS_SHOW_MOBILE_OTP_SCREEN,
   IS_LOGGING_OUT
 } from '../../lib/constants'
@@ -71,14 +66,15 @@ import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, setState, showToastAndAddUserExceptionLog, resetNavigationState, resetApp } from '../global/globalActions'
+import { deleteSessionToken, setState, showToastAndAddUserExceptionLog, resetApp } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions, StackActions } from 'react-navigation'
+import { navDispatch } from '../navigators/NavigationService';
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
-import { LOGOUT_UNSUCCESSFUL, OK, SHOW_MOBILE_SCREEN, SHOW_OTP, CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DOWNLOADING_PACKAGE, CODEPUSH_INSTALLING_UPDATE, CODEPUSH_SOMETHING_WENT_WRONG } from '../../lib/ContainerConstants'
+import { SHOW_MOBILE_SCREEN, SHOW_OTP, CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DOWNLOADING_PACKAGE, CODEPUSH_INSTALLING_UPDATE, CODEPUSH_SOMETHING_WENT_WRONG } from '../../lib/ContainerConstants'
 import codePush from "react-native-code-push"
 import { Platform } from 'react-native'
 import { performSyncService } from '../home/homeActions';
@@ -116,7 +112,7 @@ export function invalidateUserSession(isPreLoader, calledFromAutoLogout) {
       const isPreLoaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       let response = await authenticationService.logout(calledFromAutoLogout, isPreLoaderComplete) // create backup, hit logout api and delete dataBase
       dispatch(setState(PRE_LOGOUT_SUCCESS))
-      dispatch(resetNavigationState(0,[NavigationActions.navigate({routeName: LoginScreen})]))
+      navDispatch(NavigationActions.navigate({routeName: 'LoginScreen'}))
       dispatch(deleteSessionToken())
     } catch (error) {
       showToastAndAddUserExceptionLog(1803, error.message, 'danger', 1)
@@ -145,7 +141,7 @@ export function autoLogout(userData) {
         let timeLimit = moment('23:59:59', "HH:mm:ss").diff(moment(new Date(), "HH:mm:ss"), 'seconds') + 5
         const timeOutId = BackgroundTimer.setTimeout(async () => {
           if (!moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
-            dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
+            navDispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
             BackgroundTimer.clearTimeout(timeOutId);
           }
         }, timeLimit * 1000)
@@ -164,7 +160,12 @@ export function startLoginScreenWithoutLogout() {
       dispatch(setState(PRE_LOGOUT_SUCCESS))
       await logoutService.deleteDataBase()
       dispatch(deleteSessionToken())
-      dispatch(resetNavigationState(0,[NavigationActions.navigate({routeName: LoginScreen})]))
+      // navDispatch(StackActions.reset({
+      //   index: 0,
+      //   key: 'StackRouterRoot',
+      //   actions: [NavigationActions.navigate({ routeName: 'LoginScreen' })],
+      // }));
+      navDispatch(NavigationActions.navigate({ routeName: 'LoginScreen' }));
     } catch (error) {
       showToastAndAddUserExceptionLog(1805, error.message, 'danger', 1)
     }
@@ -176,10 +177,19 @@ export function checkForUnsyncBackupFilesAndNavigate(user) {
     try {
       let unsyncBackupFilesList = await backupService.checkForUnsyncBackup(user)
       if (unsyncBackupFilesList.length > 0) {
-        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: UnsyncBackupUpload })]))
+        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','UnsyncBackupUpload')
+        navDispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
         
       } else {
-        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
+          const { value: { company: { customErpPullActivated: ErpCheck }}} = await keyValueDBService.getValueFromStore(USER)
+          if(ErpCheck) {
+            keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','LoggedInERP')
+            navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
+          }
+          else {
+            keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','LoggedIn')
+            navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+          }
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(1814, error.message, 'danger', 1)
@@ -425,7 +435,3 @@ export function checkForUnsyncTransactionAndLogout(calledFromAutoLogout) {
     }
   }
 }
-
-
-
-

@@ -1,17 +1,15 @@
 'use strict'
 
 import { paymentService } from '../../services/payment/Payment'
-import { setState, showToastAndAddUserExceptionLog, navigateToScene } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
-import { NavigationActions } from 'react-navigation'
 import {
     CLEAR_PAYMENT_STATE,
     CUSTOMIZATION_APP_MODULE,
     FIELD_ATTRIBUTE,
     FIELD_ATTRIBUTE_VALIDATION,
-    JOB_ATTRIBUTE,
     JOB_MASTER_MONEY_TRANSACTION_MODE,
     SET_PAYMENT_INITIAL_PARAMETERS,
     UPDATE_PAYMENT_AT_END,
@@ -174,7 +172,7 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formLa
             //     paymentAtEnd
             // }))
             // dispatch(setState(CLEAR_PAYMENT_STATE))
-            // dispatch(NavigationActions.back())
+            // navDispatch(NavigationActions.back())
             navigation.pop(1)
         } catch (error) {
             showToastAndAddUserExceptionLog(1603, error.message, 'danger', 1)

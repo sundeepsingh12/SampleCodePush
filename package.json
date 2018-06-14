@@ -46,12 +46,10 @@
     "react-native-swipe-gestures": "1.0.2",
     "react-native-vector-icons": "4.6.0",
     "react-native-zip-archive": "2.2.4",
-    "react-navigation": "2.0.2",
-    "react-navigation-redux-helpers": "1.1.1",
+    "react-navigation": "2.4.1",
     "react-redux": "5.0.7",
     "realm": "2.6.0",
     "redux": "4.0.0",
-    "redux-logger": "3.0.6",
     "redux-mock-store": "1.5.1",
     "redux-thunk": "2.2.0",
     "regenerator": "0.12.3",
@@ -71,6 +69,7 @@
   "devDependencies": {
     "babel-preset-react-native": "4.0.0",
     "eslint": "^4.14.0",
+    "redux-logger": "3.0.6",
     "reactotron-react-native": "^1.14.0",
     "reactotron-redux": "^1.13.0",
     "rn-nodeify": "^8.2.0"

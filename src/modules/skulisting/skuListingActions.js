@@ -3,7 +3,6 @@
 import {
     SKU_LIST_FETCHING_STOP,
     SKU_LIST_FETCHING_START,
-    SHOW_SEARCH_BAR,
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
     SET_SHOW_VIEW_IMAGE,
@@ -22,19 +21,12 @@ import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
 
 import {
-    SKU_ORIGINAL_QUANTITY,
-    SKU_CODE,
-    SKU_ACTUAL_QUANTITY,
-    TOTAL_ORIGINAL_QUANTITY,
-    TOTAL_ACTUAL_QUANTITY,
-    SKU_ACTUAL_AMOUNT,
     ARRAY_SAROJ_FAREYE,
     SKU_PHOTO,
     SKU_REASON,
     NA,
     SKUVALIDATION
 } from '../../lib/AttributeConstants'
-import { NavigationActions } from 'react-navigation'
 
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
@@ -107,7 +99,7 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
             if (rowItem.attributeTypeId == SKU_PHOTO || rowItem.attributeTypeId == SKU_REASON) {
                 if (rowItem.attributeTypeId == SKU_PHOTO) {
                     value = await signatureService.saveFile(value, moment(), true)
-                    // dispatch(NavigationActions.back())
+                    // navDispatch(NavigationActions.back())
                     goBack()
                     dispatch(setState(SET_SHOW_VIEW_IMAGE, { imageData: '', showImage: false, viewData: '' }))
                 }
