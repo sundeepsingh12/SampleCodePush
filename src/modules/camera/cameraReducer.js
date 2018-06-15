@@ -2,7 +2,6 @@
 import {
     VIEW_IMAGE_DATA,
     SET_SHOW_IMAGE_AND_DATA,
-    SET_VALIDATION_FOR_CAMERA,
     SET_CAMERA_LOADER,
     SET_CAMERA_LOADER_INITIAL_SET_UP,
     SET_SHOW_IMAGE_AND_VALIDATION
@@ -24,8 +23,10 @@ export default function cameraReducer(state = initialState, action) {
             return state.set('imageData', action.payload)
                 .set('cameraLoader',false)
         case SET_CAMERA_LOADER_INITIAL_SET_UP: 
-            return initialState
-                   .set('cameraLoader', true)
+        return state.set('imageData', '')
+                    .set('validation', null)
+                    .set('viewData','')
+                    .set('cameraLoader', true)
         case SET_SHOW_IMAGE_AND_VALIDATION:
             return state.set('imageData', action.payload.data)
                         .set('validation', action.payload.validation)

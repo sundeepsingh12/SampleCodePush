@@ -5,20 +5,18 @@ import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Left, Body, Right, Icon, Footer, StyleProvider, Button, Toast } from 'native-base';
 import Loader from '../components/Loader'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
-import CompressImage from 'react-native-compress-image';
 import { RNCamera } from 'react-native-camera'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import * as cameraActions from '../modules/camera/cameraActions'
-import { SET_SHOW_IMAGE_AND_DATA, SET_CAMERA_LOADER } from '../lib/constants'
+import { SET_SHOW_IMAGE_AND_DATA } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
 import ImagePicker from 'react-native-image-picker'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import platform from '../../native-base-theme/variables/platform'
-import { CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, SKU_PHOTO } from '../lib/AttributeConstants'
-import { OPEN_CAMERA } from '../lib/ContainerConstants'
+import {  SKU_PHOTO } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
     return {

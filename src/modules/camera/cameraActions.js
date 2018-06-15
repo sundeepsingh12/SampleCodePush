@@ -2,20 +2,17 @@
 import {
     NEXT_FOCUS,
     VIEW_IMAGE_DATA,
-    SET_VALIDATION_FOR_CAMERA,
     SET_CAMERA_LOADER,
     SET_SHOW_IMAGE_AND_DATA,
     SET_SHOW_IMAGE_AND_VALIDATION,
     SET_CAMERA_LOADER_INITIAL_SET_UP,
 } from '../../lib/constants'
-import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions';
 import CompressImage from 'react-native-compress-image';
-import CONFIG from '../../lib/config'
 
 import {
     ImageStore,
@@ -110,6 +107,7 @@ export function setCameraInitialView(item) {
             }
             dispatch(setState(SET_SHOW_IMAGE_AND_VALIDATION, { data, validation }))
         } catch (error) {
+            dispatch(setState(SET_CAMERA_LOADER, false))
             showToastAndAddUserExceptionLog(305, error.message, 'danger', 1)
         }
     }
@@ -133,10 +131,7 @@ export function cropImage(uri) {
                 path: uri,
                 width: 300,
                 height: 300,
-                enableRotationGesture: true,
-                showCropGuidelines: true,
                 freeStyleCropEnabled: true,
-                cropping: true
             }).then((image) => {
                 if (image.path) {
                     ImageStore.getBase64ForTag(image.path, (base64Data) => {
@@ -146,7 +141,9 @@ export function cropImage(uri) {
                         showToastAndAddUserExceptionLog(314, error.message, 'danger', 1)
                     })
                 }
-            })
+            }).catch(e => {
+                dispatch(setState(SET_CAMERA_LOADER, false))
+            });
         } catch (error) {
             dispatch(setState(SET_CAMERA_LOADER, false))
             showToastAndAddUserExceptionLog(313, error.message, 'danger', 1)
