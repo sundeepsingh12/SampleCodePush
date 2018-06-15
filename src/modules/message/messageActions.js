@@ -4,7 +4,7 @@ import {
     SET_MESSAGE_LOADER,
     USER
 } from '../../lib/constants'
-import { setState, navigateToScene } from '../global/globalActions'
+import { setState } from '../global/globalActions'
 import _ from 'lodash'
 import { messageService } from '../../services/classes/MessageService'
 import {
@@ -55,7 +55,7 @@ export function sendMessage(messageText, messageList) {
             cloneMessageList.push(messageInteraction)
             dispatch(setState(SET_MESSAGE_LIST, cloneMessageList))
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            let finalMessageList = await messageService.sendMessage(cloneMessageList, user.value.id, token)
+            let finalMessageList = await messageService.sendMessage(cloneMessageList, token)
             dispatch(setState(SET_MESSAGE_LIST, finalMessageList))
 
         } catch (error) {

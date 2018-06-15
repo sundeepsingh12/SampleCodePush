@@ -34,17 +34,16 @@ class ExpandableHeader extends PureComponent {
                         </View>
                     </View>
                 </TouchableHighlight>
-                {renderIf(this.state.showDropDown && this.props.showDetailsList,
+                {this.state.showDropDown ? this.props.showDetailsList ?
                     <ExpandableDetailsList
                         dataList={this.props.dataList}
                         navigateToDataStoreDetails={this.props.navigateToDataStoreDetails}
                         navigateToCameraDetails={this.props.navigateToCameraDetails} />
-                )}
-                {renderIf(this.state.showDropDown && !this.props.showDetailsList,
+                    :
                     <MessagesListView
                         dataList={this.props.dataList}
                     />
-                )}
+                    : null}
             </View>
         )
     }

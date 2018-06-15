@@ -110,6 +110,9 @@ class HomeTabNavigator extends PureComponent {
             JobDetailsV2: {
                 screen: JobDetailsV2,
             },
+            FormLayout: {
+                screen: FormLayout,
+            },
         },
         )
         MenuStack.navigationOptions = ({ navigation }) => {

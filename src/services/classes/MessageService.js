@@ -24,7 +24,7 @@ class MessageService {
     }
 
 
-    async sendMessage(messageList, userId, token) {
+    async sendMessage(messageList, token) {
         let cloneMessageList = _.cloneDeep(messageList)
         let pendingMessagesList = []
         for (let message of cloneMessageList) {

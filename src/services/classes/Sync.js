@@ -139,7 +139,7 @@ class Sync {
    * @param {*} tdcResponse 
    */
   async processTdcResponse(tdcContentArray, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
-    let tdcContentObject, jobMasterIds, numberOfMessages
+    let tdcContentObject, jobMasterIds, numberOfMessages = 0
     //Prepare jobMasterWithAssignOrderToHubEnabledhere only and if it is non empty,then only hit store for below 4 lines
     // const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const { jobMasterList } = syncStoreDTO
@@ -180,7 +180,7 @@ class Sync {
         }
         realm.deleteRecordsInBatch(deleteJobTransactions, deleteJobData)
       } else if (queryType == 'message') {
-        numberOfMessages = this.saveMessagesInDb(tdcContentObject)
+        numberOfMessages += this.saveMessagesInDb(tdcContentObject)
       }
     }
     return { jobMasterIds, numberOfMessages }
