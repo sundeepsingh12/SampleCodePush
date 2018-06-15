@@ -6,18 +6,9 @@
 'use strict'
 
 import {
-  SET_SESSION_TOKEN,
-  SET_STORE,
-  ON_GLOBAL_USERNAME_CHANGE,
-  ON_GLOBAL_PASSWORD_CHANGE,
-  SET_CREDENTIALS,
-  LOGOUT_START,
-  LOGOUT_SUCCESS,
-  LOGOUT_FAILURE,
   USER_SUMMARY,
   JOB_SUMMARY,
   IS_PRELOADER_COMPLETE,
-  USER,
   RESET_STATE,
   SAVE_ACTIVATED,
   LIVE_JOB,
@@ -41,12 +32,11 @@ import { userExceptionLogsService } from '../../services/classes/UserException'
 import { OK } from '../../lib/ContainerConstants'
 import { logoutService } from '../../services/classes/Logout'
 import package_json from '../../../package.json'
+import RNFS from 'react-native-fs'
+import { PATH_CUSTOMER_IMAGES } from '../../lib/AttributeConstants'
 
 export function setState(type, payload) {
-  return {
-    type,
-    payload
-  }
+  return { type, payload }
 }
 
 //Use to navigate to other scene
@@ -60,6 +50,10 @@ export function navigateToScene(routeName, params, navigate) {
 export function deleteSessionToken() {
   return async function (dispatch) {
     try {
+      let isFileExists = await RNFS.exists(PATH_CUSTOMER_IMAGES);
+      if (isFileExists) {
+        await RNFS.unlink(PATH_CUSTOMER_IMAGES).then(() => { }).catch((error) => { })
+      }
       await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_OTP_SCREEN)

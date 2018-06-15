@@ -69,7 +69,7 @@ export function getImageData(value) {
 export function takePicture(ref) {
     return async function (dispatch) {
         try {
-            const options = { quality: 0.5, base64: true, fixOrientation: true };
+            const options = { quality: 0.2, base64: true, fixOrientation: true };
             ref.takePictureAsync(options).then((capturedImg) => {
                 const { uri, base64 } = capturedImg;
                 dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64, uri }))
