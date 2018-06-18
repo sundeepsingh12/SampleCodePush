@@ -89,7 +89,7 @@ class TransactionCustomization {
             imei: imei ? imei.value : imei,
             userEventsLogsList: userEventsLogsList ? userEventsLogsList.value : userEventsLogsList,
             transactionIdToBeSynced: transactionIdToBeSynced ? transactionIdToBeSynced.value : transactionIdToBeSynced,
-            pageList : pageList ? pageList.value : pageList
+            pageList: pageList ? pageList.value : pageList
         }
     }
 }

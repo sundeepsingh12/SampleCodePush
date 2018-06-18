@@ -82,7 +82,6 @@ export function performBatchSave(...tableNamesVsDataList) {
                     }
                 }
             } catch (error) {
-                console.log(error)
             }
         })
     })

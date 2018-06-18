@@ -287,7 +287,6 @@ class TransientStatusAndSaveActivatedService {
                 }
             } else return ''
         } catch (error) {
-            console.log(error.message)
         }
     }
 

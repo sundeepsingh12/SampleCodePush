@@ -182,7 +182,6 @@ export function checkIfDraftExists(jobMasterId, navigate) {
                 }
             }
         } catch (error) {
-            console.log(error)
         }
     }
 }
@@ -200,7 +199,6 @@ export function restoreDraft(draft, contactData, recurringData, jobMasterId, nav
             dispatch(restoreDraftAndNavigateToFormLayout(contactData, cloneJobTransaction, draft, navigationFormLayoutStates, null, null, navigate))
             dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, {}))
         } catch (error) {
-            console.log(error)
         }
     }
 }

@@ -52,7 +52,6 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-
 class Menu extends PureComponent {
 
   startLoginScreenWithoutLogout = () => {
