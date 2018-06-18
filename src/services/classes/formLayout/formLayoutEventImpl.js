@@ -843,7 +843,7 @@ export default class FormLayoutEventImpl {
      * @param {*} jobTransactionList 
      */
     changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList) {
-        return (jobTransactionId < 0 && jobTransactionList && (jobTransactionList.jobId < 0)) ? this.makeNegativeJobTransactionId() : jobTransactionId//if it is not a case of new job then return jobTransactionId
+        return (jobTransactionId < 0 && jobTransactionList && jobTransactionList.jobId < 0) ? this.makeNegativeJobTransactionId() : jobTransactionId//if it is not a case of new job then return jobTransactionId
     }
 
     /**

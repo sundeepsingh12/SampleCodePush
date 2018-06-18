@@ -20,6 +20,7 @@ var InitialState = Record({
     isShowDropdown: null,
     jobExpiryTime: null,
     syncLoading: false,
+    checkTransactionStatus: null
 })
 
 export default InitialState

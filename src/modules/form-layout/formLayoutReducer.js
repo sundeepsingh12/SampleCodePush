@@ -21,6 +21,7 @@ import {
     SET_NO_FIELD_ATTRIBUTE_MAPPED,
     SET_FORM_INVALID_AND_FORM_ELEMENT,
     SET_ARRAY_DATA_STORE_FILTER_MAP,
+    CLEAR_FORM_LAYOUT_WITH_LOADER,
 } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -82,6 +83,11 @@ export default function formLayoutReducer(state = initialState, action) {
         /**
          * resets state to initial state
          */
+        case CLEAR_FORM_LAYOUT_WITH_LOADER:{
+            return initialState
+                   .set('isLoading',true)
+        }
+           
         case CLEAR_FORM_LAYOUT:
         case RESET_STATE: {
             return initialState

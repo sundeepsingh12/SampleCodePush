@@ -28,7 +28,6 @@ export default class OtpGeneratedView extends PureComponent {
                                 style={[styles.fontXxxl, styles.padding10]}
                             />
                         </View>
-                        <Text style={[styles.fontDanger, styles.fontSm, styles.marginLeft5]}>{this.props.message}</Text>
                     </View>
                 </View>
             </Content>
