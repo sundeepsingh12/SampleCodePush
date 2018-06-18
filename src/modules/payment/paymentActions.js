@@ -131,6 +131,7 @@ export function saveMoneyCollectObject(actualAmount, currentElement, jobTransact
             let paymentAtEnd = {
                 currentElement: formLayoutState.formElement.get(currentElement.fieldAttributeMasterId),
                 modeTypeId: selectedPaymentMode,
+                parameters: null,
                 isCardPayment
             }
             formLayoutState.paymentAtEnd = paymentAtEnd

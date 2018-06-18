@@ -19,7 +19,8 @@ var InitialState = Record({
     isEtaTimerShow: false,
     isShowDropdown: null,
     jobExpiryTime : null,
-    syncLoading: false
+    syncLoading: false,
+    checkTransactionStatus: null
 })
 
 export default InitialState

@@ -217,7 +217,6 @@ export default class FormLayoutEventImpl {
                 await this._updateEtaTimeOfJobtransactions(delayInCompletingJobTransaction, runsheetIdToJobTransactionMap)
             }
         } catch (error) {
-            console.log("_getRunsheetIdToUpdateJobTransactions", error.message)
         }
     }
 
@@ -239,7 +238,6 @@ export default class FormLayoutEventImpl {
             }
             realm.saveList(TABLE_JOB_TRANSACTION, jobTransactions)
         } catch (error) {
-            console.log("_updateEtaTimeOfJobtransactions", error.message)
         }
     }
 
@@ -845,7 +843,7 @@ export default class FormLayoutEventImpl {
      * @param {*} jobTransactionList 
      */
     changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList) {
-        return (jobTransactionId < 0 && jobTransactionList && (jobTransactionList.jobId < 0)) ? this.makeNegativeJobTransactionId() : jobTransactionId//if it is not a case of new job then return jobTransactionId
+        return (jobTransactionId < 0 && jobTransactionList && jobTransactionList.jobId < 0) ? this.makeNegativeJobTransactionId() : jobTransactionId//if it is not a case of new job then return jobTransactionId
     }
 
     /**

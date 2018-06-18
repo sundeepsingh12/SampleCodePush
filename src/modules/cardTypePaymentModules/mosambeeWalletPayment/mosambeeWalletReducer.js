@@ -27,6 +27,7 @@ export default function mosambeeWalletPaymentReducer(state = initialState, actio
                         .set('walletList', action.payload.walletList)
                         .set('isModalVisible', action.payload.isModalVisible)
                         .set('contactNumber', action.payload.contactNumber)
+                        .set('errorMessage',null)
                         .set('isLoaderRunning', false)
         case SET_ERROR_MESSAGE_FOR_WALLET:
             return state.set('errorMessage', action.payload.errorMessage)

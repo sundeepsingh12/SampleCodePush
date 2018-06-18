@@ -30,7 +30,6 @@ class UserSummary {
             userSummary.value.gpsKms = totalDistanceTravelled
             await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
         } catch (error) {
-            console.log("error_updateUserSummary", error.message) // todo remove this
         }
     }
 

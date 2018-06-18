@@ -23,7 +23,8 @@ import {
     ADD_FORM_LAYOUT_STATE,
     SET_FORM_INVALID_AND_FORM_ELEMENT,
     SYNC_RUNNING_AND_TRANSACTION_SAVING,
-    SET_LANDING_TAB
+    SET_LANDING_TAB,
+    CLEAR_FORM_LAYOUT_WITH_LOADER
 } from '../../lib/constants'
 
 import {
@@ -52,7 +53,7 @@ import { fetchJobs } from '../taskList/taskListActions';
 export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
     return async function (dispatch) {
         try {
-            dispatch(setState(IS_LOADING, true))
+            dispatch(setState(CLEAR_FORM_LAYOUT_WITH_LOADER))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
             let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
@@ -172,7 +173,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack, key) {
     return async function (dispatch) {
         try {
             let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
@@ -204,6 +205,9 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         dispatch(fetchJobs())
                         dispatch(setState(CLEAR_FORM_LAYOUT))
                     } else {
+                        if(key){
+                           goBack(key)
+                        }
                         dispatch(navigateToScene(routeName, routeParam, navigate))
                     }
                 } else {

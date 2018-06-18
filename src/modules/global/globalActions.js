@@ -71,7 +71,6 @@ export function deleteSessionToken() {
       CONFIG.intervalId = 0
       dispatch(setState(RESET_STATE))
     } catch (error) {
-      console.log(error)
     }
   }
 }
@@ -110,7 +109,6 @@ export function resetApp() {
       dispatch(setState(RESET_STATE))
       // dispatch(setState(DOWNLOAD_LATEST_APP, {displayMessage:null}))
     } catch (error) {
-      console.log('error1', error)
     }
   }
 }
