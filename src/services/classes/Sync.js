@@ -139,7 +139,7 @@ class Sync {
    * @param {*} tdcResponse 
    */
   async processTdcResponse(tdcContentArray, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
-    let tdcContentObject, jobMasterIds, numberOfMessages = 0
+    let tdcContentObject, jobMasterIds, messageIdDto = []
     //Prepare jobMasterWithAssignOrderToHubEnabledhere only and if it is non empty,then only hit store for below 4 lines
     // const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const { jobMasterList } = syncStoreDTO
@@ -180,10 +180,10 @@ class Sync {
         }
         realm.deleteRecordsInBatch(deleteJobTransactions, deleteJobData)
       } else if (queryType == 'message') {
-        numberOfMessages += this.saveMessagesInDb(tdcContentObject)
+        messageIdDto = messageIdDto.concat(this.saveMessagesInDb(tdcContentObject))
       }
     }
-    return { jobMasterIds, numberOfMessages }
+    return { jobMasterIds, messageIdDto }
   }
 
   getAssignOrderTohubEnabledJobs(query, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
@@ -606,7 +606,7 @@ class Sync {
 
           const unseenTransactions = postOrderList && _.size(postOrderList.value) > 0 ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
           const jobMasterIdJobStatusIdTransactionIdDtoObject = jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap)
-          const messageIdDTOs = []
+          const messageIdDTOs = jobMasterIdsAndNumberOfMessages && jobMasterIdsAndNumberOfMessages.messageIdDto ? jobMasterIdsAndNumberOfMessages.messageIdDto : []
           if (!isLiveJob) {
             await this.deleteDataFromServer(successSyncIds, messageIdDTOs, jobMasterIdJobStatusIdTransactionIdDtoObject.transactionIdDtos, jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries)
             if (postOrderList) {
@@ -639,8 +639,8 @@ class Sync {
       this.showJobMasterNotification(_.uniq(jobMasterTitleList))
       await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
     }
-    if (jobMasterIdsAndNumberOfMessages && jobMasterIdsAndNumberOfMessages.numberOfMessages && jobMasterIdsAndNumberOfMessages.numberOfMessages > 0) {
-      this.showMessageNotification(jobMasterIdsAndNumberOfMessages.numberOfMessages)
+    if (jobMasterIdsAndNumberOfMessages && jobMasterIdsAndNumberOfMessages.messageIdDto && jobMasterIdsAndNumberOfMessages.messageIdDto.length > 0) {
+      this.showMessageNotification(jobMasterIdsAndNumberOfMessages.messageIdDto.length)
     }
     if (isJobsPresent) {
       await runSheetService.updateRunSheetUserAndJobSummary()
@@ -736,16 +736,20 @@ class Sync {
 
   saveMessagesInDb(contentData) {
     let messageInteractionList = JSON.parse(contentData.query)
-
+    let messageIdList = [], currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
     let currentFieldDataObject = {}; // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
     currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_MESSAGE_INTERACTION, null, true, 'id').length;
     for (let message of messageInteractionList.messageDataCenters) {
+      messageIdList.push({
+        id: message.id,
+        dateTimeOfMessageReceiving: currentTime
+      })
       message.id = currentFieldDataObject.currentFieldDataId
       currentFieldDataObject.currentFieldDataId++
     }
 
     realm.saveList(TABLE_MESSAGE_INTERACTION, messageInteractionList.messageDataCenters)
-    return messageInteractionList.messageDataCenters.length
+    return messageIdList
   }
   /**
    * This function deletes transaction list from schema that has been synced successfully with server.
