@@ -84,7 +84,6 @@ class MessageBox extends Component {
             {
                 jobSwipableDetails: item.jobSwipableDetails,
                 jobTransaction: item,
-                pageObjectAdditionalParams: {}
             },
             this.props.navigation.navigate
         )

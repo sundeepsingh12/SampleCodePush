@@ -113,6 +113,82 @@ class HomeTabNavigator extends PureComponent {
             FormLayout: {
                 screen: FormLayout,
             },
+            ArrayFieldAttribute: {
+                screen: ArrayFieldAttribute
+            },
+            DataStore: {
+                screen: DataStore,
+            },
+            Transient: {
+                screen: Transient,
+                navigationOptions: {
+                    gesturesEnabled: false,
+                }
+            },
+            SignatureAndNps: {
+                screen: SignatureAndNps
+            },
+            CashTendering: {
+                screen: CashTendering,
+                navigationOptions: {
+                    header: null
+                }
+            },
+
+            DataStoreDetails: {
+                screen: DataStoreDetails
+            },
+            SplitPayment: {
+                screen: SplitPayment,
+            },
+            CameraAttribute: {
+                screen: CameraFieldAttribute,
+            },
+            ImageDetailsView: {
+                screen: ImageDetailsView,
+            },
+
+            FixedSKUListing: {
+                screen: FixedSKUListing,
+                navigationOptions: {
+                    header: null
+                }
+            },
+
+            Signature: {
+                screen: Signature,
+                navigationOptions: {
+                    header: null
+                }
+            },
+            SkuListing: {
+                screen: SkuListing,
+                navigationOptions: {
+                    title: 'SKU Listing',
+                }
+            },
+            Payment: {
+                screen: Payment
+            },
+            UPIPayment: {
+                screen: UPIPayment
+            },
+            PayByLink: {
+                screen: PayByLink
+            },
+            MosamBeeWalletPayment: {
+                screen: MosambeeWalletPayment,
+                navigationOptions: {
+                    header: null
+                }
+            },
+            QrCodeScanner: {
+                screen: QrCodeScanner,
+                navigationOptions: {
+                    title: 'Scanner',
+                    header: null,
+                }
+            },
         },
         )
         MenuStack.navigationOptions = ({ navigation }) => {
