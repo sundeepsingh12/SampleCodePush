@@ -150,10 +150,6 @@ class MosambeeWalletPayment extends PureComponent {
         )
     }
 
-    stateChangeOnBack() {
-        this.props.navigation.goBack()
-    }
-
     showPaymentSuccessfulScreen() {
         return (
             <Content>
@@ -221,7 +217,7 @@ class MosambeeWalletPayment extends PureComponent {
                     </Text>
                     {buttonView}
                     <Text style={[{ color: '#007AFF', lineHeight: 19, height: 19, width: 53 }, styles.fontWeight500, styles.fontLg, { marginTop: 54 }]}
-                        onPress={() => this.stateChangeOnBack()} >
+                        onPress={() => this.props.navigation.goBack()} >
                         Cancel
                     </Text>
                 </View>
@@ -250,7 +246,7 @@ class MosambeeWalletPayment extends PureComponent {
                             </TouchableOpacity> : null}
                             <View style={[style.headerBody]}>
                                 {this.props.isModalVisible > 3 ? <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, { marginLeft: 100 }, styles.fontWeight500]}>{PAYMENT}</Text>
-                                    : <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500, styles.justifySelfCenter, checkForPayment ? { marginLeft: 100 } : null]}>{MOSAMBEE_WALLET}</Text>}
+                                    : <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500,  checkForPayment ? { marginLeft: 100 } : null]}>{MOSAMBEE_WALLET}</Text>}
                             </View>
                             <View style={[style.headerRight]}>
                             </View>

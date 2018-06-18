@@ -8,47 +8,31 @@ import { jobDetailsService } from '../../services/classes/JobDetails'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '..//global/globalActions'
 import { performSyncService, pieChartCount } from '../home/homeActions'
 import { jobStatusService } from '../../services/classes/JobStatus'
-import { NavigationActions } from 'react-navigation'
-import * as realm from '../../repositories/realmdb'
 import { MosambeeWalletPaymentServices } from '../../services/payment/MosambeeWalletPayment'
-import { NetInfo } from 'react-native'
 import _ from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions'
 import { paymentService } from '../../services/payment/Payment'
-import { PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB, UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
+import {  UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
 import { saveJobTransaction } from '../form-layout/formLayoutActions'
 import { Toast } from 'native-base'
 
 import {
-    Start,
-    PENDING,
     JOB_EXPIRY_TIME,
-    MOSAMBEE_WALLET_ID
 } from '../../lib/AttributeConstants'
 import { TRANSACTION_SUCCESSFUL } from '../../lib/ContainerConstants'
 import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
-    JOB_ATTRIBUTE_STATUS,
-    FIELD_ATTRIBUTE_STATUS,
     JOB_STATUS,
     JOB_DETAILS_FETCHING_START,
     JOB_DETAILS_FETCHING_END,
-    FormLayout,
-    JOB_SUMMARY,
     IS_MISMATCHING_LOCATION,
-    TABLE_JOB,
     USER_SUMMARY,
-    JOB_MASTER,
     USER,
-    TabScreen,
-    HomeTabNavigatorScreen,
     RESET_STATE_FOR_JOBDETAIL,
-    SHOULD_RELOAD_START,
     SET_LANDING_TAB,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT,
-    CUSTOMIZATION_APP_MODULE,
     SET_CHECK_TRANSACTION_STATUS
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService';
@@ -95,7 +79,7 @@ export function getJobDetails(params, key, navigate, goBack) {
             const draftStatusInfo = draftService.getDraftForState(details.jobTransactionDisplay, null)
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
             if (draftStatusInfo) {
-                const checkPayment = await dispatch(checkForPaymentAtEnd(draftStatusInfo, details.jobTransactionDisplay, params, key, SET_CHECK_TRANSACTION_STATUS, null, null, goBack))
+                await dispatch(checkForPaymentAtEnd(draftStatusInfo, details.jobTransactionDisplay, params, key, SET_CHECK_TRANSACTION_STATUS, null, null, goBack))
             }
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, (statusCategory == 1), jobExpiryTime, draftStatusInfo && jobMaster[0].enableLiveJobMaster))
             if (draftStatusInfo && jobMaster[0].enableLiveJobMaster) dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(null, jobMaster, navigate))
@@ -123,7 +107,7 @@ export function checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, ke
                         Toast.show({ text: TRANSACTION_SUCCESSFUL, position: 'bottom', buttonText: "OK", type: 'success', duration: 5000 })
                         jobTransaction = { id: formLayoutState.jobTransactionId, jobMasterId: draftStatusInfo.jobMasterId, jobId: formLayoutState.jobTransactionId, referenceNumber: draftStatusInfo.referenceNumber }
                     }
-                    const saveTransaction = await dispatch(saveJobTransaction(formLayoutState, draftStatusInfo.jobMasterId, walletParameters.contactData, jobTransaction, navigationFormLayoutStatesForRestore, null, null, taskListScreenDetails, navigate, goBack))
+                    await dispatch(saveJobTransaction(formLayoutState, draftStatusInfo.jobMasterId, walletParameters.contactData, jobTransaction, navigationFormLayoutStatesForRestore, null, null, taskListScreenDetails, navigate, goBack))
                     return true
                 } else {
                     dispatch(setState(checkTransactionState, null))

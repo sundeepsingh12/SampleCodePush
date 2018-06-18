@@ -272,7 +272,6 @@ class SaveActivated extends PureComponent {
     }
     render() {
         let textCounter = 1
-        let draftModalView = this.draftModal()
         if (this.props.loading) {
             return (
                 <Loader />

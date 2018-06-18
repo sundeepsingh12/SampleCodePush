@@ -92,21 +92,6 @@ class Home extends PureComponent {
     )
   }
 
-  showPaymentSuccessfulScreen() {
-    return (
-        <Content>
-            <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
-                <Image
-                    style={style.imageSync}
-                    source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
-                />
-                <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
-                    {PAYMENT_SUCCESSFUL}
-                </Text>
-            </View>
-        </Content>
-    )
-}
 
 showCheckTransactionAlert(){
   return <TransactionAlert checkTransactionAlert={this.props.checkNewJobTransactionStatus} onCancelPress={() => this.props.actions.redirectToFormLayout({id : this.props.draftNewJobInfo.draft.statusId, name: this.props.draftNewJobInfo.draft.statusName} , -1, this.props.draftNewJobInfo.draft.jobMasterId, this.props.navigation.navigate,  true, CHECK_TRANSACTION_STATUS_NEW_JOB)} 

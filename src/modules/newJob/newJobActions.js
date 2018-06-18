@@ -1,6 +1,5 @@
 'use strict'
 import {
-    NEW_JOB_STATUS,
     SAVE_ACTIVATED,
     POPULATE_DATA,
     FormLayout,
@@ -31,7 +30,7 @@ export function redirectToFormLayout(status, negativeId, jobMasterId, navigate, 
             const referenceNumber = user.value.id + '/' + user.value.hubId + '/' + moment().valueOf()
             if(deleteDraft ) {
                 dispatch(setState(action, DELETE_DRAFT))
-                await draftService.deleteDraftFromDb({ id: -1, jobId: -1, jobMasterId }, jobMasterId)
+                draftService.deleteDraftFromDb({ id: -1, jobId: -1, jobMasterId }, jobMasterId)
             }
             dispatch(navigateToScene(FormLayout, {
                 statusId: status.id,

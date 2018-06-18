@@ -145,6 +145,7 @@ module.exports = keyMirror({
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL: null,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT: null,
     SET_CHECK_TRANSACTION_STATUS: null,
+    RESET_CHECK_TRANSACTION_AND_DRAFT: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,

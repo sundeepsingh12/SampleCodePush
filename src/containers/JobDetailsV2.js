@@ -47,11 +47,11 @@ import {
   SET_JOBDETAILS_DRAFT_INFO,
   SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
   SET_CHECK_TRANSACTION_STATUS,
-  JOB_DETAILS_FETCHING_START
+  JOB_DETAILS_FETCHING_START,
+  RESET_CHECK_TRANSACTION_AND_DRAFT
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
-import { LANDMARK, PINCODE, ADDRESS_LINE_1, ADDRESS_LINE_2 } from '../lib/AttributeConstants'
 import Communications from 'react-native-communications'
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
@@ -427,7 +427,7 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.statusRevertList[0] == 1) {
       { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
     }
-    else if (!(this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType)) {
+    else if (this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType) {
       { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
     }
     else {
@@ -677,14 +677,11 @@ class JobDetailsV2 extends PureComponent {
                 </Text>
                 <View>
                 <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 50, width: 200 }, styles.alignCenter, styles.justifyCenter, { marginTop: 183 }]}
-                    onPress={() => {this.props.actions.checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, key, SET_CHECK_TRANSACTION_STATUS, JOB_DETAILS_FETCHING_START, null, this.props.navigation.goBack)}}  >
+                    onPress={() => {this.props.actions.checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, key, SET_CHECK_TRANSACTION_STATUS, JOB_DETAILS_FETCHING_START, null, this.props.navigation.goBack)}}  
+                    onLongPress={() => {this._goToFormLayoutWithoutDraft()}} >
                     <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontRegular]}> {'Check Transaction'}</Text>
                 </Button>
             </View>
-                <Text style={[{ color: '#007AFF', lineHeight: 19, height: 19, width: 53 }, styles.fontWeight500, styles.fontLg, { marginTop: 54 }]}
-                    onPress={() => {this._goToFormLayoutWithoutDraft()}} >
-                    Cancel
-                </Text>
             </View>
         </Content>
     )
@@ -703,7 +700,7 @@ _goToFormLayoutWithoutDraft = () => {
   },
   this.props.navigation.navigate
   )
-  this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
+  this.props.actions.setState(RESET_CHECK_TRANSACTION_AND_DRAFT)
 }
 
   _goToFormLayoutWithDraft = () => {
@@ -719,38 +716,42 @@ _goToFormLayoutWithoutDraft = () => {
     this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
   }
 
+  renderView(checkTransactionStatus){
+    switch(checkTransactionStatus){
+      case null : {
+        return this.detailsContainerView()
+      }
+      case TRANSACTION_SUCCESSFUL : {
+        return this.showPaymentSuccessfulScreen()
+      }
+      default : {
+        return this.showPaymentFailedScreen()
+      }
+  }
+}
+
+  detailsContainerView(){
+    const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
+    const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
+    return (
+      <StyleProvider style={getTheme(platform)}>
+        <Container style={[styles.bgLightGray]}>
+          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} /> : null}
+          {draftAlert}
+          {mismatchAlert}
+          {this.showHeaderView()}
+          { this.showContentView()}
+          {this.showFooterView()}
+        </Container>
+      </StyleProvider>
+    )
+  }
+
   render() {
     if (this.props.jobDetailsLoading) {
-      return (
-        <Loader />
-      )
+      return <Loader />
     }
-    if(this.props.checkTransactionStatus == TRANSACTION_SUCCESSFUL){
-      return(
-        this.showPaymentSuccessfulScreen()
-      )
-    }
-    if(this.props.checkTransactionStatus){
-      return(
-        this.showPaymentFailedScreen()
-      )
-    }
-    else {
-      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
-      const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
-      return (
-        <StyleProvider style={getTheme(platform)}>
-          <Container style={[styles.bgLightGray]}>
-            {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} /> : null}
-            {draftAlert}
-            {mismatchAlert}
-            {this.showHeaderView()}
-            { this.showContentView()}
-            {this.showFooterView()}
-          </Container>
-        </StyleProvider>
-      )
-    }
+    return this.renderView(this.props.checkTransactionStatus)
   }
 }
 

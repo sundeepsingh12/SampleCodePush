@@ -47,17 +47,14 @@ class MosambeeWalletPayment {
         const modulesCustomization = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
         const walletModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomization.value, MOSAMBEE_WALLET_ID)[0]
         let walletParameters = walletModule && walletModule.remark ? JSON.parse(walletModule.remark) : null
-        let actualAmount = 0.00, referenceNoActualAmountMap = '', transactionActualAmount, counter = 0
+        let actualAmount = 0.00, referenceNoActualAmountMap = '', transactionActualAmount, separator = ''
         const walletList = (walletParameters && walletParameters.partnerId && walletParameters.secretKey && walletParameters.apiPassword && walletParameters.PayProMID) ? await this.hitWalletUrlToGetWalletList(walletParameters) : null
         if(_.isArray(jobTransactionList)){
             for(let transaction in jobTransactionList){
-                counter = counter + 1
                 transactionActualAmount = (jobTransactionIdAmountMap[jobTransactionList[transaction].jobTransactionId]) ? jobTransactionIdAmountMap[jobTransactionList[transaction].jobTransactionId].actualAmount : 0
                 actualAmount = actualAmount + transactionActualAmount
-                referenceNoActualAmountMap = referenceNoActualAmountMap + jobTransactionList[transaction].referenceNumber + ':' + String(transactionActualAmount * 100) 
-                if(counter != jobTransactionList.length){
-                    referenceNoActualAmountMap += ', '
-                }
+                referenceNoActualAmountMap = referenceNoActualAmountMap + separator + jobTransactionList[transaction].referenceNumber + ':' + String(transactionActualAmount * 100) 
+                separator = ', '
             }
         }else{
             actualAmount = jobTransactionIdAmountMap.actualAmount
