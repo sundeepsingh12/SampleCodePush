@@ -13,7 +13,7 @@ import AutoLogout from '../../containers/AutoLogout'
 import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
 import HomeTabNavigator from '../../containers/HomeTabNavigator'
 import { ApplicationScreen, HardwareBackPress, HomeScreen, HomeTabNavigatorScreen, LoginScreen, PreloaderScreen, SHOW_DISCARD_ALERT, RETURN_TO_HOME, SET_TRANSIENT_BACK_PRESSED, SET_SEQUENCE_BACK_ENABLED } from '../../lib/constants'
-import { createReduxBoundAddListener, createReactNavigationReduxMiddleware,initializeListeners } from 'react-navigation-redux-helpers'
+import { createReduxBoundAddListener, createReactNavigationReduxMiddleware, initializeListeners } from 'react-navigation-redux-helpers'
 import { setState } from '../global/globalActions'
 import PropTypes from 'prop-types'
 
@@ -77,7 +77,7 @@ class AppWithNavigationState extends React.PureComponent {
     };
     return (
       <Root>
-        <AppNavigator navigation={navigation }
+        <AppNavigator navigation={navigation}
         />
       </Root>
     )

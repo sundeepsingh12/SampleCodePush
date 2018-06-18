@@ -215,6 +215,7 @@ class RestAPI {
           throw new Error(responseBody)
         }
       }).catch(err => {
+
         throw {
           code: err.message ? JSON.parse(err.message).status : null,
         }

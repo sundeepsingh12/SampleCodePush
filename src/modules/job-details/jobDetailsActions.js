@@ -12,7 +12,7 @@ import { MosambeeWalletPaymentServices } from '../../services/payment/MosambeeWa
 import _ from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions'
 import { paymentService } from '../../services/payment/Payment'
-import {  UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
 import { saveJobTransaction } from '../form-layout/formLayoutActions'
 import { Toast } from 'native-base'
 
@@ -44,7 +44,7 @@ export function startFetchingJobDetails() {
 }
 
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow, jobExpiryTime, isSyncLoading) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow, jobExpiryTime, isSyncLoading, messageList) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -57,7 +57,8 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             draftStatusInfo,
             isEtaTimerShow,
             jobExpiryTime,
-            isSyncLoading
+            isSyncLoading,
+            messageList
         }
     }
 }
@@ -81,7 +82,7 @@ export function getJobDetails(params, key, navigate, goBack) {
             if (draftStatusInfo) {
                 await dispatch(checkForPaymentAtEnd(draftStatusInfo, details.jobTransactionDisplay, params, key, SET_CHECK_TRANSACTION_STATUS, null, null, goBack))
             }
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, (statusCategory == 1), jobExpiryTime, draftStatusInfo && jobMaster[0].enableLiveJobMaster))
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, (statusCategory == 1), jobExpiryTime, draftStatusInfo && jobMaster[0].enableLiveJobMaster, details.messageList))
             if (draftStatusInfo && jobMaster[0].enableLiveJobMaster) dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(null, jobMaster, navigate))
         } catch (error) {
             showToastAndAddUserExceptionLog(1101, error.message, 'danger', 0)
