@@ -129,7 +129,7 @@ import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION
 export function fetchPagesAndPiechart() {
   return async function (dispatch) {
     try {
-      dispatch(setState(PAGES_LOADING, { pagesLoading: true }));
+      dispatch(setState(PAGES_LOADING));
       const user = await keyValueDBService.getValueFromStore(USER);
       //Fetching list of Pages
       const pageList = await keyValueDBService.getValueFromStore(PAGES);

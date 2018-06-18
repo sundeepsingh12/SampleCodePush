@@ -12,7 +12,9 @@ import {
     SHOW_DROPDOWN,
     SET_JOBDETAILS_DRAFT_INFO,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
-    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT,
+    SET_CHECK_TRANSACTION_STATUS,
+    RESET_CHECK_TRANSACTION_AND_DRAFT
 } from '../../lib/constants'
 
 
@@ -43,6 +45,10 @@ export default function jobDetailsReducer(state = initialState, action) {
                 
         case RESET_STATE:
             return initialState
+        case SET_CHECK_TRANSACTION_STATUS:
+            return state.set('checkTransactionStatus', action.payload)
+                        .set('jobDetailsLoading', false)
+
 
         case RESET_STATE_FOR_JOBDETAIL:
             return state.set('errorMessage', false)
@@ -52,6 +58,11 @@ export default function jobDetailsReducer(state = initialState, action) {
 
         case SHOW_DROPDOWN:
             return state.set('isShowDropdown', action.payload)
+
+        case RESET_CHECK_TRANSACTION_AND_DRAFT:
+            return state.set('isShowDropdown', {})
+                         .set('checkTransactionStatus', null)
+
 
         case SET_JOBDETAILS_DRAFT_INFO:
             return state.set('draftStatusInfo', action.payload)
