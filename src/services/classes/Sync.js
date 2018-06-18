@@ -718,7 +718,6 @@ class Sync {
       const url = CONFIG.API.FCM_TOKEN_DEREGISTRATION + '?topic=' + topic
       RestAPIFactory(token.value).serviceCall(fcmToken.value, url, 'POST')
     } catch (error) {
-      console.log('error', error)
     }
   }
 

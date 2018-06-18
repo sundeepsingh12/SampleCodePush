@@ -26,6 +26,7 @@ module.exports = keyMirror({
     SET_LOADER_FOR_WALLET: null,
     RESET_STATE_FOR_WALLET: null,
     SET_ERROR_FOR_OTP: null,
+    MOSAMBEE_RESET_STATE: null,
 
     //Auth Actions
     LOGOUT: null,
@@ -74,6 +75,7 @@ module.exports = keyMirror({
     SHOW_OTP_MOBILE_LOADER: null,
     IS_SHOW_MOBILE_OTP_SCREEN: null,
     IS_LOGGING_OUT: null,
+    CHECK_TRANSACTION_STATUS_NEW_JOB: null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,
@@ -107,6 +109,7 @@ module.exports = keyMirror({
     ERP_SYNC_STATUS: null,
     SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE: null,
     SET_NEWJOB_DRAFT_INFO: null,
+    SET_CHECK_TRANSACTION_AND_DRAFT: null,
     SET_LANDING_TAB: null,
     TABS_LOADING: null,
     SET_SELECTED_DATE: null,
@@ -141,6 +144,8 @@ module.exports = keyMirror({
     SET_JOBDETAILS_DRAFT_INFO: null,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL: null,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT: null,
+    SET_CHECK_TRANSACTION_STATUS: null,
+    RESET_CHECK_TRANSACTION_AND_DRAFT: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
@@ -271,6 +276,7 @@ module.exports = keyMirror({
     CLEAR_FORM_LAYOUT: null,
     SET_UPDATE_DRAFT: null,
     SET_ARRAY_DATA_STORE_FILTER_MAP: null,
+    CLEAR_FORM_LAYOUT_WITH_LOADER: null,
 
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
@@ -417,6 +423,8 @@ module.exports = keyMirror({
     SHOW_DISCARD_ALERT: null,
     RETURN_TO_HOME: null,
     SET_SAVE_ACTIVATED_DRAFT: null,
+    CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED: null,
+    SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED: null,
 
     //Bulk Module
     START_FETCHING_BULK_TRANSACTIONS: null,

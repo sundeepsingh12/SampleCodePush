@@ -25,7 +25,6 @@ function mapDispatchToProps(dispatch) {
 class CodePushUpdate extends PureComponent {
 
     render() {
-        console.log('this.props', this.props)
         return (
             <Modal
                 animationType={"slide"}
