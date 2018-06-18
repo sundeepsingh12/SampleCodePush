@@ -24,7 +24,6 @@ export function getIOSDownloadUrl() {
         dispatch(setState(SET_IOS_UPGRADE_SCREEN, { iosDownloadScreen: 'Webview', downloadUrl: iosUrlLink }))
       }
     } catch (error) {
-      console.log('error1', error)
       dispatch(setState(SET_IOS_UPGRADE_SCREEN, { iosDownloadScreen: 'Failed', downloadUrl: iosUrlLink }))
     }
   }

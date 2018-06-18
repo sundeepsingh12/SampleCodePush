@@ -489,7 +489,6 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       }
       return true;
     } catch (error) {
-      console.log('error', error)
       showToastAndAddUserExceptionLog(2706, JSON.stringify(error), 'danger', 0)
       let syncStatus = ''
       if (error.code == 500 || error.code == 502) {

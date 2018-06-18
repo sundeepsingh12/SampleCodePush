@@ -41,7 +41,6 @@ export function getDataForJobMasterSummaryAndRunSheetSummary() {
             dispatch(setState(SET_SUMMARY_FOR_JOBMASTER, jobMasterSummaryList))
             dispatch(setState(SET_SUMMARY_FOR_RUNSHEET,runsheetSummaryList))
         } catch (error) {
-            console.log("ErrorMessage",error)
         }
     }
 }

@@ -26,7 +26,6 @@ export function fetchTabs() {
       dispatch(setState(SET_TABS_LIST, { tabsList: tabs.value, tabIdStatusIdMap, isFutureRunsheetEnabled }));
     } catch (error) {
       //TODO handle UI
-      console.log(error);
     }
   }
 }
