@@ -42,7 +42,8 @@ function mapStateToProps(state) {
     errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
     menu: state.home.menu,
     isUnsyncTransactionOnLogout: state.home.isUnsyncTransactionOnLogout,
-    subMenuList: state.home.subMenuList
+    subMenuList: state.home.subMenuList,
+    utilities: state.home.utilities
   }
 };
 
@@ -132,7 +133,24 @@ class Menu extends PureComponent {
       />
     )
   }
-
+  messageView() {
+    let view
+    if (this.props.utilities.messagingEnabled) {
+      view = <TouchableOpacity onPress={() => this.props.actions.navigateToScene('MessageBox', null, this.props.navigation.navigate)}>
+        <View style={[styles.bgWhite, styles.borderBottomGray]}>
+          <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+            <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
+              <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomColor: '#f3f3f3' }]}>
+                <Text style={[styles.fontDefault]}> Messages </Text>
+                <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontBlack]} />
+              </View>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    }
+    return view
+  }
   render() {
     return (
       <StyleProvider style={getTheme(platform)}>
@@ -148,6 +166,7 @@ class Menu extends PureComponent {
           {((this.props.isLoggingOut && _.isEmpty(this.props.errorMessage_403_400_Logout)) ? <Loader /> :
             <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
               {this.getPageListItemsView()}
+              {this.messageView()}
               {this.renderLogoutView()}
             </Content>)}
         </Container>
