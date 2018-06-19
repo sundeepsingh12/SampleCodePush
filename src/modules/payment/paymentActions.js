@@ -5,7 +5,6 @@ import { setState, showToastAndAddUserExceptionLog, navigateToScene } from '../g
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
-import { NavigationActions } from 'react-navigation'
 import {
     CLEAR_PAYMENT_STATE,
     CUSTOMIZATION_APP_MODULE,

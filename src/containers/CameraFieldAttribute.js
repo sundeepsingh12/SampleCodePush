@@ -163,9 +163,9 @@ class CameraFieldAttribute extends PureComponent {
                         style={style.preview}
                         flashMode={this.state.torchOff}
                         type={this.state.cameraType}>
-                        <SafeAreaView style={[styles.absolute, styles.padding15, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
-                            <View style={[styles.padding15]}>
-                                <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.flex1]}>
+                        <SafeAreaView style={[styles.absolute, styles.paddingTop10, { top: 0, left: 0, height: 60, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
+                            <View style={[styles.paddingVertical10, styles.paddingHorizontal15]}>
+                                <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
                                     <Icon
                                         name="md-close"
                                         style={[styles.fontXxxl, styles.fontWhite]}

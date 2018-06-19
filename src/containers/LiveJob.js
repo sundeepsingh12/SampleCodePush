@@ -15,7 +15,6 @@ import ExpandableHeader from '../components/ExpandableHeader'
 import renderIf from '../lib/renderIf'
 import { START, SET_LIVE_JOB_TOAST } from '../lib/constants'
 import moment from 'moment'
-import { NavigationActions } from 'react-navigation'
 import { OK } from '../lib/ContainerConstants'
 import Line1Line2View from '../components/Line1Line2View'
 
