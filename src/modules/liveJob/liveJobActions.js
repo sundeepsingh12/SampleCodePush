@@ -1,7 +1,6 @@
 'use strict'
 
 import { jobTransactionService } from '../../services/classes/JobTransaction'
-import { NavigationActions } from 'react-navigation'
 import { setState, showToastAndAddUserExceptionLog } from '..//global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { liveJobService } from '../../services/classes/LiveJobService'
