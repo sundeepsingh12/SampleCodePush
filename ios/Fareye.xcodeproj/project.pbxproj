@@ -24,9 +24,9 @@
 		140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		15925B0D560B4327B54D8D34 /* libBVLinearGradient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F5BDB0DBAA64E9DA404CDA8 /* libBVLinearGradient.a */; };
-		1C197DEC20C24BE90080F881 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 1C197DEA20C248D20080F881 /* main.jsbundle */; };
 		1C1D77E71FF7D9B7003594E2 /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C1D77DA1FF68FA3003594E2 /* libRCTPushNotification.a */; };
 		1C90270E20A5546B00742D7E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1C90270D20A5546B00742D7E /* GoogleService-Info.plist */; };
+		1CE7F3E820D971770067564E /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 1CE7F3E720D971760067564E /* main.jsbundle */; };
 		1E5E746C01DE4344A905B2F5 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7BAFBD90623D46009E6F04FE /* OFL.txt */; };
 		1F3F5E4D033D48A886295E57 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D3B9E9A5F194416A862AEDC8 /* libRNImagePicker.a */; };
 		2216829A3047362BEAFC0213 /* libPods-Fareye-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 992D45662F81711DB2FAF73D /* libPods-Fareye-tvOS.a */; };
@@ -644,10 +644,10 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Fareye/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		1C1963B71FCEDBC8002AEF2D /* Fareye.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Fareye.entitlements; path = Fareye/Fareye.entitlements; sourceTree = "<group>"; };
-		1C197DEA20C248D20080F881 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		1C1D77D41FF68FA3003594E2 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		1C1D77DD1FF68FDB003594E2 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		1C90270D20A5546B00742D7E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Fareye/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		1CE7F3E720D971760067564E /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		1D1024AA870C46D882256716 /* rubicon-icon-font.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "rubicon-icon-font.ttf"; path = "../node_modules/native-base/Fonts/rubicon-icon-font.ttf"; sourceTree = "<group>"; };
 		1F1DB001E6484715B5E8ECCC /* RNBackgroundGeolocation.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNBackgroundGeolocation.xcodeproj; path = "../node_modules/react-native-background-geolocation/ios/RNBackgroundGeolocation.xcodeproj"; sourceTree = "<group>"; };
 		1F5BDB0DBAA64E9DA404CDA8 /* libBVLinearGradient.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libBVLinearGradient.a; sourceTree = "<group>"; };
@@ -884,7 +884,7 @@
 		13B07FAE1A68108700A75B9A /* Fareye */ = {
 			isa = PBXGroup;
 			children = (
-				1C197DEA20C248D20080F881 /* main.jsbundle */,
+				1CE7F3E720D971760067564E /* main.jsbundle */,
 				1C90270D20A5546B00742D7E /* GoogleService-Info.plist */,
 				1C1D77D41FF68FA3003594E2 /* RCTPushNotification.xcodeproj */,
 				1C1963B71FCEDBC8002AEF2D /* Fareye.entitlements */,
@@ -2109,7 +2109,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1C197DEC20C24BE90080F881 /* main.jsbundle in Resources */,
 				1C90270E20A5546B00742D7E /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
@@ -2120,6 +2119,7 @@
 				4C6BA6617B3D4049B6A69FD4 /* Feather.ttf in Resources */,
 				FB911C19F323472CA783743E /* FontAwesome.ttf in Resources */,
 				2A59E0B15FD84C38B9461E02 /* Ionicons.ttf in Resources */,
+				1CE7F3E820D971770067564E /* main.jsbundle in Resources */,
 				BCA07562E66C4769B9BDD979 /* MaterialCommunityIcons.ttf in Resources */,
 				EB095FB96B6A4A86B3A78790 /* MaterialIcons.ttf in Resources */,
 				0238DAD8CCC64A3B84BDD049 /* SimpleLineIcons.ttf in Resources */,
