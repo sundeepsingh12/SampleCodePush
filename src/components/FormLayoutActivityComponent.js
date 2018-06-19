@@ -6,9 +6,8 @@ import {
     Text,
     TouchableHighlight,
 } from 'react-native'
-import { Container, Card, CardItem, Body, Icon, Right } from 'native-base'
+import {  Icon} from 'native-base'
 import styles from '../themes/FeStyle'
-import renderIf from '../lib/renderIf'
 import {
     ARRAY,
     CASH_TENDERING,

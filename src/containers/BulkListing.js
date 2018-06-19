@@ -12,7 +12,6 @@ import { Container, Header, Button, Text, Body, Icon, Footer, StyleProvider, Act
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import renderIf from '../lib/renderIf'
 import JobListItem from '../components/JobListItem'
 import _ from 'lodash'
 import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED,  NO_JOBS_PRESENT, TOTAL_COUNT } from '../lib/ContainerConstants'

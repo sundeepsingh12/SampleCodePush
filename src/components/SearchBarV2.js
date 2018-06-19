@@ -1,9 +1,7 @@
 import React, { PureComponent } from 'react'
-import renderIf from '../lib/renderIf'
 import { StyleSheet, View, TouchableOpacity, TextInput } from 'react-native'
 import {
     Button,
-    Input,
     Icon,
 } from 'native-base';
 import styles from '../themes/FeStyle'

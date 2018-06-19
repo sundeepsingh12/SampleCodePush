@@ -3,7 +3,6 @@
 import {
     SKU_LIST_FETCHING_STOP,
     SKU_LIST_FETCHING_START,
-    SHOW_SEARCH_BAR,
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
     UPDATE_SKU_LIST_ITEMS,
@@ -21,12 +20,6 @@ import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
 
 import {
-    SKU_ORIGINAL_QUANTITY,
-    SKU_CODE,
-    SKU_ACTUAL_QUANTITY,
-    TOTAL_ORIGINAL_QUANTITY,
-    TOTAL_ACTUAL_QUANTITY,
-    SKU_ACTUAL_AMOUNT,
     ARRAY_SAROJ_FAREYE,
     SKU_PHOTO,
     SKU_REASON,

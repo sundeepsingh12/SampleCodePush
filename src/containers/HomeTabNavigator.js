@@ -1,10 +1,9 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { Platform, BackHandler, View, StyleSheet, Text } from 'react-native'
-import { Icon, Header, Body, Image } from 'native-base'
+import { Icon} from 'native-base'
 import { connect } from 'react-redux'
-import { createBottomTabNavigator, createStackNavigator } from 'react-navigation'
+import { createBottomTabNavigator } from 'react-navigation'
 import SyncScreen from './SyncScreen'
 import ErpSyncScreen from './ErpSyncScreen'
 import styles from '../themes/FeStyle'

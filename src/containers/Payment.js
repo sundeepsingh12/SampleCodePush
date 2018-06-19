@@ -1,18 +1,16 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, Platform, TextInput, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Footer, FooterTab, Input, Button, Item, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox, StyleProvider } from 'native-base'
+import { Container, Content, Footer, FooterTab, Input, Button, Item, CheckBox, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import PopOver from '../components/PopOver'
 import * as paymentActions from '../modules/payment/paymentActions'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import _ from 'lodash'
 import {
     CASH, CHEQUE, DEMAND_DRAFT, DISCOUNT, EZE_TAP, MOSAMBEE, MOSAMBEE_WALLET, MPAY, M_SWIPE, NET_BANKING, NET_BANKING_LINK,
     NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, NOT_PAID, PAYNEAR, PAYO, PAYTM, POS, RAZOR_PAY, SODEXO, SPLIT, TICKET_RESTAURANT, UPI,

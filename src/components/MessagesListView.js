@@ -7,9 +7,6 @@ import {
     FlatList,
     Text
 } from 'react-native'
-import { List } from 'native-base';
-import ExpandableDetailsView from './ExpandableDetailsView'
-import NonExpandableDetailsView from './NonExpandableDetailsView'
 import styles from '../themes/FeStyle'
 
 import {

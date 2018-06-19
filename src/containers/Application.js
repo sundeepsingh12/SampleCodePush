@@ -18,8 +18,6 @@ import {
 }
     from 'react-native'
 
-var package_json = require('../../package.json')
-
 var styles = StyleSheet.create({
     container: {
         borderTopWidth: 2,

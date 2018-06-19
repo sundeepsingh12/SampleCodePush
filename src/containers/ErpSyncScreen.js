@@ -2,20 +2,15 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Image, Modal } from 'react-native'
+import { StyleSheet, View, Image, Modal } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, Footer, FooterTab, StyleProvider } from 'native-base';
+import { Container, Content, Header, Button, Text, Body, StyleProvider } from 'native-base';
 import {
-  AUTHENTICATING,
   DOWNLOADING,
   INTERNAL_ERROR,
   INTERNAL_SERVER_ERROR,
   NO_INTERNET,
-  RE_SYNC,
   RETRY,
-  SYNC_OK_TEXT,
-  UNSYNCED_TASKS,
-  UPLOADING,
   SYNC,
   ERP_SYNC_OK_TEXT,
   CLOSE,

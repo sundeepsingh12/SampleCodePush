@@ -10,7 +10,6 @@ import {
 import { Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
-import renderIf from '../lib/renderIf'
 import MessagesListView from './MessagesListView'
 class ExpandableHeader extends PureComponent {
 

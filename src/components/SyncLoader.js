@@ -8,7 +8,6 @@ import {
   Modal,
   Text
 } from 'react-native'
-import styles from '../themes/FeStyle'
 
 export default class SyncLoader extends PureComponent {
     render() {

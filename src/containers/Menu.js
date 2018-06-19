@@ -2,37 +2,21 @@
 'use strict'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert, SectionList } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import Loader from '../components/Loader'
-import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, Footer, FooterTab, StyleProvider, Toast, Separator } from 'native-base'
+import { Container, Content, Header, Text, Body, Icon, StyleProvider, Separator } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import renderIf from '../lib/renderIf'
 import CustomAlert from '../components/CustomAlert'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { PROFILE_ID, STATISTIC_ID, OFFLINEDATASTORE_ID, BACKUP_ID, BLUETOOTH_ID } from '../lib/AttributeConstants'
 import {
-  ProfileView,
-  Statistics,
-  PROFILE,
-  EZETAP,
-  MSWIPE,
-  STATISTIC,
-  OFFLINEDATASTORE,
-  BACKUP,
-  BLUETOOTH,
-  OfflineDS,
-  Backup,
   SET_UNSYNC_TRANSACTION_PRESENT,
-  BluetoothListing,
-  IS_LOGGING_OUT
 } from '../lib/constants'
 import { OK, CANCEL, LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE, UNTITLED, APP, LOGOUT } from '../lib/ContainerConstants'
 

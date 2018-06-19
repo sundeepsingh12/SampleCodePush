@@ -1,19 +1,17 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, WebView, Platform, ActivityIndicator, BackHandler } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, WebView, Platform, ActivityIndicator} from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import * as statisticsActions from '../modules/statistics/statisticsActions'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import * as globalActions from '../modules/global/globalActions'
 import { WEBVIEW_REF, ENTER_URL_HERE, HTTP } from '../lib/AttributeConstants'
-import renderIf from '../lib/renderIf'
 import { INVALID_URL_OR_NO_INTERNET, OK } from '../lib/ContainerConstants'
 import { START_FETCHING_URL, END_FETCHING_URL, ON_CHANGE_STATE, QrCodeScanner, SCANNER_TEXT } from '../lib/constants'
-import { Container, Content, Header, Button, Text, Left, Body, Input, Right, Icon, Footer, FooterTab, StyleProvider, Toast } from 'native-base'
+import { Container, Header, Button, Text, Body, Input,  Icon, Footer, FooterTab, StyleProvider, Toast } from 'native-base'
 function mapStateToProps(state) {
     return {
         isLoaderRunning: state.customApp.isLoaderRunning,

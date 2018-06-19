@@ -4,7 +4,6 @@ import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { setState, showToastAndAddUserExceptionLog } from '..//global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { liveJobService } from '../../services/classes/LiveJobService'
-import * as realm from '../../repositories/realmdb'
 import { Toast } from 'native-base'
 import {
     JOB_ATTRIBUTE,
@@ -12,17 +11,13 @@ import {
     JOB_ATTRIBUTE_STATUS,
     FIELD_ATTRIBUTE_STATUS,
     JOB_STATUS,
-    JOB_SUMMARY,
     JOB_MASTER,
     END_LIVEJOB_DETAILD_FETCHING,
     SET_LIVE_JOB_LIST,
     TOGGLE_LIVE_JOB_LIST_ITEM,
     START_FETCHING_LIVE_JOB,
-    SET_SEARCH,
-    TabScreen,
     SET_MESSAGE,
     SET_LIVE_JOB_TOAST,
-    HomeTabNavigatorScreen,
     SET_LIVE_JOB_LOADER,
 } from '../../lib/constants'
 import { OK } from '../../lib/ContainerConstants'
