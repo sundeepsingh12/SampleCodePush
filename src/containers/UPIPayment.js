@@ -107,8 +107,6 @@ class UPIPayment extends PureComponent {
                                 )}
                                 style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
                             />
-                            {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
-                        <PopOver visible={this.checkValidation()} /> */}
                         </View>
                         <Text> Payer VPA </Text>
                         <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
@@ -122,8 +120,6 @@ class UPIPayment extends PureComponent {
                                 )}
                                 style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
                             />
-                            {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
-                        <PopOver visible={this.checkValidation()} /> */}
                         </View>
                     </View>
                 </Content>

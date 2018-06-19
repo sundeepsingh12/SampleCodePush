@@ -6,15 +6,11 @@ import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import sha256 from 'sha256';
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
-import renderIf from '../lib/renderIf'
 import { QrCodeScanner } from '../lib/constants'
-import Icon from '../../native-base-theme/components/Icon'
 import CONFIG from '../lib/config'
 import { OK, CANCEL, CONFIRM_RESET, RESET_ACCOUNT_SETTINGS, REMEMBER_ME } from '../lib/ContainerConstants'
-import { keyValueDBService } from '../services/classes/KeyValueDBService';
 
 
 var style = StyleSheet.create({

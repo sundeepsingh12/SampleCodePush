@@ -8,20 +8,9 @@ import {
   PAGES_ADDITIONAL_UTILITY,
   //ROUTE NAME FOR NAVIGATION
   TabScreen,
-  CUSTOMIZATION_APP_MODULE,
-  HOME_LOADING,
   CHART_LOADING,
-  JOB_DOWNLOADING_STATUS,
-  PENDING_SYNC_TRANSACTION_IDS,
   USER,
-  SET_MODULES,
-  UNSEEN,
-  JOB_SUMMARY,
-  SYNC_ERROR,
   SYNC_STATUS,
-  PENDING,
-  PIECHART,
-  LAST_SYNC_WITH_SERVER,
   LAST_SYNC_TIME,
   USERNAME,
   PASSWORD,
@@ -36,10 +25,6 @@ import {
   SET_ERP_PULL_ACTIVATED,
   ERP_SYNC_STATUS,
   SET_NEWJOB_DRAFT_INFO,
-  JOB_MASTER,
-  SAVE_ACTIVATED,
-  POPULATE_DATA,
-  NewJob,
   BulkListing,
   SET_TRANSACTION_SERVICE_STARTED,
   SYNC_RUNNING_AND_TRANSACTION_SAVING,
@@ -83,23 +68,20 @@ import {
   PAGE_MESSAGING,
   PAGE_SUMMARY_PIECHART,
   //ERROR MESSAGES
-  UNKNOWN_PAGE_TYPE,
   //Others
   SERVER_REACHABLE,
   SERVER_UNREACHABLE,
   Piechart,
-  SERVICE_ALREADY_SCHEDULED
 } from '../../lib/AttributeConstants'
 import { Toast, ActionSheet, } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import { trackingService } from '../../services/classes/Tracking'
-import { jobStatusService } from '../../services/classes/JobStatus'
 import { userEventLogService } from '../../services/classes/UserEvent'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog, deleteSessionToken, resetNavigationState } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
-import { NetInfo, Alert, Platform } from 'react-native'
+import { Platform } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'

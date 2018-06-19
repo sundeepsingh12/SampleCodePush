@@ -2,10 +2,10 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, Platform, FlatList, KeyboardAvoidingView } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Card, Button, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
+import { Container, Button, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform';
+import platform from '../../native-base-theme/variables/platform'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'

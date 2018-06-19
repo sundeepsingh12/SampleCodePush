@@ -1,13 +1,12 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, Platform, View, Text, Modal, Image, WebView } from 'react-native'
+import {  Platform, View, Text, Modal, Image } from 'react-native'
 import styles from '../themes/FeStyle'
-import { Container, Right, StyleProvider, Content } from 'native-base'
+import { StyleProvider} from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
-import { DOWNLOADING_LATEST_VERSION, HANG_ON, PLEASE_WAIT_FOR_IOS_LINK_URL } from '../lib/ContainerConstants'
-import Loader from '../components/Loader'
+import { DOWNLOADING_LATEST_VERSION} from '../lib/ContainerConstants'
 export default class DownloadProgressbar extends PureComponent {
 
     render() {
