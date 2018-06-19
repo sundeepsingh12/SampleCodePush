@@ -140,11 +140,7 @@ class Signature extends PureComponent {
                                 showTitleLabel={false}
                                 viewMode={this.state.isLandscape} />
                         </View>
-                        <SafeAreaView style={[styles.bgWhite]}>
-                            <FooterTab>
                                 {this.saveSignButton()}
-                            </FooterTab>
-                        </SafeAreaView>
                     </View>
                 </Container>
             </StyleProvider >
