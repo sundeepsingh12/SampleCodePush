@@ -11,7 +11,6 @@ import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import { SET_FAIL_UPLOAD_COUNT } from '../lib/constants'
 import { Container, Button, StyleProvider, } from 'native-base'
-import _ from 'lodash'
 import {
     UNABLE_TO_UPLOAD,
     BACKUP_FILE,

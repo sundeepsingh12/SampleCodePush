@@ -2,13 +2,10 @@
 
 import React, { PureComponent } from 'react'
 import {
-    StyleSheet,
     View,
     Text,
-    Platform,
     TouchableOpacity
 } from 'react-native'
-import { Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
 import renderIf from '../lib/renderIf'

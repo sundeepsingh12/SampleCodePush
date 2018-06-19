@@ -1,25 +1,16 @@
 'use strict'
 
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
-import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { postAssignmentService } from '../../services/classes/PostAssignment'
 import {
     PENDING,
-    CUSTOMIZATION_APP_MODULE,
-    JOB_MASTER,
     SET_POST_ASSIGNMENT_TRANSACTION_LIST,
     SET_POST_ASSIGNMENT_ERROR,
     SET_POST_SCAN_SUCCESS,
-    JobMasterListScreen,
-    PostAssignmentScanner
 } from '../../lib/constants'
 
 import _ from 'lodash'
-
-import {
-    JOB_ASSIGNMENT_ID
-} from '../../lib/AttributeConstants'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import {jobMasterService} from '../../services/classes/JobMaster'
  

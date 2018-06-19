@@ -12,7 +12,6 @@ import styles from '../themes/FeStyle'
 import { SET_OFFLINEDS_INITIAL_STATE, } from '../lib/constants'
 import { Container, Header, Button, Body, Right, Icon, StyleProvider, } from 'native-base'
 import { DOWNLOADING_OFFLINE_DS, DOWNLOAD_SUCCESSFUL, DOWNLOAD_FAILED, CLOSE } from '../lib/ContainerConstants'
-import _ from 'lodash'
 
 function mapStateToProps(state) {
     return {

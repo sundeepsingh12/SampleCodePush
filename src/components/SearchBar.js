@@ -1,10 +1,7 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
-import { Header, Button, Text, Input, Body, Icon, } from 'native-base';
+import { Header, Button, Text, Input, Body } from 'native-base';
 import styles from '../themes/FeStyle'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
 import { SEARCH } from '../lib/ContainerConstants'

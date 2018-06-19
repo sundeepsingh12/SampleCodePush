@@ -7,14 +7,9 @@ import {
 import { setState } from '../global/globalActions'
 import _ from 'lodash'
 import { messageService } from '../../services/classes/MessageService'
-import {
-    FIELDEXECUTIVE_INTERACTION
-} from '../../lib/ContainerConstants'
-import moment from 'moment'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import CONFIG from '../../lib/config'
 import { fetchJobs } from '../taskList/taskListActions'
-import RestAPIFactory from '../../lib/RestAPIFactory'
 export function getAllMessages() {
     return async function (dispatch) {
         try {

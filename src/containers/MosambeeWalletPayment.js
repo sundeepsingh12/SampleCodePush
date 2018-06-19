@@ -1,10 +1,10 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, Platform, TextInput, Modal, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, View, Text, Modal, TouchableOpacity, Image } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { SET_MODAL_VIEW, SET_OTP_MODAL_VIEW, CHANGE_WALLET_MOBILE_NO, SET_ERROR_MESSAGE_FOR_WALLET, CHANGE_OTP_NUMBER, RESET_STATE_FOR_WALLET, SET_ERROR_FOR_OTP } from '../lib/constants'
-import { Container, Content, Footer, FooterTab, Button, Icon, Body, Header, Toast, StyleProvider } from 'native-base';
+import { SET_MODAL_VIEW, SET_OTP_MODAL_VIEW, CHANGE_WALLET_MOBILE_NO, CHANGE_OTP_NUMBER, RESET_STATE_FOR_WALLET} from '../lib/constants'
+import { Container, Content, Footer, FooterTab, Button, Icon, Body, Header, StyleProvider } from 'native-base';
 import styles from '../themes/FeStyle'
 import * as mosambeeWalletActions from '../modules/cardTypePaymentModules/mosambeeWalletPayment/mosambeeWalletActions'
 import * as globalActions from '../modules/global/globalActions'

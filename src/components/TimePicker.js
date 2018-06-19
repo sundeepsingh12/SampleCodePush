@@ -1,8 +1,4 @@
-import React, { PureComponent } from 'react';
-import { bindActionCreators } from 'redux'
-import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
-import * as globalActions from '../modules/global/globalActions'
-import { connect } from 'react-redux'
+import React, { PureComponent } from 'react'
 import DateTimePicker from 'react-native-modal-datetime-picker'
 import moment from 'moment'
 

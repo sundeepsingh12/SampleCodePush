@@ -1,18 +1,9 @@
 import StarRating from 'react-native-star-rating'
 import {
-    StyleSheet,
     View,
-    Text,
-    TouchableHighlight
 }
     from 'react-native'
 import React, { PureComponent } from 'react'
-import renderIf from '../lib/renderIf'
-import {
-    SAVE,
-    CANCEL
-} from '../lib/ContainerConstants'
-import styles from '../themes/FeStyle'
 
 class NPSFeedback extends PureComponent {
 

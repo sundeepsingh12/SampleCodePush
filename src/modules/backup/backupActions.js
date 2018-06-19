@@ -14,7 +14,6 @@ import {
     PRE_LOGOUT_START,
     PRE_LOGOUT_SUCCESS
 } from '../../lib/constants'
-import _ from 'lodash'
 import { setState, deleteSessionToken, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { backupService } from '../../services/classes/BackupService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
@@ -26,12 +25,8 @@ import {
     USER_MISSING,
     TOKEN_MISSING,
     FILE_MISSING,
-    LOGOUT_UNSUCCESSFUL,
-    OK,
     TRY_AFTER_CLEARING_YOUR_STORAGE_DATA,
 } from '../../lib/ContainerConstants'
-import { Toast } from 'native-base'
-import moment from 'moment'
 
 /** This method creates backup manually when button is pressed.
  * 
