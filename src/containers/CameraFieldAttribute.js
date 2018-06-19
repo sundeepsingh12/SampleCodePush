@@ -1,29 +1,26 @@
 'use strict';
 import React, { PureComponent } from 'react'
-import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Image, ImageStore, Platform } from 'react-native';
+import {  StyleSheet, View, TouchableOpacity, Image, Platform } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Left, Body, Right, Icon, Footer, StyleProvider, Button, Toast } from 'native-base';
+import { Container, Right, Icon, Footer, StyleProvider, Toast } from 'native-base'
 import Loader from '../components/Loader'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
-import CompressImage from 'react-native-compress-image';
 import { RNCamera } from 'react-native-camera'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import * as cameraActions from '../modules/camera/cameraActions'
-import { SET_IMAGE_DATA, SET_SHOW_IMAGE, SET_SHOW_IMAGE_AND_DATA, SET_CAMERA_LOADER } from '../lib/constants'
+import { SET_SHOW_IMAGE_AND_DATA } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
 import ImagePicker from 'react-native-image-picker'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import platform from '../../native-base-theme/variables/platform'
-import { CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, SKU_PHOTO } from '../lib/AttributeConstants'
-import { OPEN_CAMERA } from '../lib/ContainerConstants'
+import {  SKU_PHOTO } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
     return {
         imageData: state.cameraReducer.imageData,
-        showImage: state.cameraReducer.showImage,
         validation: state.cameraReducer.validation,
         cameraLoader: state.cameraReducer.cameraLoader
     }
@@ -40,7 +37,6 @@ class CameraFieldAttribute extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            quality: '',
             torchOff: '',
             cameraType: 'back',
         }
@@ -50,33 +46,8 @@ class CameraFieldAttribute extends PureComponent {
         return { header: null }
     }
 
-    componentWillUnmount() {
-        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-            data: '',
-            showImage: true
-        })
-    }
-
     componentDidMount() {
-        let item = this.props.navigation.state.params.currentElement
-        if (!_.isEmpty(item.validation)) this.props.actions.getValidation(item.validation)
-        switch (item.attributeTypeId) {
-            case CAMERA: this.setState({ quality: 'low' })
-                break
-            case CAMERA_MEDIUM: this.setState({ quality: 'medium' })
-                break
-            case CAMERA_HIGH: this.setState({ quality: 'high' })
-                break
-            case SKU_PHOTO: this.setState({ quality: 'high' })
-                break
-            default: {
-
-            }
-        }
-        this.setState({ torchOff: RNCamera.Constants.FlashMode.off })
-        if (item.value && item.value != '' && item.value != OPEN_CAMERA) {
-            this.props.actions.setExistingImage(item)
-        }
+        this.props.actions.setCameraInitialView(this.props.navigation.state.params.currentElement)
     }
 
     _setTorchOn = () => {
@@ -102,8 +73,7 @@ class CameraFieldAttribute extends PureComponent {
                 return {
                     cameraType: 'front'
                 }
-            }
-            else {
+            }else {
                 return { cameraType: 'back' }
             }
         })
@@ -126,14 +96,7 @@ class CameraFieldAttribute extends PureComponent {
                 this._setToastForError(response.error)
             }
             else if (response.data) {
-                if (Platform.OS === 'ios') {
-                    this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-                        data: response.data,
-                        showImage: true
-                    })
-                } else {
-                    this.props.actions.compressImages(response.uri);
-                }
+                this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data : response.data, uri: response.uri}) 
             }
         })
     }
@@ -150,7 +113,7 @@ class CameraFieldAttribute extends PureComponent {
         return view
     }
 
-    imageCaptureView(getValidationObject) {
+    imageCaptureView(getValidationObject, quality) {
         let torchView = this.renderTorch()
         return <StyleProvider style={getTheme(platform)}>
             <Container>
@@ -159,7 +122,7 @@ class CameraFieldAttribute extends PureComponent {
                         ref={(cam) => {
                             this.camera = cam;
                         }}
-                        captureQuality={this.state.quality}
+                        captureQuality={quality}
                         style={style.preview}
                         flashMode={this.state.torchOff}
                         type={this.state.cameraType}>
@@ -188,7 +151,7 @@ class CameraFieldAttribute extends PureComponent {
                         <View style={[styles.flexBasis33_3, styles.alignCenter, styles.marginTop10]}>
                             <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
                                 <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }}>
-                                    <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={this.takePicture.bind(this)} />
+                                    <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={() => this.takePicture()} />
                                 </View>
                             </View>
                         </View>
@@ -201,7 +164,7 @@ class CameraFieldAttribute extends PureComponent {
         </StyleProvider>
     }
 
-    showImageView() {
+    showImageView(getValidationObject) {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
@@ -210,7 +173,7 @@ class CameraFieldAttribute extends PureComponent {
                             resizeMethod={'resize'}
                             source={{
                                 isStatic: true,
-                                uri: 'data:image/jpeg;base64,' + this.props.imageData,
+                                uri: 'data:image/jpeg;base64,' + this.props.imageData.data,
                             }}
                             style={[styles.flex1]}
                         />
@@ -220,20 +183,24 @@ class CameraFieldAttribute extends PureComponent {
                                     name="md-close"
                                     style={[styles.fontXxxl, styles.fontWhite]}
                                     onPress={() => {
-                                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-                                            data: '',
-                                            showImage: false
-                                        })
+                                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA,'')
                                     }} />
                             </View>
                         </SafeAreaView>
                     </View>
-                    <SafeAreaView style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, { bottom: 0 }]}>
+                    <SafeAreaView style={[styles.width100, styles.absolute, styles.row, styles.heightAuto, styles.justifyCenter, styles.alignCenter, styles.padding10, { bottom: 0 }]}>
+                        {(getValidationObject && getValidationObject.cropImageValidation && Platform.OS==='android') ?
+                            <View style={[styles.justifyCenter, styles.alignCenter, { marginRight: 46 }]}>
+                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.props.imageData.uri)}>
+                                    <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
+                                </TouchableOpacity>
+                            </View>
+                            : null}
                         <View>
-                            <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
+                            <View style={[styles.justifyCenter, styles.alignCenter]}>
                                 <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
                                     if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
-                                        this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData, this.props.navigation.state.params.currentElement)
+                                        this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData.data, this.props.navigation.state.params.currentElement)
                                     } else {
                                         this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction, this.props.navigation.goBack)
                                     }
@@ -250,34 +217,19 @@ class CameraFieldAttribute extends PureComponent {
 
     render() {
         let item = this.props.navigation.state.params.currentElement
+        const quality = { 20 : 'low', 42: 'high', 43: 'medium', 55: 'high' }
         if (this.props.cameraLoader)
             return <Loader />
-        if (((item.value && item.value != '' && item.value != OPEN_CAMERA) || this.props.imageData) && this.props.showImage) {
-            return this.showImageView()
+        if ((!_.isEmpty(this.props.imageData))) {
+            return this.showImageView(this.props.validation)
         } else {
-            return this.imageCaptureView(this.props.validation)
+            return this.imageCaptureView(this.props.validation, quality[item.attributeTypeId])
         }
     }
 
-    takePicture = async function () {
+    takePicture =  () => {
         if (this.camera) {
-            const options = { quality: 0.2, base64: true, fixOrientation: true };
-            try {
-                const data = await this.camera.takePictureAsync(options).then((capturedImg) => {
-                    const { uri, base64 } = capturedImg;
-                    if (Platform.OS == 'ios') {
-                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-                            data: base64,
-                            showImage: true
-                        })
-                    } else {
-                        this.props.actions.compressImages(uri);
-                    }
-                })
-            } catch (error) {
-                this._setToastForError(error.message)
-                this.props.actions.setState(SET_CAMERA_LOADER, false)
-            }
+            this.props.actions.takePicture(this.camera)
         }
     };
 }

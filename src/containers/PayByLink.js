@@ -5,16 +5,10 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform,
-    TextInput,
-    Modal,
 } from 'react-native'
 
 import {
-    SET_UPI_APPROVAL,
     SET_UPI_PAYMENT_CUSTOMER_CONTACT,
-    SET_UPI_PAYMENT_CUSTOMER_NAME,
-    SET_UPI_PAYMENT_PAYER_VPA,
 } from '../lib/constants'
 
 import { Container, Content, Footer, FooterTab, Input, Button, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox } from 'native-base';

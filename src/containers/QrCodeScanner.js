@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react';
 import { Dimensions, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Left, Body, Right, Icon, Footer, StyleProvider } from 'native-base';
+import { Container, Header,Body, Icon,StyleProvider } from 'native-base';
 import { RNCamera } from 'react-native-camera'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'

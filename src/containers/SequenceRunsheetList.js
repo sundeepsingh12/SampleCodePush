@@ -3,9 +3,6 @@
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Preloader from '../containers/Preloader'
-import Loader from '../components/Loader'
 import React, { Component } from 'react'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
