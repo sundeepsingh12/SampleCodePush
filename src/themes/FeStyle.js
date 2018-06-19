@@ -2,14 +2,17 @@
 var themeColor = '#00796B'
 export default {
     primaryColor: themeColor,
-    bgPrimaryColor : themeColor,
-    fontPrimaryColor : themeColor,
+    bgPrimaryColor: themeColor,
+    fontPrimaryColor: themeColor,
     shadeColor: themeColor + '98',
     mainBg: {
         backgroundColor: '#F7F8FA'
     },
     heightAuto: {
         height: 'auto'
+    },
+    widthAuto: {
+        width: 'auto'
     },
     bgWhite: {
         backgroundColor: '#ffffff'
@@ -74,7 +77,7 @@ export default {
     fontInfo: {
         color: '#51adfd'
     },
-    
+
     fontXs: {
         fontSize: 10
     },
@@ -179,7 +182,7 @@ export default {
     marginTop30: {
         marginTop: 30
     },
-    
+
     marginBottom5: {
         marginBottom: 5
     },
@@ -555,7 +558,7 @@ export default {
         shadowColor: '#d3d3d3',
         shadowOpacity: .5,
     },
-    borderLeft4Color : themeColor,
+    borderLeft4Color: themeColor,
     header: {
         borderBottomWidth: 0,
         height: 'auto',

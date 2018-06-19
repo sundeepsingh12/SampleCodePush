@@ -15,8 +15,8 @@ import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import JobListItem from '../components/JobListItem'
 import _ from 'lodash'
-import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED, BULK_UPDATE, NO_JOBS_PRESENT, TOTAL_COUNT } from '../lib/ContainerConstants'
-import { FormLayout, CLEAR_BULK_STATE, HardwareBackPress, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner } from '../lib/constants'
+import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED,  NO_JOBS_PRESENT, TOTAL_COUNT } from '../lib/ContainerConstants'
+import { FormLayout, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 function mapStateToProps(state) {

@@ -4,8 +4,7 @@
  *  getSessionTokenAtStartup which will navigate upon completion
  */
 'use strict'
-import React, { PureComponent } from 'react';
-import { bindActionCreators } from 'redux'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { APP_VERSION_NUMBER } from '../lib/AttributeConstants'
 
@@ -37,8 +36,6 @@ var styles = StyleSheet.create({
 /**
  * ## Application class
  */
-// var reactMixin = require('react-mixin')
-// import TimerMixin from 'react-timer-mixin'
 
 class Application extends PureComponent {
 
@@ -61,8 +58,7 @@ class Application extends PureComponent {
     }
 
 }
-// Since we're using ES6 classes, have to define the TimerMixin
-// reactMixin(Application.prototype, TimerMixin)
+
 /**
  * Connect the properties
  */

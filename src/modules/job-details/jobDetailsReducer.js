@@ -41,8 +41,9 @@ export default function jobDetailsReducer(state = initialState, action) {
                 .set('draftStatusInfo', action.payload.draftStatusInfo)
                 .set('isEtaTimerShow', action.payload.isEtaTimerShow)
                 .set('jobExpiryTime', action.payload.jobExpiryTime)
-                .set('syncLoading',action.payload.isSyncLoading)
-                
+                .set('syncLoading', action.payload.isSyncLoading)
+                .set('messageList', action.payload.messageList)
+
         case RESET_STATE:
             return initialState
         case SET_CHECK_TRANSACTION_STATUS:
@@ -66,10 +67,10 @@ export default function jobDetailsReducer(state = initialState, action) {
 
         case SET_JOBDETAILS_DRAFT_INFO:
             return state.set('draftStatusInfo', action.payload)
-        
+
         case SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT:
             return state.set('draftStatusInfo', null)
-                        .set('syncLoading', action.payload)
+                .set('syncLoading', action.payload)
 
     }
     return state

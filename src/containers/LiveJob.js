@@ -15,7 +15,6 @@ import ExpandableHeader from '../components/ExpandableHeader'
 import renderIf from '../lib/renderIf'
 import { START, SET_LIVE_JOB_TOAST } from '../lib/constants'
 import moment from 'moment'
-import { NavigationActions } from 'react-navigation'
 import { OK } from '../lib/ContainerConstants'
 import Line1Line2View from '../components/Line1Line2View'
 
@@ -175,6 +174,7 @@ class LiveJob extends PureComponent {
                         <ExpandableHeader
                             title={'Basic Details'}
                             dataList={this.props.jobDataList}
+                            showDetailsList={true}
                         />
                     </View>)}
             </Content>
@@ -195,7 +195,7 @@ class LiveJob extends PureComponent {
     }
 
     onButtonPress = (status) => {
-        this.props.actions.acceptOrRejectJob(status, this.props.jobTransaction, this.props.navigation.state.params.liveJobList,this.props.navigation.goBack)
+        this.props.actions.acceptOrRejectJob(status, this.props.jobTransaction, this.props.navigation.state.params.liveJobList, this.props.navigation.goBack)
     }
 
     showAccepRejectButtons() {

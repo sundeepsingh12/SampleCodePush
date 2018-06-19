@@ -40,13 +40,13 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Fareye needs access to your camera</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>CHANGEME: Location Always And When In Use Usage Description</string>
+	<string>Your location will be captured and used for live tracking,calculating total distance travelled and average speed</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>CHANGEME: Location Always Usage Description</string>
+	<string>Your location will be captured and used for live tracking,calculating total distance travelled and average speed</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string/>
 	<key>NSMotionUsageDescription</key>
-	<string>CHANGEME: Motion updates increase battery efficiency by intelligently toggling location-services when device is detected to be moving</string>
+	<string>Motion updates increase battery efficiency by intelligently toggling location-services when device is detected to be moving</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Fareye would like access to your photo gallery</string>
 	<key>UIAppFonts</key>

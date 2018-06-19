@@ -1,8 +1,8 @@
 'use strict';
 import React, { PureComponent } from 'react'
-import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Image, ImageStore, Platform } from 'react-native';
+import {  StyleSheet, View, TouchableOpacity, Image, Platform } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Left, Body, Right, Icon, Footer, StyleProvider, Button, Toast } from 'native-base';
+import { Container, Right, Icon, Footer, StyleProvider, Toast } from 'native-base'
 import Loader from '../components/Loader'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
 import { RNCamera } from 'react-native-camera'
@@ -126,9 +126,9 @@ class CameraFieldAttribute extends PureComponent {
                         style={style.preview}
                         flashMode={this.state.torchOff}
                         type={this.state.cameraType}>
-                        <SafeAreaView style={[styles.absolute, styles.padding15, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
-                            <View style={[styles.padding15]}>
-                                <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.flex1]}>
+                        <SafeAreaView style={[styles.absolute, styles.paddingTop10, { top: 0, left: 0, height: 60, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
+                            <View style={[styles.paddingVertical10, styles.paddingHorizontal15]}>
+                                <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
                                     <Icon
                                         name="md-close"
                                         style={[styles.fontXxxl, styles.fontWhite]}
@@ -189,7 +189,7 @@ class CameraFieldAttribute extends PureComponent {
                         </SafeAreaView>
                     </View>
                     <SafeAreaView style={[styles.width100, styles.absolute, styles.row, styles.heightAuto, styles.justifyCenter, styles.alignCenter, styles.padding10, { bottom: 0 }]}>
-                        {(getValidationObject && getValidationObject.cropImageValidation) ?
+                        {(getValidationObject && getValidationObject.cropImageValidation && Platform.OS==='android') ?
                             <View style={[styles.justifyCenter, styles.alignCenter, { marginRight: 46 }]}>
                                 <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.props.imageData.uri)}>
                                     <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />

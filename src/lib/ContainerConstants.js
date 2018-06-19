@@ -445,5 +445,8 @@ module.exports = {
     //FCM
     FCM_REGISTRATION_ERROR: 'FCM Permission Denied',
     APNS_TOKEN_ERROR: 'APNS Token Registration Error',
-    FCM_PERMISSION_DENIED: 'FCM Request Access Denied'
+    FCM_PERMISSION_DENIED: 'FCM Request Access Denied',
+
+    MANAGER_INTERACTION: 'MANAGERINTERACTION',
+    FIELDEXECUTIVE_INTERACTION: 'FIELDEXECUTIVEINTERACTION'
 }
