@@ -9,7 +9,6 @@ import SyncScreen from './SyncScreen'
 import ErpSyncScreen from './ErpSyncScreen'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
-import { NavigationActions } from 'react-navigation'
 import HomeStack from '../modules/navigators/HomeStackNavigator'
 import MenuStack from '../modules/navigators/MenuStackNavigator'
 

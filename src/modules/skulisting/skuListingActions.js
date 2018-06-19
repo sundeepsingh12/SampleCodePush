@@ -34,8 +34,6 @@ import {
     NA,
     SKUVALIDATION
 } from '../../lib/AttributeConstants'
-import { NavigationActions } from 'react-navigation'
-
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
 import {
