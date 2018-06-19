@@ -22,7 +22,7 @@ import AppOutdated from '../components/AppOutdated'
 import { LATEST_APK_PATH } from '../lib/AttributeConstants'
 import CodePushUpdate from './CodePushUpdate'
 import Loader from '../components/Loader'
-import { DOWNLOADING_LATEST_VERSION, HANG_ON, PLEASE_WAIT_FOR_IOS_LINK_URL } from '../lib/ContainerConstants'
+import { HANG_ON, PLEASE_WAIT_FOR_IOS_LINK_URL } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {

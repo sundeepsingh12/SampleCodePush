@@ -1,16 +1,15 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, Platform, TextInput, Modal, } from 'react-native'
+import { StyleSheet, View, Text, Modal } from 'react-native'
 import {
     SET_UPI_APPROVAL,
     SET_UPI_PAYMENT_CUSTOMER_CONTACT,
     SET_UPI_PAYMENT_CUSTOMER_NAME,
     SET_UPI_PAYMENT_PAYER_VPA,
 } from '../lib/constants'
-import { Container, Content, Footer, FooterTab, Input, Button, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox } from 'native-base';
+import { Container, Content, Footer, FooterTab, Input, Button } from 'native-base'
 import styles from '../themes/FeStyle'
-import PopOver from '../components/PopOver'
 import * as upiPaymentActions from '../modules/cardTypePaymentModules/upiPayment/upiPaymentActions'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'

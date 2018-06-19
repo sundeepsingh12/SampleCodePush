@@ -5,7 +5,7 @@ import {
     Text,
     Image
 } from 'react-native'
-import { StyleProvider, Container, Content, Button, List, ListItem, Body, Left, Right, Input } from 'native-base'
+import { StyleProvider, Container, Content, Button, List, ListItem, Left, Right } from 'native-base'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import feStyle from '../themes/FeStyle'
