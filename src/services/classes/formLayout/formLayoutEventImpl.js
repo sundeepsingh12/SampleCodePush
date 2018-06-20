@@ -316,12 +316,13 @@ export default class FormLayoutEventImpl {
         const count = (jobTransactionList && jobTransactionList.length) ? jobTransactionList.length : 1
         let jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
         jobSummaryList.value.forEach(item => {
-            item.updatedTime = currentDate
             if (item.jobStatusId == prevStatusId) { // check for previous statusID
                 item.count = (item.count - count >= 0) ? item.count - count : 0
+                item.updatedTime = currentDate
             }
             if (item.jobStatusId == statusId) { // check for next statusID
                 item.count += count
+                item.updatedTime = currentDate
             }
         })
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
