@@ -15,7 +15,8 @@ import {
     USER,
     PENDING_SYNC_TRANSACTION_IDS,
     BACKUP_ALREADY_EXIST,
-    DOMAIN_URL
+    DOMAIN_URL,
+    JOB_SUMMARY,
 } from '../../lib/constants'
 import { userEventLogService } from './UserEvent'
 import { jobSummaryService } from './JobSummary'
@@ -23,22 +24,11 @@ import { keyValueDBService } from './KeyValueDBService'
 import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs'
 import moment from 'moment'
-import {
-    zip,
-    unzip
-} from 'react-native-zip-archive'
+import { zip } from 'react-native-zip-archive'
 import _ from 'lodash'
 import { syncZipService } from './SyncZip'
-import {
-    USER_MISSING,
-    BACKUP_CREATED_SUCCESS_TOAST,
-    BACKUP_ALREADY_EXISTS,
-    TRANSACTIONLIST_IS_MISSING
-} from '../../lib/ContainerConstants'
-var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
-var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
-var PATH_BACKUP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUP';
-var PATH_BACKUP_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUPTEMP';
+import { USER_MISSING, BACKUP_CREATED_SUCCESS_TOAST, BACKUP_ALREADY_EXISTS, TRANSACTIONLIST_IS_MISSING } from '../../lib/ContainerConstants'
+import { PATH, PATH_BACKUP, PATH_BACKUP_TEMP } from '../../lib/AttributeConstants'
 
 class Backup {
     /**
@@ -61,12 +51,10 @@ class Backup {
             let syncFilePath = PATH + '/sync.zip'
             RNFS.mkdir(PATH);
             RNFS.mkdir(PATH_BACKUP);
-            RNFS.mkdir(PATH_BACKUP_TEMP);
-            await unzip(syncFilePath, PATH_BACKUP_TEMP)
-            const targetPath = PATH_BACKUP + '/' + backupFileName
-            const sourcePath = PATH_BACKUP_TEMP
-            await zip(sourcePath, targetPath);
-            await RNFS.unlink(PATH_BACKUP_TEMP)
+            let fileExits = await RNFS.exists(syncFilePath)
+            if (fileExits) {
+                await RNFS.copyFile(syncFilePath, PATH_BACKUP + '/' + backupFileName)
+            }
         }
     }
     /**
@@ -81,7 +69,7 @@ class Backup {
         if (!json) return
         //Writing Object to File at TEMP location
         await RNFS.writeFile(PATH_BACKUP_TEMP + '/logs.json', json, 'utf8');
-        const backupFileName = this.getBackupFileName(user.value,false,url ) // this will get the backup file name.
+        const backupFileName = this.getBackupFileName(user.value, false, url) // this will get the backup file name.
         //Creating ZIP file
         const targetPath = PATH_BACKUP + '/' + backupFileName
         const sourcePath = PATH_BACKUP_TEMP
@@ -99,7 +87,8 @@ class Backup {
         if (shouldCreateBackup && shouldCreateBackup.value) {
             return { syncedBackupFiles, toastMessage: BACKUP_ALREADY_EXISTS }
         }
-        let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL) 
+        let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
+        if (!user || !user.value || !domainUrl || !domainUrl.value) throw new Error(USER_MISSING)
         let backupFileName = await this.createSyncedBackup(user, domainUrl.value) // will create backup of synced files.
         if (syncedBackupFiles) {
             var stat = await RNFS.stat(PATH_BACKUP + '/' + backupFileName);
@@ -142,7 +131,7 @@ class Backup {
      * @param {*} dateTime 
      */
     async  _getSyncDataFromDb(transactionList, dateTime) {
-        if(!transactionList) throw new Error(TRANSACTIONLIST_IS_MISSING)
+        if (!transactionList) throw new Error(TRANSACTIONLIST_IS_MISSING)
         var BACKUP_JSON = {};
         let fieldDataList = [],
             jobList = [],
@@ -161,7 +150,9 @@ class Backup {
         BACKUP_JSON.fieldData = fieldDataList
         BACKUP_JSON.job = jobList
         BACKUP_JSON.jobTransaction = transactionList
-        let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(dateTime)
+        const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
+        const jobSummaryListValue = alljobSummaryList ? alljobSummaryList.value : null
+        let jobSummary = jobSummaryService.getJobSummaryListForSync(jobSummaryListValue, dateTime)
         BACKUP_JSON.jobSummary = jobSummary || {}
         BACKUP_JSON.trackLog = trackLogs
         BACKUP_JSON.userCommunicationLog = [];
@@ -260,7 +251,7 @@ class Backup {
      */
     async checkForUnsyncBackup(user) {
         let unsyncBackupFilesList = []
-        let domainUrl = keyValueDBService.getValueFromStore(DOMAIN_URL)
+        let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
         if (!user || !user.value || !domainUrl || !domainUrl.value) return unsyncBackupFilesList
         RNFS.mkdir(PATH_BACKUP);
         let backUpFilesInfo = await RNFS.readDir(PATH_BACKUP)

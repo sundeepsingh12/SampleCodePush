@@ -1,25 +1,8 @@
 'use strict';
 import React, { PureComponent } from 'react';
-import {
-    Dimensions,
-    StyleSheet,
-    Text,
-    View,
-    TouchableOpacity
-} from 'react-native';
-
-import {
-    Container,
-    Content,
-    Header,
-    Left,
-    Body,
-    Right,
-    Icon,
-    Footer,
-    StyleProvider
-} from 'native-base';
-
+import { Dimensions, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-navigation'
+import { Container, Header,Body, Icon,StyleProvider } from 'native-base';
 import { RNCamera } from 'react-native-camera'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -63,20 +46,22 @@ class QrCodeScanner extends PureComponent {
             return (
                 <StyleProvider style={getTheme(platform)}>
                     <Container>
-                        <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-                            <Body>
-                                <View
-                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                    </TouchableOpacity>
-                                    <View style={[style.headerBody]}>
-                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Scanner</Text>
+                        <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                                <Body>
+                                    <View
+                                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                        <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                        </TouchableOpacity>
+                                        <View style={[style.headerBody]}>
+                                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Scanner</Text>
+                                        </View>
+                                        <View style={[style.headerRight]} />
                                     </View>
-                                    <View style={[style.headerRight]} />
-                                </View>
-                            </Body>
-                        </Header>
+                                </Body>
+                            </Header>
+                        </SafeAreaView>
                         <View style={style.rectangleContainer}>
                             <RNCamera style={style.camera}
                                 type={RNCamera.Constants.Type.back}

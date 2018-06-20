@@ -1,49 +1,16 @@
 'use strict'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-
-
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
-
-
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Image } from 'react-native'
-
-import {
-  Container,
-  Content,
-  Header,
-  Button,
-  Text,
-  Left,
-  Body,
-  Right,
-  Icon,
-  Footer,
-  FooterTab,
-  StyleProvider
-} from 'native-base';
-
-import {
-  AUTHENTICATING,
-  DOWNLOADING,
-  INTERNAL_ERROR,
-  INTERNAL_SERVER_ERROR,
-  NO_INTERNET,
-  RE_SYNC,
-  RETRY,
-  SYNC_OK_TEXT,
-  UNSYNCED_TASKS,
-  UPLOADING,
-} from '../lib/ContainerConstants'
-
+import { SafeAreaView } from 'react-navigation'
+import { Container, Content, Header, Button, Text, Body, StyleProvider } from 'native-base';
+import { AUTHENTICATING, DOWNLOADING, INTERNAL_ERROR, INTERNAL_SERVER_ERROR, NO_INTERNET, RE_SYNC, RETRY, SYNC_OK_TEXT, UNSYNCED_TASKS, UPLOADING, } from '../lib/ContainerConstants'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
-import * as globalActions from '../modules/global/globalActions'
 
 function mapStateToProps(state) {
   return {
@@ -127,7 +94,7 @@ class SyncScreen extends PureComponent {
             {SYNC_OK_TEXT}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
+            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RE_SYNC} </Text>
             </Button>
           </View>
@@ -144,7 +111,7 @@ class SyncScreen extends PureComponent {
             {INTERNAL_SERVER_ERROR}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
+            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -162,7 +129,7 @@ class SyncScreen extends PureComponent {
             {NO_INTERNET}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
+            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -189,7 +156,7 @@ class SyncScreen extends PureComponent {
             {INTERNAL_ERROR}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
+            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -210,20 +177,20 @@ class SyncScreen extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
-
-          <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
-            <Body>
-              <View
-                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Sync</Text>
-                  <Text style={[styles.fontCenter, styles.fontBlack, styles.fontSm, styles.alignCenter]}>{this.props.lastSyncTime}</Text>
+          <SafeAreaView>
+            <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
+              <Body>
+                <View
+                  style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                  <View style={[style.headerBody]}>
+                    <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Sync</Text>
+                    <Text style={[styles.fontCenter, styles.fontBlack, styles.fontSm, styles.alignCenter]}>{this.props.lastSyncTime}</Text>
+                  </View>
+                  <View />
                 </View>
-                <View />
-              </View>
-            </Body>
-          </Header>
-
+              </Body>
+            </Header>
+          </SafeAreaView>
           <Content style={[styles.bgLightGray]}>
             {syncView}
             {transactionView}

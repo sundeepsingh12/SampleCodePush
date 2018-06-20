@@ -7,13 +7,10 @@ const initialState = new InitialState()
 import {
   PAGES_LOADING,
   SET_PAGES_UTILITY_N_PIESUMMARY,
-  HOME_LOADING,
-  SET_MODULES,
   SYNC_STATUS,
   CHART_LOADING,
   RESET_STATE,
   LAST_SYNC_TIME,
-  TOGGLE_LOGOUT,
   SET_UNSYNC_TRANSACTION_PRESENT,
   SET_BACKUP_UPLOAD_VIEW,
   SET_UPLOAD_FILE_COUNT,
@@ -22,8 +19,14 @@ import {
   SET_TRANSACTION_SERVICE_STARTED,
   SET_ERP_PULL_ACTIVATED,
   ERP_SYNC_STATUS,
-  SET_NEWJOB_DRAFT_INFO
+  SET_NEWJOB_DRAFT_INFO,
+  LOADER_FOR_SYNCING,
+  IS_LOGGING_OUT,
+  CHECK_TRANSACTION_STATUS_NEW_JOB,
+  SET_CHECK_TRANSACTION_AND_DRAFT
 } from '../../lib/constants'
+
+import { TRANSACTION_SUCCESSFUL, DELETE_DRAFT } from '../../lib/ContainerConstants'
 
 export default function homeReducer(state = initialState, action) {
   if (!(state instanceof InitialState)) {
@@ -31,8 +34,18 @@ export default function homeReducer(state = initialState, action) {
   }
   switch (action.type) {
     case PAGES_LOADING: {
-      return state.set('pagesLoading', action.payload.pagesLoading)
+      return state.set('pagesLoading', true)
     }
+
+    case  CHECK_TRANSACTION_STATUS_NEW_JOB: {
+      if(action.payload == TRANSACTION_SUCCESSFUL || action.payload == DELETE_DRAFT){
+      return state.set('checkNewJobTransactionStatus',action.payload)
+                  .set('draftNewJobInfo', null)
+      }else{
+        return state.set('checkNewJobTransactionStatus',action.payload)
+                  .set('pagesLoading', false)
+      }
+     }
 
     case SET_PAGES_UTILITY_N_PIESUMMARY: {
       return state.set('mainMenuList', action.payload.sortedMainMenuAndSubMenuList.mainMenuSectionList)
@@ -56,10 +69,13 @@ export default function homeReducer(state = initialState, action) {
         .set('lastErpSyncTime', action.payload.lastErpSyncTime)
     }
 
+    case LOADER_FOR_SYNCING:{
+      return state.set('moduleLoading', action.payload)
+    }
+
     case CHART_LOADING:
       return state.set('chartLoading', action.payload.loading)
         .set('pieChartSummaryCount', action.payload.count)
-
 
     case LAST_SYNC_TIME:
       return state.set('lastSyncTime', action.payload)
@@ -67,12 +83,13 @@ export default function homeReducer(state = initialState, action) {
     case RESET_STATE: {
       return initialState
     }
-
-    case TOGGLE_LOGOUT:
+    case IS_LOGGING_OUT: {
       return state.set('isLoggingOut', action.payload)
+    }
 
     case SET_UNSYNC_TRANSACTION_PRESENT:
-      return state.set('isUnsyncTransactionOnLogout', action.payload)
+      return state.set('isUnsyncTransactionOnLogout', action.payload.isUnsyncTransactionOnLogout)
+                  .set('isLoggingOut',action.payload.isLoggingOut)
 
     case SET_BACKUP_UPLOAD_VIEW:
       return state.set('backupUploadView', action.payload)
@@ -88,7 +105,10 @@ export default function homeReducer(state = initialState, action) {
 
     case SET_NEWJOB_DRAFT_INFO:
       return state.set('draftNewJobInfo', action.payload)
-
+      
+    case SET_CHECK_TRANSACTION_AND_DRAFT: 
+    return state.set('draftNewJobInfo', {})
+                .set('checkNewJobTransactionStatus', null)
     case SET_TRANSACTION_SERVICE_STARTED:
       return state.set('trackingServiceStarted', action.payload)
   }

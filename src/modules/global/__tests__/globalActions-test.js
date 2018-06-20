@@ -12,8 +12,6 @@ import {
     LOGOUT_FAILURE,
     USER_SUMMARY,
     JOB_SUMMARY,
-    IS_SHOW_MOBILE_NUMBER_SCREEN,
-    IS_SHOW_OTP_SCREEN,
     IS_PRELOADER_COMPLETE
 } from '../../../lib/constants'
 
@@ -30,14 +28,6 @@ const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
 describe('global actions', () => {
-
-    it('should set store', () => {
-        const store = 'test token'
-        expect(actions.setStore(store)).toEqual({
-            type: SET_STORE,
-            payload: store
-        })
-    })
 
     it('should delete session token', () => {
         const expectedActions = [

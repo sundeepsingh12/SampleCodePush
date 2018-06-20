@@ -2,64 +2,32 @@
 'use strict'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert, SectionList } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import Loader from '../components/Loader'
-import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, Footer, FooterTab, StyleProvider, Toast, Separator } from 'native-base'
+import { Container, Content, Header, Text, Body, Icon, StyleProvider, Separator } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import renderIf from '../lib/renderIf'
 import CustomAlert from '../components/CustomAlert'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import {
-  PROFILE_ID,
-  STATISTIC_ID,
-  OFFLINEDATASTORE_ID,
-  BACKUP_ID,
-  BLUETOOTH_ID
-} from '../lib/AttributeConstants'
-
-import {
-  ProfileView,
-  Statistics,
-  PROFILE,
-  EZETAP,
-  MSWIPE,
-  STATISTIC,
-  OFFLINEDATASTORE,
-  BACKUP,
-  BLUETOOTH,
-  OfflineDS,
-  Backup,
   SET_UNSYNC_TRANSACTION_PRESENT,
-  ERROR_400_403_LOGOUT_FAILURE,
-  BluetoothListing
 } from '../lib/constants'
-
-import {
-  OK,
-  CANCEL,
-  LOGOUT_UNSYNCED_TRANSACTIONS_TITLE,
-  LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
-  UNTITLED,
-  APP,
-  LOGOUT
-} from '../lib/ContainerConstants'
+import { OK, CANCEL, LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE, UNTITLED, APP, LOGOUT } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
-    loading: state.home.loading,
-    errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
-    isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
-    menu: state.home.menu,
     isLoggingOut: state.home.isLoggingOut,
+    errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
+    menu: state.home.menu,
     isUnsyncTransactionOnLogout: state.home.isUnsyncTransactionOnLogout,
-    subMenuList: state.home.subMenuList
+    subMenuList: state.home.subMenuList,
+    utilities: state.home.utilities
   }
 };
 
@@ -69,7 +37,6 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-
 class Menu extends PureComponent {
 
   startLoginScreenWithoutLogout = () => {
@@ -78,12 +45,13 @@ class Menu extends PureComponent {
 
   getUnsyncTransactionPresentAlert() {
     if (this.props.isUnsyncTransactionOnLogout) {
+
       return Alert.alert(LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
-        [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false), style: 'cancel' },
+        [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, { isUnsyncTransactionOnLogout: false, isLoggingOut: false }), style: 'cancel' },
         {
           text: OK, onPress: () => {
-            this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false)
-            this.props.actions.invalidateUserSessionWhenLogoutPressed(true)
+            this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, { isUnsyncTransactionOnLogout: false, isLoggingOut: true })
+            this.props.actions.invalidateUserSession(false)
           }
         },],
         { cancelable: false })
@@ -92,27 +60,29 @@ class Menu extends PureComponent {
 
   renderMenuHeader() {
     return (
-      <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
-        <Body>
-          <View
-            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-            <View style={[style.headerBody]}>
-              <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Menu</Text>
+      <SafeAreaView style={[styles.bgWhite]}>
+        <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
+          <Body>
+            <View
+              style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+              <View style={[style.headerBody]}>
+                <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Menu</Text>
+              </View>
+              <View />
             </View>
-            <View />
-          </View>
-        </Body>
-      </Header>
+          </Body>
+        </Header>
+      </SafeAreaView>
     )
   }
 
   getPageView(page) {
     return (
-      <TouchableOpacity key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
+      <TouchableOpacity key={page.id} onPress={() => this.props.actions.navigateToPage(page, this.props.navigation.navigate)}>
         <View style={[styles.bgWhite, styles.borderBottomGray]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             <View style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter]}>
-              <MaterialIcons name={page.icon} style={[styles.fontPrimary, styles.fontLg]} />
+              <MaterialIcons name={page.icon} style={[{ color: styles.fontPrimaryColor }, styles.fontLg]} />
             </View>
             <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
               <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomColor: '#f3f3f3' }]}>
@@ -147,28 +117,44 @@ class Menu extends PureComponent {
       />
     )
   }
-
+  messageView() {
+    let view
+    if (this.props.utilities.messagingEnabled) {
+      view = <TouchableOpacity onPress={() => this.props.actions.navigateToScene('MessageBox', null, this.props.navigation.navigate)}>
+        <View style={[styles.bgWhite, styles.borderBottomGray]}>
+          <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+            <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
+              <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomColor: '#f3f3f3' }]}>
+                <Text style={[styles.fontDefault]}> Messages </Text>
+                <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontBlack]} />
+              </View>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    }
+    return view
+  }
   render() {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
           {this.renderMenuHeader()}
-          {(this.props.isErrorType_403_400_Logout &&
+          {(!_.isEmpty(this.props.errorMessage_403_400_Logout) &&
             <CustomAlert
               title="Unauthorised Device"
-              message={this.props.errorMessage_403_400_Logout.message}
+              message={this.props.errorMessage_403_400_Logout}
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
-          {renderIf(this.props.isLoggingOut, <Loader />)}
           {this.getUnsyncTransactionPresentAlert()}
-          {renderIf(!this.props.isLoggingOut,
+          {((this.props.isLoggingOut && _.isEmpty(this.props.errorMessage_403_400_Logout)) ? <Loader /> :
             <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
               {this.getPageListItemsView()}
+              {this.messageView()}
               {this.renderLogoutView()}
             </Content>)}
         </Container>
       </StyleProvider>
-
     )
   }
 
@@ -183,7 +169,7 @@ class Menu extends PureComponent {
             <View style={[styles.justifySpaceBetween, styles.flex1]}>
               <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
                 <Text style={[styles.fontDefault]}> {LOGOUT} </Text>
-                <Icon name="ios-log-in" style={[styles.fontLg, styles.fontPrimary]} />
+                <Icon name="ios-log-in" style={[styles.fontLg, { color: styles.fontPrimaryColor }]} />
               </View>
             </View>
           </View>

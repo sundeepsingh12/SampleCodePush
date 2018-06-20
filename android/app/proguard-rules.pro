@@ -19,7 +19,7 @@
 # Disabling obfuscation is useful if you collect stack traces from production crashes
 # (unless you are using a system that supports de-obfuscate the stack traces).
 -dontobfuscate
-
+-optimizationpasses 5
 # React Native
 
 # Keep our interfaces so they can be used by other ProGuard rules.
@@ -95,3 +95,10 @@
 -keep class ch.qos.** { *; }
 -keep class org.slf4j.** { *; }
 -dontwarn ch.qos.logback.core.net.*
+
+# Google Play Services
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
+
+-keep class io.realm.react.** { *; }
+-dontwarn io.realm.react.**

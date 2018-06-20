@@ -16,9 +16,10 @@ import {
     SET_DSF_REVERSE_MAP,
     SEARCH_DATA_STORE_RESULT,
     SET_ARRAY_DATA_STORE_FILTER_MAP,
+
 } from '../../lib/constants'
 import {
-    DATA_STORE
+    DATA_STORE,
 } from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
@@ -80,16 +81,22 @@ export function getJobAttribute(jobAttributeMasterId, value) {
  * @param {*} dataStoreFilterReverseMap 
  * this actions check for filters and validations
  */
-export function checkForFiltersAndValidation(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap) {
+export function checkForFiltersAndValidation(currentElement, formLayoutState, jobTransaction, dataStoreFilterReverseMap) {
     return async function (dispatch) {
         try {
             dispatch(setState(SHOW_LOADER_DS, true))
-            let returnParams = await dataStoreService.checkForFiltersAndValidations(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap)
+            let cloneFormElement = _.cloneDeep(formLayoutState.formElement)
+            let returnParams = await dataStoreService.runDataStoreBeforeValidations(currentElement, formLayoutState, jobTransaction, cloneFormElement, dataStoreFilterReverseMap)
             dispatch(setState(SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP, {
                 dataStoreAttrValueMap: returnParams.dataStoreAttrValueMap,
                 isFiltersPresent: returnParams.isFiltersPresent,
-                validation: returnParams.validation
+                validation: returnParams.validationObject,
+                searchText: returnParams.searchText,
+                isDataStoreEditable: returnParams.isDataStoreEditable
             }))
+            if (!returnParams.isFiltersPresent && !_.isEmpty(returnParams.searchText) && returnParams.validationObject.isSearchEnabled) {
+                dispatch(checkOfflineDS(returnParams.searchText, currentElement.dataStoreMasterId, currentElement.dataStoreAttributeId, currentElement.externalDataStoreMasterUrl, currentElement.key, currentElement.attributeTypeId))
+            }
             dispatch(setState(SET_DSF_REVERSE_MAP, returnParams.dataStoreFilterReverseMap))
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {
@@ -178,13 +185,13 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function onSave(fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction) {
+export function onSave(fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction,goBack) {
     return async function (dispatch) {
         try {
             if (!calledFromArray) {
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction,null,null,goBack))
             } else {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState,goBack))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(705, error.message, 'danger', 0)
@@ -233,13 +240,13 @@ export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, it
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction) {
+export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction,goBack) {
     return async function (dispatch) {
         try {
             if (!calledFromArray) {
                 let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formLayoutState.formElement)
                 formLayoutState.formElement = formElementResult
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction,null,null,goBack))
             } else {
                 let formElementResult = await dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formLayoutState.formElement[rowId].formLayoutObject)
                 formLayoutState.formElement[rowId].formLayoutObject = formElementResult
@@ -335,13 +342,19 @@ export function checkForFiltersAndValidationForArray(functionParamsFromDS) {
     return async function (dispatch) {
         try {
             dispatch(setState(SHOW_LOADER_DS, true))
-            let dataStoreParams = await dataStoreService.checkForFiltersAndValidationsForArray(functionParamsFromDS)
+            let returnParams = await dataStoreService.checkForFiltersAndValidationsForArray(functionParamsFromDS)
             dispatch(setState(SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP, {
-                dataStoreAttrValueMap: dataStoreParams.dataStoreAttrValueMap,
-                isFiltersPresent: dataStoreParams.isFiltersPresent,
-                validation: dataStoreParams.validation
+                dataStoreAttrValueMap: returnParams.dataStoreAttrValueMap,
+                isFiltersPresent: returnParams.isFiltersPresent,
+                validation: returnParams.validationObject,
+                searchText: returnParams.searchText,
+                isDataStoreEditable: returnParams.isDataStoreEditable
             }))
-            dispatch(setState(SET_ARRAY_DATA_STORE_FILTER_MAP, dataStoreParams.arrayReverseDataStoreFilterMap))  // set formLayout state of arrayReverseDataStoreFilterMap which is avilable globally
+            let currentElement=functionParamsFromDS.currentElement
+            if (!returnParams.isFiltersPresent && !_.isEmpty(returnParams.searchText) && returnParams.validationObject.isSearchEnabled) {
+                dispatch(checkOfflineDS(returnParams.searchText, currentElement.dataStoreMasterId, currentElement.dataStoreAttributeId, currentElement.externalDataStoreMasterUrl, currentElement.key, currentElement.attributeTypeId))
+            }
+            dispatch(setState(SET_ARRAY_DATA_STORE_FILTER_MAP, returnParams.arrayReverseDataStoreFilterMap))  // set formLayout state of arrayReverseDataStoreFilterMap which is avilable globally
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {
                 errorMessage: error.message,

@@ -3,23 +3,25 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, PushNotificationIOS, Animated, SectionList } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, SectionList } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import Loader from '../components/Loader'
 import PieChart from '../components/PieChart'
-import renderIf from '../lib/renderIf'
 import * as globalActions from '../modules/global/globalActions'
 import * as homeActions from '../modules/home/homeActions'
-import { Container, Content, Header, Button, Text, List, ListItem, Separator, Left, Body, Right, Icon, Title, Footer, FooterTab, StyleProvider, Toast, ActionSheet } from 'native-base'
+import { checkForPaymentAtEnd } from '../modules/job-details/jobDetailsActions'
+import { Container, Content, Header, Button, Text, List, ListItem, Separator, Left, Body, Right, Icon, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
-import { Platform } from 'react-native'
-import PushNotification from 'react-native-push-notification'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { UNTITLED } from '../lib/ContainerConstants'
-import { Summary }from '../lib/constants'
+import { UNTITLED, TRANSACTION_SUCCESSFUL, DELETE_DRAFT } from '../lib/ContainerConstants'
+import { Summary, PAGES_LOADING, CHECK_TRANSACTION_STATUS_NEW_JOB, SET_NEWJOB_DRAFT_INFO, SET_CHECK_TRANSACTION_AND_DRAFT } from '../lib/constants'
 import DraftModal from '../components/DraftModal'
+import TransactionAlert from '../components/TransactionAlert'
+import SyncLoader from '../components/SyncLoader'
+import { redirectToFormLayout } from '../modules/newJob/newJobActions'
 
 function mapStateToProps(state) {
   return {
@@ -34,42 +36,31 @@ function mapStateToProps(state) {
     utilities: state.home.utilities,
     pagesLoading: state.home.pagesLoading,
     pieChartSummaryCount: state.home.pieChartSummaryCount,
+    trackingServiceStarted: state.home.trackingServiceStarted,
+    checkNewJobTransactionStatus: state.home.checkNewJobTransactionStatus,
+    customErpPullActivated: state.home.customErpPullActivated
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...homeActions }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...homeActions, checkForPaymentAtEnd, redirectToFormLayout }, dispatch)
   }
 }
 
 class Home extends PureComponent {
 
   componentDidMount() {
-    if (Platform.OS === 'ios') {
-      PushNotification.configure({
-        onNotification: function (notification) {
-          console.log('NOTIFICATION:', notification);
-          Toast.show({
-            text: `${notification.message}`,
-            position: 'top',
-            buttonText: 'OK',
-            duration: 10000
-          })
-          notification.finish(PushNotificationIOS.FetchResult.NoData);
-        }
-      })
-    }
     this.props.actions.fetchPagesAndPiechart();
-    this.props.actions.startMqttService(this.props.pieChart);
-    this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated');
+    this.props.actions.performSyncService(this.props.customErpPullActivated == 'notActivated');
     this.props.actions.startTracking(this.props.trackingServiceStarted);
+    this.props.actions.startFCM();
   }
 
   getPageView(page) {
     return (
-      <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
-        <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon]} />
+      <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page, this.props.navigation.navigate)}>
+        <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon, { backgroundColor: styles.primaryColor }]} />
         <Body><Text style={[styles.fontWeight500, styles.fontLg]}>{page.name}</Text></Body>
         <Right><Icon name="ios-arrow-forward" /></Right>
       </ListItem>
@@ -97,6 +88,12 @@ class Home extends PureComponent {
       />
     )
   }
+
+
+showCheckTransactionAlert(){
+  return <TransactionAlert checkTransactionAlert={this.props.checkNewJobTransactionStatus} onCancelPress={() => this.props.actions.redirectToFormLayout({id : this.props.draftNewJobInfo.draft.statusId, name: this.props.draftNewJobInfo.draft.statusName} , -1, this.props.draftNewJobInfo.draft.jobMasterId, this.props.navigation.navigate,  true, CHECK_TRANSACTION_STATUS_NEW_JOB)} 
+                        onOkPress = {() => this.props.actions.checkForPaymentAtEnd(this.props.draftNewJobInfo.draft, null, null, null, CHECK_TRANSACTION_STATUS_NEW_JOB, PAGES_LOADING, this.props.navigation.push ) }      onRequestClose={() => this.props.actions.setState(SET_CHECK_TRANSACTION_AND_DRAFT)} />
+}
   pieChartView() {
     if (!this.props.utilities.pieChartEnabled) {
       return null
@@ -105,7 +102,7 @@ class Home extends PureComponent {
     if (this.props.chartLoading) {
       return (
         <ActivityIndicator animating={this.props.chartLoading}
-          style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color="green" />
+          style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color={styles.bgPrimaryColor} />
       )
     }
 
@@ -115,17 +112,15 @@ class Home extends PureComponent {
     return null
   }
   _onPieChartPress = () => {
-      this.props.actions.navigateToScene(Summary)
+    this.props.actions.navigateToScene(Summary, null, this.props.navigation.navigate)
   }
-  
+
   getNewJobDraftModal() {
     if (!_.isEmpty(this.props.draftNewJobInfo)) {
-      return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
+      return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true, this.props.navigation.navigate)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false, this.props.navigation.navigate)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
     }
     return null
   }
-
-  
 
   render() {
     const pieChartView = this.pieChartView()
@@ -135,16 +130,19 @@ class Home extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={StyleSheet.flatten([styles.bgWhite])}>
-          <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
-            <Body>
-              <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}><View style={[style.headerBody]}><View style={{ width: 90 }}>
-                <Image style={StyleSheet.flatten([styles.width100, { resizeMode: 'contain' }])} source={FareyeLogo} />
-              </View></View></View>
-            </Body>
-          </Header>
+          <SafeAreaView>
+            <Header searchBar style={StyleSheet.flatten([styles.bgWhite])}>
+              <Body>
+                <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}><View><View style={{ width: 90 }}>
+                  <Image style={StyleSheet.flatten([styles.width100, { resizeMode: 'contain' }])} source={FareyeLogo} />
+                </View></View></View>
+              </Body>
+            </Header>
+          </SafeAreaView>
           <Content>
+            {(this.props.moduleLoading) ? <SyncLoader moduleLoading={this.props.moduleLoading} /> : null}
             {pieChartView}
-            {this.getNewJobDraftModal()}
+            {(this.props.checkNewJobTransactionStatus && this.props.checkNewJobTransactionStatus != TRANSACTION_SUCCESSFUL && this.props.checkNewJobTransactionStatus != DELETE_DRAFT) ? this.showCheckTransactionAlert() : this.getNewJobDraftModal()}
             <List>{this.getPageListItemsView()}</List>
           </Content>
         </Container>
@@ -162,8 +160,12 @@ const style = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d6d7da',
     padding: 5,
-    backgroundColor: styles.primaryColor
-  }
+  },
+  imageSync: {
+    width: 116,
+    height: 116,
+    resizeMode: 'contain'
+}
 });
 
 

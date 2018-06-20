@@ -1,46 +1,22 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import {
-  StyleSheet,
-  View,
-  Text,
-  Platform,
-  FlatList,
-  TouchableOpacity,
-  KeyboardAvoidingView
-}
-  from 'react-native'
-import { Container, Content, Card, Button, Body, Header, Right, Icon, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
+import { StyleSheet, View, Text, Platform, FlatList, KeyboardAvoidingView } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
+import { Container, Button, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform';
+import platform from '../../native-base-theme/variables/platform'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import BasicFormElement from '../components/FormLayoutBasicComponent.js'
 import Loader from '../components/Loader'
-import renderIf from '../lib/renderIf.js'
-import {
-  NET_BANKING,
-  NET_BANKING_LINK,
-  NET_BANKING_CARD_LINK,
-  NET_BANKING_UPI_LINK,
-  UPI,
-} from '../lib/AttributeConstants'
-
-import {
-  SET_UPDATE_DRAFT,
-  ERROR_MESSAGE,
-  SET_FORM_TO_INVALID,
-  SET_NO_FIELD_ATTRIBUTE_MAPPED
-} from '../lib/constants'
+import { NET_BANKING, NET_BANKING_LINK, NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, UPI, MOSAMBEE_WALLET } from '../lib/AttributeConstants'
+import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
-import {
-  ALERT,
-  INVALID_FORM_ALERT,
-  OK
-} from '../lib/ContainerConstants'
+import { ALERT, INVALID_FORM_ALERT, OK } from '../lib/ContainerConstants'
+import TitleHeader from '../components/TitleHeader'
 
 function mapStateToProps(state) {
   return {
@@ -73,6 +49,10 @@ function mapDispatchToProps(dispatch) {
 
 class FormLayout extends PureComponent {
 
+  static navigationOptions = ({ navigation, props }) => {
+    return { header: <TitleHeader pageName={navigation.state.params.statusName} goBack={navigation.goBack} /> }
+  }
+
   componentDidUpdate() {
     if (this.props.errorMessage && this.props.errorMessage != '') {
       Toast.show({
@@ -86,11 +66,11 @@ class FormLayout extends PureComponent {
     }
   }
 
-  componentWillUnmount() {
-    if (this.props.noFieldAttributeMappedWithStatus) {
-      this.props.actions.setState(SET_NO_FIELD_ATTRIBUTE_MAPPED, false)
-    }
-  }
+  // componentWillUnmount() {
+  //   if (this.props.noFieldAttributeMappedWithStatus) {
+  //     this.props.actions.setState(SET_NO_FIELD_ATTRIBUTE_MAPPED, false)
+  //   }
+  // }
 
   componentDidMount() {
     if (!this.props.navigation.state.params.isDraftRestore) {
@@ -126,6 +106,7 @@ class FormLayout extends PureComponent {
         jobTransaction={this.props.navigation.state.params.jobTransaction}
         jobStatusId={this.props.navigation.state.params.statusId}
         formLayoutState={formLayoutState}
+        navigate={this.props.navigation.navigate}
       />
     )
   }
@@ -140,6 +121,7 @@ class FormLayout extends PureComponent {
       case NET_BANKING_CARD_LINK.id:
       case NET_BANKING_UPI_LINK.id: return 'PayByLink'
       case UPI.id: return 'UPIPayment'
+      case MOSAMBEE_WALLET.id: return 'MosamBeeWalletPayment'
     }
 
     return null
@@ -160,8 +142,16 @@ class FormLayout extends PureComponent {
       isLoading: this.props.isLoading,
       errorMessage: this.props.errorMessage,
       currentElement: this.props.currentElement,
-      fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+      fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
+      noFieldAttributeMappedWithStatus: this.props.noFieldAttributeMappedWithStatus,
+      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList
     }
+
+    let taskListScreenDetails = {
+      jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
+      pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
+    }
+
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
       this.props.actions.navigateToScene(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
         {
@@ -169,7 +159,14 @@ class FormLayout extends PureComponent {
           formElement: this.props.formElement,
           jobTransaction: this.props.navigation.state.params.jobTransaction,
           paymentAtEnd: this.props.paymentAtEnd,
-        })
+          formLayoutState,
+          jobMasterId: this.props.navigation.state.params.jobMasterId,
+          navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
+          saveActivatedStatusData: this.props.navigation.state.params.saveActivatedStatusData,
+          pieChart: this.props.pieChart,
+          taskListScreenDetails
+        },
+        this.props.navigation.push)
     } else {
       this.props.actions.saveJobTransaction(
         formLayoutState,
@@ -178,7 +175,10 @@ class FormLayout extends PureComponent {
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
         this.props.navigation.state.params.saveActivatedStatusData,
-        this.props.pieChart
+        this.props.pieChart,
+        taskListScreenDetails,
+        this.props.navigation.push,
+        this.props.navigation.goBack
       )
     }
   }
@@ -199,38 +199,19 @@ class FormLayout extends PureComponent {
     return view
   }
 
-  getHeaderView() {
-    return (
-      <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-        <Body>
-          <View
-            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-            </TouchableOpacity>
-            <View style={[style.headerBody]}>
-              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.statusName}</Text>
-            </View>
-            <View style={[style.headerRight]}>
-            </View>
-            <View />
-          </View>
-        </Body>
-      </Header>
-    )
-  }
-
   getFooterView() {
     return (
-      <Footer style={[style.footer]}>
-        <FooterTab style={[styles.padding10]}>
-          <Button success full
-            onPress={() => this.saveJobTransaction()}
-            disabled={this.props.isSaveDisabled}>
-            <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
-          </Button>
-        </FooterTab>
-      </Footer>
+      <SafeAreaView style={[styles.bgWhite]}>
+        <Footer style={[style.footer]}>
+          <FooterTab style={[styles.padding10]}>
+            <Button success full
+              onPress={() => this.saveJobTransaction()}
+              disabled={this.props.isSaveDisabled}>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{!_.isEmpty(this.props.paymentAtEnd) ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
+      </SafeAreaView>
     )
   }
 
@@ -239,9 +220,11 @@ class FormLayout extends PureComponent {
    */
   emptyFieldAttributeForStatusView() {
     if (this.props.noFieldAttributeMappedWithStatus) {
-      return <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-        <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}> No visible attribute mapped</Text>
-      </View>
+      return (
+        <View style={[{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }]}>
+          <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}> No visible attribute mapped</Text>
+        </View>
+      )
     }
   }
 
@@ -251,22 +234,22 @@ class FormLayout extends PureComponent {
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
-      <Footer style={[style.footer]}>
-        <FooterTab style={[styles.padding10]}>
-          <Button success full
-            onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
-            disabled={this.props.isSaveDisabled}>
-            <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
-          </Button>
-        </FooterTab>
-      </Footer>
+      <SafeAreaView style={[styles.bgWhite]}>
+        <Footer style={[style.footer]}>
+          <FooterTab style={[styles.padding10]}>
+            <Button success full
+              onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
+              disabled={this.props.isSaveDisabled}>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
+      </SafeAreaView>
     }
-    const headerView = this.getHeaderView()
     const footerView = this.getFooterView()
     if (Platform.OS == 'ios') {
-      formView = <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+      formView = <KeyboardAvoidingView style={[{ flex: 1 }, styles.bgWhite]} behavior="padding">
         {invalidFormAlert}
-        {headerView}
         {emptyFieldAttributeForStatusView}
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>
@@ -283,7 +266,6 @@ class FormLayout extends PureComponent {
     } else {
       formView = <Container>
         {invalidFormAlert}
-        {headerView}
         {emptyFieldAttributeForStatusView}
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>

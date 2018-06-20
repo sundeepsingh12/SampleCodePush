@@ -27,7 +27,8 @@ import {
     BACKUP_ALREADY_EXIST,
     TABLE_FIELD_DATA,
     JOB_ATTRIBUTE,
-    USER
+    USER,
+    HUB
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
@@ -54,6 +55,7 @@ class FormLayout {
         const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
         const jobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
         const user = await keyValueDBService.getValueFromStore(USER)
+        const hub = await keyValueDBService.getValueFromStore(HUB)
         const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS);
         const fieldAttributeMasterValidation = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION);
         const fieldAttributeValidationCondition = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION_CONDITION);
@@ -118,7 +120,8 @@ class FormLayout {
             sequenceWiseFormLayout.jobAndFieldAttributesList = {
                 jobAttributes: jobAttributes.value,
                 fieldAttributes: fieldAttributes.value,
-                user: user.value
+                user: user.value,
+                hub: hub.value
             }
             return sequenceWiseFormLayout
         }
@@ -214,32 +217,7 @@ class FormLayout {
         return { formLayoutObject, isSaveDisabled: isRequiredAttributeFound, latestPositionId: positionId, noFieldAttributeMappedWithStatus: false }
     }
 
-    /**
-     * creates nextEditable object, which contains attributeMasterId wise required and non required elements
-     * @param {*fieldAttributeMasterId} attributeMasterId 
-     * @param {*currentSequence of calling method} currentSequence 
-     * @param {*formLayout array} formLayoutArr 
-     * @param {*nextEditable object} nextEditable 
-     */
-    getNextEditableAndFocusableElements(attributeMasterId, currentSequence, formLayoutArr, nextEditable) {
-        if (!formLayoutArr || formLayoutArr.length == 0) {
-            return;
-        }
-        for (let i = 0; i < formLayoutArr.length; i++) {
-            if (!nextEditable[attributeMasterId]) {
-                nextEditable[attributeMasterId] = [];
-            }
-            const fieldAttribute = formLayoutArr[i];
-            if (i < currentSequence || (i == currentSequence && (attributeMasterId == fieldAttribute.id || attributeMasterId == fieldAttribute.fieldAttributeMasterId))) {
-                continue; // if parent iteration is less than child iteration then continue
-            }
-            if (fieldAttribute.required && !fieldAttribute.value) {
-                nextEditable[attributeMasterId].push('required$$' + (fieldAttribute.id ? fieldAttribute.id : fieldAttribute.fieldAttributeMasterId)); //this is not necessary that required is always the last element in array, ex - if there are all non required. So instead of adding a new data structure, used a separator to know that this element is the required element
-                break; // as soon as next required attribute is found without value then break the loop
-            }
-            nextEditable[attributeMasterId].push(fieldAttribute.id ? fieldAttribute.id : fieldAttribute.fieldAttributeMasterId);
-        }
-    }
+
 
     /**
      * creates fieldAttributeDto
@@ -283,7 +261,7 @@ class FormLayout {
         return combineMap
     }
 
-    async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList) {
+    async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, taskListScreenDetails) {
         let routeName, routeParam
         const currentStatus = await transientStatusAndSaveActivatedService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
@@ -291,8 +269,8 @@ class FormLayout {
             routeParam = {
                 formLayoutState, contactData, currentStatus, jobTransaction, jobMasterId, navigationFormLayoutStates
             }
-            await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
-        
+            draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
+
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
             let { elementsArray, amount } = await transientStatusAndSaveActivatedService.getDataFromFormElement(formLayoutState.formElement)
             let totalAmount = await transientStatusAndSaveActivatedService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
@@ -303,11 +281,12 @@ class FormLayout {
                 formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
             await transientStatusAndSaveActivatedService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
-            await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
+            draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
         }
         else if (currentStatus.transient) {
             routeName = Transient
-            routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, }
+            let { jobDetailsScreenKey, pageObjectAdditionalParams } = taskListScreenDetails
+            routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams }
         }
         else {
             routeName = TabScreen
@@ -318,9 +297,9 @@ class FormLayout {
             }
             let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
-            if (!jobTransaction.length) { //Delete draft only if not bulk
-                await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
-            }
+            //if (!jobTransaction.length) { //Delete draft only if not bulk
+            draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
+            //}
             //await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
             await keyValueDBService.validateAndSaveData(BACKUP_ALREADY_EXIST, new Boolean(false))
             await geoFencingService.addNewGeoFenceAndDeletePreviousFence()
@@ -331,12 +310,12 @@ class FormLayout {
         }
     }
 
-    isFormValid(formElement, jobTransaction, fieldAttributeMasterParentIdMap) {
+    isFormValid(formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
         if (!formElement) {
             throw new Error('formElement is missing')
         }
         for (let [id, currentObject] of formElement.entries()) {
-            let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
+            let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
             let uniqueValidationResult = this.checkUniqueValidation(currentObject)
             if (uniqueValidationResult) {
                 currentObject.alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
@@ -344,9 +323,9 @@ class FormLayout {
             currentObject.value = afterValidationResult && !uniqueValidationResult ? currentObject.displayValue : null
             if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
                 return { isFormValid: false, formElement }
-            } else if ((currentObject.value || currentObject.value == 0) && (currentObject.attributeTypeId == 6 || currentObject.attributeTypeId == 27) && !Number.isInteger(Number(currentObject.value))) {
+            } else if ((currentObject.value && currentObject.value != 0) && (currentObject.attributeTypeId == 6 || currentObject.attributeTypeId == 27) && !Number.isInteger(Number(currentObject.value))) {
                 return { isFormValid: false, formElement }
-            } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 13 && !Number(currentObject.value)) {
+            } else if ((currentObject.value && currentObject.value != 0) && currentObject.attributeTypeId == 13 && !Number(currentObject.value)) {
                 return { isFormValid: false, formElement }
             }
         }
@@ -363,7 +342,7 @@ class FormLayout {
             case NUMBER:
                 return dataStoreService.checkForUniqueValidation(currentObject.displayValue, currentObject)
             default:
-                false
+                return false
         }
     }
     getLatestPositionIdForJobTransaction(jobTransaction) {

@@ -1,34 +1,53 @@
 'use strict'
 import {
     NEXT_FOCUS,
-    SET_IMAGE_DATA,
     VIEW_IMAGE_DATA,
-    SET_SHOW_IMAGE,
-    SET_SHOW_VIEW_IMAGE,
-    SET_VALIDATION_FOR_CAMERA
+    SET_CAMERA_LOADER,
+    SET_SHOW_IMAGE_AND_DATA,
+    SET_SHOW_IMAGE_AND_VALIDATION,
+    SET_CAMERA_LOADER_INITIAL_SET_UP,
 } from '../../lib/constants'
-import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions';
+import CompressImage from 'react-native-compress-image';
 
-export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction) {
+import {
+    ImageStore,
+    Platform
+} from 'react-native';
+
+import { PATH_CUSTOMER_IMAGES } from '../../lib/AttributeConstants'
+import { OPEN_CAMERA } from '../../lib/ContainerConstants'
+import RNFS from 'react-native-fs'
+import ImageCropPicker from 'react-native-image-crop-picker';
+
+var PATH_COMPRESS_IMAGE = '/compressImages';
+
+export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack) {
     return async function (dispatch) {
         try {
-            const value = await signatureService.saveFile(result, moment(), true)
-            if (calledFromArray) {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState))
+            dispatch(setState(SET_CAMERA_LOADER, true))
+            if (Platform.OS == 'android') {
+                CompressImage.createCompressedImage(result.uri, PATH_COMPRESS_IMAGE).then((resizedImage) => {
+                    ImageStore.getBase64ForTag(resizedImage.uri, (base64Data) => {
+                        dispatch(saveImageInFormLayout(base64Data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack))
+                        RNFS.unlink(resizedImage.path)
+                    }, (reason) => {
+                        dispatch(setState(SET_CAMERA_LOADER, false))
+                        showToastAndAddUserExceptionLog(310, reason.message, 'danger', 1)
+                    })
+                }, (error) => {
+                    dispatch(setState(SET_CAMERA_LOADER, false))
+                    showToastAndAddUserExceptionLog(311, error.message, 'danger', 1)
+                });
             } else {
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
+                dispatch(saveImageInFormLayout(result.data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack))
             }
-            dispatch(setState(SET_SHOW_VIEW_IMAGE, {
-                imageData: '',
-                showImage: false,
-                viewData: ''
-            }))
         } catch (error) {
+            dispatch(setState(SET_CAMERA_LOADER, false))
             showToastAndAddUserExceptionLog(301, error.message, 'danger', 1)
         }
     }
@@ -44,12 +63,51 @@ export function getImageData(value) {
     }
 }
 
-export function getValidation(value) {
+export function takePicture(ref) {
     return async function (dispatch) {
         try {
-            const result = await signatureService.getValidations(value)
-            dispatch(setState(SET_VALIDATION_FOR_CAMERA, result))
+            const options = { quality: 0.2, base64: true, fixOrientation: true };
+            ref.takePictureAsync(options).then((capturedImg) => {
+                const { uri, base64 } = capturedImg;
+                dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64, uri }))
+                })
         } catch (error) {
+            dispatch(setState(SET_CAMERA_LOADER, false))
+            showToastAndAddUserExceptionLog(316, error.message, 'danger', 1)        }
+    }
+}
+
+export function saveImageInFormLayout(data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack) {
+    return async function (dispatch) {
+        try {
+            const value = await signatureService.saveFile(data, moment(), true)
+            if (calledFromArray) {
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState, goBack))
+            } else {
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction, null, null, goBack))
+            }
+        } catch (error) {
+            showToastAndAddUserExceptionLog(312, error.message, 'danger', 1)
+        }
+    }
+}
+
+export function setCameraInitialView(item) {
+    return async function (dispatch) {
+        try {
+            dispatch(setState(SET_CAMERA_LOADER_INITIAL_SET_UP))
+            const validation = null, data = null
+            if (!_.isEmpty(item.validation)) {
+                validation = await signatureService.getValidations(item.validation)
+            }
+            if (item.value && item.value != '' && item.value != OPEN_CAMERA) {
+                const base64Data = await signatureService.getImageData(item.value)
+                let imageName = item.value.split('/')
+                data = (base64Data) ? { data: base64Data, uri: 'file://' + PATH_CUSTOMER_IMAGES + imageName[imageName.length - 1] } : null
+            }
+            dispatch(setState(SET_SHOW_IMAGE_AND_VALIDATION, { data, validation }))
+        } catch (error) {
+            dispatch(setState(SET_CAMERA_LOADER, false))
             showToastAndAddUserExceptionLog(305, error.message, 'danger', 1)
         }
     }
@@ -64,18 +122,31 @@ export function setInitialState() {
         }
     }
 }
-export function setExistingImage(item) {
+
+export function cropImage(uri) {
     return async function (dispatch) {
         try {
-            if (item.value && item.value != '') {
-                const result = await signatureService.getImageData(item.value)
-                dispatch(setState(SET_IMAGE_DATA, result))
-                if (result) {
-                    dispatch(setState(SET_SHOW_IMAGE, true))
+            dispatch(setState(SET_CAMERA_LOADER, true))
+            ImageCropPicker.openCropper({
+                path: uri,
+                width: 300,
+                height: 300,
+                freeStyleCropEnabled: true,
+            }).then((image) => {
+                if (image.path) {
+                    ImageStore.getBase64ForTag(image.path, (base64Data) => {
+                        dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64Data, uri: image.path }))
+                    }, (error) => {
+                        dispatch(setState(SET_CAMERA_LOADER, false))
+                        showToastAndAddUserExceptionLog(314, error.message, 'danger', 1)
+                    })
                 }
-            }
+            }).catch(e => {
+                dispatch(setState(SET_CAMERA_LOADER, false))
+            });
         } catch (error) {
-            showToastAndAddUserExceptionLog(304, error.message, 'danger', 1)
+            dispatch(setState(SET_CAMERA_LOADER, false))
+            showToastAndAddUserExceptionLog(313, error.message, 'danger', 1)
         }
     }
 }

@@ -10,17 +10,7 @@ import { StyleSheet, View, TouchableOpacity, FlatList, Image, Text, Alert, Modal
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-
-import {
-    Container,
-    Content,
-    Header,
-    Button,
-    Body,
-    Icon,
-    StyleProvider,
-    Toast
-} from 'native-base'
+import { Container, Content, Header, Button, Body, Icon, StyleProvider, Toast } from 'native-base'
 import {
     BACKUP_ALERT_MESSAGE,
     BACKUP_ALERT_TITLE,
@@ -45,13 +35,11 @@ import {
     KB,
     MB,
 } from '../lib/ContainerConstants'
-import {
-    SET_BACKUP_VIEW,
-    SET_BACKUP_TOAST
-} from '../lib/constants'
+import { SET_BACKUP_VIEW, SET_BACKUP_TOAST } from '../lib/constants'
 import _ from 'lodash'
 //let calls = require('../wrapper/CALLS')
 
+import TitleHeader from '../components/TitleHeader'
 
 function mapStateToProps(state) {
     return {
@@ -77,6 +65,11 @@ class Backup extends Component {
             indexOfModal: 0,
         }
     }
+
+    static navigationOptions = ({ navigation }) => {
+        return { header: <TitleHeader pageName={navigation.state.params.displayName} goBack={navigation.goBack} /> }
+    }
+
     componentDidUpdate() {
         if (this.props.toastMessage && this.props.toastMessage != '') {
             Toast.show({
@@ -89,6 +82,7 @@ class Backup extends Component {
             this.props.actions.setState(SET_BACKUP_TOAST, '')
         }
     }
+
     componentDidMount() {
         // //let x = moment()
         // calls.getCallLogs('1524584505232', (status) => {
@@ -100,19 +94,16 @@ class Backup extends Component {
         this.props.actions.getBackupList()
     }
 
-    static navigationOptions = ({ navigation }) => {
-        return { header: null }
-    }
+
 
     goBack = () => {
         this.props.navigation.goBack()
     }
+    
     createBackupPressed = () => {
-
         var _buttons = new Array();
         _buttons.push({ text: CANCEL, onPress: this.props.onCancelPressed, style: 'cancel' });
         _buttons.push({ text: 'Create', onPress: () => this.props.actions.createManualBackup(this.props.syncedFiles) });
-
         return (
             <View>
                 {Alert.alert(
@@ -124,6 +115,7 @@ class Backup extends Component {
             </View>
         );
     }
+
     getLoader() {
         let loader
         if (this.props.isLoading) {
@@ -131,6 +123,7 @@ class Backup extends Component {
         }
         return loader
     }
+
     _getViewOfSize(size) {
         if (size >= 1024) {
             return <Text>{+(Math.round(size / 1024 + "e+2") + "e-2")} {MB}</Text>
@@ -138,6 +131,7 @@ class Backup extends Component {
             return <Text>{size} {KB}</Text>
         }
     }
+
     renderSyncedData = (item) => {
         return (
             <View style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1 }]}>
@@ -191,6 +185,7 @@ class Backup extends Component {
             </View>
         )
     }
+
     getUnSyncedFilesView() {
         let flatListView
         let emptyListView
@@ -241,7 +236,7 @@ class Backup extends Component {
     }
 
     headerView() {
-        return <Header style={[styles.bgPrimary, style.header]}>
+        return <Header style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
             <Body>
                 <View
                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -274,7 +269,7 @@ class Backup extends Component {
                             style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
                             <View style={[styles.bgWhite, styles.justifyEnd]}>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.uploadBackupFile(this.state.indexOfModal, this.props.syncedFiles)}>
-                                    <Text style={[styles.fontPrimary, styles.fontXl]}>
+                                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>
                                         {UPLOAD}
                                     </Text>
                                 </Button>
@@ -301,7 +296,7 @@ class Backup extends Component {
                             style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
                             <View style={[styles.bgWhite, styles.justifyEnd]}>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.uploadBackupFile(this.state.indexOfModal, this.props.unSyncedFiles)}>
-                                    <Text style={[styles.fontPrimary, styles.fontXl]}>
+                                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>
                                         {UPLOAD}
                                     </Text>
                                 </Button>
@@ -398,7 +393,7 @@ class Backup extends Component {
         let button =
             <View style={[styles.padding15]}>
                 <Button full style={[styles.bgWhite]} onPress={this.createBackupPressed}>
-                    <Text style={[styles.fontPrimary]}>
+                    <Text style={[{ color: styles.fontPrimaryColor }]}>
                         {CREATE_BACKUP_BUTTON}
                     </Text>
                 </Button>
@@ -437,12 +432,12 @@ class Backup extends Component {
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
+                        <Button bordered style={{ borderColor: styles.bgPrimaryColor }}
                             onPress={() => {
                                 this.props.actions.setState(SET_BACKUP_VIEW, 0)
                                 this.setState({ indexOfModal: 0 })
                             }}  >
-                            <Text style={[styles.fontPrimary]}>{CLOSE}</Text>
+                            <Text style={[{ color: styles.fontPrimaryColor }]}>{CLOSE}</Text>
                         </Button>
                     </View>
                 </View>
@@ -468,7 +463,7 @@ class Backup extends Component {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    {this.headerView()}
+                    {/* {this.headerView()} */}
                     {this.uploadingView()}
                     {this.uploadSuccessView()}
                     {this.failureView()}

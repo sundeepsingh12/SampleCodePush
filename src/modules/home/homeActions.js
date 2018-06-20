@@ -8,20 +8,9 @@ import {
   PAGES_ADDITIONAL_UTILITY,
   //ROUTE NAME FOR NAVIGATION
   TabScreen,
-  CUSTOMIZATION_APP_MODULE,
-  HOME_LOADING,
   CHART_LOADING,
-  JOB_DOWNLOADING_STATUS,
-  PENDING_SYNC_TRANSACTION_IDS,
   USER,
-  SET_MODULES,
-  UNSEEN,
-  JOB_SUMMARY,
-  SYNC_ERROR,
   SYNC_STATUS,
-  PENDING,
-  PIECHART,
-  LAST_SYNC_WITH_SERVER,
   LAST_SYNC_TIME,
   USERNAME,
   PASSWORD,
@@ -36,12 +25,6 @@ import {
   SET_ERP_PULL_ACTIVATED,
   ERP_SYNC_STATUS,
   SET_NEWJOB_DRAFT_INFO,
-  JOB_MASTER,
-  SAVE_ACTIVATED,
-  NEW_JOB_STATUS,
-  NEW_JOB_MASTER,
-  POPULATE_DATA,
-  NewJob,
   BulkListing,
   SET_TRANSACTION_SERVICE_STARTED,
   SYNC_RUNNING_AND_TRANSACTION_SAVING,
@@ -53,7 +36,10 @@ import {
   LiveJobs,
   OfflineDS,
   ProfileView,
-  MDM_POLICIES
+  FCM_TOKEN,
+  LOADER_FOR_SYNCING,
+  MDM_POLICIES,
+  APP_THEME
 } from '../../lib/constants'
 
 import {
@@ -82,38 +68,39 @@ import {
   PAGE_MESSAGING,
   PAGE_SUMMARY_PIECHART,
   //ERROR MESSAGES
-  UNKNOWN_PAGE_TYPE,
   //Others
   SERVER_REACHABLE,
   SERVER_UNREACHABLE,
   Piechart,
-  SERVICE_ALREADY_SCHEDULED
 } from '../../lib/AttributeConstants'
-import { Toast, ActionSheet } from 'native-base'
+import { Toast, ActionSheet, } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import { trackingService } from '../../services/classes/Tracking'
-import { jobStatusService } from '../../services/classes/JobStatus'
 import { userEventLogService } from '../../services/classes/UserEvent'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog, deleteSessionToken, resetNavigationState } from '../global/globalActions'
 import CONFIG from '../../lib/config'
-import { Client } from 'react-native-paho-mqtt'
 import { sync } from '../../services/classes/Sync'
-import { NetInfo } from 'react-native'
+import { Platform } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import { logoutService } from '../../services/classes/Logout'
 import { authenticationService } from '../../services/classes/Authentication'
-import { backupService } from '../../services/classes/BackupService';
+import { backupService } from '../../services/classes/BackupService'
 import { autoLogoutAfterUpload } from '../backup/backupActions'
 import { utilitiesService } from '../../services/classes/Utilities'
-import { transactionCustomizationService } from '../../services/classes/TransactionCustomization';
-import { moduleCustomizationService } from '../../services/classes/ModuleCustomization';
+import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
+import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
-import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
-import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
+import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions'
+import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
+import FCM, { NotificationActionType, FCMEvent, NotificationType, RemoteNotificationResult, WillPresentNotificationResult } from "react-native-fcm"
+import feStyle from '../../themes/FeStyle'
+import { jobMasterService } from '../../services/classes/JobMaster'
+import { NavigationActions } from 'react-navigation'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR,FCM_PERMISSION_DENIED,OK } from '../../lib/ContainerConstants'
 
 /**
  * Function which updates STATE when component is mounted
@@ -124,7 +111,7 @@ import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutAc
 export function fetchPagesAndPiechart() {
   return async function (dispatch) {
     try {
-      dispatch(setState(PAGES_LOADING, { pagesLoading: true }));
+      dispatch(setState(PAGES_LOADING));
       const user = await keyValueDBService.getValueFromStore(USER);
       //Fetching list of Pages
       const pageList = await keyValueDBService.getValueFromStore(PAGES);
@@ -174,22 +161,22 @@ export function fetchPagesAndPiechart() {
  *  }
 */
 //TODO Move this to Globalfunction if feasible
-export function navigateToPage(pageObject) {
+export function navigateToPage(pageObject, navigationProps) {
   return async function (dispatch) {
     try {
       switch (pageObject.screenTypeId) {
         case PAGE_BACKUP:
-          dispatch(navigateToScene(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' }));
+          dispatch(navigateToScene(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' }, navigationProps));
           break;
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
-          dispatch(navigateToScene(BulkListing, { pageObject }));
+          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING, navigationProps))
           break;
         }
         case PAGE_CUSTOM_WEB_PAGE:
           let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
-          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (customRemarks.length) ? customRemarks[0].customUrl : null })) : dispatch(customAppSelection(customRemarks))
+          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null },navigationProps)) : dispatch(customAppSelection(customRemarks,navigationProps))
           break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -198,55 +185,53 @@ export function navigateToPage(pageObject) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob' }));
+          dispatch(navigateToScene(LiveJobs, { pageObject }, navigationProps));
           break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_MSWIPE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_NEW_JOB: {
-          dispatch(redirectToContainer(pageObject))
+          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING, navigationProps))
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
-          dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' }))
+          dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' }, navigationProps))
           break;
         case PAGE_OUTSCAN:
-          dispatch(navigateToScene(PostAssignmentScanner, { pageObject }))
+          dispatch(navigateToScene(PostAssignmentScanner, { pageObject }, navigationProps))
+
           break
         case PAGE_PAYNEAR_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PICKUP:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PROFILE:
-          dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' }))
+          dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' }, navigationProps))
           break;
         case PAGE_SEQUENCING: {
-          dispatch(getRunsheetsForSequence(pageObject));
+          dispatch(getRunsheetsForSequence(pageObject, navigationProps));
           break;
         }
         case PAGE_SORTING_PRINTING:
-          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' }))
+          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' }, navigationProps))
           break;
         case PAGE_STATISTICS:
-          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' }))
+          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' }, navigationProps))
           break;
         case PAGE_TABS:
-          dispatch(navigateToScene(TabScreen, { pageObject }));
+          dispatch(navigateToScene(TabScreen, { pageObject }, navigationProps));
           break;
         default:
           throw new Error("Unknown page type " + pageObject.screenTypeId + ". Contact support");
       }
     } catch (error) {
-      //TODO : show proper error code message ERROR CODE 600
-      //Save the error in exception logs
-      console.log(error)
       showToastAndAddUserExceptionLog(2702, error.message, 'danger', 1)
     }
   }
 }
 
-export function customAppSelection(appModule) {
+export function customAppSelection(appModule, navigationProps) {
   return async function (dispatch) {
     try {
       let BUTTONS = appModule.map(id => !(id.title) ? 'URL' : id.title)
@@ -259,7 +244,7 @@ export function customAppSelection(appModule) {
           destructiveButtonIndex: BUTTONS.length - 1
         },
         buttonIndex => {
-          (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? dispatch(navigateToScene(CustomApp, { customUrl: appModule[buttonIndex].customUrl })) : null
+          (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? dispatch(navigateToScene(CustomApp, { customUrl: appModule[buttonIndex].customUrl }, navigationProps)) : null
         }
       )
     } catch (error) {
@@ -273,9 +258,49 @@ export function checkCustomErpPullActivated() {
     try {
       const user = await keyValueDBService.getValueFromStore(USER)
       const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? 'activated' : 'notActivated'
+      let appTheme = await keyValueDBService.getValueFromStore(APP_THEME);
+      if (appTheme && appTheme.value) {
+        feStyle.primaryColor = appTheme.value
+        feStyle.bgPrimaryColor = appTheme.value
+        feStyle.fontPrimaryColor = appTheme.value
+        feStyle.shadeColor = appTheme.value + '98'
+        feStyle.borderLeft4Color = appTheme.value
+      }
       dispatch(setState(SET_ERP_PULL_ACTIVATED, { customErpPullActivated }))
     } catch (error) {
       showToastAndAddUserExceptionLog(2704, error.message, 'danger', 1)
+    }
+  }
+}
+
+export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader, navigate) {
+  return async function (dispatch) {
+    try {
+      if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
+        dispatch(setState(syncLoader, true))
+        let message = await dispatch(performSyncService())
+        if (message === true) {
+          dispatch(setState(syncLoader, false))
+          if (!isBulk) {
+            dispatch(redirectToContainer(pageObject, navigate))
+          } else {
+            dispatch(navigateToScene(BulkListing, { pageObject }, navigate))
+          }
+        } else {
+          dispatch(setState(syncLoader, false))
+          alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
+        }
+      }
+      else {
+        if (!isBulk) {
+          dispatch(redirectToContainer(pageObject, navigate))
+        } else {
+          dispatch(navigateToScene(BulkListing, { pageObject }, navigate))
+        }
+      }
+    } catch (error) {
+      dispatch(setState(syncLoader, false))
+      showToastAndAddUserExceptionLog(2714, error.message, 'danger', 1)
     }
   }
 }
@@ -285,7 +310,7 @@ export function startTracking(trackingServiceStarted) {
     try {
       if (!trackingServiceStarted) {
         trackingService.init()
-        // dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
+        dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2705, error.message, 'danger', 1)
@@ -293,67 +318,99 @@ export function startTracking(trackingServiceStarted) {
   }
 }
 
-export function startMqttService(pieChart) {
+export function startFCM() {
   return async function (dispatch) {
+    try{
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    //Check if user session is alive
     if (token && token.value) {
-      const uri = `ws://${CONFIG.API.PUSH_BROKER}:${CONFIG.FAREYE.port}/ws`
-      const userObject = await keyValueDBService.getValueFromStore(USER)
-      const clientId = `FE_${userObject.value.id}`
-      const storage = {
-        setItem: (key, item) => {
-          storage[key] = item;
-        },
-        getItem: (key) => storage[key],
-        removeItem: (key) => {
-          delete storage[key]
-        },
-      };
 
-      // Create a client instance 
-      const client = new Client({
-        uri,
-        clientId,
-        storage
-      })
-
-      // set event handlers 
-      //TODO connection re-establishment on connection lost
-      client.on('connectionLost', responseObject => {
-      })
-      client.on('messageReceived', message => {
-        if (message.payloadString == 'Live Job Notification') {
-          keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-          dispatch(performSyncService(pieChart, true, true))
-        } else {
-          dispatch(performSyncService(pieChart, true))
+      //these callback will be triggered only when app is foreground or background
+      FCM.on(FCMEvent.Notification, notif => {
+        if (notif.Notification == 'Android push notification') {
+          dispatch(performSyncService(true))
         }
-      })
-
-      // connect the client 
-      client.connect()
-        .then(() => {
-          // Once a connection has been made, make a subscription 
-          return client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
-        })
-        .catch(responseObject => {
-          if (responseObject.errorCode !== 0) {
-            console.log('onConnectionLost:' + responseObject.errorMessage);
-            // dispatch(startMqttService())
+        else if (notif.Notification == 'Live Job Notification') {
+          keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+          dispatch(performSyncService(true, true))
+        }
+        if (notif.local_notification) {
+          return
+        }
+        if (notif.opened_from_tray) {
+          return
+        }
+          if (Platform.OS === 'ios') {
+            switch (notif._notificationType) {
+              case NotificationType.Remote:
+                notif.finish(RemoteNotificationResult.NewData) // other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
+                break
+              case NotificationType.NotificationResponse:
+                notif.finish()
+                break
+              case NotificationType.WillPresent:
+                notif.finish(WillPresentNotificationResult.All) // other types available: WillPresentNotificationResult.None
+                break
+            }
           }
         })
+        
+      FCM.enableDirectChannel();
+      FCM.on(FCMEvent.DirectChannelConnectionChanged, (data) => {
+      });
+      setTimeout(function() {
+        FCM.isDirectChannelEstablished().then(d =>  {});
+      }, 1000);
+
+      FCM.getInitialNotification().then(notif => {
+      });
+      try {
+        let result = await FCM.requestPermissions({
+          badge: false,
+          sound: true,
+          alert: true
+        });
+      } catch (e) {
+        showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED, 'danger', 1)
+      }
+      const userObject = await keyValueDBService.getValueFromStore(USER)
+      const topic = `FE_${userObject.value.id}`
+
+      FCM.getFCMToken().then(async fcmToken => {
+        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+
+      }, (error) => {
+      }).catch( () =>  showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR, 'danger', 1))
+      
+          if (Platform.OS === 'ios') {
+            FCM.getAPNSToken().then(token => {
+            }).catch(() =>  showToastAndAddUserExceptionLog(2718, APNS_TOKEN_ERROR, 'danger', 1))
+          }
+
+       // fcm token may not be available on first load, catch it here
+      FCM.on(FCMEvent.RefreshToken, async fcmToken => {
+        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+      });
+
+      FCM.subscribeToTopic(topic)
     }
+    else {
+      Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
+    }
+  }catch(error){
+    showToastAndAddUserExceptionLog(2715, error.message, 'danger', 1)    
+  }
   }
 }
 
-export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPull) {
+export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledFromAutoLogout) {
   return async function (dispatch) {
     let syncStoreDTO
     try {
       const currenDate = moment().format('YYYY-MM-DD HH:mm:ss')
       let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
-      if (syncRunningAndTransactionSaving && syncRunningAndTransactionSaving.value && (syncRunningAndTransactionSaving.value.syncRunning || syncRunningAndTransactionSaving.value.transactionSaving)) {
+      if (!calledFromAutoLogout && syncRunningAndTransactionSaving && syncRunningAndTransactionSaving.value && (syncRunningAndTransactionSaving.value.syncRunning || syncRunningAndTransactionSaving.value.transactionSaving)) {
         return
       } else {
         await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, {
@@ -364,11 +421,11 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
       const userData = syncStoreDTO.user
       const autoLogoutEnabled = userData ? userData.company ? userData.company.autoLogoutFromDevice : null : null
       const lastLoginTime = userData ? userData.lastLoginTime : null
-      if (autoLogoutEnabled && !moment(moment(lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
-        dispatch(navigateToScene(AutoLogoutScreen));
+      if (!calledFromAutoLogout && autoLogoutEnabled && !moment(moment(lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
+        dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
         return
       }
-      const syncCount = 0
+      let syncCount = 0
       if (!erpPull) {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
@@ -387,16 +444,17 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         }))
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, syncStoreDTO);
         // check if live job module is present
-        const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO);
+        const isLiveJobModulePresent = syncStoreDTO.pageList ? syncStoreDTO.pageList.filter((module) => module.screenTypeId == PAGE_LIVE_JOB).length > 0 : false
+        if (isLiveJobModulePresent) {
+          await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO)
+        }
         if (isJobsPresent) {
           if (Piechart.enabled) {
             dispatch(pieChartCount())
           }
-          //dispatch(fetchJobs())
+          dispatch(fetchJobs())
         }
-        if (isLiveJob) {
-          dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
-        }
+
       }
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
         unsyncedTransactionList: [],
@@ -405,15 +463,15 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         lastErpSyncTime: userData.lastERPSyncWithServer
       }))
       //Now schedule sync service which will run regularly after 2 mins
-      await dispatch(syncService(pieChart))
+      await dispatch(syncService())
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
       if (_.isNull(serverReachable) || serverReachable.value == 2) {
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
         await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
       }
+      return true;
     } catch (error) {
-      console.log(error)
-      showToastAndAddUserExceptionLog(2706, error.message, 'danger', 0)
+      showToastAndAddUserExceptionLog(2706, JSON.stringify(error), 'danger', 0)
       let syncStatus = ''
       if (error.code == 500 || error.code == 502) {
         syncStatus = 'INTERNALSERVERERROR'
@@ -434,6 +492,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
         syncStatus
       }))
+      return false;
     } finally {
       if (!erpPull) {
         const difference = await sync.calculateDifference()
@@ -443,26 +502,26 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         syncRunning: false
       })
     }
+
   }
 }
 
 /**
  * This services schedules sync service at interval of 2 minutes
  */
-export function syncService(pieChart) {
+export function syncService() {
   return async (dispatch) => {
     try {
       if (CONFIG.intervalId) {
-        throw new Error(SERVICE_ALREADY_SCHEDULED)
+        return
       }
       const mdmPolicies = await keyValueDBService.getValueFromStore(MDM_POLICIES)
-      const timeInterval = (mdmPolicies && mdmPolicies.value  && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : CONFIG.SYNC_SERVICE_DELAY
+      const timeInterval = (mdmPolicies && mdmPolicies.value && mdmPolicies.value.basicSetting && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : CONFIG.SYNC_SERVICE_DELAY
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
-        dispatch(performSyncService(pieChart))
-      }, timeInterval*1000)
+        dispatch(performSyncService())
+      }, timeInterval * 1000)
     } catch (error) {
       //Update UI here
-      console.log(error)
     }
   }
 }
@@ -474,8 +533,6 @@ export function pieChartCount() {
       const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params)
       dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
     } catch (error) {
-      //Update UI here
-      console.log(error)
       showToastAndAddUserExceptionLog(2707, error.message, 'danger', 1)
       dispatch(setState(CHART_LOADING, { loading: false, count: null }))
     }
@@ -504,7 +561,7 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
         }))
         await logoutService.deleteDataBase()
         dispatch(deleteSessionToken())
-        dispatch(navigateToScene(LoginScreen))
+        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: LoginScreen })]))
       } else {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
@@ -553,7 +610,6 @@ export function uploadUnsyncFiles(backupFilesList) {
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2709, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }
@@ -571,7 +627,6 @@ export function readAndUploadFiles() {
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2710, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }
@@ -581,24 +636,22 @@ export function resetFailCountInStore() {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
     } catch (error) {
       showToastAndAddUserExceptionLog(2711, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }
 
 
-export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
+export function restoreNewJobDraft(draftStatusInfo, restoreDraft, navigate) {
   return async function (dispatch) {
     try {
       if (restoreDraft) {
-        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft))
+        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft, null, null, null, navigate))
       } else {
-        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId))
+        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId, navigate))
       }
       dispatch(setState(SET_NEWJOB_DRAFT_INFO, {}))
     } catch (error) {
       showToastAndAddUserExceptionLog(2712, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }

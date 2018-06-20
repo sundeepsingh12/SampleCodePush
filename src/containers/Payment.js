@@ -1,69 +1,23 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    Platform,
-    TextInput,
-    TouchableOpacity,
-} from 'react-native'
-import {
-    Container, Content, Header, Footer, FooterTab, Input, Button, Item, Card,
-    CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox, StyleProvider
-} from 'native-base'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
+import { Container, Content, Footer, FooterTab, Input, Button, Item, CheckBox, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import PopOver from '../components/PopOver'
 import * as paymentActions from '../modules/payment/paymentActions'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import _ from 'lodash'
 import {
-    CASH,
-    CHEQUE,
-    DEMAND_DRAFT,
-    DISCOUNT,
-    EZE_TAP,
-    MOSAMBEE,
-    MOSAMBEE_WALLET,
-    MPAY,
-    M_SWIPE,
-    NET_BANKING,
-    NET_BANKING_LINK,
-    NET_BANKING_CARD_LINK,
-    NET_BANKING_UPI_LINK,
-    NOT_PAID,
-    PAYNEAR,
-    PAYO,
-    PAYTM,
-    POS,
-    RAZOR_PAY,
-    SODEXO,
-    SPLIT,
-    TICKET_RESTAURANT,
-    UPI,
+    CASH, CHEQUE, DEMAND_DRAFT, DISCOUNT, EZE_TAP, MOSAMBEE, MOSAMBEE_WALLET, MPAY, M_SWIPE, NET_BANKING, NET_BANKING_LINK,
+    NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, NOT_PAID, PAYNEAR, PAYO, PAYTM, POS, RAZOR_PAY, SODEXO, SPLIT, TICKET_RESTAURANT, UPI,
 } from '../lib/AttributeConstants'
-
-import {
-    SET_PAYMENT_CHANGED_PARAMETERS,
-    SET_SPLIT_PAYMENT,
-    SplitPayment
-} from '../lib/constants'
-
-import {
-    AMOUNT_TO_BE_COLLECTED,
-    YES,
-    NO,
-    SPLIT_PAYMENT,
-    SELECT_PAYMENT_METHOD,
-    SELECT_PAYMENT_METHOD_TO_SPLIT,
-    ENTER_SPLIT_DETAILS,
-    SAVE,
-} from '../lib/ContainerConstants'
+import { SET_PAYMENT_CHANGED_PARAMETERS, SET_SPLIT_PAYMENT, SplitPayment } from '../lib/constants'
+import { AMOUNT_TO_BE_COLLECTED, YES, NO, SPLIT_PAYMENT, SELECT_PAYMENT_METHOD, SELECT_PAYMENT_METHOD_TO_SPLIT, ENTER_SPLIT_DETAILS, SAVE } from '../lib/ContainerConstants'
+import TitleHeader from '../components/TitleHeader'
 
 function mapStateToProps(state) {
     return {
@@ -90,7 +44,7 @@ function mapDispatchToProps(dispatch) {
 class Payment extends PureComponent {
 
     static navigationOptions = ({ navigation }) => {
-        return { header: null }
+        return { header: <TitleHeader pageName={navigation.state.params.currentElement.label} goBack={navigation.goBack} /> }
     }
 
     componentDidMount() {
@@ -220,7 +174,7 @@ class Payment extends PureComponent {
         let finalPaymentView = []
         let paymentModeView = []
         paymentModeView.push(
-            <Text key='PaymentText' style={[styles.fontPrimary, styles.fontSm, styles.width100, styles.marginBottom10]}>
+            <Text key='PaymentText' style={[{ color: styles.fontPrimaryColor }, styles.fontSm, styles.width100, styles.marginBottom10]}>
                 {this.props.splitPaymentMode == YES ? SELECT_PAYMENT_METHOD_TO_SPLIT : SELECT_PAYMENT_METHOD}
             </Text>
         )
@@ -264,7 +218,7 @@ class Payment extends PureComponent {
         }
         return (
             <View style={[styles.marginBottom15]}>
-                <Text style={[styles.fontPrimary, styles.fontSm]}>
+                <Text style={[{ color: styles.fontPrimaryColor }, styles.fontSm]}>
                     {SPLIT_PAYMENT}
                 </Text>
                 <View style={[styles.row, styles.marginTop10]}>
@@ -330,7 +284,8 @@ class Payment extends PureComponent {
                 moneyCollectMaster: this.props.moneyCollectMaster,
                 paymentContainerKey: this.props.navigation.state.key,
                 renderPaymentModeId: this.renderPaymentModeId,
-            })
+            },
+                this.props.navigation.navigate)
         } else {
             this.props.actions.saveMoneyCollectObject(
                 this.props.actualAmount,
@@ -343,7 +298,8 @@ class Payment extends PureComponent {
                 null,
                 null,
                 this.props.jobTransactionIdAmountMap,
-                this.props.navigation.state.params.formLayoutState
+                this.props.navigation.state.params.formLayoutState,
+                this.props.navigation.goBack
             )
         }
     }
@@ -356,23 +312,6 @@ class Payment extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingTop5]}>
-                                <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[styles.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Status</Text>
-                                </View>
-                                <View style={[styles.headerRight]}>
-                                </View>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
-
                     <Content style={[styles.flex1, styles.bgWhite, styles.padding10]}>
                         {amountTobeCollectedView}
                         {splitView}
@@ -383,19 +322,21 @@ class Payment extends PureComponent {
                             {paymentModeSelectedView}
                         </View>
                     </Content>
-                    <Footer style={[styles.padding10, style.footer]}>
-                        <FooterTab>
-                            <Button success
-                                disabled={this.props.isSaveButtonDisabled}
-                                style={StyleSheet.flatten([{ borderRadius: 0 }])}
-                                onPress={() => {
-                                    this.moveToSplitOrSavePayment()
-                                }}
-                            >
-                                <Text style={[styles.fontWhite]}>{this.props.splitPaymentMode == YES ? ENTER_SPLIT_DETAILS : SAVE}</Text>
-                            </Button>
-                        </FooterTab>
-                    </Footer>
+                    <SafeAreaView style={[styles.bgWhite]}>
+                        <Footer style={[styles.padding10, style.footer]}>
+                            <FooterTab>
+                                <Button success
+                                    disabled={this.props.isSaveButtonDisabled}
+                                    style={StyleSheet.flatten([{ borderRadius: 0 }])}
+                                    onPress={() => {
+                                        this.moveToSplitOrSavePayment()
+                                    }}
+                                >
+                                    <Text style={[styles.fontWhite]}>{this.props.splitPaymentMode == YES ? ENTER_SPLIT_DETAILS : SAVE}</Text>
+                                </Button>
+                            </FooterTab>
+                        </Footer>
+                    </SafeAreaView>
                 </Container>
             </StyleProvider>
         )

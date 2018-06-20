@@ -3,17 +3,18 @@ import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { statisticsListService } from '../../../services/classes/Statistics'
-import {getDataForStatisticsList} from '../statisticsActions'
+import { getDataForStatisticsList } from '../statisticsActions'
+import { showToastAndAddUserExceptionLog } from '../../global/globalActions'
 
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
-import {SET_DATA_IN_STATISTICS_LIST} from '../../../lib/constants'
+import { SET_DATA_IN_STATISTICS_LIST } from '../../../lib/constants'
 
 describe('statisticsActions', () => {
     const statisticsList = {
-        id:12453,
-        value:{
+        id: 12453,
+        value: {
             "activeTimeInMillis": 0,
             "avgSpeed": 0,
             "cashCollected": 278,
@@ -32,7 +33,7 @@ describe('statisticsActions', () => {
             "gpsKms": 0,
             "haltDuration": 0,
             "hubId": 0,
-            "id" : 0,
+            "id": 0,
             "imeiNumber": '4774744',
             "lastBattery": 0,
             "lastCashCollected": 0,
@@ -71,14 +72,14 @@ describe('statisticsActions', () => {
         '6': { id: 6, value: '1  text messages', label: 'Personal SMS' },
         '7': { id: 7, value: '0 minutes,0 seconds', label: 'Officials Calls' },
         '8': { id: 8, value: '0 minutes,0 seconds', label: 'Personal Calls' },
-        '9': { id: 9, value: '278.00/- collected', label: 'Collection' } 
+        '9': { id: 9, value: '278.00/- collected', label: 'Collection' }
     }
-     const expectedActions = [
-            {
-                type: SET_DATA_IN_STATISTICS_LIST,
-                payload: returnData
-            },
-        ]
+    const expectedActions = [
+        {
+            type: SET_DATA_IN_STATISTICS_LIST,
+            payload: returnData
+        },
+    ]
 
     it('should get Data For StatisticsList', () => {
         keyValueDBService.getValueFromStore = jest.fn()
@@ -88,9 +89,21 @@ describe('statisticsActions', () => {
         const store = mockStore({})
         return store.dispatch(getDataForStatisticsList())
             .then(() => {
-                    expect(statisticsListService.setStatisticsList).toHaveBeenCalled()
-                    expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                    expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(statisticsListService.setStatisticsList).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+    it('should throw error', () => {
+        try {
+            keyValueDBService.getValueFromStore = jest.fn()
+            keyValueDBService.getValueFromStore.mockReturnValue(null)
+            const store = mockStore({})
+            return store.dispatch(getDataForStatisticsList())
+                .then(() => {
                 })
+        } catch (error) {
+            showToastAndAddUserExceptionLog.toHaveBeenCalled()
+        }
     })
 });

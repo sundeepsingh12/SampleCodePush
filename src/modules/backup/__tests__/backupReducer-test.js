@@ -68,10 +68,15 @@ describe('test cases for case SET_SYNCED_FILES', () => {
         const syncedFiles = {}
         const action = {
             type: SET_SYNCED_FILES,
-            payload: syncedFiles
+            payload: {
+                syncedBackupFiles: {},
+                toastMessage: ''
+            }
         }
         let nextState = backupReducer(undefined, action)
-        expect(nextState.syncedFiles).toEqual(action.payload)
+        expect(nextState.syncedFiles).toEqual(action.payload.syncedBackupFiles)
+        expect(nextState.toastMessage).toEqual(action.payload.toastMessage)
+        expect(nextState.isLoading).toEqual(false)
     })
 })
 

@@ -18,16 +18,16 @@ const mockStore = configureStore(middlewares)
 
 describe('FixedSKU Actions', () => {
 
-    it('should set action type and payload', () => {
-        let type = SET_FIXED_SKU
-        let payload = {
-            id: 1
-        }
-        expect(actions.actionDispatch(type, payload)).toEqual({
-            type: SET_FIXED_SKU,
-            payload: payload
-        })
-    })
+    // it('should set action type and payload', () => {
+    //     let type = SET_FIXED_SKU
+    //     let payload = {
+    //         id: 1
+    //     }
+    //     expect(actions.actionDispatch(type, payload)).toEqual({
+    //         type: SET_FIXED_SKU,
+    //         payload: payload
+    //     })
+    // })
 
     it('should change quantity of individual item', () => {
         const expectedAction = [{
@@ -93,9 +93,13 @@ describe('FixedSKU Actions', () => {
                 isLoaderRunning: false
             }
         }]
+        let formElement = new Map()
+        formElement.set(1, { id: 1 })
         let parameters = {
-            parentObject: {},
-            formElement: {},
+            parentObject: {
+                fieldAttributeMasterId: 1
+            },
+            formElement,
             nextEditable: {},
             fixedSKUList: {},
             isSaveDisabled: true,
@@ -106,14 +110,11 @@ describe('FixedSKU Actions', () => {
         fixedSKUDetailsService.calculateTotalAmount.mockReturnValue({})
         fieldDataService.prepareFieldDataForTransactionSavingInState = jest.fn()
         fieldDataService.prepareFieldDataForTransactionSavingInState.mockReturnValue({})
-        formLayoutActions.updateFieldDataWithChildData = jest.fn()
-        formLayoutActions.updateFieldDataWithChildData.mockReturnValue({})
         const store = mockStore({})
-        return store.dispatch(actions.onSave(parameters.parentObject, parameters.formElement, parameters.nextEditable, parameters.fixedSKUList, parameters.isSaveDisabled, parameters.latestPositionId, parameters.jobTransactionId))
+        return store.dispatch(actions.onSave(parameters.parentObject, parameters, parameters.fixedSKUList, { id: 1, jobId: 1 }))
             .then(() => {
                 expect(fixedSKUDetailsService.calculateTotalAmount).toHaveBeenCalled()
                 expect(fieldDataService.prepareFieldDataForTransactionSavingInState).toHaveBeenCalled()
-                expect(formLayoutActions.updateFieldDataWithChildData).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedAction[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedAction[0].payload)
             })

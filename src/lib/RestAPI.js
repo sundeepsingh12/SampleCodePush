@@ -16,12 +16,9 @@ import _ from 'lodash'
 import RNFS from 'react-native-fs'
 import RNFetchBlob from 'react-native-fetch-blob'
 import { keyValueDBService } from '../services/classes/KeyValueDBService.js'
-import {
-  PENDING_SYNC_TRANSACTION_IDS,
-  LAST_SYNC_WITH_SERVER,
-  DOMAIN_URL
-} from './constants'
+import { PENDING_SYNC_TRANSACTION_IDS, LAST_SYNC_WITH_SERVER, DOMAIN_URL } from './constants'
 import moment from 'moment'
+import { sync } from '../services/classes/Sync'
 const fetch = require('react-native-cancelable-fetch');
 class RestAPI {
   /**
@@ -58,10 +55,11 @@ class RestAPI {
    */
   async _fetch(opts, fetchRequestId) {
     let url = opts.url
-    if (!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK)) {
+    if (!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK) && opts.method != 'WALLET') {
       let data = await keyValueDBService.getValueFromStore(DOMAIN_URL)
       url = data.value + url
     }
+    if (opts.method == 'WALLET') opts.method = 'POST'
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
     }
@@ -129,12 +127,12 @@ class RestAPI {
   */
   serviceCall(body, url, method) {
     let opts;
-    if (method === 'POST') {
+    if (method === 'POST' || method === 'WALLET') {
       opts = {
         method,
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': method != 'WALLET' ? 'application/json' : 'application/x-www-form-urlencoded'
         },
         url,
         body
@@ -189,9 +187,8 @@ class RestAPI {
     });
   }
 
-  async uploadZipFile(path, fileName, currenDate) {
+  async uploadZipFile(path, fileName, currenDate, syncStoreDTO) {
     // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
-    // console.log('jid',jid)
     var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
     var filePath = (!path) ? PATH + '/sync.zip' : PATH
     let responseBody = "Fail"
@@ -207,14 +204,18 @@ class RestAPI {
         const message = responseBody.split(",")[0]
         if (!path && message == 'success') {
           if (currenDate) {
-          await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
+            await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
           }
-          await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+          if (syncStoreDTO) {
+            await sync.deleteSpecificTransactionFromStoreList(syncStoreDTO.transactionIdToBeSynced, PENDING_SYNC_TRANSACTION_IDS, currenDate)
+          }
+          // await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         }
         else if (message != 'success') {
           throw new Error(responseBody)
         }
       }).catch(err => {
+
         throw {
           code: err.message ? JSON.parse(err.message).status : null,
         }

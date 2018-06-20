@@ -120,10 +120,17 @@ describe('test for fillKeysAndSave', () => {
 
 
     it('should fill value of matched keys in formElement in case of called from array', () => {
+        let formLayoutState = {
+            formElement: formLayoutMap
+        }
+        let jobTransaction = {
+            id: 1,
+            jobId: 1
+        }
         dataStoreService.fillKeysInFormElement = jest.fn();
         dataStoreService.fillKeysInFormElement.mockReturnValue(formLayoutMapResult);
         const store = mockStore({})
-        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, formLayoutObject, null, null, true, 1))
+        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, formLayoutState, 'abc', null, null, jobTransaction))
             .then(() => {
                 expect(dataStoreService.fillKeysInFormElement).toHaveBeenCalledTimes(1)
             })
@@ -133,7 +140,7 @@ describe('test for fillKeysAndSave', () => {
         dataStoreService.fillKeysInFormElement = jest.fn();
         dataStoreService.fillKeysInFormElement.mockReturnValue(formLayoutMapResult);
         const store = mockStore({})
-        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, null, null, null, false))
+        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, {}, null, false))
             .then(() => {
                 expect(dataStoreService.fillKeysInFormElement).toHaveBeenCalledTimes(1)
             })
@@ -144,7 +151,7 @@ describe('test for fillKeysAndSave', () => {
             throw new Error('error')
         })
         const store = mockStore({})
-        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, null, null, null, false))
+        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, {}, null, null, false))
             .then(() => {
                 expect(dataStoreService.fillKeysInFormElement).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
@@ -562,7 +569,9 @@ describe('test for checkForFiltersAndValidation', () => {
                 id: 1
             },
             isFiltersPresent: false,
-            validation: {}
+            validation: {},
+            searchText: '',
+            isDataStoreEditable: true
         }
     }, {
         type: SHOW_ERROR_MESSAGE,
@@ -576,19 +585,21 @@ describe('test for checkForFiltersAndValidation', () => {
     }]
 
     it('should set dataStoreAttrValueMap, isFiltersPresent, validation and dataStoreFilterReverseMap', () => {
-        dataStoreService.checkForFiltersAndValidations = jest.fn()
-        dataStoreService.checkForFiltersAndValidations.mockReturnValue({
+        dataStoreService.runDataStoreBeforeValidations = jest.fn()
+        dataStoreService.runDataStoreBeforeValidations.mockReturnValue({
             dataStoreAttrValueMap: {
                 id: 1
             },
             isFiltersPresent: false,
-            validation: {},
-            dataStoreFilterReverseMap: {}
+            validationObject: {},
+            dataStoreFilterReverseMap: {},
+            searchText: '',
+            isDataStoreEditable: true
         })
         const store = mockStore({})
         return store.dispatch(actions.checkForFiltersAndValidation('temp', 1234, null, null))
             .then(() => {
-                expect(dataStoreService.checkForFiltersAndValidations).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.runDataStoreBeforeValidations).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
@@ -599,13 +610,13 @@ describe('test for checkForFiltersAndValidation', () => {
     })
 
     it('should throw an error', () => {
-        dataStoreService.checkForFiltersAndValidations = jest.fn(() => {
+        dataStoreService.runDataStoreBeforeValidations = jest.fn(() => {
             throw new Error('error')
         })
         const store = mockStore({})
         return store.dispatch(actions.checkForFiltersAndValidation('temp', 1234, null, null))
             .then(() => {
-                expect(dataStoreService.checkForFiltersAndValidations).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.runDataStoreBeforeValidations).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[2].type)
@@ -683,7 +694,9 @@ describe('test for checkForFiltersAndValidationForArray', () => {
                 id: 1
             },
             isFiltersPresent: false,
-            validation: {}
+            validation: {},
+            searchText: '',
+            isDataStoreEditable: true
         }
     }, {
         type: SHOW_ERROR_MESSAGE,
@@ -703,8 +716,10 @@ describe('test for checkForFiltersAndValidationForArray', () => {
                 id: 1
             },
             isFiltersPresent: false,
-            validation: {},
-            arrayReverseDataStoreFilterMap: {}
+            validationObject: {},
+            arrayReverseDataStoreFilterMap: {},
+            searchText: '',
+            isDataStoreEditable: true
         })
         const store = mockStore({})
         return store.dispatch(actions.checkForFiltersAndValidationForArray('temp'))
@@ -726,7 +741,7 @@ describe('test for checkForFiltersAndValidationForArray', () => {
         const store = mockStore({})
         return store.dispatch(actions.checkForFiltersAndValidationForArray('temp'))
             .then(() => {
-                expect(dataStoreService.checkForFiltersAndValidations).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.checkForFiltersAndValidationsForArray).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[2].type)

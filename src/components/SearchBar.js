@@ -1,16 +1,7 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View } from 'react-native'
-import {
-    Header,
-    Button,
-    Text,
-    Input,
-    Body,
-    Icon,
-} from 'native-base';
+import { Header, Button, Text, Input, Body } from 'native-base';
 import styles from '../themes/FeStyle'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
 import { SEARCH } from '../lib/ContainerConstants'
@@ -39,16 +30,9 @@ export default class SearchBar extends PureComponent {
     render() {
         let scanner = this._startScanner()
         return (
-            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
                 <Body>
-                    <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
-                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.paddingRight10, styles.paddingLeft10, styles.fontXxl]} onPress={() => { this.props.goBack() }} />
-                        <Text
-                            style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.title}</Text>
-                        <View />
-                    </View>
-                    <View style={[styles.row,]}>
+                    <View style={[styles.row]}>
                         <View
                             style={[styles.row, styles.flex1, styles.justifySpaceBetween, styles.relative]}>
                             <Input
@@ -58,7 +42,9 @@ export default class SearchBar extends PureComponent {
                                 }}
                                 keyboardAppearance={"dark"}
                                 value={this.props.searchText}
-                                style={[style.headerSearch, styles.bgGray]} />
+                                style={[style.headerSearch, styles.bgGray]}
+                                editable={this.props.isDataStoreEditable}
+                            />
                             {scanner}
                         </View>
                         {(_.size(this.props.searchText) > 2 && !this.props.isFiltersPresent) &&

@@ -1,17 +1,8 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
-import {
-    Container,
-    Content,
-    Header,
-    Text,
-    Body,
-    Icon,
-    StyleProvider,
-} from 'native-base'
-import {
-    _id
-} from '../lib/constants'
+import { SafeAreaView } from 'react-navigation'
+import { Container, Content, Header, Text, Body, Icon, StyleProvider, } from 'native-base'
+import { _id } from '../lib/constants'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -122,21 +113,22 @@ class DataStoreDetails extends PureComponent {
                 onRequestClose={() => this.props.navigation.goBack()}>
                 <StyleProvider style={getTheme(platform)}>
                     <Container>
-                        <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])} >
-                            <Body>
-                                <View
-                                    style={[styles.row, styles.width100]}>
-                                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack() }
-                                    }>
-                                        <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                    </TouchableOpacity >
-                                    <View style={[style.headerBody]}>
-                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}> {this.props.navigation.state.params.value}</Text >
+                        <SafeAreaView>
+                            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])} >
+                                <Body>
+                                    <View
+                                        style={[styles.row, styles.width100]}>
+                                        <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack() }
+                                        }>
+                                            <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                        </TouchableOpacity >
+                                        <View style={[style.headerBody]}>
+                                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}> {this.props.navigation.state.params.value}</Text >
+                                        </View >
                                     </View >
-                                </View >
-                            </Body >
-                        </Header >
-
+                                </Body >
+                            </Header >
+                        </SafeAreaView>
                         <Content style={[styles.flex1, styles.bgWhite]}>
                             {this.loader()}
                             {flatListView}

@@ -137,12 +137,22 @@ describe('test for onSave', () => {
         type: SHOW_LOADER_DSF,
         payload: false
     }]
-
+    let formLayoutState = {
+        latestPositionId: 1,
+        formElement: {}
+    }
+    let arrayElements = {
+        formElement: {
+            0: {
+                formLayoutObject: {}
+            }
+        }
+    }
     it('should set formElement to formLayout state', () => {
         dataStoreFilterService.clearMappedDSFValue = jest.fn()
         dataStoreFilterService.clearMappedDSFValue.mockReturnValue({})
         const store = mockStore({})
-        return store.dispatch(actions.onSave('abc', {}, null, null, 1, {}, {}, 1233, false))
+        return store.dispatch(actions.onSave('abc', formLayoutState, null, null, 1, false, {}, 1233, null))
             .then(() => {
                 expect(dataStoreFilterService.clearMappedDSFValue).toHaveBeenCalledTimes(1)
             })
@@ -152,7 +162,7 @@ describe('test for onSave', () => {
         dataStoreFilterService.clearMappedDSFValue = jest.fn()
         dataStoreFilterService.clearMappedDSFValue.mockReturnValue({})
         const store = mockStore({})
-        return store.dispatch(actions.onSave('abc', { 123: {} }, null, null, 1, {}, {}, 1233, true, 123, { 121: {} }, 121))
+        return store.dispatch(actions.onSave('abc', arrayElements, '123', {}, {}, true, 0, {}, 1))
             .then(() => {
                 expect(dataStoreFilterService.clearMappedDSFValue).toHaveBeenCalledTimes(1)
             })
@@ -163,12 +173,8 @@ describe('test for onSave', () => {
             throw new Error('error')
         })
         const store = mockStore({})
-        Toast.show = jest.fn()
-        Toast.show.mockReturnValue({})
         return store.dispatch(actions.onSave('abc'))
             .then(() => {
-                expect(dataStoreFilterService.clearMappedDSFValue).toHaveBeenCalled()
-                expect(Toast.show).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })

@@ -25,9 +25,7 @@ import {
     MONEY_COLLECT,
     MONEY_PAY,
     ACTUAL_AMOUNT,
-    PATH_TEMP,
     SIGN,
-    IMAGE_EXTENSION
 } from '../../lib/AttributeConstants'
 import { formLayoutEventsInterface } from '../classes/formLayout/FormLayoutEventInterface.js'
 

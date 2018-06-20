@@ -1,17 +1,15 @@
 'use strict'
 
 import { paymentService } from '../../services/payment/Payment'
-import { setState, showToastAndAddUserExceptionLog, navigateToScene } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
-import { NavigationActions } from 'react-navigation'
 import {
     CLEAR_PAYMENT_STATE,
     CUSTOMIZATION_APP_MODULE,
     FIELD_ATTRIBUTE,
     FIELD_ATTRIBUTE_VALIDATION,
-    JOB_ATTRIBUTE,
     JOB_MASTER_MONEY_TRANSACTION_MODE,
     SET_PAYMENT_INITIAL_PARAMETERS,
     UPDATE_PAYMENT_AT_END,
@@ -100,7 +98,7 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
  * @param {*} receipt 
  * @param {*} jobTransactionIdAmountMap 
  */
-export function saveMoneyCollectObject(actualAmount, currentElement, jobTransaction, moneyCollectMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt, jobTransactionIdAmountMap, formLayoutState) {
+export function saveMoneyCollectObject(actualAmount, currentElement, jobTransaction, moneyCollectMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt, jobTransactionIdAmountMap, formLayoutState,goBack) {
     return async function (dispatch) {
         try {
             //While saving actual amount should be a number
@@ -111,11 +109,6 @@ export function saveMoneyCollectObject(actualAmount, currentElement, jobTransact
             const moneyCollectChildFieldDataList = paymentService.prepareMoneyCollectChildFieldDataListDTO(actualAmount, moneyCollectMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt)
             const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransaction.id, currentElement.positionId, formLayoutState.latestPositionId)
             const isCardPayment = paymentService.checkCardPayment(selectedPaymentMode)
-            let paymentAtEnd = {
-                currentElement,
-                modeTypeId: selectedPaymentMode,
-                isCardPayment
-            }
             //Initialising jobTransactionIdAmountMap in case of null for saving actual and original amount in job transaction
             if (!jobTransactionIdAmountMap) {
                 jobTransactionIdAmountMap = {}
@@ -133,10 +126,17 @@ export function saveMoneyCollectObject(actualAmount, currentElement, jobTransact
             }
             formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).jobTransactionIdAmountMap = jobTransactionIdAmountMap
             formLayoutState.formElement = CashTenderingService.checkForCashTenderingAndResetValue(formLayoutState.formElement, currentElement)
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
-            // dispatch(setState(UPDATE_PAYMENT_AT_END, {
-            //     paymentAtEnd
-            // }))
+            let paymentAtEnd = {
+                currentElement: formLayoutState.formElement.get(currentElement.fieldAttributeMasterId),
+                modeTypeId: selectedPaymentMode,
+                parameters: null,
+                isCardPayment
+            }
+            formLayoutState.paymentAtEnd = paymentAtEnd
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction,null,null,goBack))
+            dispatch(setState(UPDATE_PAYMENT_AT_END, {
+                paymentAtEnd
+            }))
         } catch (error) {
             showToastAndAddUserExceptionLog(1602, error.message, 'danger', 1)
         }
@@ -156,7 +156,7 @@ export function saveMoneyCollectObject(actualAmount, currentElement, jobTransact
  * @param {*} splitPaymentModeMap 
  * @param {*} paymentContainerKey 
  */
-export function saveMoneyCollectSplitObject(actualAmount, currentElement, formLayoutState, jobTransaction, moneyCollectMaster, originalAmount, splitPaymentModeMap, paymentContainerKey) {
+export function saveMoneyCollectSplitObject(actualAmount, currentElement, formLayoutState, jobTransaction, moneyCollectMaster, originalAmount, splitPaymentModeMap, paymentContainerKey,navigation) {
     return async function (dispatch) {
         try {
             paymentService.checkSplitAmount(actualAmount, splitPaymentModeMap)
@@ -168,12 +168,13 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formLa
             //     modeTypeId: selectedPaymentMode,
             //     isCardPayment
             // }
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction,null,null,navigation.goBack))
             // dispatch(setState(UPDATE_PAYMENT_AT_END, {
             //     paymentAtEnd
             // }))
-            dispatch(setState(CLEAR_PAYMENT_STATE))
-            dispatch(NavigationActions.back())
+            // dispatch(setState(CLEAR_PAYMENT_STATE))
+            // dispatch(NavigationActions.back())
+            navigation.pop(1)
         } catch (error) {
             showToastAndAddUserExceptionLog(1603, error.message, 'danger', 1)
         }

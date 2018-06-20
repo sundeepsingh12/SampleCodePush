@@ -80,8 +80,6 @@ describe('test cases for undefined action', () => {
         expect(nextState.pendingCount).toEqual(0)
         expect(nextState.error).toEqual(null)
         expect(nextState.scanSuccess).toEqual(false)
-        expect(nextState.isManualSelectionAllowed).toEqual(false)
-        expect(nextState.isForceAssignmentAllowed).toEqual(false)
         expect(nextState.scanError).toEqual(null)
 
     })

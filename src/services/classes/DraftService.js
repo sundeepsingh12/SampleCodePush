@@ -12,12 +12,8 @@ class DraftService {
         if (draftObject && draftObject.jobTransactionId) {
             realm.save(TABLE_DRAFT, draftObject)
         }
-        // let allData = realm.getRecordListOnQuery(TABLE_DRAFT)
-        // for (let index in allData) {
-        //     let draft = { ...allData[index] }
-        //     console.logs('draft', draft)
-        // }
     }
+    
     setFormLayoutObjectForSaving(formLayoutState, jobMasterId, navigationFormLayoutStates, jobTransaction) {
         if (!formLayoutState || !formLayoutState.formElement) return
         let statusIdToFormLayoutMap = {}
@@ -31,10 +27,11 @@ class DraftService {
         let draftObject = {
             jobTransactionId: (jobTransaction.id < 0 && jobTransaction.jobId < 0) ? -jobMasterId : formLayoutState.jobTransactionId,
             statusId: formLayoutState.statusId,
+            referenceNumber: jobTransaction.referenceNumber,
             formLayoutObject: JSON.stringify(statusIdToFormLayoutMap),
             jobMasterId,
             navigationFormLayoutStates: JSON.stringify(navigationFormLayoutStatesForDb),
-            statusName: formLayoutState.statusName
+            statusName: formLayoutState.statusName,
         }
         let draftObjectCopy = {}
         if (_.isEmpty(navigationFormLayoutStates)) {
@@ -43,6 +40,7 @@ class DraftService {
         }
         return draftObject
     }
+
     convertFormLayoutStateToString(formLayoutState) {
         let cloneFormLayoutState = JSON.parse(JSON.stringify(formLayoutState))
         let formElement = formLayoutState.formElement
@@ -50,6 +48,7 @@ class DraftService {
         cloneFormLayoutState.formElement = formElementAsArray
         return cloneFormLayoutState
     }
+
     getDraftForState(jobTransaction, jobMasterId) {
         let draftDbObject = this.getDraftFromDb(jobTransaction, jobMasterId)
         for (let index in draftDbObject) {
@@ -57,13 +56,10 @@ class DraftService {
             return draft
         }
     }
+
     getDraftFromDb(jobTransaction, jobMasterId) {
         let draftQuery, draftDbObject
         let allData = realm.getRecordListOnQuery(TABLE_DRAFT)
-        // for (let index in allData) {
-        //     let draft = { ...allData[index] }
-        //     console.logs('draft', draft)
-        // }
         if (jobMasterId) {
             draftQuery = `jobTransactionId =  ${-jobMasterId}`
             draftDbObject = realm.getRecordListOnQuery(TABLE_DRAFT, draftQuery)
@@ -75,10 +71,15 @@ class DraftService {
     }
 
     deleteDraftFromDb(jobTransaction, jobMasterId) {
-        if (jobTransaction.id < 0 && jobTransaction.jobId < 0) {
-            realm.deleteSingleRecord(TABLE_DRAFT, -jobMasterId, 'jobTransactionId')
+        if (jobTransaction.length) {
+            let transactionList = jobTransaction.map(transaction => transaction.jobTransactionId)
+            realm.deleteRecordList(TABLE_DRAFT, transactionList, 'jobTransactionId')
         } else {
-            realm.deleteSingleRecord(TABLE_DRAFT, jobTransaction.id, 'jobTransactionId')
+            if (jobTransaction.id < 0 && jobTransaction.jobId < 0) {
+                realm.deleteSingleRecord(TABLE_DRAFT, -jobMasterId, 'jobTransactionId')
+            } else {
+                realm.deleteSingleRecord(TABLE_DRAFT, jobTransaction.id, 'jobTransactionId')
+            }
         }
         // let allData = realm.getRecordListOnQuery(TABLE_DRAFT)
         // for (let index in allData) {

@@ -1,42 +1,19 @@
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    FlatList,
-    TouchableOpacity,
-}
-    from 'react-native'
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as arrayActions from '../modules/array/arrayActions'
 import ArrayBasicComponent from '../components/ArrayBasicComponent.js'
 import CustomAlert from '../components/CustomAlert.js'
-import {
-    Container,
-    Content,
-    Header,
-    Button,
-    List,
-    ListItem,
-    Left,
-    Body,
-    Right,
-    Icon,
-    Title,
-    Footer,
-    FooterTab,
-    StyleProvider,
-    Card,
-    CardItem,
-    Toast
-} from 'native-base'
+import { Container, Content, Header, Button, Body, Icon, Footer, StyleProvider, Toast } from 'native-base'
 import _ from 'lodash'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
+import TitleHeader from '../components/TitleHeader'
 import { TOTAL_COUNT, ADD, SAVE, ADD_TOAST, OK } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -58,6 +35,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ArrayFieldAttribute extends PureComponent {
+
+    static navigationOptions = ({ navigation }) => {
+        return { header: <TitleHeader pageName={navigation.state.params.currentElement.label} goBack={navigation.goBack} /> }
+    }
 
     componentDidMount() {
         this.props.actions.setInitialArray(
@@ -89,6 +70,8 @@ class ArrayFieldAttribute extends PureComponent {
                 jobTransaction={this.props.navigation.state.params.jobTransaction}
                 jobStatusId={this.props.jobStatusId}
                 arrayFieldAttributeMasterId={this.props.navigation.state.params.currentElement.fieldAttributeMasterId}
+                navigate={this.props.navigation.navigate}
+                goBack={this.props.navigation.goBack}
             />
         )
     }
@@ -114,11 +97,11 @@ class ArrayFieldAttribute extends PureComponent {
             this.props.navigation.state.params.jobTransaction,
             this.props.navigation.state.params.formLayoutState,
             this.props.arrayMainObject,
-            this.props.arrayReverseDataStoreFilterMap)
+            this.props.arrayReverseDataStoreFilterMap,
+            this.props.navigation.goBack
+        )
     }
-    static navigationOptions = ({ navigation }) => {
-        return { header: null }
-    }
+
     backPressed = () => {
         this.props.navigation.goBack()
         this.props.actions.clearArrayState()
@@ -144,7 +127,7 @@ class ArrayFieldAttribute extends PureComponent {
     }
     headerView() {
         let view
-        view = <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+        view = <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
             <Body>
                 <View
                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -166,29 +149,31 @@ class ArrayFieldAttribute extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)} >
                 <Container>
-                    {this.headerView()}
+                    {/* {this.headerView()} */}
                     {renderIf(this.props.errorMessage != '',
                         <CustomAlert title='Alert' message={this.props.errorMessage} onOkPressed={this.backPressed} />
                     )}
-                    {this.getLoader()}
                     <Content style={[styles.flex1, styles.bgWhite]}>
+                        {this.getLoader()}
                         {this.getListView()}
                     </Content>
-                    <Footer
-                        style={[style.footer, styles.bgWhite]}>
-                        <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
-                            <Text
-                                style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.arrayElements)}</Text>
-                            <Button bordered success small onPress={this.addPressed}>
-                                <Text style={[styles.fontSuccess, styles.padding10]}>{ADD}</Text>
-                            </Button>
-                        </View>
-                        <View style={[styles.bgPrimary]}>
-                            <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
-                                <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
-                            </Button>
-                        </View>
-                    </Footer>
+                    <SafeAreaView style={[styles.bgWhite]}>
+                        <Footer
+                            style={[style.footer, styles.bgWhite]}>
+                            <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
+                                <Text
+                                    style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.arrayElements)}</Text>
+                                <Button bordered success small onPress={this.addPressed}>
+                                    <Text style={[styles.fontSuccess]}>{ADD}</Text>
+                                </Button>
+                            </View>
+                            <View style={[{ backgroundColor: styles.bgPrimaryColor }]}>
+                                <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
+                                    <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
+                                </Button>
+                            </View>
+                        </Footer>
+                    </SafeAreaView>
                 </Container >
             </StyleProvider >
         )

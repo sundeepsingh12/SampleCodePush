@@ -21,10 +21,9 @@ import {
     MONEY_COLLECT,
     MONEY_PAY,
     ACTUAL_AMOUNT,
-    PATH_TEMP,
     SIGN,
     IMAGE_EXTENSION,
-    PATH
+    PATH_CUSTOMER_IMAGES
 } from '../../lib/AttributeConstants'
 import {
     USER,
@@ -92,17 +91,14 @@ class SignatureRemarks {
             * @param {*} currentTimeInMillis current time 
             */
     async saveFile(result, currentTimeInMillis, isCameraImage) {
-        RNFS.mkdir(PATH_TEMP);
-        RNFS.mkdir(PATH);
+        RNFS.mkdir(PATH_CUSTOMER_IMAGES);
         let image_name
         if (!isCameraImage) {
             image_name = SIGN + currentTimeInMillis + IMAGE_EXTENSION
-            await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64')
-            await RNFS.writeFile(PATH + image_name, result.encoded, 'base64');
+            await RNFS.writeFile(PATH_CUSTOMER_IMAGES + image_name, result.encoded, 'base64');
         } else {
             image_name = 'cust_' + currentTimeInMillis + IMAGE_EXTENSION
-            await RNFS.writeFile(PATH_TEMP + image_name, result, 'base64');
-            await RNFS.writeFile(PATH + image_name, result, 'base64');
+            await RNFS.writeFile(PATH_CUSTOMER_IMAGES + image_name, result, 'base64');
         }
         const user = await keyValueDBService.getValueFromStore(USER);
         const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + image_name
@@ -118,6 +114,9 @@ class SignatureRemarks {
                         if (validationCountForImage == 0) {
                             validationObject.imageUploadFromDevice = (validation.condition == 'true')
                             validationCountForImage = 1
+                        } else if(validationCountForImage == 1){
+                            validationObject.cropImageValidation = (validation.condition == 'true')
+                            validationCountForImage = 2
                         }
                         break
                     case REMARKS:
@@ -166,10 +165,10 @@ class SignatureRemarks {
     }
     async getImageData(value) {
         let imageName = value.split('/')
-        let fileExits = await RNFS.exists(PATH + imageName[imageName.length - 1])
+        let fileExits = await RNFS.exists(PATH_CUSTOMER_IMAGES + imageName[imageName.length - 1])
         let result
         if (fileExits) {
-            result = await RNFS.readFile(PATH + imageName[imageName.length - 1], 'base64');
+            result = await RNFS.readFile(PATH_CUSTOMER_IMAGES + imageName[imageName.length - 1], 'base64');
         }
         return result
     }

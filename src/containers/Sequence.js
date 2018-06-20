@@ -7,9 +7,8 @@ import * as sequenceActions from '../modules/sequence/sequenceActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import React, { PureComponent } from 'react'
-import {
-  StyleSheet, View, Alert, TouchableOpacity, Modal
-} from 'react-native'
+import { StyleSheet, View, Alert, TouchableOpacity, Modal } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { ROUTE_OPTIMIZATION, FILTER_REF_NO } from '../lib/AttributeConstants'
 import {
   UPDATE_SEQUENCE, SAVE,
@@ -23,28 +22,8 @@ import {
   AUTO_ROUTING_MESSAGE,
   AUTO_ROUTING_EXTRA_MESSAGE
 } from '../lib/ContainerConstants'
-import {
-  Container,
-  Header,
-  Button,
-  Text,
-  Body,
-  Icon,
-  Footer,
-  Item,
-  Input,
-  FooterTab,
-  StyleProvider,
-  Toast,
-  Label
-} from 'native-base'
-import {
-  SET_RESPONSE_MESSAGE,
-  SET_REFERENCE_NO,
-  SET_SEQUENCE_LIST_ITEM,
-  SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST,
-  SET_SEQUENCE_BACK_ENABLED
-} from '../lib/constants'
+import { Container, Header, Button, Text, Body, Icon, Footer, Item, Input, FooterTab, StyleProvider, Toast, Label } from 'native-base'
+import { SET_RESPONSE_MESSAGE, SET_REFERENCE_NO, SET_SEQUENCE_LIST_ITEM, SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST, SET_SEQUENCE_BACK_ENABLED } from '../lib/constants'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -178,7 +157,7 @@ class Sequence extends PureComponent {
    */
   getButtonView() {
     return _.isEmpty(this.props.transactionsWithChangedSeqeunceMap) ? <Button
-      style={[styles.bgPrimary]}
+      style={{ backgroundColor: styles.bgPrimaryColor }}
       onPress={this.showAlert}
       disabled={this.props.isResequencingDisabled}
       full>
@@ -282,13 +261,13 @@ class Sequence extends PureComponent {
             <View style={{ width: '50%' }}>
               <Button transparent full
                 onPress={() => this.setModalView({})} >
-                <Text style={[styles.fontPrimary]}>{CANCEL}</Text>
+                <Text style={{ color: styles.fontPrimaryColor }}>{CANCEL}</Text>
               </Button>
             </View>
             <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
               <Button transparent full
                 onPress={() => this.onJumpSequencePressed(this.state.newSequenceNumber)}>
-                <Text style={[styles.fontPrimary]}>{JUMP_SEQUENCE}</Text>
+                <Text style={{ color: styles.fontPrimaryColor }}>{JUMP_SEQUENCE}</Text>
               </Button>
             </View>
           </View>
@@ -301,23 +280,27 @@ class Sequence extends PureComponent {
    * inflate header view
    */
   headerView() {
-    return <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-      <Body>
-        <View
-          style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-          <TouchableOpacity style={[style.headerLeft]}
-            onPress={this.goBack}>
-            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-          </TouchableOpacity>
-          <View style={[style.headerBody]}>
-            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.runsheetNumber}</Text>
-          </View>
-          <View style={[style.headerRight]}>
-          </View>
-        </View>
-        {!_.isEmpty(this.props.sequenceList) && !this.props.isSequenceScreenLoading ? <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} /> : null}
-      </Body>
-    </Header>
+    return (
+      <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+        <Header style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+          <Body>
+            <View
+              style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+              <TouchableOpacity style={[style.headerLeft]}
+                onPress={this.goBack}>
+                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+              </TouchableOpacity>
+              <View style={[style.headerBody]}>
+                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.runsheetNumber}</Text>
+              </View>
+              <View style={[style.headerRight]}>
+              </View>
+            </View>
+            {!_.isEmpty(this.props.sequenceList) && !this.props.isSequenceScreenLoading ? <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} /> : null}
+          </Body>
+        </Header>
+      </SafeAreaView>
+    )
   }
 
   /**
@@ -357,13 +340,13 @@ class Sequence extends PureComponent {
                 activeOpacity={1}
                 sortRowStyle={style.sortableListStyle}
                 renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(row)} />} />
-              <Footer style={{
-                height: 'auto'
-              }}>
-                <FooterTab style={StyleSheet.flatten([styles.padding10])}>
-                  {buttonView}
-                </FooterTab>
-              </Footer>
+              <SafeAreaView>
+                <Footer style={{ height: 'auto' }}>
+                  <FooterTab style={StyleSheet.flatten([styles.padding10])}>
+                    {buttonView}
+                  </FooterTab>
+                </Footer>
+              </SafeAreaView>
             </View>
             : this.viewForNoJobPresent()}
         </Container>

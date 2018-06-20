@@ -225,7 +225,7 @@ class AddServerSms {
                     break
                 case JOB_ETA://check this
                     let jobEta = jobTransaction.jobEtaTime
-                    messageBody = (jobEta && jobEta.length > 0) ? messageBody.replace(key, moment(jobEta).format('DD MMM')) : messageBody.replace(key, '')
+                    messageBody = (jobEta && jobEta.length > 0) ? messageBody.replace(key, moment(jobEta).format('DD MMM HH:mm')) : messageBody.replace(key, 'N.A.')
                     break
                 case TRANSACTION_COMPLETED_DATE:
                     let lastTransactionTimeOnMobile = jobTransaction.lastTransactionTimeOnMobile
@@ -320,12 +320,19 @@ class AddServerSms {
         }
     }
 
+    async getJobMasterIdToAttributesMap() {
+        let jobAttributesList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE);
+        let fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
+        let jobMasterIdToJobAtrributesMap = (jobAttributesList && jobAttributesList.value && jobAttributesList.value.length > 0) ? _.groupBy(jobAttributesList.value, 'jobMasterId') : {}
+        let jobMasterIdToFieldAtrributesMap = (fieldAttributesList && fieldAttributesList.value && fieldAttributesList.value.length > 0) ? _.groupBy(fieldAttributesList.value, 'jobMasterId') : {}
+        return { jobMasterIdToJobAtrributesMap, jobMasterIdToFieldAtrributesMap }
+    }
     /**
     * This function checks if a sms is mapped to transaction's pending status and saves server sms log
     * @param {String} transactionIdDtos 
     */
-    async setServerSmsMapForPendingStatus(transactionIdDtosMap) {
-        if (_.isEmpty(transactionIdDtosMap)) {
+    async setServerSmsMapForPendingStatus(updatedTransactionList) {
+        if (_.isEmpty(updatedTransactionList)) {
             return
         }
         let serverSmsMap = await this.prepareServerSmsMap()
@@ -334,29 +341,23 @@ class AddServerSms {
         }
         let user = await keyValueDBService.getValueFromStore(USER);
         let serverSmsLogs = []
-        for (let jobMasterId in transactionIdDtosMap) {
-            let statusIdTransactionIdMap = _.values(transactionIdDtosMap[jobMasterId])
-            if (statusIdTransactionIdMap && statusIdTransactionIdMap[0] && serverSmsMap[statusIdTransactionIdMap[0].pendingStatusId]) {
-                let jobAndFieldAttributes = await this.getJobFieldAttributeForJobmaster(jobMasterId)
-                let transactionIdList = statusIdTransactionIdMap[0].transactionId.split(':')
-                let jobTransactionQuery = transactionIdList.map(transactionId => 'id = ' + transactionId).join(' OR ')
-                let transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, null, null)
-                let jobIdToJobDataMap = jobDataService.getJobData(transactionList)
-                for (let index in transactionList) {
-                    let jobTransaction = { ...transactionList[index] }
-                    let serverSmsLog = await this.setSmsBody(statusIdTransactionIdMap[0].pendingStatusId, null, jobTransaction, jobAndFieldAttributes.jobAttributes, jobAndFieldAttributes.fieldAttributes, user, serverSmsMap[statusIdTransactionIdMap[0].pendingStatusId], jobIdToJobDataMap[jobTransaction.jobId])
-                    if (serverSmsLog.length > 0) {
-                        serverSmsLogs = serverSmsLogs.concat(serverSmsLog)
-                    }
+        let transactionListMappedWithSms = updatedTransactionList.filter(jobTransaction => serverSmsMap[jobTransaction.jobStatusId])
+        if (_.isEmpty(transactionListMappedWithSms)) {
+            return
+        }
+        let { jobMasterIdToJobAtrributesMap, jobMasterIdToFieldAtrributesMap } = await this.getJobMasterIdToAttributesMap()
+        let jobIdToJobDataMap = jobDataService.getJobData(transactionListMappedWithSms)
+        for (let transaction of transactionListMappedWithSms) {
+            if (serverSmsMap[transaction.jobStatusId]) {
+                let serverSmsLog = await this.setSmsBody(transaction.jobStatusId, null, transaction, jobMasterIdToJobAtrributesMap[transaction.jobMasterId], jobMasterIdToFieldAtrributesMap[transaction.jobMasterId], user, serverSmsMap[transaction.jobStatusId], jobIdToJobDataMap[transaction.jobId])
+                if (serverSmsLog.length > 0) {
+                    serverSmsLogs = serverSmsLogs.concat(serverSmsLog)
                 }
-            } else {
-                return
             }
         }
 
-        let serverSmsLogList
         if (serverSmsLogs && serverSmsLogs.length > 0) {
-            serverSmsLogList = this.saveServerSmsLog(serverSmsLogs)
+            let serverSmsLogList = this.saveServerSmsLog(serverSmsLogs)
             realm.performBatchSave(serverSmsLogList)
         }
     }

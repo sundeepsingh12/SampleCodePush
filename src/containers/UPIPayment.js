@@ -1,25 +1,15 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    Platform,
-    TextInput,
-    Modal,
-} from 'react-native'
-
+import { StyleSheet, View, Text, Modal } from 'react-native'
 import {
     SET_UPI_APPROVAL,
     SET_UPI_PAYMENT_CUSTOMER_CONTACT,
     SET_UPI_PAYMENT_CUSTOMER_NAME,
     SET_UPI_PAYMENT_PAYER_VPA,
 } from '../lib/constants'
-
-import { Container, Content, Footer, FooterTab, Input, Button, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox } from 'native-base';
+import { Container, Content, Footer, FooterTab, Input, Button } from 'native-base'
 import styles from '../themes/FeStyle'
-import PopOver from '../components/PopOver'
 import * as upiPaymentActions from '../modules/cardTypePaymentModules/upiPayment/upiPaymentActions'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
@@ -68,7 +58,7 @@ class UPIPayment extends PureComponent {
                             </Text>
                         </View>
                         <View style={[styles.row, styles.justifyCenter, styles.marginTop30]}>
-                            <Button onPress={() => console.log() } 
+                            <Button onPress={() => console.log()}
                                 full rounded style={StyleSheet.flatten(styles.margin10)}
                             >
                                 <Text style={[styles.fontWhite]}>Proceed</Text>
@@ -117,8 +107,6 @@ class UPIPayment extends PureComponent {
                                 )}
                                 style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
                             />
-                            {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
-                        <PopOver visible={this.checkValidation()} /> */}
                         </View>
                         <Text> Payer VPA </Text>
                         <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
@@ -132,8 +120,6 @@ class UPIPayment extends PureComponent {
                                 )}
                                 style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
                             />
-                            {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
-                        <PopOver visible={this.checkValidation()} /> */}
                         </View>
                     </View>
                 </Content>

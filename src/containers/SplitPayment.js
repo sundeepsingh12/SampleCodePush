@@ -1,18 +1,9 @@
 'use strict'
 
 import React, { Component } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    Platform,
-    TextInput,
-    TouchableOpacity,
-} from 'react-native'
-import {
-    Container, Content, Header, Footer, FooterTab, Input, Button, Item, Card,
-    CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox, StyleProvider
-} from 'native-base'
+import { StyleSheet, View, Text, Platform, TextInput, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
+import { Container, Content,Footer, FooterTab, Input, Button, Item,Icon, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -21,55 +12,16 @@ import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
-    CASH,
-    CHEQUE,
-    DEMAND_DRAFT,
-    DISCOUNT,
-    EZE_TAP,
-    MOSAMBEE,
-    MOSAMBEE_WALLET,
-    MPAY,
-    M_SWIPE,
-    NET_BANKING,
-    NET_BANKING_LINK,
-    NET_BANKING_CARD_LINK,
-    NET_BANKING_UPI_LINK,
-    NOT_PAID,
-    PAYNEAR,
-    PAYO,
-    PAYTM,
-    POS,
-    RAZOR_PAY,
-    SODEXO,
-    SPLIT,
-    TICKET_RESTAURANT,
-    UPI,
+     CHEQUE, DEMAND_DRAFT,
 } from '../lib/AttributeConstants'
-
-import {
-    SET_PAYMENT_CHANGED_PARAMETERS,
-    SET_SPLIT_PAYMENT,
-} from '../lib/constants'
-
-import {
-    AMOUNT_TO_BE_COLLECTED,
-    AMOUNT,
-    PAYMENT,
-    ADD_PAYMENT_MODE,
-    YES,
-    NO,
-    SPLIT_PAYMENT,
-    SELECT_PAYMENT_METHOD,
-    SELECT_PAYMENT_METHOD_TO_SPLIT,
-    NUMBER,
-} from '../lib/ContainerConstants'
+import { AMOUNT_TO_BE_COLLECTED, AMOUNT, PAYMENT, ADD_PAYMENT_MODE, NUMBER, SAVE } from '../lib/ContainerConstants'
+import TitleHeader from '../components/TitleHeader'
 
 function mapStateToProps(state) {
     return {
         splitPaymentModeMap: state.payment.splitPaymentModeMap
     }
 }
-
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -80,7 +32,7 @@ function mapDispatchToProps(dispatch) {
 class SplitPayment extends Component {
 
     static navigationOptions = ({ navigation }) => {
-        return { header: null }
+        return { header: <TitleHeader pageName={navigation.state.params.currentElement.label} goBack={navigation.goBack} /> }
     }
 
     componentDidMount() {
@@ -95,7 +47,7 @@ class SplitPayment extends Component {
                     <Text style={[styles.fontLg, styles.width100, styles.fontCenter, styles.marginBottom10, styles.paddingTop5]}>
                         {titleText} {PAYMENT}
                     </Text>
-                    <Text style={[styles.fontPrimary, styles.fontSm, styles.width100]}>
+                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontSm, styles.width100]}>
                         {AMOUNT}
                     </Text>
                     <Item>
@@ -114,7 +66,7 @@ class SplitPayment extends Component {
                 </View>
                 {paymentView ? <View style={[styles.marginTop5, styles.marginBottom15]}>
                     <Button bordered small onPress={() => { this.props.actions.changeChequeOrDDPaymentModeList(modeTypeId, this.props.splitPaymentModeMap) }}>
-                        <Text style={[styles.fontPrimary]}>{ADD_PAYMENT_MODE}</Text>
+                        <Text style={{ color: styles.fontPrimaryColor }}>{ADD_PAYMENT_MODE}</Text>
                     </Button>
                 </View> : null}
             </View>
@@ -126,7 +78,7 @@ class SplitPayment extends Component {
         return (
             <View key={`${id}${modeTypeId}`} style={[styles.row, styles.justifySpaceBetween, styles.marginTop10]}>
                 <View style={[styles.justifySpaceBetween, { width: '50%' }]}>
-                    <Text style={[styles.fontPrimary, styles.fontSm, styles.width100]}>
+                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontSm, styles.width100]}>
                         {titleText} {NUMBER}
                     </Text>
                     <Item>
@@ -142,7 +94,7 @@ class SplitPayment extends Component {
                     </Item>
                 </View>
                 <View style={[styles.justifySpaceBetween, { width: '35%' }]}>
-                    <Text style={[styles.fontPrimary, styles.fontSm, styles.width100]}>
+                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontSm, styles.width100]}>
                         {titleText} {AMOUNT}
                     </Text>
                     <Item>
@@ -184,25 +136,7 @@ class SplitPayment extends Component {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingTop5]}>
-                                <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack() }}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[styles.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Status</Text>
-                                </View>
-                                <View style={[styles.headerRight]}>
-                                </View>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
-
                     <Content style={{ backgroundColor: '#f4f4f4' }}>
-
                         <View style={[styles.bgWhite, styles.padding10, styles.marginBottom15]}>
                             <Text style={[styles.fontDarkGray, styles.fontSm, styles.width100]}>
                                 {AMOUNT_TO_BE_COLLECTED}
@@ -221,28 +155,31 @@ class SplitPayment extends Component {
                         </View>
                         {paymentModeListView}
                     </Content>
-                    <Footer style={[styles.padding10, style.footer]}>
-                        <FooterTab>
-                            <Button success
-                                disabled={this.props.isSaveButtonDisabled}
-                                style={{ borderRadius: 0 }}
-                                onPress={() => {
-                                    this.props.actions.saveMoneyCollectSplitObject(
-                                        this.props.navigation.state.params.actualAmount,
-                                        this.props.navigation.state.params.currentElement,
-                                        this.props.navigation.state.params.formLayoutState,
-                                        this.props.navigation.state.params.jobTransaction,
-                                        this.props.navigation.state.params.moneyCollectMaster,
-                                        this.props.navigation.state.params.originalAmount,
-                                        this.props.splitPaymentModeMap,
-                                        this.props.navigation.state.params.paymentContainerKey
-                                    )
-                                }}
-                            >
-                                <Text style={[styles.fontWhite]}>Save</Text>
-                            </Button>
-                        </FooterTab>
-                    </Footer>
+                    <SafeAreaView style={[styles.bgWhite]}>
+                        <Footer style={[styles.padding10, style.footer]}>
+                            <FooterTab>
+                                <Button success
+                                    disabled={this.props.isSaveButtonDisabled}
+                                    style={{ borderRadius: 0 }}
+                                    onPress={() => {
+                                        this.props.actions.saveMoneyCollectSplitObject(
+                                            this.props.navigation.state.params.actualAmount,
+                                            this.props.navigation.state.params.currentElement,
+                                            this.props.navigation.state.params.formLayoutState,
+                                            this.props.navigation.state.params.jobTransaction,
+                                            this.props.navigation.state.params.moneyCollectMaster,
+                                            this.props.navigation.state.params.originalAmount,
+                                            this.props.splitPaymentModeMap,
+                                            this.props.navigation.state.params.paymentContainerKey,
+                                            this.props.navigation
+                                        )
+                                    }}
+                                >
+                                    <Text style={[styles.fontWhite]}>{SAVE}</Text>
+                                </Button>
+                            </FooterTab>
+                        </Footer>
+                    </SafeAreaView>
                 </Container>
             </StyleProvider>
         )

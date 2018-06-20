@@ -1,31 +1,19 @@
 'use strict'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { Container, Button, Header, Body, Content, Icon, Card, CardItem, Toast, Footer, StyleProvider } from 'native-base';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { ARRAY_SAROJ_FAREYE } from '../lib/AttributeConstants'
-import { FormLayout } from '../lib/constants'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import CashTenderingView from '../components/CashTenderingView'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
 import { IS_RECEIVE_TOGGLE, CHANGE_AMOUNT, CHANGE_AMOUNT_RETURN } from '../lib/constants'
 import styles from '../themes/FeStyle'
-import {
-    MORE_MONEY_TO_PAY,
-    LESS_MONEY_TO_PAY,
-    AMOUNT_TO_COLLECT,
-    AMOUNT_TO_RETURN,
-    TOTAL_AMOUNT,
-    TOTAL_AMOUNT_RETURNING,
-    SAVE,
-    COLLECT_CASH,
-    RETURN_CASH,
-    OK
-} from '../lib/ContainerConstants'
+import { MORE_MONEY_TO_PAY, LESS_MONEY_TO_PAY, AMOUNT_TO_COLLECT, AMOUNT_TO_RETURN, TOTAL_AMOUNT, TOTAL_AMOUNT_RETURNING, SAVE, COLLECT_CASH, RETURN_CASH, OK } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -61,7 +49,7 @@ class CashTendering extends PureComponent {
     _onSavePressReturn() {
         let cashToReturn = this.props.totalAmount - this.props.navigation.state.params['cash']
         if (cashToReturn == this.props.totalAmountReturn) {
-            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params.formLayoutState, this.props.cashTenderingList, this.props.cashTenderingListReturn, this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
+            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params.formLayoutState, this.props.cashTenderingList, this.props.cashTenderingListReturn, this.props.navigation.state.params['jobTransaction'], this.props.isReceive, this.props.navigation.goBack)
             this.props.actions.setState(IS_RECEIVE_TOGGLE, true)
             this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
             this.props.actions.setState(CHANGE_AMOUNT_RETURN, { cashTenderingList: {}, totalAmount: 0 })
@@ -71,7 +59,7 @@ class CashTendering extends PureComponent {
 
     _onSavePress() {
         if (this.props.navigation.state.params['cash'] > 0 && this.props.navigation.state.params['cash'] == this.props.totalAmount) {
-            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params.formLayoutState, this.props.cashTenderingList, null, this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
+            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params.formLayoutState, this.props.cashTenderingList, null, this.props.navigation.state.params['jobTransaction'], this.props.isReceive, this.props.navigation.goBack)
             this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
         } else if (this.props.navigation.state.params['cash'] > this.props.totalAmount) {
             Toast.show({ text: MORE_MONEY_TO_PAY, position: 'bottom', buttonText: OK, duration: 3000 })
@@ -84,7 +72,8 @@ class CashTendering extends PureComponent {
                     formElements: this.props.navigation.state.params.formLayoutState,
                     jobTransaction: this.props.navigation.state.params['jobTransaction'],
                     cash: this.props.navigation.state.params['cash']
-                }
+                },
+                this.props.navigation.navigate
             )
             this.props.actions.setState(IS_RECEIVE_TOGGLE, false)
         }
@@ -126,22 +115,24 @@ class CashTendering extends PureComponent {
 
     showHeaderView() {
         return (
-            <Header searchBar style={[styles.bgPrimary, style.header]}>
-                <Body>
-                    <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                        <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                        </TouchableOpacity>
-                        <View style={[style.headerBody]}>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.isReceive) ? 'Collect Cash' : 'Return Cash'}</Text>
+            <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }]}>
+                <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+                    <Body>
+                        <View
+                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                            </TouchableOpacity>
+                            <View style={[style.headerBody]}>
+                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.isReceive) ? 'Collect Cash' : 'Return Cash'}</Text>
+                            </View>
+                            <View style={[style.headerRight]}>
+                            </View>
+                            <View />
                         </View>
-                        <View style={[style.headerRight]}>
-                        </View>
-                        <View />
-                    </View>
-                </Body>
-            </Header>
+                    </Body>
+                </Header>
+            </SafeAreaView>
         )
     }
 
@@ -168,16 +159,16 @@ class CashTendering extends PureComponent {
             <StyleProvider style={getTheme(platform)}>
                 <Container style={[styles.bgLightGray]}>
                     {this.showHeaderView()}
-
                     {this._checkIfCashCollectOrReturn()}
                     {this.showFlatList()}
-
-                    <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
-                        {totalAmountInCashTendering}
-                        <Button success full onPress={() => (this.props.isReceive) ? this._onSavePress() : this._onSavePressReturn()}>
-                            <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
-                        </Button>
-                    </Footer>
+                    <SafeAreaView style={[styles.bgWhite]}>
+                        <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
+                            {totalAmountInCashTendering}
+                            <Button success full onPress={() => (this.props.isReceive) ? this._onSavePress() : this._onSavePressReturn()}>
+                                <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
+                            </Button>
+                        </Footer>
+                    </SafeAreaView>
                 </Container>
             </StyleProvider>
         )

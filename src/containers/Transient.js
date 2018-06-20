@@ -6,28 +6,11 @@ import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
-import { View, TouchableOpacity, FlatList, StyleSheet } from 'react-native'
-import {
-    SET_FORM_LAYOUT_STATE,
-    FormLayout,
-    SET_TRANSIENT_BACK_PRESSED
-} from '../lib/constants'
-
-import {
-    Select_Next_Status
-} from '../lib/AttributeConstants'
-import {
-    Container,
-    Header,
-    Text,
-    Body,
-    Icon,
-    Content,
-    List,
-    ListItem,
-    Right,
-} from 'native-base'
-import _ from 'lodash'
+import { View, FlatList, StyleSheet } from 'react-native'
+import { SET_FORM_LAYOUT_STATE, FormLayout, SET_TRANSIENT_BACK_PRESSED } from '../lib/constants'
+import { Select_Next_Status } from '../lib/AttributeConstants'
+import { Container, Text,Icon, Content, List, ListItem, Right, } from 'native-base'
+import TitleHeader from '../components/TitleHeader'
 
 function mapStateToProps(state) {
     return {
@@ -46,17 +29,18 @@ function mapDispatchToProps(dispatch) {
 class Transient extends PureComponent {
 
     static navigationOptions = ({ navigation }) => {
-        return { header: null }
+        return {
+            header: <TitleHeader pageName={navigation.state.params.currentStatus.name} goBack={navigation.state.params.backForTransient} />
+        }
     }
 
     componentDidMount() {
+        this.props.navigation.setParams({ backForTransient: this._goBack });
         this.props.actions.setStateFromNavigationParams(
-            this.props.navigation.state.params.formLayoutState,
+            this.props.navigation.state.params,
             this.props.formLayoutStates,
-            this.props.navigation.state.params.currentStatus,
-            this.props.navigation.state.params.contactData,
-            this.props.navigation.state.params.jobTransaction,
-            this.props.navigation.state.params.jobMasterId)
+            this.props.navigation.push
+        )
     }
 
     navigateToFormLayout(statusId, statusName) {
@@ -68,7 +52,11 @@ class Transient extends PureComponent {
             statusName,
             jobMasterId: this.props.navigation.state.params.jobMasterId,
             navigationFormLayoutStates: this.props.formLayoutStates,
-        })
+            jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
+            pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
+        },
+            this.props.navigation.push
+        )
     }
 
     componentDidUpdate() {
@@ -79,11 +67,11 @@ class Transient extends PureComponent {
     }
 
     _goBack = () => {
-        this.props.navigation.goBack()
         this.props.actions.setState(SET_FORM_LAYOUT_STATE, {
             editableFormLayoutState: this.props.formLayoutStates[this.props.navigation.state.params.currentStatus.id],
             statusName: this.props.navigation.state.params.currentStatus.name
         })
+        this.props.navigation.goBack()
     }
 
     renderData = (item) => {
@@ -111,27 +99,9 @@ class Transient extends PureComponent {
         }
         return (
             <Container>
-                <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-                    <Body>
-                        <View
-                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                            <TouchableOpacity style={[style.headerLeft]} onPress={this._goBack}>
-                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                            </TouchableOpacity>
-                            <View style={[style.headerBody]}>
-                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>
-                                    {this.props.navigation.state.params.currentStatus.name}
-                                </Text>
-                            </View>
-                            <View style={[style.headerRight]}>
-                            </View>
-                        </View>
-                    </Body>
-                </Header>
-
                 <Content style={[styles.bgWhite]}>
                     <View style={[styles.flexBasis25]}>
-                        <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>{Select_Next_Status}</Text>
+                        <Text style={[styles.fontSm, { color: styles.fontPrimaryColor }, styles.padding15]}>{Select_Next_Status}</Text>
                         <List style={[styles.flex1]}>
                             <FlatList
                                 data={this.props.navigation.state.params.currentStatus.nextStatusList}
@@ -141,7 +111,7 @@ class Transient extends PureComponent {
                             </FlatList>
                         </List>
                     </View>
-                </Content>        
+                </Content>
             </Container>
         )
     }

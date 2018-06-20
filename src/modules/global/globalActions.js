@@ -6,20 +6,9 @@
 'use strict'
 
 import {
-  SET_SESSION_TOKEN,
-  SET_STORE,
-  ON_GLOBAL_USERNAME_CHANGE,
-  ON_GLOBAL_PASSWORD_CHANGE,
-  SET_CREDENTIALS,
-  LOGOUT_START,
-  LOGOUT_SUCCESS,
-  LOGOUT_FAILURE,
   USER_SUMMARY,
   JOB_SUMMARY,
-  IS_SHOW_MOBILE_NUMBER_SCREEN,
-  IS_SHOW_OTP_SCREEN,
   IS_PRELOADER_COMPLETE,
-  USER,
   RESET_STATE,
   SAVE_ACTIVATED,
   LIVE_JOB,
@@ -27,34 +16,30 @@ import {
   PENDING_SYNC_TRANSACTION_IDS,
   BACKUP_ALREADY_EXIST,
   USER_EXCEPTION_LOGS,
-  SYNC_RUNNING_AND_TRANSACTION_SAVING
+  SYNC_RUNNING_AND_TRANSACTION_SAVING,
+  LoginScreen,
+  IS_SHOW_MOBILE_OTP_SCREEN
 } from '../../lib/constants'
-
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-
 import CONFIG from '../../lib/config'
-
-import { onResyncPress } from '../home/homeActions'
-
 import BackgroundTimer from 'react-native-background-timer'
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions, StackActions } from 'react-navigation'
 import { trackingService } from '../../services/classes/Tracking'
 import { Toast } from 'native-base'
 import { userExceptionLogsService } from '../../services/classes/UserException'
 import { OK } from '../../lib/ContainerConstants'
+import { logoutService } from '../../services/classes/Logout'
+import RNFS from 'react-native-fs'
+import { PATH_CUSTOMER_IMAGES } from '../../lib/AttributeConstants'
 
 export function setState(type, payload) {
-  return {
-    type,
-    payload
-  }
+  return { type, payload }
 }
 
-
 //Use to navigate to other scene
-export function navigateToScene(routeName, params) {
+export function navigateToScene(routeName, params, navigate) {
   return async function (dispatch) {
-    dispatch(NavigationActions.navigate({ routeName, params }))
+    navigate(routeName, params)
   }
 }
 
@@ -62,10 +47,13 @@ export function navigateToScene(routeName, params) {
 export function deleteSessionToken() {
   return async function (dispatch) {
     try {
+      let isFileExists = await RNFS.exists(PATH_CUSTOMER_IMAGES);
+      if (isFileExists) {
+        await RNFS.unlink(PATH_CUSTOMER_IMAGES).then(() => { }).catch((error) => { })
+      }
       await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
-      await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
-      await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
+      await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_OTP_SCREEN)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await keyValueDBService.deleteValueFromStore(SAVE_ACTIVATED)
       await keyValueDBService.deleteValueFromStore(LIVE_JOB)
@@ -80,7 +68,6 @@ export function deleteSessionToken() {
       CONFIG.intervalId = 0
       dispatch(setState(RESET_STATE))
     } catch (error) {
-      throw error
     }
   }
 }
@@ -93,18 +80,33 @@ export function deleteSessionToken() {
  * @param {Integer} isToastShow integer whether to show toast or not.
  */
 export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
-      if (isToastShow == 1) {
-        Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
-      }
-      userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
+  if (isToastShow == 1) {
+    Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
+  }
+  userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
 }
 //Use to reset navigation state
 export function resetNavigationState(index, actions) {
   return async function (dispatch) {
-    dispatch(NavigationActions.reset({
-      index: 0,
+    dispatch(StackActions.reset({
+      index,
       actions
     }))
+  }
+}
+
+
+export function resetApp() {
+  return async function (dispatch) {
+    try {
+      await logoutService.deleteDataBase()
+      const allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
+      await keyValueDBService.deleteValueFromStore(allSchemaInstance)
+      dispatch(NavigationActions.reset({ index: 0, actions: [NavigationActions.navigate({ routeName: LoginScreen })] }))
+      dispatch(setState(RESET_STATE))
+      // dispatch(setState(DOWNLOAD_LATEST_APP, {displayMessage:null}))
+    } catch (error) {
+    }
   }
 }
 

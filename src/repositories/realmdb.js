@@ -17,9 +17,10 @@ import Draft from './schema/Draft'
 import DeviceInfo from 'react-native-device-info'
 import AesCtr from '../services/classes/AesCtr'
 import userExceptionLogs from './schema/userExceptionLogsDB'
+import messageInteracion from './schema/MessageInteractionSchema'
 
-const schemaVersion = 45;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs];
+const schemaVersion = 48;
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs, messageInteracion];
 
 let realm = new Realm({
     schemaVersion,
@@ -42,6 +43,7 @@ import {
     TABLE_DRAFT,
     DEVICE_IMEI,
     USER_EXCEPTION_LOGS,
+    TABLE_MESSAGE_INTERACTION
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -67,12 +69,12 @@ export function saveList(tableName, array) {
 export function performBatchSave(...tableNamesVsDataList) {
     return realm.write(() => {
         let imeiNumber = DeviceInfo.getUniqueID()
+        // Create counter block from imei number used for encryption
+        let counterBlock = Array.from(imeiNumber).slice(0, 8)
         tableNamesVsDataList.forEach(record => {
             try {
                 if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
                     if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
-                        // Create counter block from imei number used for encryption
-                        let counterBlock = Array.from(imeiNumber).slice(0, 8)
                         for (let data in record.value) {
                             record.value[data].value = _encryptData(record.value[data].value, imeiNumber, counterBlock)
                             realm.create(record.tableName, record.value[data], true)
@@ -82,7 +84,6 @@ export function performBatchSave(...tableNamesVsDataList) {
                     }
                 }
             } catch (error) {
-                console.log(error)
             }
         })
     })
@@ -116,6 +117,7 @@ export function deleteRecords() {
         realm.delete(realm.objects(TABLE_TRANSACTION_LOGS))
         realm.delete(realm.objects(TABLE_DRAFT))
         realm.delete(realm.objects(USER_EXCEPTION_LOGS))
+        realm.delete(realm.objects(TABLE_MESSAGE_INTERACTION))
     });
 }
 
@@ -202,4 +204,11 @@ export function deleteSingleRecord(tableName, value, property) {
 export function getMaxValueOfProperty(tableName, query, property) {
     let filteredRecords = realm.objects(tableName).filtered(query).max(property)
     return filteredRecords
+}
+
+export function deleteRecordList(tableName, valueList, property) {
+    let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => property + ' = "' + value + '"').join(' OR '));
+    realm.write(() => {
+        realm.delete(filteredRecords)
+    });
 }

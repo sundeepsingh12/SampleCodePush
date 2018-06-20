@@ -12,6 +12,7 @@ import { keyValueDBService } from '../classes/KeyValueDBService'
 import { dataStoreFilterService } from '../classes/DataStoreFilterService'
 import { EXTERNAL_DATA_STORE, DATA_STORE } from '../../lib/AttributeConstants'
 import { SEARCH_TEXT_MISSING, DATA_STORE_MAP_MISSING, CURRENT_ELEMENT_MISSING } from '../../lib/ContainerConstants'
+import { fieldValidationService } from '../classes/FieldValidation';
 
 describe('test checkIfUniqueConditionExists', () => {
     it('should return false', () => {
@@ -325,7 +326,7 @@ describe('test fetchJsonForExternalDS', () => {
 })
 
 describe('test checkForUniqueValidation', () => {
-
+    realm._encryptData = jest.fn()
     it('should throw fieldAttributeValue missing error', () => {
         const message = 'fieldAttributeValue missing in currentElement'
         try {
@@ -347,6 +348,7 @@ describe('test checkForUniqueValidation', () => {
         }]);
         dataStoreService.checkIfUniqueConditionExists = jest.fn()
         dataStoreService.checkIfUniqueConditionExists.mockReturnValue(true)
+        realm._encryptData.mockReturnValue('abhi')
         expect(dataStoreService.checkForUniqueValidation('abhi', { fieldAttributeMasterId: 123 })).toEqual(true)
     })
 
@@ -360,6 +362,7 @@ describe('test checkForUniqueValidation', () => {
             positionId: 0,
             value: 'abhi'
         }]);
+        realm._encryptData.mockReturnValue('abhi')
         dataStoreService.checkIfUniqueConditionExists = jest.fn()
         dataStoreService.checkIfUniqueConditionExists.mockReturnValue(false)
         expect(dataStoreService.checkForUniqueValidation('xyz', { fieldAttributeMasterId: 12345 })).toEqual(false)
@@ -1090,7 +1093,7 @@ describe('test checkForFiltersAndValidations', () => {
     })
     it('should throw current element missing error', () => {
         try {
-            dataStoreService.checkForFiltersAndValidations(null)
+            dataStoreService.checkForFilters(null)
         } catch (error) {
             expect(error.message).toEqual(CURRENT_ELEMENT_MISSING)
         }
@@ -1098,21 +1101,13 @@ describe('test checkForFiltersAndValidations', () => {
 
     it('should return isFiltersPresent to false and check for validations and validations are also not present', () => {
         const currentElement = { id: 1 }
-        let validation = {
-            isScannerEnabled: false,
-            isAutoStartScannerEnabled: false,
-            isMinMaxValidation: false,
-            isSearchEnabled: false,
-            isAllowFromFieldInExternalDS: false
-        }
-        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+        return dataStoreService.checkForFilters(currentElement, {}, null, {})
             .then((result) => {
                 expect(result).toEqual(
                     {
                         dataStoreAttrValueMap: {},
                         dataStoreFilterReverseMap: {},
                         isFiltersPresent: false,
-                        validation
                     }
                 )
             })
@@ -1120,21 +1115,13 @@ describe('test checkForFiltersAndValidations', () => {
 
     it('should return isFiltersPresent to false, check for validations and validations are also not present and dataStoreFilterMapping is []', () => {
         const currentElement = { id: 1, dataStoreFilterMapping: '[]' }
-        let validation = {
-            isScannerEnabled: false,
-            isAutoStartScannerEnabled: false,
-            isMinMaxValidation: false,
-            isSearchEnabled: false,
-            isAllowFromFieldInExternalDS: false
-        }
-        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+        return dataStoreService.checkForFilters(currentElement, {}, null, {})
             .then((result) => {
                 expect(result).toEqual(
                     {
                         dataStoreAttrValueMap: {},
                         dataStoreFilterReverseMap: {},
                         isFiltersPresent: false,
-                        validation
                     }
                 )
             })
@@ -1142,21 +1129,13 @@ describe('test checkForFiltersAndValidations', () => {
 
     it('should return isFiltersPresent to false, check for validations and validations are also not present and attribute type id is 63', () => {
         const currentElement = { id: 1, dataStoreFilterMapping: '[J[123]]', attributeTypeId: EXTERNAL_DATA_STORE }
-        let validation = {
-            isScannerEnabled: false,
-            isAutoStartScannerEnabled: false,
-            isMinMaxValidation: false,
-            isSearchEnabled: false,
-            isAllowFromFieldInExternalDS: false
-        }
-        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+        return dataStoreService.checkForFilters(currentElement, {}, null, {})
             .then((result) => {
                 expect(result).toEqual(
                     {
                         dataStoreAttrValueMap: {},
                         dataStoreFilterReverseMap: {},
                         isFiltersPresent: false,
-                        validation
                     }
                 )
             })
@@ -1164,27 +1143,14 @@ describe('test checkForFiltersAndValidations', () => {
 
     it('should return isFiltersPresent to false, check for validations and validations are present and attribute type id is 63', () => {
         const currentElement = { id: 1, dataStoreFilterMapping: '[J[123]]', attributeTypeId: EXTERNAL_DATA_STORE, validation: [{ timeOfExecution: REMARKS }] }
-        let validation = {
-            isScannerEnabled: true,
-            isAutoStartScannerEnabled: false,
-            isMinMaxValidation: false,
-            isSearchEnabled: false
-        }
-        dataStoreService.getValidations.mockReturnValue({
-            isScannerEnabled: true,
-            isAutoStartScannerEnabled: false,
-            isMinMaxValidation: false,
-            isSearchEnabled: false
-        })
-        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+        return dataStoreService.checkForFilters(currentElement, {}, null, {})
             .then((result) => {
-                expect(dataStoreService.getValidations).toHaveBeenCalledTimes(1)
                 expect(result).toEqual(
                     {
                         dataStoreAttrValueMap: {},
                         dataStoreFilterReverseMap: {},
                         isFiltersPresent: false,
-                        validation
+
                     }
                 )
             })
@@ -1192,20 +1158,13 @@ describe('test checkForFiltersAndValidations', () => {
 
     it('should return isFiltersPresent to true and dataStoreAttrValueMap', () => {
         const currentElement = { id: 1, dataStoreFilterMapping: '[J[123]]', attributeTypeId: DATA_STORE, validation: [{ timeOfExecution: REMARKS }] }
-        let validation = {
-            isScannerEnabled: false,
-            isAutoStartScannerEnabled: false,
-            isMinMaxValidation: false,
-            isSearchEnabled: false,
-            isAllowFromFieldInExternalDS: false
-        }
         keyValueDBService.getValueFromStore.mockReturnValue({})
         dataStoreFilterService.fetchDataForFilter.mockReturnValue({
             dataStoreFilterResponse: {},
             dataStoreFilterReverseMap: {}
         })
         dataStoreService.createDataStoreAttrValueMapInCaseOfFilter.mockReturnValue({})
-        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+        return dataStoreService.checkForFilters(currentElement, {}, null, {})
             .then((result) => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
                 expect(dataStoreService.createDataStoreAttrValueMapInCaseOfFilter).toHaveBeenCalledTimes(1)
@@ -1215,23 +1174,91 @@ describe('test checkForFiltersAndValidations', () => {
                         dataStoreAttrValueMap: {},
                         dataStoreFilterReverseMap: {},
                         isFiltersPresent: true,
-                        validation
                     }
                 )
             })
     })
 })
 
+describe('test runDataStoreBeforeValidations', () => {
+    beforeEach(() => {
+        fieldValidationService.fieldValidations = jest.fn()
+        dataStoreService.checkForFilters = jest.fn()
+        dataStoreService.getValidations = jest.fn()
+    })
 
+    let functionParamsFromDS = {
+        currentElement: { fieldAttributeMasterId: 1 },
+        formLayoutState: {
+            formElement: {
+                1: {
+                    value: '123',
+                    fieldAttributeMasterId: 1,
+                    editable: true
+                }
+            }
+        },
+        jobTransaction: {},
+        arrayReverseDataStoreFilterMap: {
+            123: {}
+        },
+        arrayFieldAttributeMasterId: 123,
+        rowId: 1
+    }
+
+    let cloneFormElement = new Map()
+    cloneFormElement.set(1, {
+        value: '123',
+        fieldAttributeMasterId: 1,
+        editable: true
+    }
+    )
+
+    it('should return search text and validations', () => {
+        dataStoreService.checkForFilters.mockReturnValue({
+            dataStoreFilterReverseMap: {},
+            dataStoreAttrValueMap: {},
+            isFiltersPresent: true,
+        })
+        dataStoreService.getValidations.mockReturnValue({
+            isScannerEnabled: false,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
+        })
+        return dataStoreService.runDataStoreBeforeValidations(functionParamsFromDS.currentElement, functionParamsFromDS.formLayoutState, functionParamsFromDS.jobTransaction, cloneFormElement, {})
+            .then((result) => {
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        isFiltersPresent: true,
+                        validationObject: {
+                            isScannerEnabled: false,
+                            isAutoStartScannerEnabled: false,
+                            isMinMaxValidation: false,
+                            isSearchEnabled: false,
+                            isAllowFromFieldInExternalDS: false
+                        },
+                        searchText: '',
+                        isDataStoreEditable: true,
+                        dataStoreFilterReverseMap: {}
+                    }
+                )
+            })
+    })
+})
 describe('test checkForFiltersAndValidationsForArray', () => {
     beforeEach(() => {
-        dataStoreService.checkForFiltersAndValidations = jest.fn()
+        dataStoreService.runDataStoreBeforeValidations = jest.fn()
     })
 
     let functionParamsFromDS = {
         currentElement: {},
-        formElement: {
-            1: {}
+        formLayoutState: {
+            formElement: {
+                1: {}
+            }
         },
         jobTransaction: {},
         arrayReverseDataStoreFilterMap: {
@@ -1242,11 +1269,13 @@ describe('test checkForFiltersAndValidationsForArray', () => {
     }
 
     it('should return isFiltersPresent to true and check for validations', () => {
-        dataStoreService.checkForFiltersAndValidations.mockReturnValue({
+        dataStoreService.runDataStoreBeforeValidations.mockReturnValue({
             dataStoreFilterReverseMap: {},
             dataStoreAttrValueMap: {},
             isFiltersPresent: true,
-            validation: {}
+            validationObject: {},
+            searchText: '',
+            isDataStoreEditable: true
         })
         return dataStoreService.checkForFiltersAndValidationsForArray(functionParamsFromDS)
             .then((result) => {
@@ -1255,12 +1284,16 @@ describe('test checkForFiltersAndValidationsForArray', () => {
                         dataStoreAttrValueMap: {},
                         arrayReverseDataStoreFilterMap: { 123: {} },
                         isFiltersPresent: true,
-                        validation: {}
+                        validationObject: {},
+                        searchText: '',
+                        isDataStoreEditable: true
                     }
                 )
             })
     })
 })
+
+
 
 function getMapFromObject(obj) {
     let strMap = new Map();

@@ -15,6 +15,19 @@ module.exports = keyMirror({
     //autoLogout Actions
     SET_LOADER_IN_AUTOLOGOUT: null,
 
+    //mosambeeWalletPaymentActions
+    SET_MOSAMBEE_WALLET_PARAMETERS: null,
+    SET_ERROR_MESSAGE_FOR_WALLET: null,
+    SET_MODAL_VIEW: null,
+    SET_OTP_MODAL_VIEW: null,
+    CHANGE_WALLET_MOBILE_NO: null,
+    SET_OTP_FOR_WALLET: null,
+    CHANGE_OTP_NUMBER: null,
+    SET_LOADER_FOR_WALLET: null,
+    RESET_STATE_FOR_WALLET: null,
+    SET_ERROR_FOR_OTP: null,
+    MOSAMBEE_RESET_STATE: null,
+
     //Auth Actions
     LOGOUT: null,
     LOGIN_START: null,
@@ -39,11 +52,9 @@ module.exports = keyMirror({
     CHECK_ASSET_FAILURE: null,
 
     OTP_GENERATION_START: null,
-    OTP_GENERATION_SUCCESS: null,
     OTP_GENERATION_FAILURE: null,
 
     OTP_VALIDATION_START: null,
-    OTP_VALIDATION_SUCCESS: null,
     OTP_VALIDATION_FAILURE: null,
 
     DELETE_TOKEN_REQUEST: null,
@@ -61,14 +72,20 @@ module.exports = keyMirror({
     ON_MOBILE_NO_CHANGE: null,
     ON_OTP_CHANGE: null,
     ERROR_400_403_LOGOUT: null,
-    ERROR_400_403_LOGOUT_FAILURE: null,
+    SHOW_OTP_MOBILE_LOADER: null,
+    IS_SHOW_MOBILE_OTP_SCREEN: null,
+    IS_LOGGING_OUT: null,
+    CHECK_TRANSACTION_STATUS_NEW_JOB: null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,
-    PRE_LOGOUT_FAILURE: null,
     TOGGLE_CHECKBOX: null,
     REMEMBER_ME_SET_TRUE: null,
     OTP_SUCCESS: null,
+    DOWNLOAD_LATEST_APP: null,
+    SET_APP_UPDATE_BY_CODEPUSH: null,
+    SET_APP_UPDATE_STATUS: null,
+    SET_IOS_UPGRADE_SCREEN: null,
 
     //Home Actions
     HOME_LOADING: null,
@@ -81,7 +98,6 @@ module.exports = keyMirror({
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
     SET_MODULES: null,
-    TOGGLE_LOGOUT: null,
     SEARCH_TAP: null,
     SET_UNSYNC_TRANSACTION_PRESENT: null,
     SET_BACKUP_UPLOAD_VIEW: null,
@@ -93,6 +109,11 @@ module.exports = keyMirror({
     ERP_SYNC_STATUS: null,
     SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE: null,
     SET_NEWJOB_DRAFT_INFO: null,
+    SET_CHECK_TRANSACTION_AND_DRAFT: null,
+    SET_LANDING_TAB: null,
+    TABS_LOADING: null,
+    SET_SELECTED_DATE: null,
+    LOADER_FOR_SYNCING: null,
 
     //Pages
     PAGES_LOADING: null,
@@ -112,6 +133,7 @@ module.exports = keyMirror({
     //Listing Actions
     JOB_LISTING_START: null,
     JOB_LISTING_END: null,
+    TASKLIST_LOADER_FOR_SYNC: null,
 
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
@@ -120,6 +142,10 @@ module.exports = keyMirror({
     RESET_STATE_FOR_JOBDETAIL: null,
     SHOW_DROPDOWN: null,
     SET_JOBDETAILS_DRAFT_INFO: null,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL: null,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT: null,
+    SET_CHECK_TRANSACTION_STATUS: null,
+    RESET_CHECK_TRANSACTION_AND_DRAFT: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
@@ -155,10 +181,6 @@ module.exports = keyMirror({
     PASSWORD: null,
     REMEMBER_ME: null,
     DOMAIN_URL: null,
-
-    //Preloader Credentials
-    IS_SHOW_OTP_SCREEN: null,
-    IS_SHOW_MOBILE_NUMBER_SCREEN: null,
 
     //Schema (Store keys)
 
@@ -210,6 +232,8 @@ module.exports = keyMirror({
     LAT_LONG_GEO_FENCE: null,
     SYNC_RUNNING_AND_TRANSACTION_SAVING: null,
     MDM_POLICIES: null,
+    FCM_TOKEN: null,
+    APP_THEME: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -225,6 +249,7 @@ module.exports = keyMirror({
     TABLE_TRANSACTION_LOGS: null,
     TABLE_DRAFT: null,
     SEND_EMAIL_OR_SMS: null,
+    TABLE_MESSAGE_INTERACTION: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -237,13 +262,11 @@ module.exports = keyMirror({
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
-    DISABLE_SAVE: null,
     UPDATE_FIELD_DATA: null,
     STATUS_NAME: null,
     BASIC_INFO: null,
     SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT: null,
     ON_BLUR: null,
-    TOOGLE_HELP_TEXT: null,
     IS_LOADING: null,
     PENDING_SYNC_TRANSACTION_IDS: null,
     RESET_STATE: null,
@@ -254,8 +277,8 @@ module.exports = keyMirror({
     CLEAR_FORM_LAYOUT: null,
     SET_UPDATE_DRAFT: null,
     SET_ARRAY_DATA_STORE_FILTER_MAP: null,
+    CLEAR_FORM_LAYOUT_WITH_LOADER: null,
 
-    UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
     SET_FORM_TO_INVALID: null,
@@ -401,6 +424,8 @@ module.exports = keyMirror({
     SHOW_DISCARD_ALERT: null,
     RETURN_TO_HOME: null,
     SET_SAVE_ACTIVATED_DRAFT: null,
+    CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED: null,
+    SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED: null,
 
     //Bulk Module
     START_FETCHING_BULK_TRANSACTIONS: null,
@@ -450,9 +475,6 @@ module.exports = keyMirror({
     ON_CHANGE_STATE: null,
     SCANNER_TEXT: null,
 
-    //Job Master
-    SET_JOB_MASTER_LIST: null,
-
     //Post Assignment
     SET_POST_ASSIGNMENT_TRANSACTION_LIST: null,
     SET_POST_ASSIGNMENT_ERROR: null,
@@ -479,13 +501,13 @@ module.exports = keyMirror({
     JOB_ASSIGNMENT: null,
 
     //Camera Actions
-    SET_SHOW_IMAGE: null,
-    SET_IMAGE_DATA: null,
     VIEW_IMAGE_DATA: null,
-    SET_SHOW_VIEW_IMAGE: null,
     UPDATE_SKU_LIST_ITEMS: null,
     SET_SHOW_IMAGE_AND_DATA: null,
     SET_VALIDATION_FOR_CAMERA: null,
+    SET_CAMERA_LOADER: null,
+    SET_CAMERA_LOADER_INITIAL_SET_UP: null,
+    SET_SHOW_IMAGE_AND_VALIDATION: null,
 
     //Offline Actions
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,
@@ -524,6 +546,14 @@ module.exports = keyMirror({
 
     //userExceptionLogs
     USER_EXCEPTION_LOGS: null,
+
+    //ApplicationVersion
+    APP_VERSION: null,
+
+    //Message Actions
+    SET_MESSAGE_LIST: null,
+    SET_MESSAGE_LOADER: null,
+
 })
 
 

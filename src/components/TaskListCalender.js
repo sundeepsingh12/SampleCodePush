@@ -1,71 +1,76 @@
 
 'use strict'
-
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
 import styles from '../themes/FeStyle'
-import {
-    Button,
-    Text,
-    Icon,
-    Footer,
-    FooterTab,
-    View
-} from 'native-base'
+import { SafeAreaView } from 'react-navigation'
+import { Button, Text, Icon, Footer, FooterTab, View } from 'native-base'
 import moment from 'moment'
 import DateTimePicker from 'react-native-modal-datetime-picker'
-import {
-    IS_CALENDAR_VISIBLE,
-} from '../lib/constants'
-import {
-    ALL,
-    TODAY
-} from '../lib/ContainerConstants'
-export default class TaskListCalender extends PureComponent {
+import { IS_CALENDAR_VISIBLE, SET_SELECTED_DATE } from '../lib/constants'
+import { ALL, TODAY } from '../lib/ContainerConstants'
+import * as taskListActions from '../modules/taskList/taskListActions'
+import * as globalActions from '../modules/global/globalActions'
 
-    _renderCalendarButtonText() {
-        if ((this.props.selectedDate == "All")) {
-            return <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>{ALL}</Text>
-        } else {
-            return <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>{moment(this.props.selectedDate).format('ddd, DD MMM, YYYY')}</Text>
-        }
+function mapStateToProps(state) {
+    return {
+        isCalendarVisible: state.taskList.isCalendarVisible,
+        selectedDate: state.taskList.selectedDate
+    }
+};
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({ ...taskListActions, ...globalActions, }, dispatch)
+    }
+}
+class TaskListCalender extends PureComponent {
+
+    setSelectedDate = (date) => {
+        this.props.actions.setState(SET_SELECTED_DATE, { selectedDate: date })
+    }
+
+    renderCalendarButtonText() {
+        return <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>{this.props.selectedDate ? this.props.selectedDate == ALL ? ALL : moment(this.props.selectedDate).format('ddd, DD MMM, YYYY') : moment().format('ddd, DD MMM, YYYY')}</Text>
     }
     render() {
-        if (!this.props.isFutureRunsheetEnabled) {
-            return null
-        }
         return (
-            <Footer style={[styles.bgWhite, { borderTopWidth: 1, borderTopColor: '#f3f3f3' }]}>
-
-                <FooterTab style={[styles.flexBasis25]}>
-                    <Button transparent
-                        onPress={this.props._transactionsForTodayDate}
-                        style={[styles.alignStart]}>
-                        <Text style={[styles.fontPrimary, styles.fontSm]}>{TODAY}</Text>
-                    </Button>
-                </FooterTab>
-                <FooterTab style={[styles.flexBasis50]}>
-                    <DateTimePicker
-                        isVisible={this.props.isCalendarVisible}
-                        onConfirm={this.props._onConfirm}
-                        onCancel={this.props._onCancel}
-                        mode='date'
-                        datePickerModeAndroid='spinner'
-                    />
-                    <Button transparent
-                        onPress={() => { this.props.setState(IS_CALENDAR_VISIBLE, true) }}
-                        style={[styles.row]}>
-                        <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>{this._renderCalendarButtonText()}</Text>
-                        <Icon name='ios-arrow-down' style={[styles.fontBlack, styles.fontSm]} />
-                    </Button>
-                </FooterTab>
-                <FooterTab style={[styles.flexBasis25]}>
-                    <Button transparent
-                        onPress={this.props._showAllJobTransactions}
-                        style={[styles.alignEnd]}>
-                        <Text style={[styles.fontPrimary, styles.fontSm]}>{ALL}</Text>
-                    </Button>
-                </FooterTab>
-            </Footer>
+            <SafeAreaView style={[styles.bgWhite]}>
+                <Footer style={[styles.bgWhite, { borderTopWidth: 1, borderTopColor: '#f3f3f3' }]}>
+                    <FooterTab style={[styles.flexBasis25]}>
+                        <Button transparent vertical
+                            onPress={() => this.props.actions.setState(SET_SELECTED_DATE, { selectedDate: moment().format('YYYY-MM-DD') })}
+                            style={[styles.alignStart]}>
+                            <Text style={[{ color: styles.fontPrimaryColor }, styles.fontSm]}>{TODAY}</Text>
+                        </Button>
+                    </FooterTab>
+                    <FooterTab style={[styles.flexBasis50]}>
+                        <DateTimePicker
+                            isVisible={this.props.isCalendarVisible}
+                            onConfirm={this.setSelectedDate}
+                            onCancel={() => this.props.actions.setState(IS_CALENDAR_VISIBLE, false)}
+                            mode='date'
+                            datePickerModeAndroid='spinner'
+                        />
+                        <Button transparent vertical
+                            onPress={() => { this.props.actions.setState(IS_CALENDAR_VISIBLE, true) }}
+                            style={[styles.row]}>
+                            <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>{this.renderCalendarButtonText()}</Text>
+                            <Icon name='ios-arrow-down' style={[styles.fontBlack, styles.fontSm]} />
+                        </Button>
+                    </FooterTab>
+                    <FooterTab style={[styles.flexBasis25]}>
+                        <Button transparent vertical
+                            onPress={() => this.props.actions.setState(SET_SELECTED_DATE, { selectedDate: ALL })}
+                            style={[styles.alignEnd]}>
+                            <Text style={[{ color: styles.fontPrimaryColor }, styles.fontSm]}>{ALL}</Text>
+                        </Button>
+                    </FooterTab>
+                </Footer>
+            </SafeAreaView>
         )
     }
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(TaskListCalender)

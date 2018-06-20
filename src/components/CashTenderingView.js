@@ -3,9 +3,9 @@
 import React, { PureComponent } from 'react'
 import { View, Text, TextInput, Input } from 'react-native'
 import { connect } from 'react-redux'
-import { Content, Card, CardItem, Toast } from 'native-base'
+import {  Toast } from 'native-base'
 import {
-    NUMBER, DECIMAL, STRING,
+    NUMBER,
 } from '../lib/AttributeConstants'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
 import { bindActionCreators } from 'redux'

@@ -6,7 +6,11 @@ describe('test cases for getJobMap', () => {
 
     it('should return empty job map', () => {
         const jobList = []
-        expect(jobService.getJobMap(jobList)).toEqual({})
+        const result = {
+            jobMap: {},
+            jobDataQuery: ''
+        }
+        expect(jobService.getJobMapAndJobDataQuery(jobList)).toEqual(result)
     })
 
     it('should return job map for job list', () => {
@@ -19,7 +23,8 @@ describe('test cases for getJobMap', () => {
                 jobStartTime: 1,
                 latitude: 1,
                 longitude: 1,
-                slot: 1
+                slot: 1,
+                referenceNo: 1
 
             },
             {
@@ -30,7 +35,9 @@ describe('test cases for getJobMap', () => {
                 jobStartTime: 1,
                 latitude: 1,
                 longitude: 1,
-                slot: 1
+                slot: 1,
+                referenceNo: 1
+
 
             },
             {
@@ -41,7 +48,8 @@ describe('test cases for getJobMap', () => {
                 jobStartTime: 1,
                 latitude: 1,
                 longitude: 1,
-                slot: 1
+                slot: 1,
+                referenceNo: 1
 
             },
         ]
@@ -55,7 +63,8 @@ describe('test cases for getJobMap', () => {
                 jobStartTime: 1,
                 latitude: 1,
                 longitude: 1,
-                slot: 1
+                slot: 1,
+                referenceNo: 1
 
             },
             2: {
@@ -66,7 +75,8 @@ describe('test cases for getJobMap', () => {
                 jobStartTime: 1,
                 latitude: 1,
                 longitude: 1,
-                slot: 1
+                slot: 1,
+                referenceNo: 1
 
             },
             3: {
@@ -77,12 +87,15 @@ describe('test cases for getJobMap', () => {
                 jobStartTime: 1,
                 latitude: 1,
                 longitude: 1,
-                slot: 1
-
+                slot: 1,
+                referenceNo: 1
             }
         }
-
-        expect(jobService.getJobMap(jobList)).toEqual(jobMap)
+        const result = {
+            jobMap,
+            jobDataQuery: 'jobId = 1 OR jobId = 2 OR jobId = 3'
+        }
+        expect(jobService.getJobMapAndJobDataQuery(jobList)).toEqual(result)
     })
 
 })

@@ -6,12 +6,9 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform,
-    SegmentedControlIOS,
     TouchableHighlight
 }
     from 'react-native'
-import { Icon} from 'native-base'
 import styles from '../themes/FeStyle'
 import LinearGradient from 'react-native-linear-gradient'
 import CircularProgress from '../svg_components/components/CircularProgress'
@@ -25,7 +22,7 @@ export default class PieChart extends PureComponent {
         return (
           <TouchableHighlight onPress={() => this.props.press()} underlayColor={"#ffffff90"}> 
             <LinearGradient 
-              colors={[styles.bgPrimary.backgroundColor, styles.shadeColor]}
+              colors={[styles.bgPrimaryColor, styles.shadeColor]}
               style={style.chartBlock}>
               <View style={[styles.justifyCenter, styles.paddingTop15, styles.paddingBottom15]}>
                 <CircularProgress percentage={percentage} style={[{backgroundColor: '#green'}]}>

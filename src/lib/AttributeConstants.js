@@ -2,6 +2,7 @@ import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
 module.exports = {
 
+    APP_VERSION_NUMBER: '0.3.0',
     /**
      * TODO : Change money collect details object keys to attribute type id
      */
@@ -233,6 +234,7 @@ module.exports = {
     SUM: 'sum',
     THEN: 'then',
     TIME_COMPARATOR: 'timeComparator',
+    SKUVALIDATION: 'SKUValidation',
 
     //REST API 
     SEARCH_VALUE: '?searchValue=',
@@ -241,8 +243,13 @@ module.exports = {
     GET: 'GET',
     EXTERNAL_DATA_STORE_URL: "&externalDataStoreUrl=",
     DATA_STORE_ATTR_KEY: "&dataStoreAttributeKey=",
-    PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
-    PATH: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/CustomerImages/',
+
+    //Location where zip contents are temporarily added and then removed
+    PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP',
+    PATH_CUSTOMER_IMAGES: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/CustomerImages/',
+    PATH: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER,
+    PATH_BACKUP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUP',
+    PATH_BACKUP_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUPTEMP',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
 
@@ -284,10 +291,11 @@ module.exports = {
     EZE_TAP_ID: 10,
     M_SWIPE_ID: 9,
     JOB_ASSIGNMENT_ID: 20,
+    MOSAMBEE_WALLET_ID: 19,
     PAGE_NEW_JOB: 2,
     Piechart: {
         enabled: false,
-        params:[]
+        params: []
     },
     Start: {
         landingTab: false
@@ -386,4 +394,9 @@ module.exports = {
     //PAGE UTILITY Constants
     PAGE_SUMMARY_PIECHART: 1,
     PAGE_MESSAGING: 2,
+
+    //App Upgrade & Code Push Constants
+    LATEST_APK_PATH: '/fareye_latest1.apk',
+    MAJOR_VERSION_OUTDATED: '1',
+    MINOR_PATCH_OUTDATED: '2'
 }

@@ -11,11 +11,13 @@ module.exports = {
     DONE: 'DONE',
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
-    VERIFY: 'Verify',
+    PROCEED: 'Proceed',
     SELECT_ALL: 'Select All',
     INVALID_SCAN: 'Invalid Scan',
     NO_JOBS_PRESENT: 'No jobs present',
     TOTAL_COUNT: 'Total Count : ',
+    PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB: 'Please enable internet connection to update this job!!!',
+    UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET: 'unable to sync with server, Please check your internet connection',
 
     //Common Error Strings
     JOB_STATUS_MISSING: 'Job status missing in store',
@@ -27,7 +29,7 @@ module.exports = {
     NO_INTERNET: 'No Internet Connection',
     RE_SYNC: 'Re-Sync',
     RETRY: 'Retry',
-    SYNC_OK_TEXT: 'All data synced perfectly to the server.',
+    SYNC_OK_TEXT: 'All data synced to the server.',
     UNSYNCED_TASKS: 'Unsynced Tasks',
     UPLOADING: 'Uploading ...',
     AUTHENTICATING: 'Authenticating...',
@@ -52,6 +54,7 @@ module.exports = {
     CUSTOM_APP_DISPLAY: 'Web URL',
     SORTING_DISPLAY: 'Sort Parcels',
     UNTITLED: 'UNTITLED',
+    DELETE_DRAFT: 'Delete Draft',
 
     //Job Master
     JOB_MASTER_HEADER: 'Job Master List',
@@ -233,12 +236,14 @@ module.exports = {
     ORIGNAL_QUANTITY: 'ORIGINAL QUANTITY',
     PHOTO: 'PHOTO',
     ACTUAL_QUANTITY: 'ACTUAL QUANTITY',
+    ACTUAL_AMOUNT: 'ACTUAL AMOUNT',
     UNIT_PRICE: 'UNIT_PRICE',
     SKU_CODE_MAX_LIMIT_REACHED: 'Maximum value reached',
     SKU_CODE_MIN_LIMIT_REACHED: 'Minimum value reached',
     SKIP_SKU_MESSAGE: 'Skipping this attribute, not allowed in new job',
     RESULT_NOT_FOUND: 'No result found for your search',
     ACTUAL_QUANTITY_INPUT_ERROR: 'Please enter valid quantity',
+    SKU: 'SKU',
 
     //Array
     ADD: 'Add',
@@ -263,7 +268,6 @@ module.exports = {
     EDIT: 'Edit',
     JOB_EXPIRED: 'Job Expired!',
     DETAILS: "Details",
-    UPDATE_GROUP: 'Update Group',
 
     //JOb List
     SELECT_NUMBER: 'Select number for message',
@@ -349,14 +353,40 @@ module.exports = {
     REMEMBER_ME: 'Remember Me',
 
     //Preloader
-    SETTING_UP: 'Setting you up...',
+    SETTING_UP: 'Setting you up ...',
     DOWNLOAD_SETTINGS: 'Downloading settings',
     APPLYING_SETTINGS: 'Applying settings',
     VERIFY_HANDSET: 'Verifying handset',
     VERIFY_MOBILE: 'Verify your mobile',
-    OTP_CODE_SENT: 'OTP code has been sent to',
-    ENTER_MOBILE: 'Enter your mobile',
+    ENTER_OTP: 'Enter OTP',
+    OTP_CODE_SENT: 'We have sent a password via SMS on',
+    ENTER_MOBILE: 'Mobile Verification',
     SEND_OTP: 'Send OTP',
+    RESEND_OTP_NO: 'Resend',
+    DID_NOT_RECEIVE_OTP: 'Didn’t Receive the OTP?',
+    ONE_TIME_PASSOWRD_WILL_BE_SENT_TO_MOBILE_NO: 'A One Time Password will be sent to this mobile number',
+    SHOW_MOBILE_SCREEN: 'SHOW_MOBILE_SCREEN',
+    SHOW_OTP: 'SHOW_OTP_SCREEN',
+
+    //Mosambee Wallet
+    FAILED: 'Failed',
+    RESEND: 'reSend',
+    TRANSACTION_SUCCESSFUL: 'Transaction Successfull',
+    FINISH: 'Finish',
+    RETRY_PAYMENT: 'Retry Payment',
+    SUBMIT: 'Submit',
+    PAYMENT_SUCCESSFUL: 'Payment Successful',
+    PAYMENT_FAILED: 'Payment Failed',
+    MOSAMBEE_WALLET: 'Mosambee Wallet',
+    PAYMENT: 'Payment',
+    SELECT_PREFERRED_METHOD: 'Select Preferred method',
+    ENTER_OTP_SENT_TO_MOBILE_NO: 'Enter One Time Password (OTP) Sent to Mobile Number ',
+    CHANGE_MOBILE_NO: 'Change Mobile Number',
+    ENTER_OTP_SENT_TO_CUSTOMER: 'Enter OTP Sent to Customer',
+    RESEND_OTP: 'Resend OTP',
+    ENTER_OTP: 'Enter OTP',
+    ENTER_REGISTERED: 'Enter Registered ',
+    TOTAL_AMOUNT_FOR_WALLET: 'Total Amount',
 
     //TaskListCalender
     ALL: 'All',
@@ -364,6 +394,9 @@ module.exports = {
 
     //TaskListScreen
     NO_NEXT_STATUS: 'No NextStatus Available',
+
+    //TabScreen
+    NO_TAB_PRESENT: 'No Tab Present',
 
     //Draft Modal
     DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',
@@ -377,5 +410,43 @@ module.exports = {
 
     //Menu Container Constants
     APP: 'App',
-    LOGOUT: 'Logout'
+    LOGOUT: 'Logout',
+
+    //App Upgrade Constants
+    DOWNLOAD_LATEST_APP_VERSION: 'You must download latest version to proceed',
+    NEW_VERSION_AVAILABLE: 'New version available',
+    DOWNLOAD: 'DOWNLOAD',
+    DOWNLOADING_LATEST_VERSION: 'Downloading latest version. Please wait',
+    UPDATE_FAILED: 'Update Failed',
+    NO_INTERNET_CONNECTIVITY: 'Please check your internet and try again',
+    HANG_ON: 'Hang On!',
+    PLEASE_WAIT_FOR_IOS_LINK_URL: 'Please wait while we generate a link to download the latest application in browser',
+    //Pages Default Name
+    ALL_TASKS: 'All Tasks',
+
+    //Mobile Job List Customization Fixed Attributes
+    ATTEMPT: 'Attempt: ',
+    SLOT: 'Slot: ',
+    START: 'Start: ',
+    END: 'End: ',
+    DISTANCE: 'Distance: ',
+    HALT_DURATION: 'Halt Duration: ',
+    CALL_COUNT: 'Call Count: ',
+    CALL_DURATION: 'Call Duration: ',
+    SMS: 'Sms: ',
+    TIME_SPENT: 'Time Spent: ',
+    SEQUENCE: 'Sequence: ',
+
+    //CodePush Status
+    CODEPUSH_CHECKING_FOR_UPDATE: 'Checking for updates',
+    CODEPUSH_DOWNLOADING_PACKAGE: 'Downloading package',
+    CODEPUSH_INSTALLING_UPDATE: 'Installing update',
+    CODEPUSH_SOMETHING_WENT_WRONG: 'Something Went Wrong.Please try again.',
+    //FCM
+    FCM_REGISTRATION_ERROR: 'FCM Permission Denied',
+    APNS_TOKEN_ERROR: 'APNS Token Registration Error',
+    FCM_PERMISSION_DENIED: 'FCM Request Access Denied',
+
+    MANAGER_INTERACTION: 'MANAGERINTERACTION',
+    FIELDEXECUTIVE_INTERACTION: 'FIELDEXECUTIVEINTERACTION'
 }

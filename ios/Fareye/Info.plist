@@ -21,8 +21,10 @@
 	<key>CFBundleVersion</key>
 	<string>3</string>
 	<key>CodePushDeploymentKey</key>
-	<string>juO4AoW41ONJEiyrQ62Njga-RRlO4a75534d-31ba-4f8d-b228-2bb58f951a4d</string>
+	<string>VugFGvXuZ5ENRD8sqWNfuYmjUA_7rk9yPiP9f</string>
 	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>FirebaseAppDelegateProxyEnabled</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -35,18 +37,16 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Fareye needs access to your bluetooth</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Fareye needs access to your camera</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>CHANGEME: Location Always And When In Use Usage Description</string>
+	<string>Your location will be captured and used for live tracking,calculating total distance travelled and average speed</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>CHANGEME: Location Always Usage Description</string>
+	<string>Your location will be captured and used for live tracking,calculating total distance travelled and average speed</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>NSMotionUsageDescription</key>
-	<string>CHANGEME: Motion updates increase battery efficiency by intelligently toggling location-services when device is detected to be moving</string>
+	<string>Motion updates increase battery efficiency by intelligently toggling location-services when device is detected to be moving</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Fareye would like access to your photo gallery</string>
 	<key>UIAppFonts</key>

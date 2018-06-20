@@ -10,8 +10,7 @@ import {
 import { Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
-import renderIf from '../lib/renderIf'
-
+import MessagesListView from './MessagesListView'
 class ExpandableHeader extends PureComponent {
 
     constructor(props) {
@@ -30,16 +29,20 @@ class ExpandableHeader extends PureComponent {
                             {this.props.title}
                         </Text>
                         <View>
-                            <Icon name={this.state.showDropDown ? 'ios-arrow-up-outline' : 'ios-arrow-down-outline'} style={StyleSheet.flatten([styles.fontXl, styles.fontPrimary, styles.justifyEnd])} />
+                            <Icon name={this.state.showDropDown ? 'ios-arrow-up-outline' : 'ios-arrow-down-outline'} style={StyleSheet.flatten([styles.fontXl, { color: styles.fontPrimaryColor }, styles.justifyEnd])} />
                         </View>
                     </View>
                 </TouchableHighlight>
-                {renderIf(this.state.showDropDown,
+                {this.state.showDropDown ? this.props.showDetailsList ?
                     <ExpandableDetailsList
                         dataList={this.props.dataList}
                         navigateToDataStoreDetails={this.props.navigateToDataStoreDetails}
                         navigateToCameraDetails={this.props.navigateToCameraDetails} />
-                )}
+                    :
+                    <MessagesListView
+                        dataList={this.props.dataList}
+                    />
+                    : null}
             </View>
         )
     }

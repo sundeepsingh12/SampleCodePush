@@ -96,18 +96,18 @@ class ArrayBasicComponent extends PureComponent {
     }
 
     onSaveDateTime = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, 2, null, this.props.formLayoutState);
+        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, 2, null, this.props.formLayoutState,this.props.goBack);
     }
     onPressModal = (fieldAttributeMasterId) => {
-        this.props.actions.showOrDropModal(fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, fieldAttributeMasterId, this.props.isSaveDisabled)
+        this.props.actions.showOrDropModal(this.props.arrayElements, this.props.arrayRow.rowId, fieldAttributeMasterId, this.props.isSaveDisabled)
     }
 
     onCloseModal = (item) => {
-        this.props.actions.showOrDropModal(item.fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, null, this.props.isSaveDisabled)
+        this.props.actions.showOrDropModal(this.props.arrayElements, this.props.arrayRow.rowId, null, this.props.isSaveDisabled)
     }
 
     getComponentLabelStyle(focus, editable) {
-        return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
+        return focus ? { color: styles.fontPrimaryColor } : editable ? styles.fontBlack : styles.fontLowGray
     }
 
     getComponentSubLabelStyle(editable) {
@@ -124,7 +124,8 @@ class ArrayBasicComponent extends PureComponent {
                 isSaveDisabled: this.props.isSaveDisabled,
                 returnData: this._searchForReferenceValue.bind(this),
                 calledFromArray: true
-            })
+            },
+        this.props.navigate)
     }
     getModalView(item) {
         if (!this.props.arrayRow.modalFieldAttributeMasterId || this.props.arrayRow.modalFieldAttributeMasterId !== item.fieldAttributeMasterId) {
@@ -224,8 +225,8 @@ class ArrayBasicComponent extends PureComponent {
     getMultipleOptionCardView(modalView, item) {
         return (
             <TouchableOpacity
-                style={[{ paddingVertical: 50 }, item.focus ? styles.borderLeft4 : null]}
-                onPress={() => this.props.actions.showOrDropModal(item.fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, item.fieldAttributeMasterId, this.props.isSaveDisabled)
+                style={[{ paddingVertical: 50 }, item.focus ? { borderLeftColor: styles.borderLeft4Color, borderLeftWidth: 4 } : null]}
+                onPress={() => this.props.actions.showOrDropModal(this.props.arrayElements, this.props.arrayRow.rowId, item.fieldAttributeMasterId, this.props.isSaveDisabled)
                 }
                 disabled={!item.editable || this.props.modalFieldAttributeMasterId ? true : false}
             >
@@ -295,10 +296,11 @@ class ArrayBasicComponent extends PureComponent {
                             </Item>
                             {(item.attributeTypeId == SCAN_OR_TEXT) ?
                                 <TouchableHighlight
-                                    style={[styles.absolute, { bottom: 50, right: 10 }]}
+                                    style={[styles.absolute, { top: 40, right: 10 }]}
                                     onPress={() => this.goToQRCode(item)} >
                                     <View>
-                                        <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentLabelStyle(item.focus, item.editable).color} />                                    </View>
+                                        <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentLabelStyle(item.focus, item.editable).color} />
+                                    </View>
                                 </TouchableHighlight> : null}
                             {item.alertMessage ?
                                 <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{item.alertMessage}</Label>
@@ -337,7 +339,7 @@ class ArrayBasicComponent extends PureComponent {
                     <View>
                         <FormLayoutActivityComponent item={item} press={
                             () => {
-                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
+                                //this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
                                 this.props.actions.navigateToScene('DataStore',
                                     {
                                         currentElement: item,
@@ -350,7 +352,8 @@ class ArrayBasicComponent extends PureComponent {
                                         rowId: this.props.arrayRow.rowId,
                                         fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
                                         arrayFieldAttributeMasterId: this.props.arrayFieldAttributeMasterId
-                                    })
+                                    },
+                                this.props.navigate)
                             }} />
                     </View>
                 )
@@ -390,7 +393,8 @@ class ArrayBasicComponent extends PureComponent {
                                     calledFromArray: true,
                                     rowId: this.props.arrayRow.rowId,
                                     fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
-                                })
+                                },
+                            this.props.navigate)
                         }} />
                 </View>
                 )

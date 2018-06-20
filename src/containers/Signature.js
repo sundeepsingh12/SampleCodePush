@@ -1,12 +1,6 @@
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    FlatList,
-    TouchableOpacity,
-}
-    from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SignatureRemarks from '../components/SignatureRemarks'
@@ -16,23 +10,8 @@ import renderIf from '../lib/renderIf'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import {
-    Container,
-    Content,
-    Header,
-    Left,
-    Body,
-    Icon,
-    StyleProvider,
-    Toast
-} from 'native-base'
-import {
-    SIGNATURE,
-} from '../lib/AttributeConstants'
-import {
-    OK,
-    IMPROPER_SIGNATURE
-} from '../lib/ContainerConstants'
+import { Container, Header, Body, Icon, StyleProvider, Toast } from 'native-base'
+import { OK, IMPROPER_SIGNATURE } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -57,8 +36,7 @@ class Signature extends PureComponent {
     }
 
     componentDidMount() {
-        this.props.actions.getRemarksList(this.props.navigation.state.params.formLayoutState.formElement)
-        this.props.actions.setIsRemarksValidation(this.props.navigation.state.params.currentElement.validation)
+        this.props.actions.getRemarksList(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState.formElement)
     }
 
     onSaveSign = async (result) => {
@@ -66,11 +44,12 @@ class Signature extends PureComponent {
             await this.props.actions.saveSignature(result,
                 this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
                 this.props.navigation.state.params.formLayoutState,
-                this.props.navigation.state.params.jobTransaction
+                this.props.navigation.state.params.jobTransaction,
+                this.props.navigation.goBack
+
             )
         }
         this.setState({ isLandscape: 'portrait' })
-        this.props.navigation.goBack()
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -104,44 +83,48 @@ class Signature extends PureComponent {
     }
 
     headerView() {
-        let view
-        view = <Header searchBar style={[styles.bgWhite, style.header]}>
-            <Body>
-                <View
-                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                    <TouchableOpacity style={[style.headerLeft]} onPress={() => {
-                        this.setState({ isLandscape: 'portrait' })
-                        this.props.navigation.goBack(null)
-                    }}>
-                        <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
-                    </TouchableOpacity>
-                    <View style={[style.headerBody]}>
-                        <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter]}>Signature</Text>
-                    </View>
-                    <TouchableOpacity style={[style.headerRight]}
-                        onPress={this.resetSign} >
-                        <Text style={[styles.fontBlack, styles.fontLg, styles.fontRight]}>Clear</Text>
-                    </TouchableOpacity>
-                    <View />
-                </View>
-            </Body>
-        </Header>
-        return view
+        return (
+            <SafeAreaView style={[styles.bgWhite]}>
+                <Header searchBar style={[styles.bgWhite, style.header]}>
+                    <Body>
+                        <View
+                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                            <TouchableOpacity style={[style.headerLeft]} onPress={() => {
+                                this.setState({ isLandscape: 'portrait' })
+                                this.props.navigation.goBack(null)
+                            }}>
+                                <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
+                            </TouchableOpacity>
+                            <View style={[style.headerBody]}>
+                                <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter]}>Signature</Text>
+                            </View>
+                            <TouchableOpacity style={[style.headerRight]}
+                                onPress={this.resetSign} >
+                                <Text style={[styles.fontBlack, styles.fontLg, styles.fontRight]}>Clear</Text>
+                            </TouchableOpacity>
+                            <View />
+                        </View>
+                    </Body>
+                </Header>
+            </SafeAreaView>
+        )
     }
     saveSignButton() {
-        return <TouchableOpacity style={[style.fabButton, styles.bgPrimary]}
-            onPress={this.saveSign} >
-            <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
-        </TouchableOpacity>
+        return (
+            <TouchableOpacity style={[style.fabButton, { backgroundColor: styles.bgPrimaryColor }]}
+                onPress={this.saveSign} >
+                <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
+            </TouchableOpacity>
+        )
     }
     render() {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     {this.headerView()}
-                    <View style={[styles.flex1, styles.row]}>
+                    <View style={[styles.flex1, styles.row, styles.bgWhite]}>
                         <View style={{ borderWidth: 1 }}>
-                            {renderIf(this.props.isRemarksValidation && this.props.fieldDataList.length > 0,
+                            {renderIf(this.props.fieldDataList.length > 0,
                                 <SignatureRemarks fieldDataList={this.props.fieldDataList} />
                             )}
                         </View>
@@ -156,7 +139,7 @@ class Signature extends PureComponent {
                                 showTitleLabel={false}
                                 viewMode={this.state.isLandscape} />
                         </View>
-                        {this.saveSignButton()}
+                                {this.saveSignButton()}
                     </View>
                 </Container>
             </StyleProvider >

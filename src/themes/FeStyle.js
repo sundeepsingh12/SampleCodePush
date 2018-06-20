@@ -1,23 +1,18 @@
 
-
-const themeColor = '#00796B';
-
+var themeColor = '#00796B'
 export default {
     primaryColor: themeColor,
-
-    bgPrimary: {
-        backgroundColor: themeColor
-    },
+    bgPrimaryColor: themeColor,
+    fontPrimaryColor: themeColor,
     shadeColor: themeColor + '98',
-    fontPrimary: {
-        color: themeColor
-    },
-
     mainBg: {
         backgroundColor: '#F7F8FA'
     },
     heightAuto: {
         height: 'auto'
+    },
+    widthAuto: {
+        width: 'auto'
     },
     bgWhite: {
         backgroundColor: '#ffffff'
@@ -61,6 +56,9 @@ export default {
     fontDarkGray: {
         color: '#a3a3a3'
     },
+    fontMediumGray: {
+        color: '#9B9B9B'
+    },
     fontLightGray: {
         color: '#e4e3e8'
     },
@@ -79,9 +77,7 @@ export default {
     fontInfo: {
         color: '#51adfd'
     },
-    fontXs: {
-        fontSize: 10
-    },
+
     fontXs: {
         fontSize: 10
     },
@@ -93,6 +89,9 @@ export default {
     },
     fontLg: {
         fontSize: 16
+    },
+    fontRegular: {
+        fontSize: 15
     },
     fontXl: {
         fontSize: 20
@@ -132,6 +131,9 @@ export default {
     },
     fontWeight500: {
         fontWeight: '500'
+    },
+    fontWeight600: {
+        fontWeight: '600'
     },
     lineHeight20: {
         lineHeight: 20
@@ -556,10 +558,7 @@ export default {
         shadowColor: '#d3d3d3',
         shadowOpacity: .5,
     },
-    borderLeft4: {
-        borderLeftColor: themeColor,
-        borderLeftWidth: 4
-    },
+    borderLeft4Color: themeColor,
     header: {
         borderBottomWidth: 0,
         height: 'auto',

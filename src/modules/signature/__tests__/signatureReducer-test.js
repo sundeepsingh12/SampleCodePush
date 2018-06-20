@@ -17,13 +17,13 @@ describe('signature reducer ', () => {
         let nextState = signatureReducer(undefined, action)
         expect(nextState.fieldDataList).toBe(remarksList)
     })
-    it('it should set remarks validation', () => {
+    it('it should set field data list initial', () => {
         const remarksList = 'test'
         const action = {
-            type: SET_REMARKS_VALIDATION,
+            type: 'abc',
             payload: remarksList
         }
         let nextState = signatureReducer(undefined, action)
-        expect(nextState.isRemarksValidation).toBe(remarksList)
+        expect(nextState.fieldDataList).toEqual([])
     })
 })

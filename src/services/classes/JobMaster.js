@@ -36,13 +36,15 @@ import {
   PAGES,
   PAGES_ADDITIONAL_UTILITY,
   HUB_LAT_LONG,
-  MDM_POLICIES
+  MDM_POLICIES,
+  APP_VERSION,
+  APP_THEME,
 } from '../../lib/constants'
-
-import {
-  UNSEEN,
-} from '../../lib/AttributeConstants'
+import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER } from '../../lib/AttributeConstants'
+import { DOWNLOAD_LATEST_APP_VERSION } from '../../lib/ContainerConstants'
 import _ from 'lodash'
+import package_json from '../../../package.json'
+
 
 class JobMaster {
   /**
@@ -93,7 +95,7 @@ class JobMaster {
    *
    */
 
-  downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
+  async downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
     if (!token) {
       throw new Error('Token Missing')
     }
@@ -123,7 +125,7 @@ class JobMaster {
         })
       }
     }
-    let jobMasterResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
+    let jobMasterResponse = await RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
     return jobMasterResponse
   }
 
@@ -132,6 +134,23 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
+    await keyValueDBService.validateAndSaveData(APP_VERSION, json.applicationVersion + "");
+    const packageJsonMajorVersion = parseInt(APP_VERSION_NUMBER.split('.')[0]);
+    //Check if appMajorVersion from server is greater than package json major version
+    if (json.applicationVersion && parseInt(json.applicationVersion) > packageJsonMajorVersion) {
+      throw ({ errorCode: MAJOR_VERSION_OUTDATED, downloadUrl: json.androidDownloadUrl })
+    }
+    const minorPatchVersion = json.minorPatchVersion
+
+     //Check if minor or patch version from server is greater than current minor/patch version installed in phone
+    if (parseInt(json.applicationVersion) == packageJsonMajorVersion && minorPatchVersion) {
+      const [minorVersionFromServer, patchVersionFromServer] = minorPatchVersion.split('.')
+      const [appMajorVersion, appMinorVersion, appPatchVersion] = APP_VERSION_NUMBER.split('.')
+      if (parseInt(minorVersionFromServer) > parseInt(appMinorVersion) || parseInt(patchVersionFromServer) > parseInt(appPatchVersion)) {
+        throw ({ errorCode: MINOR_PATCH_OUTDATED, androidDeploymentKey: json.androidDeployementKey, iosDeploymentKey: json.iosDeployementKey })
+    }
+  }
+
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);
     await keyValueDBService.validateAndSaveData(USER, json.user);
@@ -160,11 +179,11 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'));
     await keyValueDBService.validateAndSaveData(PAGES, json.pages);
     await keyValueDBService.validateAndSaveData(PAGES_ADDITIONAL_UTILITY, json.additionalUtilities);
-    if(!_.isEmpty(json.companyMDM)) await keyValueDBService.validateAndSaveData(MDM_POLICIES, json.companyMDM);
-    if (json.hubLatLng && !_.isEmpty(json.hubLatLng)) {
-      await keyValueDBService.validateAndSaveData(HUB_LAT_LONG, json.hubLatLng)
-    }
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.appTheme, APP_THEME)
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.companyMDM, MDM_POLICIES)
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.hubLatLng, HUB_LAT_LONG)
   }
+
 
   /**
    * 
@@ -215,26 +234,15 @@ class JobMaster {
     return jobMasterIdCustomizationMap
   }
 
-  /**
-   * 
-   * @param {*} jobStatus 
-   * Map<TabId,[StatusIds]>
-   */
-  prepareTabStatusIdMap(jobStatus) {
-    if (!jobStatus) {
-      return null
+  async checkForEnableLiveJobMaster(jobMasterId) {
+    const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    const jobMasterListValue = jobMasterList.value
+    for (let id in jobMasterListValue) {
+      if (jobMasterListValue[id].id == jobMasterId && jobMasterListValue[id].enableLiveJobMaster) {
+        return true
+      }
     }
-    let tabIdStatusIdsMap = {}
-    jobStatus.forEach(jobStatusObject => {
-      if (jobStatusObject.code == UNSEEN) {
-        return
-      }
-      if (!tabIdStatusIdsMap[jobStatusObject.tabId]) {
-        tabIdStatusIdsMap[jobStatusObject.tabId] = []
-      }
-      tabIdStatusIdsMap[jobStatusObject.tabId].push(jobStatusObject.id)
-    })
-    return tabIdStatusIdsMap
+    return false
   }
 
 
@@ -252,18 +260,17 @@ class JobMaster {
     return statusIdsTabIdsMap
   }
   /**
-   * 
+   * filters tab on hidden and save tabs list
    * @param {*} tabs 
-   * validates ,sort and save tabs list 
-   * sort on basis of isDefault
+   * @returns
+   * [tabs]
    */
   validateAndSortTabList(tabs) {
     if (!tabs) {
-      return null
+      return null;
     }
-    tabs = tabs.filter(tab => tab.name.toLocaleLowerCase() !== 'hidden')
-      .sort((x, y) => x.isDefault === y.isDefault ? 0 : x.isDefault ? -1 : 1);
-    return tabs
+    tabs = tabs.filter(tab => tab.name.toLocaleLowerCase() !== 'hidden').sort((x, y) => x.isDefault === y.isDefault ? 0 : x.isDefault ? -1 : 1);
+    return tabs;
   }
 
 
@@ -289,7 +296,7 @@ class JobMaster {
   getJobMasterTitleListFromIds(jobMasterIdList, jobMasterList) {
     let jobMasterTitleList = []
     if (_.isUndefined(jobMasterIdList)) {
-      return null
+      return jobMasterTitleList
     }
     jobMasterList.forEach(jobMaster => {
       if (jobMasterIdList.includes(jobMaster.id)) {
@@ -299,7 +306,7 @@ class JobMaster {
     return jobMasterTitleList
   }
 
-  async getJobMasterIdList(){
+  async getJobMasterIdList() {
     const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
     return jobMasterList.value.map((data) => data.id)
   }

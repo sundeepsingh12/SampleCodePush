@@ -1,33 +1,25 @@
 'use strict'
 
 import {
-    FIELD_ATTRIBUTE,
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
-    DISABLE_SAVE,
     UPDATE_FIELD_DATA,
-    STATUS_NAME,
-    ON_BLUR,
-    TOOGLE_HELP_TEXT,
     SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT,
     IS_LOADING,
-    ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
     JOB_STATUS,
-    UPDATE_FIELD_DATA_VALIDATION,
     NEXT_FOCUS,
     TabScreen,
     HomeTabNavigatorScreen,
     CLEAR_FORM_LAYOUT,
     SET_FORM_LAYOUT_STATE,
-    SET_UPDATE_DRAFT,
-    CLEAR_BULK_STATE,
-    SET_FORM_TO_INVALID,
     USER,
     AutoLogoutScreen,
     SET_OPTION_ATTRIBUTE_ERROR,
     ADD_FORM_LAYOUT_STATE,
     SET_FORM_INVALID_AND_FORM_ELEMENT,
-    SYNC_RUNNING_AND_TRANSACTION_SAVING
+    SYNC_RUNNING_AND_TRANSACTION_SAVING,
+    SET_LANDING_TAB,
+    CLEAR_FORM_LAYOUT_WITH_LOADER
 } from '../../lib/constants'
 
 import {
@@ -38,38 +30,29 @@ import {
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 import { NavigationActions } from 'react-navigation'
-import InitialState from './formLayoutInitialState.js'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobStatusService } from '../../services/classes/JobStatus'
 
 import _ from 'lodash'
-import { performSyncService } from '../home/homeActions'
+import { performSyncService, pieChartCount } from '../home/homeActions'
 import { draftService } from '../../services/classes/DraftService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
 import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../lib/ContainerConstants'
 import moment from 'moment'
-import getTheme from '../../../native-base-theme/components';
-import platform from '../../../native-base-theme/variables/platform';
-import styles from '../../themes/FeStyle'
 import { Toast } from 'native-base'
+import { fetchJobs } from '../taskList/taskListActions';
 
-export function _setErrorMessage(message) {
-    return {
-        type: ERROR_MESSAGE,
-        payload: message
-    }
-}
 
-export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, positionId) {
+export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
     return async function (dispatch) {
         try {
-            dispatch(setState(IS_LOADING, true))
+            dispatch(setState(CLEAR_FORM_LAYOUT_WITH_LOADER))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
             let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
-            sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap);
+            sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList);
             dispatch(setState(SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT, {
                 statusId,
                 statusName,
@@ -85,7 +68,6 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
         } catch (error) {
             showToastAndAddUserExceptionLog(1001, error.message, 'danger', 0)
             dispatch(setState(IS_LOADING, false))
-            dispatch(_setErrorMessage(error))
         }
     }
 }
@@ -94,7 +76,7 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formLayou
     return async function (dispatch) {
         try {
             const cloneFormElement = _.cloneDeep(formLayoutState.formElement)
-            const { formLayoutObject, isSaveDisabled } = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, formLayoutState.isSaveDisabled, value, null, event, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap);
+            const { formLayoutObject, isSaveDisabled } = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, formLayoutState.isSaveDisabled, value, null, event, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList);
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, { formLayoutObject, isSaveDisabled }))
             if (formLayoutState.updateDraft) {
                 formLayoutState.formElement = formLayoutObject
@@ -126,17 +108,6 @@ export function setSequenceDataAndNextFocus(currentElement, formLayoutState, seq
     }
 }
 
-export function disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value) {
-    return async function (dispatch) {
-        try {
-            const saveDisabled = formLayoutEventsInterface.disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value)
-            dispatch(setState(DISABLE_SAVE, saveDisabled))
-        } catch (error) {
-            showToastAndAddUserExceptionLog(1004, error.message, 'danger', 1)
-        }
-    }
-}
-
 export function updateFieldData(attributeId, value, formLayoutState, jobTransaction) {
     return async function (dispatch) {
         try {
@@ -153,7 +124,7 @@ export function updateFieldData(attributeId, value, formLayoutState, jobTransact
     }
 }
 
-export function updateFieldDataWithChildData(attributeMasterId, formLayoutState, value, fieldDataListObject, jobTransaction, modalPresent, containerValue) {
+export function updateFieldDataWithChildData(attributeMasterId, formLayoutState, value, fieldDataListObject, jobTransaction, modalPresent, containerValue, goBack) {
     return function (dispatch) {
         try {
             const cloneFormElement = _.cloneDeep(formLayoutState.formElement)
@@ -163,7 +134,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
             let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, AFTER, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
             cloneFormElement.get(attributeMasterId).value = validationsResult ? cloneFormElement.get(attributeMasterId).displayValue : null
             cloneFormElement.get(attributeMasterId).containerValue = validationsResult ? containerValue : null
-            const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, formLayoutState.isSaveDisabled, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap);
+            const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, formLayoutState.isSaveDisabled, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList);
             dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
                 {
                     formElement: updatedFieldDataObject.formLayoutObject,
@@ -179,7 +150,8 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
                 draftService.saveDraftInDb(formLayoutState, formLayoutState.jobMasterId, null, jobTransaction)
             }
             if (validationsResult && !modalPresent) {
-                dispatch(NavigationActions.back())
+                // dispatch(NavigationActions.back())
+                goBack()
             }
             if (!validationsResult && cloneFormElement.get(attributeMasterId).alertMessage) {
                 if (modalPresent) {
@@ -190,12 +162,13 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
             }
 
         } catch (error) {
+            //console.log(error)
             showToastAndAddUserExceptionLog(1006, error.message, 'danger', 1)
         }
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack, key) {
     return async function (dispatch) {
         try {
             let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
@@ -209,24 +182,29 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
             } else {
                 dispatch(setState(IS_LOADING, true))
-                let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap)
+                let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
                 if (isFormValidAndFormElement.isFormValid) {
                     const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-                    let { routeName, routeParam } = await formLayoutService.saveAndNavigate(cloneFormLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList)
-                    //let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, cloneFormLayoutState.statusId) : false
+                    let { routeName, routeParam } = await formLayoutService.saveAndNavigate(cloneFormLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, taskListScreenDetails)
                     dispatch(setState(IS_LOADING, false))
-                    if (routeName == TabScreen) {
-                        dispatch(NavigationActions.reset({
-                            index: 0,
-                            actions: [
-                                NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                                //NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: landingId } })
-                            ]
-                        }))
+                    if (routeName == TabScreen && taskListScreenDetails.jobDetailsScreenKey && taskListScreenDetails.pageObjectAdditionalParams) {
+                        let landingTabId = JSON.parse(taskListScreenDetails.pageObjectAdditionalParams).landingTabAfterJobCompletion ? jobStatusService.getTabIdOnStatusId(statusList.value, cloneFormLayoutState.statusId) : null
+                        dispatch(setState(SET_LANDING_TAB, { landingTabId }))
+                        dispatch(pieChartCount())
+                        // dispatch(NavigationActions.back({ key: taskListScreenDetails.jobDetailsScreenKey }))
+                        goBack(taskListScreenDetails.jobDetailsScreenKey)
+                        dispatch(fetchJobs())
+                        dispatch(setState(CLEAR_FORM_LAYOUT))
+                    } else if (routeName == TabScreen) {
+                        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
+                        dispatch(fetchJobs())
+                        dispatch(setState(CLEAR_FORM_LAYOUT))
                     } else {
-                        dispatch(navigateToScene(routeName, routeParam))
+                        if(key){
+                           goBack(key)
+                        }
+                        dispatch(navigateToScene(routeName, routeParam, navigate))
                     }
-                    dispatch(setState(CLEAR_FORM_LAYOUT))
                 } else {
                     dispatch(setState(SET_FORM_INVALID_AND_FORM_ELEMENT, {
                         isLoading: false,
@@ -244,7 +222,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 syncRunningAndTransactionSaving.value.transactionSaving = false
             }
             await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, syncRunningAndTransactionSaving.value)
-            dispatch(performSyncService(pieChart))
+            dispatch(performSyncService())
         }
     }
 }
@@ -267,30 +245,6 @@ export function fieldValidations(currentElement, formLayoutState, timeOfExecutio
         }
         catch (error) {
             showToastAndAddUserExceptionLog(1008, error.message, 'danger', 1)
-        }
-    }
-}
-export function saveDraftInDb(formLayoutState, jobMasterId, jobTransaction) {
-    return async function (dispatch) {
-        try {
-            draftService.saveDraftInDb(formLayoutState, jobMasterId, null, jobTransaction)
-            dispatch(setState(SET_UPDATE_DRAFT, false))
-        } catch (error) {
-            showToastAndAddUserExceptionLog(1009, error.message, 'danger', 1)
-        }
-    }
-}
-
-export function restoreDraft(jobTransactionId, statusId, jobMasterId) {
-    return async function (dispatch) {
-        try {
-            let formLayoutState = draftService.restoreDraftFromDb(jobTransactionId, statusId, jobMasterId)
-            dispatch(setState(SET_FORM_LAYOUT_STATE, {
-                editableFormLayoutState: formLayoutState,
-                statusName: formLayoutState.statusName
-            }))
-        } catch (error) {
-            showToastAndAddUserExceptionLog(1010, error.message, 'danger', 1)
         }
     }
 }
@@ -335,7 +289,7 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formLayoutState, v
     }
 }
 
-export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction, draft, navgiationStateForSaveActivated) {
+export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction, draft, navgiationStateForSaveActivated, pageObjectAdditionalParams, jobDetailsScreenKey, navigate) {
     return async function (dispatch) {
         try {
             let draftRestored = draftService.getFormLayoutStateFromDraft(draft)
@@ -348,9 +302,10 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                     id: draftRestored.formLayoutState.jobTransactionId,
                     jobMasterId: draft.jobMasterId,
                     jobId: draftRestored.formLayoutState.jobTransactionId,
+                    referenceNumber: draft.referenceNumber
                 }
             }
-            if (restoreDraftAndNavigateToFormLayout) {
+            if (!_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore)) {
                 dispatch(setState(ADD_FORM_LAYOUT_STATE, draftRestored.navigationFormLayoutStatesForRestore))
             }
             dispatch(navigateToScene('FormLayout', {
@@ -361,8 +316,10 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                 statusName: draftRestored.formLayoutState.statusName,
                 jobMasterId: draft.jobMasterId,
                 navigationFormLayoutStates: !_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore) ? draftRestored.navigationFormLayoutStatesForRestore : (navgiationStateForSaveActivated ? navgiationStateForSaveActivated : null),
-                isDraftRestore: true
-            }))
+                isDraftRestore: true,
+                pageObjectAdditionalParams,
+                jobDetailsScreenKey
+            }, navigate))
         } catch (error) {
             showToastAndAddUserExceptionLog(1013, error.message, 'danger', 1)
         }

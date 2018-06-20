@@ -1,19 +1,7 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    Platform,
-    FlatList,
-    TouchableHighlight,
-    ActivityIndicator,
-    Modal,
-    Keyboard,
-    TouchableOpacity,
-}
-    from 'react-native'
-import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, Toast, Item, Label } from 'native-base'
+import { StyleSheet, View, Text, TouchableHighlight, ActivityIndicator, Modal, Keyboard, TouchableOpacity, } from 'react-native'
+import { Input, Icon, Item, Label } from 'native-base'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
@@ -66,16 +54,8 @@ import {
     ADVANCE_DROPDOWN
 } from '../lib/AttributeConstants'
 
-import {
-    NEXT_FOCUS,
-    CameraAttribute,
-    Payment,
-    SET_MODAL_FIELD_ATTRIBUTE
-} from '../lib/constants'
-import {
-    OPTIONAL,
-    SELECTED
-} from '../lib/ContainerConstants'
+import { NEXT_FOCUS, CameraAttribute, Payment, SET_MODAL_FIELD_ATTRIBUTE } from '../lib/constants'
+import { OPTIONAL, SELECTED } from '../lib/ContainerConstants'
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'
 import TimePicker from '../components/TimePicker'
@@ -97,7 +77,9 @@ class BasicFormElement extends PureComponent {
 
     navigateToScene = (item) => {
         let screenName = ''
-        this.props.actions.fieldValidations(item, this.props.formLayoutState, BEFORE, this.props.jobTransaction)
+        if (item.attributeTypeId != DATA_STORE && item.attributeTypeId != EXTERNAL_DATA_STORE) {
+            this.props.actions.fieldValidations(item, this.props.formLayoutState, BEFORE, this.props.jobTransaction)
+        }
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
@@ -114,7 +96,8 @@ class BasicFormElement extends PureComponent {
                     jobTransaction: this.props.jobTransaction,
                     returnData: this._searchForReferenceValue.bind(this),
                     formLayoutState: this.props.formLayoutState
-                })
+                },
+            this.props.navigate)
                 break
             }
             case SIGNATURE: {
@@ -127,7 +110,8 @@ class BasicFormElement extends PureComponent {
                     jobTransaction: this.props.jobTransaction,
                     returnData: this._searchForReferenceValue.bind(this),
                     formLayoutState: this.props.formLayoutState
-                })
+                },
+                this.props.navigate)
                 break
             }
             case EXTERNAL_DATA_STORE:
@@ -157,7 +141,6 @@ class BasicFormElement extends PureComponent {
                 break
             }
         }
-
         if (screenName) {
             this.props.actions.navigateToScene(screenName,
                 {
@@ -165,7 +148,8 @@ class BasicFormElement extends PureComponent {
                     formLayoutState: this.props.formLayoutState,
                     jobTransaction: this.props.jobTransaction,
                     returnData: this._searchForReferenceValue.bind(this),
-                }
+                },
+                this.props.navigate
             )
         }
     }
@@ -211,7 +195,7 @@ class BasicFormElement extends PureComponent {
     }
 
     getComponentLabelStyle(focus, editable) {
-        return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
+        return focus ? { color: styles.fontPrimaryColor } : editable ? styles.fontBlack : styles.fontLowGray
     }
 
     getComponentSubLabelStyle(editable) {
@@ -286,7 +270,8 @@ class BasicFormElement extends PureComponent {
         this.props.actions.navigateToScene('QrCodeScanner',
             {
                 returnData: this._searchForReferenceValue.bind(this)
-            })
+            },
+        this.props.navigate)
     }
 
     getValueTextForMultipleOption() {
@@ -315,7 +300,7 @@ class BasicFormElement extends PureComponent {
     getMultipleOptionCardView(modalView) {
         return (
             <TouchableOpacity
-                style={[{ paddingVertical: 50 }, this.props.item.focus ? styles.borderLeft4 : null]}
+                style={[{ paddingVertical: 50 }, this.props.item.focus ? { borderLeftColor: styles.borderLeft4Color, borderLeftWidth: 4 } : null]}
                 onPress={() => { this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, this.props.item.fieldAttributeMasterId) }}
                 disabled={!this.props.item.editable || this.props.modalFieldAttributeMasterId ? true : false}
             >
@@ -360,7 +345,7 @@ class BasicFormElement extends PureComponent {
             case CONTACT_NUMBER:
                 return (
                     <View>
-                        <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, styles.relative, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? styles.borderLeft4 : null]}>
+                        <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, styles.relative, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? { borderLeftColor: styles.borderLeft4Color, borderLeftWidth: 4 } : null]}>
                             {this.props.item.label ?
                                 <Label style={[styles.fontDefault, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)]}>{this.props.item.label}
                                     {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> {OPTIONAL}</Text>}

@@ -12,6 +12,7 @@ import {
     JOB_STATUS,
     JOB_SUMMARY,
 } from '../../lib/constants'
+import _ from 'lodash'
 
 import  { Piechart } from '../../lib/AttributeConstants'
 
@@ -40,7 +41,6 @@ export function getDataForJobMasterSummaryAndRunSheetSummary() {
             dispatch(setState(SET_SUMMARY_FOR_JOBMASTER, jobMasterSummaryList))
             dispatch(setState(SET_SUMMARY_FOR_RUNSHEET,runsheetSummaryList))
         } catch (error) {
-            console.log("ErrorMessage",error)
         }
     }
 }

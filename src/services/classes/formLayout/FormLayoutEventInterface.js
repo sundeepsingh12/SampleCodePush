@@ -2,16 +2,16 @@ import FormLayoutEventImpl from './formLayoutEventImpl.js'
 
 class FormLayoutEventsInterface extends FormLayoutEventImpl {
 
-    findNextFocusableAndEditableElement(attributeMasterId, formElement, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap) {
-        return this.findNextFocusableAndEditableElements(attributeMasterId, formElement, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap);
+    findNextFocusableAndEditableElement(attributeMasterId, formElement, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
+        return this.findNextFocusableAndEditableElements(attributeMasterId, formElement, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList);
     }
 
     disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value) {
         return this.disableSave(attributeMasterId, isSaveDisabled, formLayoutObject, value);
     }
 
-    updateFieldData(attributeMasterId, value, formElement, calledFrom) {
-        return this.updateFieldInfo(attributeMasterId, value, formElement, calledFrom);
+    updateFieldData(attributeMasterId, value, formElement, calledFrom, fieldDataList) {
+        return this.updateFieldInfo(attributeMasterId, value, formElement, calledFrom, fieldDataList);
     }
 
     /**
@@ -32,10 +32,6 @@ class FormLayoutEventsInterface extends FormLayoutEventImpl {
     getSequenceData(sequenceMasterId) {
         return this.getSequenceAttrData(sequenceMasterId)
     }
-
-    executeBeforeValidations(attributeMasterId) { }
-
-    executeAfterValidations(attributeMasterId) { }
 
 }
 

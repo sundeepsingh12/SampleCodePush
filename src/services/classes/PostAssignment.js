@@ -76,12 +76,12 @@ class PostAssignment {
      * @param {*} jobMaster 
      */
     async updateTransactionStatus(transaction, pendingStatus, jobMaster) {
-        let transactionDTOList = [], transactionList = []
+        let jobTransactionDTOMap = {}, transactionList = []
         let jobTransaction = { ...transaction }
         let transactionDTO = {
             id: jobTransaction.id,
             referenceNumber: jobTransaction.referenceNumber,
-            jobId:jobTransaction.jobId
+            jobId: jobTransaction.jobId
         }
         const runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction.jobStatusId, pendingStatus.statusCategory, [jobTransaction])
         await formLayoutEventsInterface._updateJobSummary(jobTransaction, pendingStatus.id)
@@ -96,13 +96,14 @@ class PostAssignment {
         jobTransaction.hubCode = hub.value.code
         jobTransaction.androidPushTime = moment().format('YYYY-MM-DD HH:mm:ss')
         transactionList.push(jobTransaction)
-        transactionDTOList.push(transactionDTO)
+        jobTransactionDTOMap[jobTransaction.id] = transactionDTO
         let jobTransactionTableDTO = {
             tableName: TABLE_JOB_TRANSACTION,
-            value: transactionList
+            value: transactionList,
+            syncTime: moment().format('YYYY-MM-DD HH:mm:ss')
         }
         realm.performBatchSave(jobTransactionTableDTO, runSheet)
-        await formLayoutEventsInterface.addTransactionsToSyncList(transactionDTOList)
+        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionDTOMap)
     }
 
     /**
@@ -115,7 +116,7 @@ class PostAssignment {
      */
     async checkPostJobOnServer(referenceNumber, jobMaster, jobTransactionMap) {
         let referenceNumberList = [referenceNumber]
-        let scanError = null
+        let scanError = null, successListDTO = {}
         let postData = JSON.stringify([{
             jobMasterId: jobMaster.id,
             referenceNumberList: [referenceNumber]
@@ -127,35 +128,51 @@ class PostAssignment {
         let postJobResponse = await RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.POST_ASSIGNMENT_FORCE_ASSIGN_API, 'POST')
         let notFoundList = postJobResponse.json[0].notFoundList
         let successList = postJobResponse.json[0].successList
+        scanError = this.setJobTransactionDTO(notFoundList, jobTransactionMap, postJobResponse, false);
+        successListDTO = this.setJobTransactionDTO(successList, jobTransactionMap, postJobResponse, true);
         if (successList && successList.length > 0) {
-            await this.savePostJobOrder(successList)
+            await this.savePostJobOrder(successListDTO)
         }
-        for (let index in notFoundList) {
-            jobTransactionMap[notFoundList[index]] = {}
-            jobTransactionMap[notFoundList[index]].referenceNumber = notFoundList[index]
-            jobTransactionMap[notFoundList[index]].isScanned = true
-            jobTransactionMap[notFoundList[index]].status = scanError = postJobResponse.json[0].message && postJobResponse.json[0].message.trim() !== '' ? postJobResponse.json[0].message : NOT_FOUND
-        }
-
-        for (let index in successList) {
-            jobTransactionMap[successList[index]] = {}
-            jobTransactionMap[successList[index]].referenceNumber = successList[index]
-            jobTransactionMap[successList[index]].isScanned = true
-            jobTransactionMap[successList[index]].status = FORCE_ASSIGNED
-        }
-
         return scanError
     }
 
     /**
-     * This function save force assigned jobs in store
-     * @param {*} successList 
+     * This function set job transaction dto to be stored in stored for force assignment jobs that has to be synced in delete sync api
+     * @param {*} referenceNumberList 
+     * @param {*} jobTransactionMap 
+     * @param {*} postJobResponse 
+     * @param {*} isSuccess 
+     * @returns 
+     * SuccessListDTO (when given success list) : {
+     *                                                  referenceNumber
+     *                                                  syncTime
+     *                                            }
+     * scanError (when given not found list) 
      */
-    async savePostJobOrder(successList) {
-        let postOrders = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
-        let postOrderList = postOrders ? postOrders.value ? postOrders.value : [] : []
-        postOrderList = postOrderList.concat(successList)
-        await keyValueDBService.validateAndSaveData(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS, postOrderList)
+    setJobTransactionDTO(referenceNumberList, jobTransactionMap, postJobResponse, isSuccess) {
+        let scanError, successListDTO = {};
+        for (let index in referenceNumberList) {
+            jobTransactionMap[referenceNumberList[index]] = {}
+            jobTransactionMap[referenceNumberList[index]].referenceNumber = referenceNumberList[index]
+            jobTransactionMap[referenceNumberList[index]].isScanned = true
+            scanError = jobTransactionMap[referenceNumberList[index]].status = isSuccess ? FORCE_ASSIGNED : postJobResponse.json[0].message && postJobResponse.json[0].message.trim() !== '' ? postJobResponse.json[0].message : NOT_FOUND
+            successListDTO[referenceNumberList[index]] = {
+                referenceNumber: referenceNumberList[index],
+                syncTime: moment().format('YYYY-MM-DD HH:mm:ss')
+            }
+        }
+        return (isSuccess ? successListDTO : scanError);
+    }
+
+    /**
+     * This function save force assigned jobs in store
+     * @param {*} successListDTO 
+     */
+    async savePostJobOrder(successListDTO) {
+        let postOrders = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS);
+        let postOrderList = postOrders ? postOrders.value ? postOrders.value : {} : {};
+        postOrderList = { ...postOrderList, ...successListDTO };
+        await keyValueDBService.validateAndSaveData(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS, postOrderList);
     }
 }
 

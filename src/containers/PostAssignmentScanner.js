@@ -2,30 +2,10 @@
 import React, { PureComponent } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import {
-    StyleSheet,
-    Text,
-    View,
-    Dimensions,
-    Image,
-    TextInput,
-    TouchableOpacity,
-    TouchableHighlight,
-    Animated,
-    Alert
-} from 'react-native'
+import { StyleSheet, Text, View, Dimensions, Image, TextInput, TouchableOpacity, TouchableHighlight, Animated, Alert } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { RNCamera } from 'react-native-camera'
-import {
-    Input,
-    Container,
-    Header,
-    Body,
-    Icon,
-    StyleProvider,
-    Button,
-    Content,
-    Toast
-} from 'native-base'
+import { Container, Header, Body, Icon, StyleProvider, Button, Content } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -33,20 +13,9 @@ import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures'
 import * as postAssignmentActions from '../modules/postAssignment/postAssignmentActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
-import {
-    SET_POST_ASSIGNMENT_ERROR,
-    SET_POST_SCAN_SUCCESS,
-} from '../lib/constants'
-
-import {
-    FORCE_ASSIGNED,
-    POST_SEARCH_PLACEHOLDER,
-} from '../lib/ContainerConstants'
-
-import {
-    Piechart
-} from '../lib/AttributeConstants'
-
+import { SET_POST_ASSIGNMENT_ERROR, SET_POST_SCAN_SUCCESS, } from '../lib/constants'
+import { FORCE_ASSIGNED, POST_SEARCH_PLACEHOLDER, } from '../lib/ContainerConstants'
+import { Piechart } from '../lib/AttributeConstants'
 import * as homeActions from '../modules/home/homeActions'
 import * as taskListActions from '../modules/taskList/taskListActions'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -242,22 +211,24 @@ class PostAssignmentScanner extends PureComponent {
 
     getHeader() {
         return (
-            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])} hasTabs>
-                <Body>
-                    <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                        <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                        </TouchableOpacity>
-                        <View style={[styles.headerBody]}>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name}</Text>
+            <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])} hasTabs>
+                    <Body>
+                        <View
+                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                            <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                            </TouchableOpacity>
+                            <View style={[styles.headerBody]}>
+                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name}</Text>
+                            </View>
+                            <View style={[styles.headerRight]}>
+                            </View>
                         </View>
-                        <View style={[styles.headerRight]}>
-                        </View>
-                    </View>
-                    {this.getSearchPlaceHolder()}
-                </Body>
-            </Header>
+                        {this.getSearchPlaceHolder()}
+                    </Body>
+                </Header>
+            </SafeAreaView>
         )
     }
 
@@ -271,12 +242,12 @@ class PostAssignmentScanner extends PureComponent {
 
                 <View style={{ width: 200, height: 200, justifyContent: 'space-between' }}>
                     <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-                        <View style={{ width: 50, height: 50, borderTopWidth: 3, borderLeftWidth: 3, borderTopColor: styles.bgPrimary.backgroundColor, borderLeftColor: styles.bgPrimary.backgroundColor }}></View>
-                        <View style={{ width: 50, height: 50, borderTopWidth: 3, borderRightWidth: 3, borderTopColor: styles.bgPrimary.backgroundColor, borderRightColor: styles.bgPrimary.backgroundColor }}></View>
+                        <View style={{ width: 50, height: 50, borderTopWidth: 3, borderLeftWidth: 3, borderTopColor: styles.bgPrimaryColor, borderLeftColor: styles.bgPrimaryColor }}></View>
+                        <View style={{ width: 50, height: 50, borderTopWidth: 3, borderRightWidth: 3, borderTopColor: styles.bgPrimaryColor, borderRightColor: styles.bgPrimaryColor }}></View>
                     </View>
                     <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-                        <View style={{ width: 50, height: 50, borderBottomWidth: 3, borderLeftWidth: 3, borderBottomColor: styles.bgPrimary.backgroundColor, borderLeftColor: styles.bgPrimary.backgroundColor }}></View>
-                        <View style={{ width: 50, height: 50, borderBottomWidth: 3, borderRightWidth: 3, borderBottomColor: styles.bgPrimary.backgroundColor, borderRightColor: styles.bgPrimary.backgroundColor }}></View>
+                        <View style={{ width: 50, height: 50, borderBottomWidth: 3, borderLeftWidth: 3, borderBottomColor: styles.bgPrimaryColor, borderLeftColor: styles.bgPrimaryColor }}></View>
+                        <View style={{ width: 50, height: 50, borderBottomWidth: 3, borderRightWidth: 3, borderBottomColor: styles.bgPrimaryColor, borderRightColor: styles.bgPrimaryColor }}></View>
                     </View>
                 </View>
                 {this.props.scanSuccess ?

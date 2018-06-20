@@ -1,14 +1,6 @@
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    Dimensions,
-    Platform,
-    View,
-    FlatList,
-    TouchableHighlight,
-    TouchableOpacity
-}
-    from 'react-native'
+import { StyleSheet, Dimensions, View, FlatList, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as summaryActions from '../modules/summary/summaryActions'
@@ -18,20 +10,10 @@ import styles from '../themes/FeStyle'
 import LinearGradient from 'react-native-linear-gradient'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
-import {
-    Container,
-    Content,
-    List,
-    ListItem,
-    Header,
-    Button,
-    Text,
-    Body,
-    Icon,
-    StyleProvider
-} from 'native-base';
+import { Container, Content, List, ListItem, Header, Button, Text, Body, Icon, StyleProvider } from 'native-base';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { RESET_SUMMARY_STATE } from '../lib/constants'
+
 function mapStateToProps(state) {
     return {
         jobMasterSummary: state.summary.jobMasterSummary,
@@ -173,22 +155,24 @@ class Summary extends PureComponent {
 
     _renderHeader() {
         return (
-            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-                <Body>
-                    <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                        <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                        </TouchableOpacity>
-                        <View style={[style.headerBody]}>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Summary</Text>
+            <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                    <Body>
+                        <View
+                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                            </TouchableOpacity>
+                            <View style={[style.headerBody]}>
+                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Summary</Text>
+                            </View>
+                            <View style={[style.headerRight]}>
+                            </View>
+                            <View />
                         </View>
-                        <View style={[style.headerRight]}>
-                        </View>
-                        <View />
-                    </View>
-                </Body>
-            </Header>
+                    </Body>
+                </Header>
+            </SafeAreaView>
         )
     }
 
@@ -276,9 +260,9 @@ class Summary extends PureComponent {
         }
         return (
             <Content style={[styles.bgLightGray]}>
-                <LinearGradient 
-                colors={[styles.bgPrimary.backgroundColor, styles.shadeColor]}> 
-                { this._renderCrousel() } 
+                <LinearGradient
+                    colors={[styles.bgPrimaryColor, styles.shadeColor]}>
+                    {this._renderCrousel()}
                 </LinearGradient>
                 <FlatList
                     data={listData}

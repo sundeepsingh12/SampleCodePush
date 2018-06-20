@@ -40,7 +40,7 @@ const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__
  *
  */
 export default function configureStore(intialState) {
-  return (__DEV__)?Reactotron.createStore(reducer,intialState,applyMiddleware(thunk,loggerMiddleware)) :createStore(reducer,intialState,applyMiddleware(thunk,loggerMiddleware)) //Redux logger not required But still working here
+  return (__DEV__) ? Reactotron.createStore(reducer, intialState, applyMiddleware(thunk, loggerMiddleware)) : createStore(reducer, intialState, applyMiddleware(thunk, loggerMiddleware)) //Redux logger not required But still working here
 }
 
 // export default function configureStore(initialState) {

@@ -57,3 +57,45 @@ describe('test cases of user summary service ', () => {
             })
     })
 })
+
+describe('test cases of user summary count ', () => {
+    beforeEach(() => {
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.validateAndSaveData = jest.fn()
+    })
+    let allCount = [1,2,3]
+    it('it should not update userSummary', () => {
+        
+        keyValueDBService.getValueFromStore.mockReturnValue({
+            value: null
+        })
+        keyValueDBService.validateAndSaveData.mockReturnValue({})
+        return userSummaryService.updateUserSummaryCount(allCount)
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+            })
+    })
+
+    it('it should update userSummary count', () => {
+        let userSummary = {
+            value : {
+                pendingCount : 1,
+                failCount : 4,
+                successCount : 6
+            }
+        }
+        keyValueDBService.getValueFromStore.mockReturnValue({
+            value: {
+                pendingCount : 1,
+                failCount : 1,
+                successCount : 1
+            }
+        })
+        keyValueDBService.validateAndSaveData.mockReturnValue(userSummary)
+        return userSummaryService.updateUserSummaryCount(allCount)
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(keyValueDBService.validateAndSaveData).toHaveBeenCalled()
+            })
+    })
+})

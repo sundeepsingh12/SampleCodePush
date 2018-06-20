@@ -61,15 +61,19 @@ class RunSheet {
     let runsheetList = {}, allCount = [0, 0, 0], statusCountMap = {}
     const runsheetArray = realm.getRecordListOnQuery(TABLE_RUNSHEET) // all runSheet List 
     const status = ['pendingCount', 'failCount', 'successCount']
+    const moneyTypeCollectionTypeMap = { 'Collection-Cash': 'cashCollected', 'Collection-SOD': 'cashCollectedByCard', 'Refund': 'cashPayment' }
     runsheetArray.forEach(runsheetObject => {
       const runsheetCLone = { ...runsheetObject }
-      runsheetCLone.pendingCount = runsheetCLone.failCount = runsheetCLone.successCount = 0
+      runsheetCLone.pendingCount = runsheetCLone.failCount = runsheetCLone.successCount = runsheetCLone.cashCollected = runsheetCLone.cashCollectedByCard = runsheetCLone.cashPayment = 0
       runsheetList[runsheetObject.id] = { ...runsheetCLone }
     }) // map of runSheetId and runSheet 
     for (let index in jobTransactionArray) {
       allCount[allStatusMap[jobTransactionArray[index].jobStatusId] - 1] += 1  //  array of pending fail and success count
       if ((runsheetList[jobTransactionArray[index].runsheetId] && allStatusMap[jobTransactionArray[index].jobStatusId])) { // check for runSheetId in runSheetList and jobStatus in allStatusMapList
         runsheetList[jobTransactionArray[index].runsheetId][status[allStatusMap[jobTransactionArray[index].jobStatusId] - 1]] += 1
+      }
+      if (runsheetList[jobTransactionArray[index].runsheetId] && moneyTypeCollectionTypeMap[jobTransactionArray[index].moneyTransactionType] && jobTransactionArray[index].actualAmount > 0){
+        runsheetList[jobTransactionArray[index].runsheetId][moneyTypeCollectionTypeMap[jobTransactionArray[index].moneyTransactionType]] += jobTransactionArray[index].actualAmount
       }
       if (statusCountMap[jobTransactionArray[index].jobStatusId]) { // check stausId count map for jobSummary
         statusCountMap[jobTransactionArray[index].jobStatusId] += 1
@@ -109,6 +113,34 @@ class RunSheet {
       runsheetNumberList.push({ ...runsheetObject })
     })
     return runsheetNumberList
+  }
+
+  /**
+   * This function prepares runsheet map and job transaction query according to runsheet
+   * @param {*} isFutureDateRunsheetEnabled 
+   * @returns 
+   * {
+   *    runsheetMap : {
+   *                      runsheetId : { startDate }
+   *                  }
+   *    jobTransactionQuery : string
+   * }
+   */
+  prepareJobTransactionQueryOnBasisOfRunsheet(isFutureDateRunsheetEnabled) {
+    let runsheetMap = {}, jobTransactionQuery = '';
+    /* If future date runsheet enabled then check for that runsheets opened else check for runsheets closed.
+       This is done as new job/assign order to hub doesn't have any runsheet id.
+       So new job/assign order to hub will not work with future date runsheet.
+    */
+    let runsheetQuery = isFutureDateRunsheetEnabled ? 'isClosed = false' : 'isClosed = true';
+    const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery);
+    for (let index in runsheetList) {
+      let id = runsheetList[index].id;
+      let startDate = runsheetList[index].startDate;
+      runsheetMap[id] = { startDate }
+      jobTransactionQuery += isFutureDateRunsheetEnabled ? index == 0 ? `runsheetId = ${runsheetList[index].id}` : ` OR runsheetId = ${runsheetList[index].id}` : index == 0 ? `runsheetId != ${runsheetList[index].id}` : ` AND runsheetId != ${runsheetList[index].id}`;
+    }
+    return { runsheetMap, jobTransactionQuery };
   }
 
 }

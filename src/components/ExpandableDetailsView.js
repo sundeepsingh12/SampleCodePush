@@ -2,13 +2,10 @@
 
 import React, { PureComponent } from 'react'
 import {
-    StyleSheet,
     View,
     Text,
-    Platform,
     TouchableOpacity
 } from 'react-native'
-import { Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
 import renderIf from '../lib/renderIf'
@@ -42,7 +39,7 @@ class ExpandableDetailsView extends PureComponent {
                         </Text>
                     </View>
                     <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                        <Text style={[styles.fontDefault, styles.fontPrimary]}>
+                        <Text style={[styles.fontDefault, {color : styles.fontPrimaryColor}]}>
                             {(!isChildData) ? N_A : this.state.showDropdown ? TAP_TO_HIDE : TAP_TO_SHOW}
                         </Text>
                     </View>

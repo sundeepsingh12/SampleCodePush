@@ -4,7 +4,6 @@ import * as realm from '../../repositories/realmdb'
 import { keyValueDBService } from './KeyValueDBService'
 import BackgroundGeolocation from "react-native-background-geolocation"
 import moment from 'moment'
-import PushNotification from 'react-native-push-notification'
 import {
     TABLE_TRACK_LOGS,
     TRACK_BATTERY,
@@ -23,6 +22,7 @@ import {
     OUTSIDE_BOUNDARY
 } from '../../lib/ContainerConstants'
 import { userEventLogService } from './UserEvent'
+import FCM from "react-native-fcm"
 class Tracking {
 
     init() {
@@ -57,10 +57,9 @@ class Tracking {
                                 this.showNotification(geofence)
                             })
                     }
-                })
+                }).catch((err) => console.log(err))
             } catch (error) {
                 //TODO
-                console.log("An error occurred in my code!", error)
             }
         })
 
@@ -89,10 +88,8 @@ class Tracking {
             //     "auth_token": "maybe_your_server_authenticates_via_token_YES?"
             // }
         }, function (state) {
-            console.log("- BackgroundGeolocation is configured and ready: ", state.enabled);
             if (!state.enabled) {
                 BackgroundGeolocation.start(function () {
-                    console.log("- Start success");
                 });
             }
         });
@@ -119,10 +116,8 @@ class Tracking {
             BackgroundGeolocation.removeGeofence(fenceIdentifier.value.identifier, () => {
                 this.deleteFence() // delete fence identifier
                 this.deleteLatLongAndStatus() // delete fence lat long object and status object
-                console.log("Successfully removed geofence")
             }, (error) => {
                 //TODO
-                console.log("Failed to remove geofence", error)
             })
         }
     }
@@ -135,10 +130,8 @@ class Tracking {
         if (fenceIdentifier && fenceIdentifier.value && fenceIdentifier.value.identifier) {
             BackgroundGeolocation.removeGeofence(fenceIdentifier.value.identifier, () => {
                 this.deleteFence()
-                console.log("Successfully removed geofence")
             }, (error) => {
                 //TODO
-                console.log("Failed to remove geofence", error)
             })
         }
     }
@@ -150,7 +143,7 @@ class Tracking {
             'gpsSignal': location.coords.accuracy,
             'latitude': location.coords.latitude,
             'longitude': location.coords.longitude,
-            'speed': location.coords.speed,
+            'speed': location.coords.speed * 3.6,
             'trackTime': moment(location.timestamp).format('YYYY-MM-DD HH:mm:ss'),
             'userId': user.value.id
         }
@@ -217,7 +210,6 @@ class Tracking {
             notifyOnExit: true,
         }
         BackgroundGeolocation.addGeofence(fenceObject, () => {
-            console.log('- addGeofence success: ', fenceObject)
             // if status is present then this is not an inital job and another fence is present
             if (status && status.value) {
                 this.storeFence(fenceObject.identifier, status.value)
@@ -282,12 +274,15 @@ class Tracking {
             eventId = 19
             message = OUTSIDE_BOUNDARY
         }
-        PushNotification.localNotification({
-            /* iOS and Android properties */
+
+        FCM.presentLocalNotification({
+            id: '1',
             title: FAREYE_UPDATES,
-            message,
-            soundName: 'default'
-        })
+            body: message,
+            priority: "high",
+            show_in_foreground: true,
+            sound: "default"
+        });
         this.updateUserEvent(geofence, message, eventId)// update user event with appropriate eventId
     }
 

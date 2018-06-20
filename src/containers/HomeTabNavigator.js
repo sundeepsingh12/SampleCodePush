@@ -1,17 +1,15 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { Platform, BackHandler, View } from 'react-native'
-import { Icon } from 'native-base'
+import { Icon} from 'native-base'
 import { connect } from 'react-redux'
-import { TabNavigator } from 'react-navigation'
+import { createBottomTabNavigator } from 'react-navigation'
 import SyncScreen from './SyncScreen'
 import ErpSyncScreen from './ErpSyncScreen'
-import Home from './Home'
-import Menu from './Menu'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
-import ErpSyncTabIcon from '../svg_components/icons/ErpSyncTabIcon'
+import HomeStack from '../modules/navigators/HomeStackNavigator'
+import MenuStack from '../modules/navigators/MenuStackNavigator'
 
 function mapStateToProps(state) {
     return {
@@ -33,31 +31,39 @@ class HomeTabNavigator extends PureComponent {
         if (!this.props.customErpPullActivated) {
             return null
         }
+
+        HomeStack.navigationOptions =  MenuStack.navigationOptions = ({ navigation }) => {
+            let tabBarVisible = true;
+            if (navigation.state.index > 0) {
+                tabBarVisible = false;
+            }
+            return {
+                tabBarVisible,
+            };
+        };
+
         const Tabs = {
-            HomeScreen: {
-                screen: Home,
+            Home: {
+                screen: HomeStack,
                 navigationOptions: {
                     header: null,
-                    gesturesEnabled: false,
-                    title: 'Home',
                     tabBarIcon: ({ tintColor }) => (
-                        <Icon
-                            name='ios-home'
-                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
-                        />
-                    ),
-                }
+                    <Icon
+                        name='ios-home'
+                        style={[{ fontSize: 18, color: tintColor }]}
+                    />
+                ),
+            }
             },
             SyncScreen: {
                 screen: SyncScreen,
                 navigationOptions: {
-                    header: null,
                     title: 'Sync',
                     gesturesEnabled: false,
                     tabBarIcon: ({ tintColor }) => (
                         <Icon
                             name='ios-sync'
-                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
+                            style={[{ fontSize: 18, color: tintColor }]}
                         />
                     ),
                 }
@@ -65,39 +71,36 @@ class HomeTabNavigator extends PureComponent {
             ErpSyncScreen: {
                 screen: ErpSyncScreen,
                 navigationOptions: {
-                    header: null,
                     title: 'ERP',
                     gesturesEnabled: false,
                     tabBarIcon: ({ tintColor }) => (
-                        <View
-                            style={[styles.alignSelfCenter, styles.marginLeft5, { height: 30, marginTop: 15 }]}>
-                            <ErpSyncTabIcon width={50} height={50} color={tintColor} />
-                        </View>
-                    ),
-                }
-            },
-            MenuScreen: {
-                screen: Menu,
-                navigationOptions: {
-                    header: null,
-                    title: 'Menu',
-                    gesturesEnabled: false,
-                    tabBarIcon: ({ tintColor }) => (
                         <Icon
-                            name='md-menu'
-                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
+                            name="ios-download"
+                            style={[{ fontSize: 18, color: tintColor }]}
                         />
                     ),
                 }
+            },
+            Menu: {
+                screen: MenuStack,
+                navigationOptions: {
+                    header: null,
+                    tabBarIcon: ({ tintColor }) => (
+                    <Icon
+                        name='md-menu'
+                        style={[{ fontSize: 18, color: tintColor }]}
+                    />
+                ),
+            }
             }
         }
         const tabStyle = {
             tabBarPosition: 'bottom',
-            initialRouteName: 'HomeScreen',
+            initialRouteName: 'Home',
             animationEnabled: true,
             tabBarOptions: {
                 showIcon: true,
-                activeTintColor: styles.bgPrimary.backgroundColor,
+                activeTintColor: styles.bgPrimaryColor,
                 inactiveTintColor: '#aaaaaa',
                 style: {
                     backgroundColor: '#ffffff',
@@ -124,19 +127,19 @@ class HomeTabNavigator extends PureComponent {
         }
         var HomeTabNavigatorOptions = null
         if (this.props.customErpPullActivated == 'activated') {
-            HomeTabNavigatorOptions = TabNavigator({
-                HomeScreen: Tabs.HomeScreen,
+            HomeTabNavigatorOptions = createBottomTabNavigator({
+                Home: Tabs.Home,
                 SyncScreen: Tabs.SyncScreen,
                 ErpSyncScreen: Tabs.ErpSyncScreen,
-                MenuScreen: Tabs.MenuScreen
+                Menu: Tabs.Menu
             },
                 tabStyle,
             );
         } else {
-            HomeTabNavigatorOptions = TabNavigator({
-                HomeScreen: Tabs.HomeScreen,
+            HomeTabNavigatorOptions = createBottomTabNavigator({
+                Home: Tabs.Home,
                 SyncScreen: Tabs.SyncScreen,
-                MenuScreen: Tabs.MenuScreen,
+                Menu: Tabs.Menu,
             },
                 tabStyle
             );

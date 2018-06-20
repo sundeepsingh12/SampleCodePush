@@ -1,28 +1,21 @@
 'use strict'
 import {
-  HomeScreen,
   HomeTabNavigatorScreen,
   IS_PRELOADER_COMPLETE,
   LoginScreen,
   LOGIN_FAILURE,
   LOGIN_START,
   LOGIN_SUCCESS,
-  LOGOUT,
-  LOGOUT_FAILURE,
-  LOGOUT_START,
   FORGET_PASSWORD,
-  LOGOUT_SUCCESS,
   ON_LOGIN_USERNAME_CHANGE,
   ON_LOGIN_PASSWORD_CHANGE,
   PASSWORD,
   PreloaderScreen,
   REMEMBER_ME,
   REMEMBER_ME_SET_TRUE,
-  SET_CREDENTIALS,
   TOGGLE_CHECKBOX,
   USERNAME,
   AutoLogoutScreen,
-  SET_LOADER_IN_AUTOLOGOUT,
   USER,
   ON_LONG_PRESS_ICON,
   RESET_STATE,
@@ -30,7 +23,6 @@ import {
   UnsyncBackupUpload,
   DOMAIN_URL
 } from '../../lib/constants'
-
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import moment from 'moment'
 import { logoutService } from '../../services/classes/Logout'
@@ -39,17 +31,10 @@ import { logoutService } from '../../services/classes/Logout'
 import {
   authenticationService
 } from '../../services/classes/Authentication'
-import {
-  invalidateUserSessionForAutoLogout
-} from '../pre-loader/preloaderActions'
-import CONFIG from '../../lib/config'
-import {
-  keyValueDBService
-} from '../../services/classes/KeyValueDBService'
-import {
-  NavigationActions
-} from 'react-navigation'
 
+import CONFIG from '../../lib/config'
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { NavigationActions } from 'react-navigation'
 import { setState, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
 
 /**
@@ -163,7 +148,7 @@ export function authenticateUser(username, password, rememberMe) {
 export function onLongPressResetSettings(url) {
   return async function (dispatch) {
     try {
-      if(!url) {
+      if (!url) {
         const domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
         url = domainUrl.value
       }
@@ -214,7 +199,7 @@ export function checkRememberMe() {
       showToastAndAddUserExceptionLog(1304, error.message, 'danger', 1)
     } finally {
       const url = await keyValueDBService.getValueFromStore(DOMAIN_URL)
-      if(!url || !url.value) await keyValueDBService.validateAndSaveData(DOMAIN_URL, CONFIG.FAREYE.domain[0].url)
+      if (!url || !url.value) await keyValueDBService.validateAndSaveData(DOMAIN_URL, CONFIG.FAREYE.domain[0].url)
     }
   }
 }
@@ -232,7 +217,7 @@ export function getSessionToken() {
       const isPreloaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       const userData = await keyValueDBService.getValueFromStore(USER)
       const backupUploadFailCount = await keyValueDBService.getValueFromStore(BACKUP_UPLOAD_FAIL_COUNT)
-      if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')) && isPreloaderComplete) {
+      if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')) && token) {
         dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
       } else {
         if (token && isPreloaderComplete && isPreloaderComplete.value && backupUploadFailCount && backupUploadFailCount.value > 0) {
@@ -242,7 +227,10 @@ export function getSessionToken() {
           }))
         }
         else if (token && isPreloaderComplete && isPreloaderComplete.value) {
-          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
+          dispatch(NavigationActions.navigate({
+            routeName: HomeTabNavigatorScreen
+          }))
+          // dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
         else if (token) {
           dispatch(NavigationActions.navigate({
