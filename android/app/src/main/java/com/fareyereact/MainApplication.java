@@ -27,6 +27,7 @@ import com.facebook.soloader.SoLoader;
 import com.imeigetter.RNIMEIPackage;
 import java.util.Arrays;
 import java.util.List;
+import com.callgetter.CallLogsPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -63,7 +64,8 @@ public class MainApplication extends Application implements ReactApplication {
             new RNDeviceInfo(),
             new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
             new BackgroundTimerPackage() ,
-            new RNIMEIPackage()
+            new RNIMEIPackage(),
+            new CallLogsPackage()
       );
     }
   };
