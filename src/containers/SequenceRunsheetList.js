@@ -3,20 +3,17 @@
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Preloader from '../containers/Preloader'
-import Loader from '../components/Loader'
 import React, { Component } from 'react'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Text, List, ListItem, Left, Body, Right, Icon, StyleProvider, Toast } from 'native-base';
+import { Container, Content, Header, Text, List, ListItem, Body, Right, Icon, StyleProvider, Toast } from 'native-base';
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as sequenceActions from '../modules/sequence/sequenceActions'
 import * as globalActions from '../modules/global/globalActions'
 import { SELECT_RUNSHEET_NUMBER, OK } from './../lib/ContainerConstants'
-import { Sequence, SET_RUNSHEET_NUMBER_LIST, SET_RESPONSE_MESSAGE } from './../lib/constants'
+import { Sequence, SET_RUNSHEET_NUMBER_LIST } from './../lib/constants'
 
 function mapStateToProps(state) {
     return {

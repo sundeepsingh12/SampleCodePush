@@ -99,11 +99,11 @@ class ArrayBasicComponent extends PureComponent {
         this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, 2, null, this.props.formLayoutState,this.props.goBack);
     }
     onPressModal = (fieldAttributeMasterId) => {
-        this.props.actions.showOrDropModal(fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, fieldAttributeMasterId, this.props.isSaveDisabled)
+        this.props.actions.showOrDropModal(this.props.arrayElements, this.props.arrayRow.rowId, fieldAttributeMasterId, this.props.isSaveDisabled)
     }
 
     onCloseModal = (item) => {
-        this.props.actions.showOrDropModal(item.fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, null, this.props.isSaveDisabled)
+        this.props.actions.showOrDropModal(this.props.arrayElements, this.props.arrayRow.rowId, null, this.props.isSaveDisabled)
     }
 
     getComponentLabelStyle(focus, editable) {
@@ -226,7 +226,7 @@ class ArrayBasicComponent extends PureComponent {
         return (
             <TouchableOpacity
                 style={[{ paddingVertical: 50 }, item.focus ? { borderLeftColor: styles.borderLeft4Color, borderLeftWidth: 4 } : null]}
-                onPress={() => this.props.actions.showOrDropModal(item.fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, item.fieldAttributeMasterId, this.props.isSaveDisabled)
+                onPress={() => this.props.actions.showOrDropModal(this.props.arrayElements, this.props.arrayRow.rowId, item.fieldAttributeMasterId, this.props.isSaveDisabled)
                 }
                 disabled={!item.editable || this.props.modalFieldAttributeMasterId ? true : false}
             >

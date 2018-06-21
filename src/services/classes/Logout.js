@@ -7,10 +7,10 @@ class Logout {
     deleteDataBase() {
         realm.deleteRecords()
     }
-    
+
     checkForUnsyncTransactions(pendingSyncTransactionIds) {
-        let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value;
-        return (transactionsToSync.length > 0)
+        let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? {} : pendingSyncTransactionIds.value;
+        return (_.size(transactionsToSync) > 0)
     }
 }
 

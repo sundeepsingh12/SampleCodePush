@@ -1,20 +1,19 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, Platform, FlatList, TouchableOpacity, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, View, Text, Platform, FlatList, KeyboardAvoidingView } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Card, Button, Body, Header, Right, Icon, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
+import { Container, Button, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform';
+import platform from '../../native-base-theme/variables/platform'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import BasicFormElement from '../components/FormLayoutBasicComponent.js'
 import Loader from '../components/Loader'
-import renderIf from '../lib/renderIf.js'
 import { NET_BANKING, NET_BANKING_LINK, NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, UPI, MOSAMBEE_WALLET } from '../lib/AttributeConstants'
-import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, RESET_STATE_FOR_WALLET, SET_NO_FIELD_ATTRIBUTE_MAPPED } from '../lib/constants'
+import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_STATE } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
 import { ALERT, INVALID_FORM_ALERT, OK } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
@@ -52,7 +51,7 @@ function mapDispatchToProps(dispatch) {
 class FormLayout extends PureComponent {
 
   static navigationOptions = ({ navigation, props }) => {
-    return { header: <TitleHeader pageName={navigation.state.params.statusName} goBack={navigation.goBack} /> }
+    return { header: <TitleHeader pageName={navigation.state.params.statusName} goBack={navigation.state.params.backForTransient} /> }
   }
 
   componentDidUpdate() {
@@ -75,6 +74,7 @@ class FormLayout extends PureComponent {
   // }
 
   componentDidMount() {
+    this.props.navigation.setParams({ backForTransient: this._goBack });
     if (!this.props.navigation.state.params.isDraftRestore) {
       this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId)
       if (this.props.navigation.state.params.jobTransaction.length || this.props.navigation.state.params.editableFormLayoutState || this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
@@ -82,7 +82,17 @@ class FormLayout extends PureComponent {
       }
     }
   }
+  _goBack = () => {
 
+    //Set previous status form layout state in case of transient single status
+    if (this.props.navigation.state.params.navigationFormLayoutStates && this.props.navigation.state.params.previousStatus) {
+      this.props.actions.setState(SET_FORM_LAYOUT_STATE, {
+        editableFormLayoutState: this.props.navigation.state.params.navigationFormLayoutStates[this.props.navigation.state.params.previousStatus.id],
+        statusName: this.props.navigation.state.params.previousStatus.name
+      })
+    }
+    this.props.navigation.pop(1)
+  }
   renderData = (item) => {
     let formLayoutState = {
       formElement: this.props.formElement,

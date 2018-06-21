@@ -21,7 +21,7 @@ module.exports = keyMirror({
     SET_MODAL_VIEW: null,
     SET_OTP_MODAL_VIEW: null,
     CHANGE_WALLET_MOBILE_NO: null,
-    SET_OTP_FOR_WALLET:null,
+    SET_OTP_FOR_WALLET: null,
     CHANGE_OTP_NUMBER: null,
     SET_LOADER_FOR_WALLET: null,
     RESET_STATE_FOR_WALLET: null,
@@ -232,8 +232,8 @@ module.exports = keyMirror({
     LAT_LONG_GEO_FENCE: null,
     SYNC_RUNNING_AND_TRANSACTION_SAVING: null,
     MDM_POLICIES: null,
-    FCM_TOKEN:null,
-    APP_THEME : null,
+    FCM_TOKEN: null,
+    APP_THEME: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -249,6 +249,7 @@ module.exports = keyMirror({
     TABLE_TRANSACTION_LOGS: null,
     TABLE_DRAFT: null,
     SEND_EMAIL_OR_SMS: null,
+    TABLE_MESSAGE_INTERACTION: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -500,14 +501,13 @@ module.exports = keyMirror({
     JOB_ASSIGNMENT: null,
 
     //Camera Actions
-    SET_SHOW_IMAGE: null,
-    SET_IMAGE_DATA: null,
     VIEW_IMAGE_DATA: null,
-    SET_SHOW_VIEW_IMAGE: null,
     UPDATE_SKU_LIST_ITEMS: null,
     SET_SHOW_IMAGE_AND_DATA: null,
     SET_VALIDATION_FOR_CAMERA: null,
     SET_CAMERA_LOADER: null,
+    SET_CAMERA_LOADER_INITIAL_SET_UP: null,
+    SET_SHOW_IMAGE_AND_VALIDATION: null,
 
     //Offline Actions
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,
@@ -548,7 +548,12 @@ module.exports = keyMirror({
     USER_EXCEPTION_LOGS: null,
 
     //ApplicationVersion
-    APP_VERSION: null
+    APP_VERSION: null,
+
+    //Message Actions
+    SET_MESSAGE_LIST: null,
+    SET_MESSAGE_LOADER: null,
+
 })
 
 

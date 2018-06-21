@@ -1,9 +1,9 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, Platform, View, Text, Modal, Image, TouchableOpacity } from 'react-native'
+import { View, Text, Modal, Image } from 'react-native'
 import styles from '../themes/FeStyle'
-import { Container, Right, StyleProvider, Content, Button } from 'native-base'
+import {  StyleProvider} from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import { bindActionCreators } from 'redux'

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -10,8 +10,7 @@ import renderIf from '../lib/renderIf'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import { Container, Content, Header, Left, Body, Icon, StyleProvider, Toast, Footer, FooterTab } from 'native-base'
-import { SIGNATURE } from '../lib/AttributeConstants'
+import { Container, Header, Body, Icon, StyleProvider, Toast } from 'native-base'
 import { OK, IMPROPER_SIGNATURE } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -140,7 +139,7 @@ class Signature extends PureComponent {
                                 showTitleLabel={false}
                                 viewMode={this.state.isLandscape} />
                         </View>
-                        {this.saveSignButton()}
+                                {this.saveSignButton()}
                     </View>
                 </Container>
             </StyleProvider >

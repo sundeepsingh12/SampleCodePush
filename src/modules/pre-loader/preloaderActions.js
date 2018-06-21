@@ -25,8 +25,6 @@ import {
   PRE_LOGOUT_SUCCESS,
   ERROR_400_403_LOGOUT,
   PRELOADER_SUCCESS,
-  Home,
-  Login,
   AutoLogoutScreen,
   JOB_MASTER,
   JOB_ATTRIBUTE,
@@ -62,7 +60,6 @@ import {
   APP_THEME,
   SET_APP_UPDATE_BY_CODEPUSH,
   SET_APP_UPDATE_STATUS,
-  FCM_TOKEN,
   IS_SHOW_MOBILE_OTP_SCREEN,
   IS_LOGGING_OUT
 } from '../../lib/constants'
@@ -78,7 +75,7 @@ import { NavigationActions } from 'react-navigation'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
-import { LOGOUT_UNSUCCESSFUL, OK, SHOW_MOBILE_SCREEN, SHOW_OTP, CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DOWNLOADING_PACKAGE, CODEPUSH_INSTALLING_UPDATE, CODEPUSH_SOMETHING_WENT_WRONG } from '../../lib/ContainerConstants'
+import { SHOW_MOBILE_SCREEN, SHOW_OTP, CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DOWNLOADING_PACKAGE, CODEPUSH_INSTALLING_UPDATE, CODEPUSH_SOMETHING_WENT_WRONG } from '../../lib/ContainerConstants'
 import codePush from "react-native-code-push"
 import { Platform } from 'react-native'
 import { performSyncService } from '../home/homeActions';

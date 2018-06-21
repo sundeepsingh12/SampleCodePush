@@ -208,7 +208,7 @@ class FormLayout {
 
     async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, taskListScreenDetails) {
         let routeName, routeParam
-        const currentStatus = await transientStatusAndSaveActivatedService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
+        const currentStatus = transientStatusAndSaveActivatedService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
             routeName = SaveActivated
             routeParam = {
@@ -217,13 +217,13 @@ class FormLayout {
             draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
 
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
-            let { elementsArray, amount } = await transientStatusAndSaveActivatedService.getDataFromFormElement(formLayoutState.formElement)
-            let totalAmount = await transientStatusAndSaveActivatedService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
+            let { elementsArray, amount } = transientStatusAndSaveActivatedService.getDataFromFormElement(formLayoutState.formElement)
+            let totalAmount = transientStatusAndSaveActivatedService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
             routeName = CheckoutDetails
             routeParam = { commonData: previousStatusSaveActivated.commonData.commonData, recurringData: previousStatusSaveActivated.recurringData, totalAmount, signOfData: elementsArray, jobMasterId }
             let formLayoutObject = formLayoutState.formElement
             if (navigationFormLayoutStates) {
-                formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
+                formLayoutObject = this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
             await transientStatusAndSaveActivatedService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
             draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
@@ -238,7 +238,7 @@ class FormLayout {
             routeParam = {}
             let formLayoutObject = formLayoutState.formElement
             if (navigationFormLayoutStates) {
-                formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
+                formLayoutObject = this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
             let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)

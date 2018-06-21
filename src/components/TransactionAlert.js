@@ -12,7 +12,6 @@ import styles from '../themes/FeStyle'
 import {
     Button
 } from 'native-base';
-import { DRAFT_RESTORE_MESSAGE, OK, CANCEL } from '../lib/ContainerConstants'
 export default class TransactionAlert extends PureComponent {
 
     _returnModalView() {

@@ -21,8 +21,6 @@ import _ from 'lodash'
 import {
     CameraAttribute,
 } from '../lib/constants'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
 import {
     SELECT_ANY_REASON,
     OPEN_CAMERA,

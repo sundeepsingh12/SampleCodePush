@@ -1,19 +1,18 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { addNavigationHelpers, createStackNavigator } from 'react-navigation'
+import { createStackNavigator } from 'react-navigation'
 import { BackHandler } from 'react-native'
 import Login from '../../containers/Login'
 import Preloader from '../../containers/Preloader'
 import Application from '../../containers/Application'
 import QrCodeScanner from '../../containers/QrCodeScanner'
-import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem, Root, } from 'native-base'
-import styles from '../../themes/FeStyle'
+import {  Root } from 'native-base'
 import { NavigationActions } from 'react-navigation'
 import AutoLogout from '../../containers/AutoLogout'
 import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
 import HomeTabNavigator from '../../containers/HomeTabNavigator'
-import { ApplicationScreen, HardwareBackPress, HomeScreen, HomeTabNavigatorScreen, LoginScreen, PreloaderScreen, SHOW_DISCARD_ALERT, RETURN_TO_HOME, SET_TRANSIENT_BACK_PRESSED, SET_SEQUENCE_BACK_ENABLED } from '../../lib/constants'
-import { createReduxBoundAddListener, createReactNavigationReduxMiddleware,initializeListeners } from 'react-navigation-redux-helpers'
+import { ApplicationScreen, HardwareBackPress, HomeTabNavigatorScreen, LoginScreen, PreloaderScreen, SHOW_DISCARD_ALERT, RETURN_TO_HOME, SET_TRANSIENT_BACK_PRESSED, SET_SEQUENCE_BACK_ENABLED } from '../../lib/constants'
+import { createReduxBoundAddListener, createReactNavigationReduxMiddleware, initializeListeners } from 'react-navigation-redux-helpers'
 import { setState } from '../global/globalActions'
 import PropTypes from 'prop-types'
 
@@ -77,7 +76,7 @@ class AppWithNavigationState extends React.PureComponent {
     };
     return (
       <Root>
-        <AppNavigator navigation={navigation }
+        <AppNavigator navigation={navigation}
         />
       </Root>
     )

@@ -10,8 +10,7 @@ import { addServerSmsService } from '../AddServerSms';
 import { fieldValidationService } from '../FieldValidation';
 import { jobStatusService } from '../JobStatus';
 import { keyValueDBService } from '../KeyValueDBService.js';
-
-
+import { runSheetService } from '../RunSheet';
 
 export default class FormLayoutEventImpl {
 
@@ -186,7 +185,7 @@ export default class FormLayoutEventImpl {
         }
         const prevStatusId = (jobTransactionList && jobTransactionList.length) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
         const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, lastTrackLog)
-        const runSheet = (jobTransactionId >= 0 || (jobTransactionList && jobTransactionList.length && jobTransactionList[0].jobTransactionId > 0)) ? await this._updateRunsheetSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value) : []
+        const runSheet = await this._updateRunsheetSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value);
         await this._updateUserSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value, userSummary.value, dbObjects.status[0].id)
         await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionList)
         let serverSmsLogs = await addServerSmsService.addServerSms(statusId, jobMasterId, fieldData, jobTransaction.value)
@@ -311,12 +310,13 @@ export default class FormLayoutEventImpl {
         const count = (jobTransactionList && jobTransactionList.length) ? jobTransactionList.length : 1
         let jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
         jobSummaryList.value.forEach(item => {
-            item.updatedTime = currentDate
             if (item.jobStatusId == prevStatusId) { // check for previous statusID
                 item.count = (item.count - count >= 0) ? item.count - count : 0
+                item.updatedTime = currentDate
             }
             if (item.jobStatusId == statusId) { // check for next statusID
                 item.count += count
+                item.updatedTime = currentDate
             }
         })
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
@@ -333,8 +333,13 @@ export default class FormLayoutEventImpl {
       * @returns {Object}  -> { tablename : TABLE, value : []}
       */
 
-    async _updateRunsheetSummary(prevStatusId, statusCategory, jobTransactionList) {
+    async _updateRunsheetSummary(prevStatusId, statusCategory, dbJobTransactionList) {
         let runSheetList = []
+        let transactionWithRunsheetObject = runSheetService.filterTransactionOnRunsheetIdPresentAndPrepareTransactionQuery(dbJobTransactionList);
+        if (_.size(transactionWithRunsheetObject.jobTransactionListWithRunsheetId) == 0) {
+            return [];
+        }
+        let jobTransactionList = transactionWithRunsheetObject.jobTransactionListWithRunsheetId;
         const status = ['pendingCount', 'failCount', 'successCount']
         const moneyTypeCollectionTypeMap = { 'Collection-Cash': 'cashCollected', 'Collection-SOD': 'cashCollectedByCard', 'Refund': 'cashPayment' }
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId) // get previous status category
@@ -343,9 +348,12 @@ export default class FormLayoutEventImpl {
             total[current.id] = Object.assign({}, current);
             return total;
         }, {}); // build map of runsheetId and runsheet
-        let prevJobTransactionValue = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION) // in case of mapping of moneycollect to more than 1 status, we have to get actual amount in previous status
+        let prevJobTransactionValue = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, transactionWithRunsheetObject.jobTransactionListWithRunsheetIdQuery) // in case of mapping of moneycollect to more than 1 status, we have to get actual amount in previous status
         let prevJobTransactionMap = _.keyBy(prevJobTransactionValue, 'id')
         for (let id in jobTransactionList) {
+            if (!runsheetMap[jobTransactionList[id].runsheetId]) {
+                continue;
+            }
             if (prevStatusCategory && runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] > 0) { // check for previousStatus category undefined and runSheetMap conut is greater than 0 
                 runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] -= 1
             }

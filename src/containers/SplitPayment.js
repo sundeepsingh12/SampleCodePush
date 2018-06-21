@@ -3,7 +3,7 @@
 import React, { Component } from 'react'
 import { StyleSheet, View, Text, Platform, TextInput, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Footer, FooterTab, Input, Button, Item, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox, StyleProvider } from 'native-base'
+import { Container, Content,Footer, FooterTab, Input, Button, Item,Icon, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -12,11 +12,9 @@ import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
-    CASH, CHEQUE, DEMAND_DRAFT, DISCOUNT, EZE_TAP, MOSAMBEE, MOSAMBEE_WALLET, MPAY, M_SWIPE, NET_BANKING, NET_BANKING_LINK,
-    NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, NOT_PAID, PAYNEAR, PAYO, PAYTM, POS, RAZOR_PAY, SODEXO, SPLIT, TICKET_RESTAURANT, UPI,
+     CHEQUE, DEMAND_DRAFT,
 } from '../lib/AttributeConstants'
-import { SET_PAYMENT_CHANGED_PARAMETERS, SET_SPLIT_PAYMENT, } from '../lib/constants'
-import { AMOUNT_TO_BE_COLLECTED, AMOUNT, PAYMENT, ADD_PAYMENT_MODE, YES, NO, SPLIT_PAYMENT, SELECT_PAYMENT_METHOD, SELECT_PAYMENT_METHOD_TO_SPLIT, NUMBER, SAVE } from '../lib/ContainerConstants'
+import { AMOUNT_TO_BE_COLLECTED, AMOUNT, PAYMENT, ADD_PAYMENT_MODE, NUMBER, SAVE } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
 
 function mapStateToProps(state) {

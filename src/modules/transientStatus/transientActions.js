@@ -26,22 +26,6 @@ export function setStateFromNavigationParams(navigationParams, transientFormLayo
             let cloneTransientFormLayoutMap = _.cloneDeep(transientFormLayoutMap)
             cloneTransientFormLayoutMap[currentStatus.id] = _.cloneDeep(formLayoutState)
             dispatch(setState(ADD_FORM_LAYOUT_STATE, cloneTransientFormLayoutMap))
-            if (_.size(currentStatus.nextStatusList) == 1) {
-                dispatch(navigateToScene(FormLayout, {
-                    contactData,
-                    jobTransactionId: jobTransaction.id,
-                    jobTransaction: jobTransaction,
-                    statusId: currentStatus.nextStatusList[0].id,
-                    statusName: currentStatus.nextStatusList[0].name,
-                    jobMasterId: jobMasterId,
-                    navigationFormLayoutStates: cloneTransientFormLayoutMap,
-                    latestPositionId: formLayoutState.latestPositionId,
-                    jobDetailsScreenKey,
-                    pageObjectAdditionalParams
-                },
-                    navigate
-                ))
-            }
             draftService.saveDraftInDb(formLayoutState, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
         } catch (error) {
             dispatch(setState(LOADER_IS_RUNNING, false))

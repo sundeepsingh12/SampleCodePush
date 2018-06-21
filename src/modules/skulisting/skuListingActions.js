@@ -3,10 +3,8 @@
 import {
     SKU_LIST_FETCHING_STOP,
     SKU_LIST_FETCHING_START,
-    SHOW_SEARCH_BAR,
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
-    SET_SHOW_VIEW_IMAGE,
     UPDATE_SKU_LIST_ITEMS,
     SkuListing,
     NEXT_FOCUS,
@@ -22,20 +20,12 @@ import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
 
 import {
-    SKU_ORIGINAL_QUANTITY,
-    SKU_CODE,
-    SKU_ACTUAL_QUANTITY,
-    TOTAL_ORIGINAL_QUANTITY,
-    TOTAL_ACTUAL_QUANTITY,
-    SKU_ACTUAL_AMOUNT,
     ARRAY_SAROJ_FAREYE,
     SKU_PHOTO,
     SKU_REASON,
     NA,
     SKUVALIDATION
 } from '../../lib/AttributeConstants'
-import { NavigationActions } from 'react-navigation'
-
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
 import {
@@ -108,7 +98,6 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
                 if (rowItem.attributeTypeId == SKU_PHOTO) {
                     value = await signatureService.saveFile(value, moment(), true)
                     navigation.pop(1)
-                    dispatch(setState(SET_SHOW_VIEW_IMAGE, { imageData: '', showImage: false, viewData: '' }))
                 }
                 let copyOfskuListItems = _.cloneDeep(skuListItems)
                 copyOfskuListItems[jobId][rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value

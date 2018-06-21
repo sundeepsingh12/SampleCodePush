@@ -109,7 +109,7 @@ class JobDetailsV2 extends PureComponent {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
     // reset dropdown state only when required
-    if(this.props.checkTransactionStatus){
+    if (this.props.checkTransactionStatus) {
       this.props.actions.setState(SET_CHECK_TRANSACTION_STATUS, null)
     }
     if (this.props.isShowDropdown) {
@@ -217,6 +217,7 @@ class JobDetailsV2 extends PureComponent {
       this.props.navigation.navigate)
     this._onCancel()
   }
+
   _onCancel = () => {
     this.props.actions.setState(IS_MISMATCHING_LOCATION, null)
   }
@@ -565,7 +566,7 @@ class JobDetailsV2 extends PureComponent {
           {etaTimer}
           {statusView}
         </View>
-
+        {this.showMessages()}
         {/*Basic Details*/}
         {this.showJobDetails()}
 
@@ -574,7 +575,18 @@ class JobDetailsV2 extends PureComponent {
       </Content>
     )
   }
-
+  showMessages() {
+    if (!_.isEmpty(this.props.messageList)) {
+      return (
+        <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
+          <ExpandableHeader
+            title={'Messages'}
+            dataList={this.props.messageList}
+          />
+        </View>
+      )
+    }
+  }
   showJobDetails() {
     return (
       <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
@@ -582,25 +594,26 @@ class JobDetailsV2 extends PureComponent {
           title={'Basic Details'}
           navigateToDataStoreDetails={this.navigateToDataStoreDetails}
           dataList={this.props.jobDataList}
+          showDetailsList={true}
         />
       </View>
     )
   }
   showPaymentSuccessfulScreen() {
     return (
-        <Content>
-            <View style={[styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
-                <Image
-                    style={style.imageSync}
-                    source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
-                />
-                <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
-                    {PAYMENT_SUCCESSFUL}
-                </Text>
-            </View>
-        </Content>
+      <Content>
+        <View style={[styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
+          <Image
+            style={style.imageSync}
+            source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
+          />
+          <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
+            {PAYMENT_SUCCESSFUL}
+          </Text>
+        </View>
+      </Content>
     )
-}
+  }
 
   showFieldDetails() {
     return (
@@ -609,7 +622,8 @@ class JobDetailsV2 extends PureComponent {
           title={'Field Details'}
           dataList={this.props.fieldDataList}
           navigateToDataStoreDetails={this.navigateToDataStoreDetails}
-          navigateToCameraDetails={this.navigateToCameraDetails} />
+          navigateToCameraDetails={this.navigateToCameraDetails}
+          showDetailsList={true} />
       </View>
     )
   }
@@ -661,47 +675,47 @@ class JobDetailsV2 extends PureComponent {
   }
 
   showPaymentFailedScreen() {
-    const  {draftStatusInfo, jobTransaction} = this.props
-    const {params, key} = this.props.navigation.state
+    const { draftStatusInfo, jobTransaction } = this.props
+    const { params, key } = this.props.navigation.state
     return (
-        <Content>
-            <View style={[ styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
-                <View style = {[styles.padding30]}>
-                <Image
-                    style={style.imageSync}
-                    source={require('../../images/fareye-default-iconset/checkTransactionError.png')}
-                />
-                </View>
-                <Text style={[styles.fontLg, styles.fontBlack, { marginTop: 27 }]}>
-                   { this.props.checkTransactionStatus}
-                </Text>
-                <View>
-                <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 50, width: 200 }, styles.alignCenter, styles.justifyCenter, { marginTop: 183 }]}
-                    onPress={() => {this.props.actions.checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, key, SET_CHECK_TRANSACTION_STATUS, JOB_DETAILS_FETCHING_START, null, this.props.navigation.goBack)}}  
-                    onLongPress={() => {this._goToFormLayoutWithoutDraft()}} >
-                    <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontRegular]}> {'Check Transaction'}</Text>
-                </Button>
-            </View>
-            </View>
-        </Content>
+      <Content>
+        <View style={[styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
+          <View style={[styles.padding30]}>
+            <Image
+              style={style.imageSync}
+              source={require('../../images/fareye-default-iconset/checkTransactionError.png')}
+            />
+          </View>
+          <Text style={[styles.fontLg, styles.fontBlack, { marginTop: 27 }]}>
+            {this.props.checkTransactionStatus}
+          </Text>
+          <View>
+            <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 50, width: 200 }, styles.alignCenter, styles.justifyCenter, { marginTop: 183 }]}
+              onPress={() => { this.props.actions.checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, key, SET_CHECK_TRANSACTION_STATUS, JOB_DETAILS_FETCHING_START, null, this.props.navigation.goBack) }}
+              onLongPress={() => { this._goToFormLayoutWithoutDraft() }} >
+              <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontRegular]}> {'Check Transaction'}</Text>
+            </Button>
+          </View>
+        </View>
+      </Content>
     )
-}
+  }
 
-_goToFormLayoutWithoutDraft = () => {
-  this.props.actions.deleteDraftAndNavigateToFormLayout({
-    contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
-    jobTransactionId: this.props.jobTransaction.id,
-    jobTransaction: this.props.jobTransaction,
-    statusId: this.props.draftStatusInfo.statusId,
-    statusName: this.props.draftStatusInfo.statusName,
-    jobMasterId: this.props.jobTransaction.jobMasterId,
-    pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
-    jobDetailsScreenKey: this.props.navigation.state.key
-  },
-  this.props.navigation.navigate
-  )
-  this.props.actions.setState(RESET_CHECK_TRANSACTION_AND_DRAFT)
-}
+  _goToFormLayoutWithoutDraft = () => {
+    this.props.actions.deleteDraftAndNavigateToFormLayout({
+      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+      jobTransactionId: this.props.jobTransaction.id,
+      jobTransaction: this.props.jobTransaction,
+      statusId: this.props.draftStatusInfo.statusId,
+      statusName: this.props.draftStatusInfo.statusName,
+      jobMasterId: this.props.jobTransaction.jobMasterId,
+      pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
+      jobDetailsScreenKey: this.props.navigation.state.key
+    },
+      this.props.navigation.navigate
+    )
+    this.props.actions.setState(RESET_CHECK_TRANSACTION_AND_DRAFT)
+  }
 
   _goToFormLayoutWithDraft = () => {
     this.props.actions.restoreDraftAndNavigateToFormLayout(
@@ -716,21 +730,21 @@ _goToFormLayoutWithoutDraft = () => {
     this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
   }
 
-  renderView(checkTransactionStatus){
-    switch(checkTransactionStatus){
-      case null : {
+  renderView(checkTransactionStatus) {
+    switch (checkTransactionStatus) {
+      case null: {
         return this.detailsContainerView()
       }
-      case TRANSACTION_SUCCESSFUL : {
+      case TRANSACTION_SUCCESSFUL: {
         return this.showPaymentSuccessfulScreen()
       }
-      default : {
+      default: {
         return this.showPaymentFailedScreen()
       }
+    }
   }
-}
 
-  detailsContainerView(){
+  detailsContainerView() {
     const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
     const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
     return (
@@ -740,7 +754,7 @@ _goToFormLayoutWithoutDraft = () => {
           {draftAlert}
           {mismatchAlert}
           {this.showHeaderView()}
-          { this.showContentView()}
+          {this.showContentView()}
           {this.showFooterView()}
         </Container>
       </StyleProvider>
@@ -815,7 +829,7 @@ const style = StyleSheet.create({
     width: 116,
     height: 116,
     resizeMode: 'contain'
-}
+  }
 
 });
 

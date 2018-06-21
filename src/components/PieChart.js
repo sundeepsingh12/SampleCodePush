@@ -6,12 +6,9 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform,
-    SegmentedControlIOS,
     TouchableHighlight
 }
     from 'react-native'
-import { Icon} from 'native-base'
 import styles from '../themes/FeStyle'
 import LinearGradient from 'react-native-linear-gradient'
 import CircularProgress from '../svg_components/components/CircularProgress'

@@ -1,15 +1,13 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { Platform, BackHandler, View, StyleSheet, Text } from 'react-native'
-import { Icon, Header, Body, Image } from 'native-base'
+import { Icon} from 'native-base'
 import { connect } from 'react-redux'
-import { createBottomTabNavigator,createStackNavigator } from 'react-navigation'
+import { createBottomTabNavigator } from 'react-navigation'
 import SyncScreen from './SyncScreen'
 import ErpSyncScreen from './ErpSyncScreen'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
-import { NavigationActions } from 'react-navigation'
 import HomeStack from '../modules/navigators/HomeStackNavigator'
 import MenuStack from '../modules/navigators/MenuStackNavigator'
 
@@ -37,18 +35,18 @@ class HomeTabNavigator extends PureComponent {
         HomeStack.navigationOptions =  MenuStack.navigationOptions = ({ navigation }) => {
             let tabBarVisible = true;
             if (navigation.state.index > 0) {
-              tabBarVisible = false;
+                tabBarVisible = false;
             }
             return {
-              tabBarVisible,
+                tabBarVisible,
             };
-          };
+        };
 
         const Tabs = {
-            Home:{
-                screen:HomeStack,
-                navigationOptions:{ 
-                    header:null,
+            Home: {
+                screen: HomeStack,
+                navigationOptions: {
+                    header: null,
                     tabBarIcon: ({ tintColor }) => (
                     <Icon
                         name='ios-home'
@@ -83,10 +81,10 @@ class HomeTabNavigator extends PureComponent {
                     ),
                 }
             },
-            Menu:{
-                screen:MenuStack,
-                navigationOptions:{ 
-                    header:null,
+            Menu: {
+                screen: MenuStack,
+                navigationOptions: {
+                    header: null,
                     tabBarIcon: ({ tintColor }) => (
                     <Icon
                         name='md-menu'
@@ -139,7 +137,7 @@ class HomeTabNavigator extends PureComponent {
             );
         } else {
             HomeTabNavigatorOptions = createBottomTabNavigator({
-                Home:Tabs.Home,
+                Home: Tabs.Home,
                 SyncScreen: Tabs.SyncScreen,
                 Menu: Tabs.Menu,
             },

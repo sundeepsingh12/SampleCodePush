@@ -113,6 +113,9 @@ class SignatureRemarks {
                         if (validationCountForImage == 0) {
                             validationObject.imageUploadFromDevice = (validation.condition == 'true')
                             validationCountForImage = 1
+                        } else if(validationCountForImage == 1){
+                            validationObject.cropImageValidation = (validation.condition == 'true')
+                            validationCountForImage = 2
                         }
                         break
                     case REMARKS:

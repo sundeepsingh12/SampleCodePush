@@ -12,7 +12,6 @@ import { Container, Content, Header, Button, Text, Body, Right, Icon, List, List
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import CheckoutDetails from '../containers/CheckoutDetails'
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
 import { FormLayout, Discard, Keep, Cancel, Checkout, SHOW_DISCARD_ALERT, SET_SAVE_ACTIVATED_DRAFT, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE, SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED } from '../lib/constants'
 import { Yes_Checkout, Total, } from '../lib/AttributeConstants'
