@@ -126,10 +126,10 @@ export function saveMoneyCollectObject(actualAmount, currentElement, jobTransact
             } else {
                 jobTransactionIdAmountMap.moneyTransactionType = COLLECTION_SOD
             }
-            formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).jobTransactionIdAmountMap = jobTransactionIdAmountMap
+            formLayoutState.formElement[currentElement.fieldAttributeMasterId].jobTransactionIdAmountMap = jobTransactionIdAmountMap
             formLayoutState.formElement = CashTenderingService.checkForCashTenderingAndResetValue(formLayoutState.formElement, currentElement)
             let paymentAtEnd = {
-                currentElement: formLayoutState.formElement.get(currentElement.fieldAttributeMasterId),
+                currentElement: formLayoutState.formElement[currentElement.fieldAttributeMasterId],
                 modeTypeId: selectedPaymentMode,
                 parameters: null,
                 isCardPayment

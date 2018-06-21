@@ -26,6 +26,7 @@ function mapStateToProps(state) {
         arrayMainObject: state.array.arrayMainObject,
         isLoading: state.array.isLoading,
         arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
+        sequenceWiseMasterIds: state.array.sequenceWiseMasterIds
     }
 }
 function mapDispatchToProps(dispatch) {
@@ -57,8 +58,8 @@ class ArrayFieldAttribute extends PureComponent {
             isSaveDisabled: this.props.isSaveDisabled,
             latestPositionId: this.props.navigation.state.params.formLayoutState.latestPositionId,
             fieldAttributeMasterParentIdMap: this.props.navigation.state.params.formLayoutState.fieldAttributeMasterParentIdMap,
-            jobAndFieldAttributesList: this.props.navigation.state.params.formLayoutState.jobAndFieldAttributesList
-
+            jobAndFieldAttributesList: this.props.navigation.state.params.formLayoutState.jobAndFieldAttributesList,
+            sequenceWiseMasterIds: this.props.sequenceWiseMasterIds
         }
         return (
             <ArrayBasicComponent
@@ -88,7 +89,9 @@ class ArrayFieldAttribute extends PureComponent {
                 this.props.childElementsTemplate,
                 this.props.arrayElements,
                 this.props.navigation.state.params.jobTransaction,
-                this.props.isSaveDisabled)
+                this.props.isSaveDisabled,
+                this.props.sequenceWiseMasterIds
+            )
         }
     }
     savePressed = () => {

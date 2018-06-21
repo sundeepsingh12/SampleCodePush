@@ -174,7 +174,7 @@ class BasicFormElement extends PureComponent {
     }
 
     _getNextFocusableElement(value) {
-        if (value.length < 2 && this.props.formLayoutState.formElement.get(this.props.item.fieldAttributeMasterId).attributeTypeId != 62) {
+        if (value.length < 2 && this.props.formLayoutState.formElement[this.props.item.fieldAttributeMasterId].attributeTypeId != 62) {
             this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formLayoutState, value, null, this.props.jobTransaction);
         }
         else {
@@ -206,7 +206,7 @@ class BasicFormElement extends PureComponent {
         if (!this.props.modalFieldAttributeMasterId || this.props.modalFieldAttributeMasterId !== this.props.item.fieldAttributeMasterId) {
             return null
         }
-        let attributeTypeId = this.props.formElement.get(this.props.modalFieldAttributeMasterId).attributeTypeId
+        let attributeTypeId = this.props.formElement[this.props.modalFieldAttributeMasterId].attributeTypeId
         if (attributeTypeId == CHECKBOX || attributeTypeId == OPTION_RADIO_FOR_MASTER || attributeTypeId == RADIOBUTTON || attributeTypeId == DROPDOWN || attributeTypeId == ADVANCE_DROPDOWN) {
             return (
                 <View>

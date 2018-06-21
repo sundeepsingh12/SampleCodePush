@@ -36,6 +36,7 @@ import { fieldValidationService } from '../FieldValidation'
 import { dataStoreService } from '../DataStoreService.js'
 import { geoFencingService } from '../GeoFencingService.js'
 import * as realm from '../../../repositories/realmdb'
+import { transactionCustomizationService } from '../TransactionCustomization'
 import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../../lib/ContainerConstants'
 class FormLayout {
 
@@ -52,80 +53,37 @@ class FormLayout {
         if (!statusId) {
             throw new Error('Missing statusId');
         }
-        const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
-        const jobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
-        const user = await keyValueDBService.getValueFromStore(USER)
-        const hub = await keyValueDBService.getValueFromStore(HUB)
-        const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS);
-        const fieldAttributeMasterValidation = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION);
-        const fieldAttributeValidationCondition = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION_CONDITION);
-
-        if (!fieldAttributes || !fieldAttributes.value || !fieldAttributeStatusList || !fieldAttributeStatusList.value) {
+        const { fieldAttributes, jobAttributes, user, hub, fieldAttributeStatusList, fieldAttributeMasterValidation, fieldAttributeValidationCondition } = await transactionCustomizationService.getFormLayoutParameters()
+        if (!fieldAttributes || !fieldAttributeStatusList) {
             throw new Error('Value of fieldAttributes or fieldAttribute Status missing')
         }
-        let filedAttributesMappedToStatus = fieldAttributeStatusList.value.filter(fieldAttributeStatus => fieldAttributeStatus.statusId == statusId)
-            .sort((a, b) => a.sequence - b.sequence) // first find list of fieldAttributeStatus mapped to a status using filter, then sort them on their sequence and then get list of fieldAttributeIds using map
-
-        if (!filedAttributesMappedToStatus) {
+        let fieldAttributesMappedToStatus = fieldAttributeStatusList.filter(fieldAttributeStatus => fieldAttributeStatus.statusId == statusId).sort((a, b) => a.sequence - b.sequence)
+        // first find list of fieldAttributeStatus mapped to a status using filter, then sort them on their sequence and then get list of fieldAttributeIds using map
+        if (_.isEmpty(fieldAttributesMappedToStatus)) {
             return []
         }
-        let fieldAttributeMap = {}; //map for root field attributes
-        let fieldAttributeValidationMap = {};
-        let arrayMainObject = {};
-        let fieldAttributeMasterParentIdMap = {}
+        let fieldAttributeMap = {}, arrayMainObject = {} //map for root field attributes
         if (fieldAttributeMasterIdFromArray) {
-            arrayMainObject = fieldAttributes.value.filter(fieldAttributeObject => (fieldAttributeObject.parentId == fieldAttributeMasterIdFromArray &&
-                fieldAttributeObject.attributeTypeId == OBJECT))
+            arrayMainObject = fieldAttributes.filter(fieldAttributeObject => (fieldAttributeObject.parentId == fieldAttributeMasterIdFromArray && fieldAttributeObject.attributeTypeId == OBJECT))
         }
-
-        for (const fieldAttribute of fieldAttributes.value) {
-            if (fieldAttribute)
-                if (fieldAttributeMasterIdFromArray) {
-                    if (fieldAttribute.parentId == arrayMainObject[0].id) {
-                        fieldAttributeMap[fieldAttribute.id] = fieldAttribute
-                    }
-                } else {
-                    fieldAttributeMap[fieldAttribute.id] = fieldAttribute;
-                }
-        }
-
-        let sequenceWiseSortedFieldAttributesForStatus = []
-
-        for (let index in filedAttributesMappedToStatus) {
-            fieldAttributeMasterParentIdMap[filedAttributesMappedToStatus[index].fieldAttributeId] = fieldAttributeMasterIdFromArray ? {} : fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId
-            if (fieldAttributeMasterIdFromArray) {
-                if (fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) {
-                    sequenceWiseSortedFieldAttributesForStatus.push(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId])
-                }
-            } else if (!fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId) {
-                sequenceWiseSortedFieldAttributesForStatus.push(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId])
+        for (const fieldAttribute in fieldAttributes) {
+            if (!fieldAttributeMasterIdFromArray || (fieldAttributeMasterIdFromArray && fieldAttributes[fieldAttribute].parentId == arrayMainObject[0].id)) {
+                fieldAttributeMap[fieldAttributes[fieldAttribute].id] = fieldAttributes[fieldAttribute]
             }
-            // if ((fieldAttributeMasterIdFromArray && fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) || (!fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId)) {
-            //     sequenceWiseSortedFieldAttributesForStatus.push(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId])
-            // }
-        } //getting fieldAttribute list
-
-        const fieldAttributeMasterValidationMap = this.getFieldAttributeValidationMap(fieldAttributeMasterValidation.value);
-        const fieldAttrMasterValidationConditionMap = this.getFieldAttributeValidationConditionMap(fieldAttributeValidationCondition.value, fieldAttributeMasterValidationMap)
+        }
+        const fieldAttributeMasterValidationMap = this.getFieldAttributeValidationMap(fieldAttributeMasterValidation);
+        const fieldAttrMasterValidationConditionMap = this.getFieldAttributeValidationConditionMap(fieldAttributeValidationCondition, fieldAttributeMasterValidationMap)
         if (!latestPositionId) {
             latestPositionId = this.getLatestPositionIdForJobTransaction(jobTransaction)
         }
-        const sequenceWiseFormLayout = this.getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap, jobTransaction, latestPositionId)
+        const sequenceWiseFormLayout = this.getFormLayoutSortedObject(fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap, latestPositionId, fieldAttributesMappedToStatus, fieldAttributeMap, fieldAttributeMasterIdFromArray)
         if (fieldAttributeMasterIdFromArray) {
             sequenceWiseFormLayout.arrayMainObject = arrayMainObject[0]
             return sequenceWiseFormLayout
-        }
-        else {
-            sequenceWiseFormLayout.fieldAttributeMasterParentIdMap = fieldAttributeMasterParentIdMap
-            sequenceWiseFormLayout.jobAndFieldAttributesList = {
-                jobAttributes: jobAttributes.value,
-                fieldAttributes: fieldAttributes.value,
-                user: user.value,
-                hub: hub.value
-            }
+        } else {
+            sequenceWiseFormLayout.jobAndFieldAttributesList = { jobAttributes, fieldAttributes, user, hub }
             return sequenceWiseFormLayout
         }
-
     }
 
     /**
@@ -181,40 +139,30 @@ class FormLayout {
      * @param {*} fieldAttributeMasterValidationMap fieldAttributeMaster validation map
      * @param {*} fieldAttrMasterValidationConditionMap validation condition map
      */
-    getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap, jobTransaction, latestPositionId) {
-        let formLayoutObject = new Map()
-        if (!sequenceWiseSortedFieldAttributesForStatus || sequenceWiseSortedFieldAttributesForStatus.length == 0) {
+    getFormLayoutSortedObject(fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap, latestPositionId, fieldAttributesMappedToStatus, fieldAttributeMap, fieldAttributeMasterIdFromArray) {
+        let formLayoutObject = {}
+        let fieldAttributeMasterParentIdMap = {}, sequenceWiseSortedFieldAttributesMasterIds = [], counterPositionId = latestPositionId + 1
+        for (let i = 0; i < fieldAttributesMappedToStatus.length; i++) {
+            let particularFieldAttributeMap = fieldAttributeMap[fieldAttributesMappedToStatus[i].fieldAttributeId]
+            if(!fieldAttributeMasterIdFromArray){
+                fieldAttributeMasterParentIdMap[fieldAttributesMappedToStatus[i].fieldAttributeId] = particularFieldAttributeMap.parentId
+            }
+            if ((!fieldAttributeMasterIdFromArray && !particularFieldAttributeMap.parentId) || (fieldAttributeMasterIdFromArray && particularFieldAttributeMap)) {
+                sequenceWiseSortedFieldAttributesMasterIds.push(fieldAttributesMappedToStatus[i].fieldAttributeId)
+                let validationArr = fieldAttributeMasterValidationMap[particularFieldAttributeMap.id]
+                if (validationArr && validationArr.length > 0 && fieldAttrMasterValidationConditionMap) {
+                    for (var validation of validationArr) {
+                        validation.conditions = fieldAttrMasterValidationConditionMap[validation.id]
+                    }
+                }
+                formLayoutObject[particularFieldAttributeMap.id] = this.getFieldAttributeObject(particularFieldAttributeMap, validationArr, counterPositionId++)
+            }
+        }
+        if (_.isEmpty(formLayoutObject)) {
             return { formLayoutObject, isSaveDisabled: false, noFieldAttributeMappedWithStatus: true } //no field attribute mapped to this status
         }
-
-        let isRequiredAttributeFound = false
-        let tempFieldAttributeList = []
-        for (let i = 0; i < sequenceWiseSortedFieldAttributesForStatus.length; i++) {
-            let fieldAttribute = sequenceWiseSortedFieldAttributesForStatus[i]
-            if (!isRequiredAttributeFound) {
-                fieldAttribute.required ? (fieldAttribute.editable = true, fieldAttribute.focus = true, isRequiredAttributeFound = true) : fieldAttribute.editable = true
-            }
-            let validationArr = fieldAttributeMasterValidationMap[fieldAttribute.id]
-            if (validationArr && validationArr.length > 0 && fieldAttrMasterValidationConditionMap) {
-                for (var validation of validationArr) {
-                    validation.conditions = fieldAttrMasterValidationConditionMap[validation.id]
-                }
-            }
-            formLayoutObject.set(fieldAttribute.id, this.getFieldAttributeObject(fieldAttribute, validationArr, i + latestPositionId + 1))
-            if (!fieldAttribute.hidden) {
-                tempFieldAttributeList.push(formLayoutObject.get(fieldAttribute.id))
-            }
-        }
-        //TODO remove this code (just a quick fix for demo)
-        // if (tempFieldAttributeList.length == 1) {
-        //     fieldValidationService.fieldValidations(tempFieldAttributeList[0], formLayoutObject, BEFORE, jobTransaction)
-        //     if (tempFieldAttributeList[0].value != undefined && tempFieldAttributeList[0].value != null && tempFieldAttributeList[0].value != '') {
-        //         isRequiredAttributeFound = false
-        //     }
-        //     // formLayoutObject.set(tempFieldAttributeList[0].id, this.getFieldAttributeObject(tempFieldAttributeList[0], formLayoutObject.get(tempFieldAttributeList[0].id).validation, formLayoutObject.get(tempFieldAttributeList[0].id).positionId))
-        // }
-        let positionId = sequenceWiseSortedFieldAttributesForStatus.length + latestPositionId
-        return { formLayoutObject, isSaveDisabled: isRequiredAttributeFound, latestPositionId: positionId, noFieldAttributeMappedWithStatus: false }
+        let positionId = sequenceWiseSortedFieldAttributesMasterIds.length + latestPositionId
+        return { formLayoutObject, isSaveDisabled: false, latestPositionId: positionId, noFieldAttributeMappedWithStatus: false, fieldAttributeMasterParentIdMap, sequenceWiseSortedFieldAttributesMasterIds }
     }
 
 
@@ -251,12 +199,9 @@ class FormLayout {
     }
 
     concatFormElementForTransientStatus(navigationFormLayoutStates, formElement) {
-        let combineMap = new Map(formElement)
+        let combineMap = _.assign({}, formElement)
         for (let formLayoutCounter in navigationFormLayoutStates) {
-            let formElementForPreviousStatus = navigationFormLayoutStates[formLayoutCounter].formElement
-            let formElement1 = JSON.parse(JSON.stringify([...combineMap]))//deep cloning ES6 Map
-            let formElement2 = JSON.parse(JSON.stringify([...formElementForPreviousStatus]))// concatinating fieldAttributes i.e. formElement map of multiple status in case if transient status is present
-            combineMap = new Map(formElement1.concat(formElement2))
+            combineMap = _.assign({}, combineMap, navigationFormLayoutStates[formLayoutCounter].formElement)
         }
         return combineMap
     }
@@ -314,18 +259,18 @@ class FormLayout {
         if (!formElement) {
             throw new Error('formElement is missing')
         }
-        for (let [id, currentObject] of formElement.entries()) {
-            let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
-            let uniqueValidationResult = this.checkUniqueValidation(currentObject)
+        for (let currentObject in formElement) {
+            let afterValidationResult = fieldValidationService.fieldValidations(formElement[currentObject], formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+            let uniqueValidationResult = this.checkUniqueValidation(formElement[currentObject])
             if (uniqueValidationResult) {
-                currentObject.alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
+                formElement[currentObject].alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
             }
-            currentObject.value = afterValidationResult && !uniqueValidationResult ? currentObject.displayValue : null
-            if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
+            formElement[currentObject].value = afterValidationResult && !uniqueValidationResult ? formElement[currentObject].displayValue : null
+            if (formElement[currentObject].required && (formElement[currentObject].value == undefined || formElement[currentObject].value == null || formElement[currentObject].value == '')) {
                 return { isFormValid: false, formElement }
-            } else if ((currentObject.value && currentObject.value != 0) && (currentObject.attributeTypeId == 6 || currentObject.attributeTypeId == 27) && !Number.isInteger(Number(currentObject.value))) {
+            } else if ((formElement[currentObject].value && formElement[currentObject].value != 0) && (formElement[currentObject].attributeTypeId == 6 || formElement[currentObject].attributeTypeId == 27) && !Number.isInteger(Number(formElement[currentObject].value))) {
                 return { isFormValid: false, formElement }
-            } else if ((currentObject.value && currentObject.value != 0) && currentObject.attributeTypeId == 13 && !Number(currentObject.value)) {
+            } else if ((formElement[currentObject].value && formElement[currentObject].value != 0) && formElement[currentObject].attributeTypeId == 13 && !Number(formElement[currentObject].value)) {
                 return { isFormValid: false, formElement }
             }
         }

@@ -1,7 +1,29 @@
 'use strict'
 
 import { keyValueDBService } from './KeyValueDBService'
-import { CUSTOMER_CARE, CUSTOMIZATION_LIST_MAP, JOB_ATTRIBUTE, JOB_ATTRIBUTE_STATUS, JOB_MASTER, JOB_STATUS, SMS_TEMPLATE, TAB, USER, LAST_SYNC_WITH_SERVER, FIELD_ATTRIBUTE, SMS_JOB_STATUS, IS_SERVER_REACHABLE, USER_SUMMARY, JOB_SUMMARY, HUB, DEVICE_IMEI, USER_EVENT_LOG, PENDING_SYNC_TRANSACTION_IDS, CUSTOM_NAMING, PAGES } from '../../lib/constants'
+import {
+    CUSTOMER_CARE,
+    CUSTOMIZATION_LIST_MAP,
+    JOB_ATTRIBUTE,
+    JOB_ATTRIBUTE_STATUS,
+    JOB_MASTER, JOB_STATUS, 
+    SMS_TEMPLATE, TAB, USER, 
+    LAST_SYNC_WITH_SERVER, 
+    FIELD_ATTRIBUTE, 
+    SMS_JOB_STATUS, 
+    IS_SERVER_REACHABLE, 
+    USER_SUMMARY, 
+    JOB_SUMMARY, 
+    HUB, 
+    DEVICE_IMEI, 
+    USER_EVENT_LOG, 
+    PENDING_SYNC_TRANSACTION_IDS, 
+    CUSTOM_NAMING, 
+    PAGES,
+    FIELD_ATTRIBUTE_STATUS,
+    FIELD_ATTRIBUTE_VALIDATION,
+    FIELD_ATTRIBUTE_VALIDATION_CONDITION
+} from '../../lib/constants'
 
 class TransactionCustomization {
 
@@ -39,6 +61,8 @@ class TransactionCustomization {
             customNaming: customNaming ? customNaming.value : customNaming
         }
     }
+
+
 
     /**
      * This function fetch different values from store for upload and download data api
@@ -90,6 +114,25 @@ class TransactionCustomization {
             userEventsLogsList: userEventsLogsList ? userEventsLogsList.value : userEventsLogsList,
             transactionIdToBeSynced: transactionIdToBeSynced ? transactionIdToBeSynced.value : transactionIdToBeSynced,
             pageList: pageList ? pageList.value : pageList
+        }
+    }
+
+    async getFormLayoutParameters() {
+        const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
+        const jobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+        const user = await keyValueDBService.getValueFromStore(USER)
+        const hub = await keyValueDBService.getValueFromStore(HUB)
+        const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS);
+        const fieldAttributeMasterValidation = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION);
+        const fieldAttributeValidationCondition = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION_CONDITION);
+        return {
+            fieldAttributes: fieldAttributes ? fieldAttributes.value : fieldAttributes,
+            jobAttributes: jobAttributes ? jobAttributes.value : jobAttributes,
+            user: user ? user.value : user,
+            hub: hub ? hub.value : hub,
+            fieldAttributeStatusList: fieldAttributeStatusList ? fieldAttributeStatusList.value : jobMasterIdCustomizationMap,
+            fieldAttributeMasterValidation: fieldAttributeMasterValidation ? fieldAttributeMasterValidation.value : fieldAttributeMasterValidation,
+            fieldAttributeValidationCondition: fieldAttributeValidationCondition ? fieldAttributeValidationCondition.value : fieldAttributeValidationCondition
         }
     }
 }

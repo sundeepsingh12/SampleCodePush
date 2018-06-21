@@ -402,13 +402,22 @@ class ArrayBasicComponent extends PureComponent {
                 return null
         }
     }
+
+    _renderArrayData(){
+        let formData  = []
+        let sequenceWiseMasterIds = this.props.formLayoutState.sequenceWiseMasterIds
+        for(let id in sequenceWiseMasterIds){
+          formData.push(this.props.arrayRow.formLayoutObject[sequenceWiseMasterIds[id]])
+        }
+        return formData
+      }
     render() {
         return (
             <View style={[style.card, styles.bgWhite]}>
                 <View style={[styles.flexBasis90]}>
                     <FlatList
-                        data={Array.from(this.props.arrayRow.formLayoutObject)}
-                        renderItem={(item) => this._renderData(item.item[1])}
+                        data={this._renderArrayData()}
+                        renderItem={(item) => this._renderData(item.item)}
                         keyExtractor={item => String(item[0])}
                     />
                 </View>
