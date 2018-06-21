@@ -469,7 +469,7 @@ class JobTransaction {
     async checkIdToBeSync(jobTransactionId) {
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
         let checkId = false
-        if (pendingSyncTransactionIds && pendingSyncTransactionIds.value.length > 0) {
+        if (pendingSyncTransactionIds && pendingSyncTransactionIds.value && _.size(pendingSyncTransactionIds.value) > 0) {
             for (let item of pendingSyncTransactionIds.value) {
                 if (item.id == jobTransactionId) {
                     checkId = true

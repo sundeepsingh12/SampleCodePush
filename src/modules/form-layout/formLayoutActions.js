@@ -9,6 +9,7 @@ import {
     JOB_STATUS,
     NEXT_FOCUS,
     TabScreen,
+    Transient,
     HomeTabNavigatorScreen,
     CLEAR_FORM_LAYOUT,
     SET_FORM_LAYOUT_STATE,
@@ -19,12 +20,12 @@ import {
     SET_FORM_INVALID_AND_FORM_ELEMENT,
     SYNC_RUNNING_AND_TRANSACTION_SAVING,
     SET_LANDING_TAB,
+    FormLayout,
     CLEAR_FORM_LAYOUT_WITH_LOADER
 } from '../../lib/constants'
 
 import {
     AFTER,
-    Start,
 } from '../../lib/AttributeConstants'
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
@@ -199,9 +200,38 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
                         dispatch(fetchJobs())
                         dispatch(setState(CLEAR_FORM_LAYOUT))
+                    } else if (routeName == Transient) {
+                        //When single status is present in transient case navigate to form layout directly
+                        if (_.size(routeParam.currentStatus.nextStatusList) == 1) {
+                            let { formLayoutState, currentStatus, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams } = routeParam
+                            if (!navigationFormLayoutStates) {
+                                navigationFormLayoutStates = {}
+                            }
+                            let cloneTransientFormLayoutMap = _.cloneDeep(navigationFormLayoutStates)
+                            cloneTransientFormLayoutMap[currentStatus.id] = formLayoutState
+                            dispatch(setState(ADD_FORM_LAYOUT_STATE, cloneTransientFormLayoutMap))
+                            dispatch(navigateToScene(FormLayout, {
+                                contactData,
+                                jobTransactionId: jobTransaction.id,
+                                jobTransaction: jobTransaction,
+                                statusId: currentStatus.nextStatusList[0].id,
+                                statusName: currentStatus.nextStatusList[0].name,
+                                jobMasterId: jobMasterId,
+                                navigationFormLayoutStates: cloneTransientFormLayoutMap,
+                                latestPositionId: formLayoutState.latestPositionId,
+                                jobDetailsScreenKey,
+                                pageObjectAdditionalParams,
+                                previousStatus: currentStatus
+                            },
+                                navigate
+                            ))
+                            draftService.saveDraftInDb(formLayoutState, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
+                        } else {
+                            dispatch(navigateToScene(routeName, routeParam, navigate))
+                        }
                     } else {
-                        if(key){
-                           goBack(key)
+                        if (key) {
+                            goBack(key)
                         }
                         dispatch(navigateToScene(routeName, routeParam, navigate))
                     }
@@ -315,7 +345,7 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                 statusId: draftRestored.formLayoutState.statusId,
                 statusName: draftRestored.formLayoutState.statusName,
                 jobMasterId: draft.jobMasterId,
-                navigationFormLayoutStates: !_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore) ? draftRestored.navigationFormLayoutStatesForRestore : (navgiationStateForSaveActivated ? navgiationStateForSaveActivated : null),
+                navigationFormLayoutStates: !_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore) ? draftRestored.navigationFormLayoutStatesForRestore : (navgiationStateForSaveActivated ? navgiationStateForSaveActivated : {}),
                 isDraftRestore: true,
                 pageObjectAdditionalParams,
                 jobDetailsScreenKey
