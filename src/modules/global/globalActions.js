@@ -17,13 +17,11 @@ import {
   BACKUP_ALREADY_EXIST,
   USER_EXCEPTION_LOGS,
   SYNC_RUNNING_AND_TRANSACTION_SAVING,
-  DOWNLOAD_LATEST_APP,
   LoginScreen,
   IS_SHOW_MOBILE_OTP_SCREEN
 } from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import CONFIG from '../../lib/config'
-import { onResyncPress } from '../home/homeActions'
 import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions, StackActions } from 'react-navigation'
 import { trackingService } from '../../services/classes/Tracking'
@@ -31,7 +29,6 @@ import { Toast } from 'native-base'
 import { userExceptionLogsService } from '../../services/classes/UserException'
 import { OK } from '../../lib/ContainerConstants'
 import { logoutService } from '../../services/classes/Logout'
-import package_json from '../../../package.json'
 import RNFS from 'react-native-fs'
 import { PATH_CUSTOMER_IMAGES } from '../../lib/AttributeConstants'
 

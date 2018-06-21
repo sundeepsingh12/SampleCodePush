@@ -1,14 +1,11 @@
 import React, { PureComponent } from 'react'
 import {
-    StyleSheet,
     View,
     Text,
-    Modal,
     TextInput,
     Platform,
     TouchableOpacity,
 } from 'react-native'
-import Loader from '../components/Loader'
 import { Content, Button, StyleProvider, Item, Icon, Spinner } from 'native-base';
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -19,7 +16,6 @@ import { setState } from '../modules/global/globalActions'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import {
     ENTER_MOBILE,
-    CLOSE,
     SEND_OTP,
     ENTER_OTP,
     OTP_CODE_SENT,
@@ -29,7 +25,6 @@ import {
     DID_NOT_RECEIVE_OTP,
     ONE_TIME_PASSOWRD_WILL_BE_SENT_TO_MOBILE_NO,
     SHOW_MOBILE_SCREEN,
-    SHOW_OTP
 } from '../lib/ContainerConstants'
 
 import {

@@ -1,12 +1,10 @@
 'use strict'
 
 import {
-    FIELD_ATTRIBUTE,
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
     UPDATE_FIELD_DATA,
     SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT,
     IS_LOADING,
-    ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
     JOB_STATUS,
     NEXT_FOCUS,
@@ -15,9 +13,6 @@ import {
     HomeTabNavigatorScreen,
     CLEAR_FORM_LAYOUT,
     SET_FORM_LAYOUT_STATE,
-    SET_UPDATE_DRAFT,
-    CLEAR_BULK_STATE,
-    SET_FORM_TO_INVALID,
     USER,
     AutoLogoutScreen,
     SET_OPTION_ATTRIBUTE_ERROR,
@@ -25,7 +20,8 @@ import {
     SET_FORM_INVALID_AND_FORM_ELEMENT,
     SYNC_RUNNING_AND_TRANSACTION_SAVING,
     SET_LANDING_TAB,
-    FormLayout
+    FormLayout,
+    CLEAR_FORM_LAYOUT_WITH_LOADER
 } from '../../lib/constants'
 
 import {
@@ -53,7 +49,7 @@ import { fetchJobs } from '../taskList/taskListActions';
 export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
     return async function (dispatch) {
         try {
-            dispatch(setState(IS_LOADING, true))
+            dispatch(setState(CLEAR_FORM_LAYOUT_WITH_LOADER))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
             let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
@@ -173,7 +169,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack, key) {
     return async function (dispatch) {
         try {
             let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
@@ -192,7 +188,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                     const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
                     let { routeName, routeParam } = await formLayoutService.saveAndNavigate(cloneFormLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, taskListScreenDetails)
                     dispatch(setState(IS_LOADING, false))
-                    if (routeName == TabScreen && taskListScreenDetails.jobDetailsScreenKey) {
+                    if (routeName == TabScreen && taskListScreenDetails.jobDetailsScreenKey && taskListScreenDetails.pageObjectAdditionalParams) {
                         let landingTabId = JSON.parse(taskListScreenDetails.pageObjectAdditionalParams).landingTabAfterJobCompletion ? jobStatusService.getTabIdOnStatusId(statusList.value, cloneFormLayoutState.statusId) : null
                         dispatch(setState(SET_LANDING_TAB, { landingTabId }))
                         dispatch(pieChartCount())
@@ -205,6 +201,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         dispatch(fetchJobs())
                         dispatch(setState(CLEAR_FORM_LAYOUT))
                     } else if (routeName == Transient) {
+                        //When single status is present in transient case navigate to form layout directly
                         if (_.size(routeParam.currentStatus.nextStatusList) == 1) {
                             let { formLayoutState, currentStatus, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams } = routeParam
                             if (!navigationFormLayoutStates) {
@@ -233,6 +230,9 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                             dispatch(navigateToScene(routeName, routeParam, navigate))
                         }
                     } else {
+                        if (key) {
+                            goBack(key)
+                        }
                         dispatch(navigateToScene(routeName, routeParam, navigate))
                     }
                 } else {

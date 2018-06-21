@@ -7,8 +7,6 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { ARRAY_SAROJ_FAREYE } from '../lib/AttributeConstants'
-import { FormLayout } from '../lib/constants'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import CashTenderingView from '../components/CashTenderingView'

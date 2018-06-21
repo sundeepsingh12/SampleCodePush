@@ -24,8 +24,6 @@ import moment from 'moment'
 import renderIf from '../lib/renderIf'
 import {
   SELECT_NUMBER_FOR_CALL,
-  SELECT_NUMBER,
-  SELECT_TEMPLATE,
   OK,
   CANCEL,
   CALL_CONFIRM,

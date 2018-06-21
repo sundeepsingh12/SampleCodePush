@@ -2,14 +2,12 @@ import React, { PureComponent } from 'react'
 import { StyleSheet, View, FlatList, TouchableHighlight } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
 import * as statisticsActions from '../modules/statistics/statisticsActions'
 import styles from '../themes/FeStyle'
-import { Container, Text, List, ListItem, Icon, StyleProvider, Header, Body, } from 'native-base';
+import { Container, Text, Icon, StyleProvider, Header, Body, } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import moment from 'moment'
-import { STATISTICS } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {

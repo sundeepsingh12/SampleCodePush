@@ -7,15 +7,13 @@ import styles from '../themes/FeStyle'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, StyleProvider, List, ListItem, Footer, FooterTab, Card, ActionSheet, Toast } from 'native-base'
+import { Container, Content, Header, Button, Text, Body, Icon, StyleProvider, Footer, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as liveJobActions from '../modules/liveJob/liveJobActions'
 import Loader from '../components/Loader'
 import ExpandableHeader from '../components/ExpandableHeader'
 import renderIf from '../lib/renderIf'
-import { START, SET_LIVE_JOB_TOAST } from '../lib/constants'
 import moment from 'moment'
-import { NavigationActions } from 'react-navigation'
 import { OK } from '../lib/ContainerConstants'
 import Line1Line2View from '../components/Line1Line2View'
 
@@ -175,6 +173,7 @@ class LiveJob extends PureComponent {
                         <ExpandableHeader
                             title={'Basic Details'}
                             dataList={this.props.jobDataList}
+                            showDetailsList={true}
                         />
                     </View>)}
             </Content>
@@ -195,7 +194,7 @@ class LiveJob extends PureComponent {
     }
 
     onButtonPress = (status) => {
-        this.props.actions.acceptOrRejectJob(status, this.props.jobTransaction, this.props.navigation.state.params.liveJobList,this.props.navigation.goBack)
+        this.props.actions.acceptOrRejectJob(status, this.props.jobTransaction, this.props.navigation.state.params.liveJobList, this.props.navigation.goBack)
     }
 
     showAccepRejectButtons() {

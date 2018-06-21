@@ -4,11 +4,10 @@ import { SafeAreaView } from 'react-navigation'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import { Container, Content, Header, Left, Body, Icon, StyleProvider, Toast, FooterTab } from 'native-base';
+import { Container, Header, Body, Icon, StyleProvider, Toast, FooterTab } from 'native-base';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SignatureRemarks from '../components/SignatureRemarks'
-import Signature from '../containers/Signature'
 import NPSFeedback from '../components/NPSFeedback'
 import * as signatureActions from '../modules/signature/signatureActions'
 import SignatureCapture from 'react-native-signature-capture';
@@ -143,12 +142,16 @@ class SignatureAndNps extends PureComponent {
                                 showTitleLabel={false}
                                 viewMode={this.state.isLandscape} />
                         </View>
-                        <View style={[style.feedback]}>
-                            <View style={[{ paddingLeft: 150, paddingRight: 150 }]}>
-                                <NPSFeedback onStarPress={this.onStarRatingPress} showSave={true} />
-                            </View>
-                        </View>
-                        {this.saveSignButton()}
+                        <SafeAreaView style={[style.feedback]}>
+                            <FooterTab>
+                                <View style={[style.feedback]}>
+                                    <View style={[{ paddingLeft: 150, paddingRight: 150 }]}>
+                                        <NPSFeedback onStarPress={this.onStarRatingPress} showSave={true} />
+                                    </View>
+                                </View>
+                                {this.saveSignButton()}
+                            </FooterTab>
+                        </SafeAreaView>
                     </View>
                 </Container>
             </StyleProvider >

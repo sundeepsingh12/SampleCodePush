@@ -8,7 +8,6 @@ import {
     StyleSheet,
     View,
     Text,
-    Alert
 }
     from 'react-native'
 function mapDispatchToProps(dispatch) {

@@ -5,21 +5,14 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform,
-    TextInput,
-    Modal,
 } from 'react-native'
 
 import {
-    SET_UPI_APPROVAL,
     SET_UPI_PAYMENT_CUSTOMER_CONTACT,
-    SET_UPI_PAYMENT_CUSTOMER_NAME,
-    SET_UPI_PAYMENT_PAYER_VPA,
 } from '../lib/constants'
 
-import { Container, Content, Footer, FooterTab, Input, Button, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox } from 'native-base';
+import { Container, Content, Footer, FooterTab, Input, Button} from 'native-base'
 import styles from '../themes/FeStyle'
-import PopOver from '../components/PopOver'
 import * as payByLinkPaymentActions from '../modules/cardTypePaymentModules/payByLinkPayment/payByLinkPaymentActions'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
@@ -66,8 +59,6 @@ class PayByLink extends PureComponent {
                                 )}
                                 style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
                             />
-                            {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
-                        <PopOver visible={this.checkValidation()} /> */}
                         </View>
                     </View>
                 </Content>
