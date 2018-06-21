@@ -355,6 +355,9 @@ export default class FormLayoutEventImpl {
         let prevJobTransactionValue = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, transactionWithRunsheetObject.jobTransactionListWithRunsheetIdQuery) // in case of mapping of moneycollect to more than 1 status, we have to get actual amount in previous status
         let prevJobTransactionMap = _.keyBy(prevJobTransactionValue, 'id')
         for (let id in jobTransactionList) {
+            if (!runsheetMap[jobTransactionList[id].runsheetId]) {
+                continue;
+            }
             if (prevStatusCategory && runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] > 0) { // check for previousStatus category undefined and runSheetMap conut is greater than 0 
                 runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] -= 1
             }
