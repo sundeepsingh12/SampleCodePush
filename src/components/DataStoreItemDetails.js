@@ -21,10 +21,10 @@ export default class DataStoreItemDetails extends PureComponent {
         let attributeArray = []
         let id = 0
         for (let attribute in dataStoreAttributeValueMap) {
-            if (attribute != _id && dataStoreAttributeValueMap[attribute]) {
+            if (attribute != _id) {
                 let attributeObject = {
                     id: id++,
-                    key: attribute,
+                    key: (this.props.keyLabelAttributeMap && this.props.keyLabelAttributeMap[attribute]) ? this.props.keyLabelAttributeMap[attribute] : attribute,
                     value: dataStoreAttributeValueMap[attribute]
                 }
                 attributeArray.push(attributeObject)

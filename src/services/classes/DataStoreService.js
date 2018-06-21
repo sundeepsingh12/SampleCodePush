@@ -584,12 +584,13 @@ class DataStoreService {
         if (!currentElement) {
             throw new Error(CURRENT_ELEMENT_MISSING)
         }
-
+        let keyLabelAttributeMap = this.prepareKeyLabelAttributeMap(formElement)
         if (!currentElement.dataStoreFilterMapping || _.isEqual(currentElement.dataStoreFilterMapping, '[]') || currentElement.attributeTypeId == EXTERNAL_DATA_STORE) {
             return {
                 dataStoreAttrValueMap: {},
                 dataStoreFilterReverseMap,
                 isFiltersPresent: false,
+                keyLabelAttributeMap
             }
         }
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
@@ -599,6 +600,7 @@ class DataStoreService {
             dataStoreAttrValueMap,
             dataStoreFilterReverseMap: returnParams.dataStoreFilterReverseMap,
             isFiltersPresent: true,
+            keyLabelAttributeMap
         }
     }
 
@@ -693,13 +695,14 @@ class DataStoreService {
             validationObject: returnParams.validationObject,
             isDataStoreEditable: returnParams.isDataStoreEditable,
             searchText: returnParams.searchText,
-            arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap
+            arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap,
+            keyLabelAttributeMap: returnParams.keyLabelAttributeMap
         }
     }
 
     async runDataStoreBeforeValidations(currentElement, formLayoutState, jobTransaction, cloneFormElement, dataStoreFilterReverse) {
         let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, BEFORE, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
-        let { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent } = await this.checkForFilters(currentElement, cloneFormElement, jobTransaction, dataStoreFilterReverse)
+        let { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, keyLabelAttributeMap } = await this.checkForFilters(currentElement, cloneFormElement, jobTransaction, dataStoreFilterReverse)
         let validation = {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
@@ -710,13 +713,20 @@ class DataStoreService {
         let validationObject = (currentElement.validation) ? this.getValidations(currentElement.validation) : validation
         let isDataStoreEditable = cloneFormElement.get(currentElement.fieldAttributeMasterId).editable
         if (isFiltersPresent) {
-            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject: validation, searchText: '', isDataStoreEditable: true }
+            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject: validation, searchText: '', isDataStoreEditable: true, keyLabelAttributeMap }
         } else if (!_.isEmpty(cloneFormElement.get(currentElement.fieldAttributeMasterId).value)) {
             validationObject.isAutoStartScannerEnabled = false
-            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: cloneFormElement.get(currentElement.fieldAttributeMasterId).value, isDataStoreEditable }
+            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: cloneFormElement.get(currentElement.fieldAttributeMasterId).value, isDataStoreEditable, keyLabelAttributeMap }
         } else {
-            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: '', isDataStoreEditable }
+            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: '', isDataStoreEditable, keyLabelAttributeMap }
         }
+    }
+    prepareKeyLabelAttributeMap(formElement) {
+        let keyLabelAttributeMap = {}
+        for (let [key, fieldAttribute] of formElement.entries()) {
+            keyLabelAttributeMap[fieldAttribute.key] = fieldAttribute.label
+        }
+        return keyLabelAttributeMap
     }
 }
 

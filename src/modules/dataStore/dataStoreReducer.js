@@ -63,6 +63,7 @@ export default function dataStoreReducer(state = initialState, action) {
                 .set('isAllowFromFieldInExternalDS', action.payload.validation.isAllowFromFieldInExternalDS)
                 .set('searchText', action.payload.searchText)
                 .set('isDataStoreEditable', action.payload.isDataStoreEditable)
+                .set('keyLabelAttributeMap', action.payload.keyLabelAttributeMap)
 
         case SEARCH_DATA_STORE_RESULT:
             return state.set('dataStoreAttrValueMap', action.payload.dataStoreAttrValueMap)
