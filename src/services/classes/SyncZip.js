@@ -53,7 +53,7 @@ class SyncZip {
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.userExceptionLog = userExceptionLogsService.getUserExceptionLog(realmDbData.userExceptionLog, lastSyncTime)
         let jobSummary = jobSummaryService.getJobSummaryListForSync(syncStoreDTO.jobSummaryList, syncStoreDTO.lastSyncWithServer)
-        SYNC_RESULTS.jobSummary = jobSummary || {}
+        SYNC_RESULTS.jobSummary = jobSummary
         const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
         await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};

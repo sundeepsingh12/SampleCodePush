@@ -1,16 +1,15 @@
 'use strict'
 import React, { PureComponent } from 'react';
-import { StyleSheet, View, ScrollView, Image, Dimensions, ListView, Platform, TouchableHighlight, FlatList, SectionList, ActivityIndicator, TouchableOpacity, Text } from 'react-native';
-import { Form, Item, Input, Container, Content, ListItem, CheckBox, List, Body, Left, Right, Header, Separator, Icon, Footer, FooterTab, Button, Toast } from 'native-base';
+import {  View, SectionList, TouchableOpacity, Text } from 'react-native';
+import { Container, Content, List, Separator, Icon, Toast } from 'native-base';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as taskListActions from '../modules/taskList/taskListActions';
 import * as globalActions from '../modules/global/globalActions';
 import _ from 'lodash';
-import renderIf from '../lib/renderIf';
 import Loader from '../components/Loader';
 import styles from '../themes/FeStyle';
-import { JobDetails, TABLE_RUNSHEET, TABLE_JOB_TRANSACTION, SEARCH_TAP, LISTING_SEARCH_VALUE, BulkListing, JobDetailsV2, TASKLIST_LOADER_FOR_SYNC } from '../lib/constants';
+import {  LISTING_SEARCH_VALUE, BulkListing, JobDetailsV2} from '../lib/constants'
 import JobListItem from '../components/JobListItem';
 import { NO_NEXT_STATUS, OK, ALL } from '../lib/ContainerConstants';
 import moment from 'moment';

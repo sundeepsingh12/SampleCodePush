@@ -29,7 +29,8 @@ import {
   CUSTOMIZATION_APP_MODULE,
   POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS,
   LAST_SYNC_WITH_SERVER,
-  PAGES
+  PAGES,
+  TABLE_MESSAGE_INTERACTION
 } from '../../lib/constants'
 import { FAREYE_UPDATES, PAGE_OUTSCAN, PATH_TEMP } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
@@ -138,7 +139,7 @@ class Sync {
    * @param {*} tdcResponse 
    */
   async processTdcResponse(tdcContentArray, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
-    let tdcContentObject, jobMasterIds
+    let tdcContentObject, jobMasterIds, messageIdDto = []
     //Prepare jobMasterWithAssignOrderToHubEnabledhere only and if it is non empty,then only hit store for below 4 lines
     // const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const { jobMasterList } = syncStoreDTO
@@ -178,9 +179,11 @@ class Sync {
           propertyName: 'jobId'
         }
         realm.deleteRecordsInBatch(deleteJobTransactions, deleteJobData)
+      } else if (queryType == 'message') {
+        messageIdDto = messageIdDto.concat(this.saveMessagesInDb(tdcContentObject))
       }
     }
-    return jobMasterIds
+    return { jobMasterIds, messageIdDto }
   }
 
   getAssignOrderTohubEnabledJobs(query, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
@@ -574,7 +577,7 @@ class Sync {
   async downloadAndDeleteDataFromServer(isLiveJob, erpPull, syncStoreDTO) {
     let pageNumber = 0, currentPage, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap
     let pageSize = isLiveJob ? 200 : 3
-    let isLastPageReached = false, json, isJobsPresent = false, jobMasterIds
+    let isLastPageReached = false, json, isJobsPresent = false, jobMasterIdsAndNumberOfMessages
     const pagesList = await keyValueDBService.getValueFromStore(PAGES)
     let outScanModuleJobMasterIds = pages.getJobMasterIdListForScreenTypeId(pagesList.value, PAGE_OUTSCAN)
     const unseenStatusIds = !_.isEmpty(outScanModuleJobMasterIds) ? jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(syncStoreDTO.statusList, outScanModuleJobMasterIds, UNSEEN) : jobStatusService.getAllIdsForCode(syncStoreDTO.statusList, UNSEEN)
@@ -589,7 +592,7 @@ class Sync {
           jobMasterMapWithAssignOrderToHubEnabled = jobMasterService.getJobMasterMapWithAssignOrderToHub(syncStoreDTO.jobMasterList)
           jobMasterIdJobStatusIdOfPendingCodeMap = jobStatusService.getStatusIdForJobMasterIdFilteredOnCodeMap(syncStoreDTO.statusList, PENDING)
           jobStatusIdJobSummaryMap = jobSummaryService.getJobStatusIdJobSummaryMap(syncStoreDTO.jobSummaryList)
-          jobMasterIds = await this.processTdcResponse(json.content, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap)
+          jobMasterIdsAndNumberOfMessages = await this.processTdcResponse(json.content, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap)
         } else {
           isLastPageReached = true
         }
@@ -603,7 +606,7 @@ class Sync {
 
           const unseenTransactions = postOrderList && _.size(postOrderList.value) > 0 ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
           const jobMasterIdJobStatusIdTransactionIdDtoObject = jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap)
-          const messageIdDTOs = []
+          const messageIdDTOs = jobMasterIdsAndNumberOfMessages && jobMasterIdsAndNumberOfMessages.messageIdDto ? jobMasterIdsAndNumberOfMessages.messageIdDto : []
           if (!isLiveJob) {
             await this.deleteDataFromServer(successSyncIds, messageIdDTOs, jobMasterIdJobStatusIdTransactionIdDtoObject.transactionIdDtos, jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries)
             if (postOrderList) {
@@ -611,7 +614,7 @@ class Sync {
             }
           }
           realm.saveList(TABLE_JOB_TRANSACTION, jobMasterIdJobStatusIdTransactionIdDtoObject.updatedTransactonsList)
-          jobMasterTitleList = jobMasterTitleList.concat(jobMasterService.getJobMasterTitleListFromIds(jobMasterIds, syncStoreDTO.jobMasterList))
+          jobMasterTitleList = jobMasterTitleList.concat(jobMasterService.getJobMasterTitleListFromIds(jobMasterIdsAndNumberOfMessages.jobMasterIds, syncStoreDTO.jobMasterList))
           await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.updatedTransactonsList)
           if (erpPull) {
             user.lastERPSyncWithServer = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -633,8 +636,11 @@ class Sync {
     }
     let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB');
     if (!_.isEmpty(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value))) {
-      this.showNotification(_.uniq(jobMasterTitleList))
+      this.showJobMasterNotification(_.uniq(jobMasterTitleList))
       await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+    }
+    if (jobMasterIdsAndNumberOfMessages && jobMasterIdsAndNumberOfMessages.messageIdDto && jobMasterIdsAndNumberOfMessages.messageIdDto.length > 0) {
+      this.showMessageNotification(jobMasterIdsAndNumberOfMessages.messageIdDto.length)
     }
     if (isJobsPresent) {
       await runSheetService.updateRunSheetUserAndJobSummary()
@@ -642,20 +648,27 @@ class Sync {
     return isJobsPresent
   }
 
-  showNotification(jobMasterTitleList) {
+  showJobMasterNotification(jobMasterTitleList) {
     const body = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
     const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${body} jobs` : body
+    this.showNotification(FAREYE_UPDATES, message, '1')
+  }
+
+  showMessageNotification(numberOfMessages) {
+    const message = `You have ${numberOfMessages} new messages`
+    this.showNotification(FAREYE_UPDATES, message, '2')
+  }
+
+  showNotification(title, message, id) {
     FCM.presentLocalNotification({
-      id: '1',
-      title: FAREYE_UPDATES,
+      id: id,
+      title: title,
       body: message,
       priority: "high",
       sound: "default",
       show_in_foreground: true
     });
-
   }
-
   async calculateDifference() {
     const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
     const differenceInDays = moment().diff(lastSyncTime.value, 'days')
@@ -718,22 +731,38 @@ class Sync {
       const url = CONFIG.API.FCM_TOKEN_DEREGISTRATION + '?topic=' + topic
       RestAPIFactory(token.value).serviceCall(fcmToken.value, url, 'POST')
     } catch (error) {
-      console.log('error', error)
     }
   }
 
+  saveMessagesInDb(contentData) {
+    let messageInteractionList = JSON.parse(contentData.query)
+    let messageIdList = [], currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
+    let currentFieldDataObject = {}; // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
+    currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_MESSAGE_INTERACTION, null, true, 'id').length;
+    for (let message of messageInteractionList.messageDataCenters) {
+      messageIdList.push({
+        id: message.id,
+        dateTimeOfMessageReceiving: currentTime
+      })
+      message.id = currentFieldDataObject.currentFieldDataId
+      currentFieldDataObject.currentFieldDataId++
+    }
+
+    realm.saveList(TABLE_MESSAGE_INTERACTION, messageInteractionList.messageDataCenters)
+    return messageIdList
+  }
   /**
    * This function deletes transaction list from schema that has been synced successfully with server.
    * This handles cases when api response comes late and other transactions are added in schema.
-   * @param {*} transactionIdsSynced 
-   * @param {*} schemaName 
-   * @param {*} date 
+   * @param {*} transactionIdsSynced
+   * @param {*} schemaName
+   * @param {*} date
    */
   async deleteSpecificTransactionFromStoreList(transactionIdsSynced, schemaName, date) {
     let transactionToBeSynced = await keyValueDBService.getValueFromStore(schemaName);
     let originalTransactionsToBeSynced = transactionToBeSynced ? transactionToBeSynced.value : {}
     for (let index in transactionIdsSynced) {
-      if (moment(originalTransactionsToBeSynced[index].syncTime).isBefore(moment(date).format('YYYY-MM-DD HH:mm:ss'))) {
+      if (moment(originalTransactionsToBeSynced[index].syncTime).isBefore(moment(date).format('YYYY-MM-DD HH:mm:ss')) || moment(originalTransactionsToBeSynced[index].syncTime.isSame(moment(date).format('YYYY-MM-DD HH:mm:ss')))) {
         delete originalTransactionsToBeSynced[index]
       }
     }

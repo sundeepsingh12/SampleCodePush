@@ -9,6 +9,7 @@ import {
     JOB_STATUS,
     NEXT_FOCUS,
     TabScreen,
+    Transient,
     CLEAR_FORM_LAYOUT,
     SET_FORM_LAYOUT_STATE,
     USER,
@@ -17,7 +18,9 @@ import {
     ADD_FORM_LAYOUT_STATE,
     SET_FORM_INVALID_AND_FORM_ELEMENT,
     SYNC_RUNNING_AND_TRANSACTION_SAVING,
-    SET_LANDING_TAB
+    SET_LANDING_TAB,
+    FormLayout,
+    CLEAR_FORM_LAYOUT_WITH_LOADER
 } from '../../lib/constants'
 
 import {
@@ -46,7 +49,7 @@ import { fetchJobs } from '../taskList/taskListActions';
 export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
     return async function (dispatch) {
         try {
-            dispatch(setState(IS_LOADING, true))
+            dispatch(setState(CLEAR_FORM_LAYOUT_WITH_LOADER))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
             let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
@@ -165,7 +168,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack, key) {
     return async function (dispatch) {
         try {
             let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
@@ -184,7 +187,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                     const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
                     let { routeName, routeParam } = await formLayoutService.saveAndNavigate(cloneFormLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, taskListScreenDetails)
                     dispatch(setState(IS_LOADING, false))
-                    if (routeName == TabScreen && taskListScreenDetails.jobDetailsScreenKey) {
+                    if (routeName == TabScreen && taskListScreenDetails.jobDetailsScreenKey && taskListScreenDetails.pageObjectAdditionalParams) {
                         let landingTabId = JSON.parse(taskListScreenDetails.pageObjectAdditionalParams).landingTabAfterJobCompletion ? jobStatusService.getTabIdOnStatusId(statusList.value, cloneFormLayoutState.statusId) : null
                         dispatch(setState(SET_LANDING_TAB, { landingTabId }))
                         dispatch(pieChartCount())
@@ -195,7 +198,39 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         navDispatch(StackActions.popToTop());
                         dispatch(fetchJobs())
                         dispatch(setState(CLEAR_FORM_LAYOUT))
+                    } else if (routeName == Transient) {
+                        //When single status is present in transient case navigate to form layout directly
+                        if (_.size(routeParam.currentStatus.nextStatusList) == 1) {
+                            let { formLayoutState, currentStatus, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams } = routeParam
+                            if (!navigationFormLayoutStates) {
+                                navigationFormLayoutStates = {}
+                            }
+                            let cloneTransientFormLayoutMap = _.cloneDeep(navigationFormLayoutStates)
+                            cloneTransientFormLayoutMap[currentStatus.id] = formLayoutState
+                            dispatch(setState(ADD_FORM_LAYOUT_STATE, cloneTransientFormLayoutMap))
+                            dispatch(navigateToScene(FormLayout, {
+                                contactData,
+                                jobTransactionId: jobTransaction.id,
+                                jobTransaction: jobTransaction,
+                                statusId: currentStatus.nextStatusList[0].id,
+                                statusName: currentStatus.nextStatusList[0].name,
+                                jobMasterId: jobMasterId,
+                                navigationFormLayoutStates: cloneTransientFormLayoutMap,
+                                latestPositionId: formLayoutState.latestPositionId,
+                                jobDetailsScreenKey,
+                                pageObjectAdditionalParams,
+                                previousStatus: currentStatus
+                            },
+                                navigate
+                            ))
+                            draftService.saveDraftInDb(formLayoutState, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
+                        } else {
+                            dispatch(navigateToScene(routeName, routeParam, navigate))
+                        }
                     } else {
+                        if (key) {
+                            goBack(key)
+                        }
                         dispatch(navigateToScene(routeName, routeParam, navigate))
                     }
                 } else {
@@ -308,7 +343,7 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                 statusId: draftRestored.formLayoutState.statusId,
                 statusName: draftRestored.formLayoutState.statusName,
                 jobMasterId: draft.jobMasterId,
-                navigationFormLayoutStates: !_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore) ? draftRestored.navigationFormLayoutStatesForRestore : (navgiationStateForSaveActivated ? navgiationStateForSaveActivated : null),
+                navigationFormLayoutStates: !_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore) ? draftRestored.navigationFormLayoutStatesForRestore : (navgiationStateForSaveActivated ? navgiationStateForSaveActivated : {}),
                 isDraftRestore: true,
                 pageObjectAdditionalParams,
                 jobDetailsScreenKey

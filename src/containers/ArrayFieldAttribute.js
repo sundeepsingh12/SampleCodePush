@@ -6,10 +6,10 @@ import { bindActionCreators } from 'redux'
 import * as arrayActions from '../modules/array/arrayActions'
 import ArrayBasicComponent from '../components/ArrayBasicComponent.js'
 import CustomAlert from '../components/CustomAlert.js'
-import { Container, Content, Header, Button, List, ListItem, Left, Body, Right, Icon, Title, Footer, FooterTab, StyleProvider, Card, CardItem, Toast } from 'native-base'
+import { Container, Content, Header, Button, Body, Icon, Footer, StyleProvider, Toast } from 'native-base'
 import _ from 'lodash'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
@@ -164,7 +164,7 @@ class ArrayFieldAttribute extends PureComponent {
                                 <Text
                                     style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.arrayElements)}</Text>
                                 <Button bordered success small onPress={this.addPressed}>
-                                    <Text style={[styles.fontSuccess, styles.padding10]}>{ADD}</Text>
+                                    <Text style={[styles.fontSuccess]}>{ADD}</Text>
                                 </Button>
                             </View>
                             <View style={[{ backgroundColor: styles.bgPrimaryColor }]}>

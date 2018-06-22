@@ -24,11 +24,13 @@ import {
   YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE,
   SELECT_ADDRESS_NAVIGATION,
   REVERT_STATUS,
-  MORE
+  MORE,
+  PAYMENT_SUCCESSFUL,
+  TRANSACTION_SUCCESSFUL
 } from '../lib/ContainerConstants'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Alert, Image } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, StyleProvider, List, ListItem, Footer, FooterTab, Card, ActionSheet, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
@@ -43,11 +45,13 @@ import {
   BulkListing,
   SHOW_DROPDOWN,
   SET_JOBDETAILS_DRAFT_INFO,
-  SET_LOADER_FOR_SYNC_IN_JOBDETAIL
+  SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
+  SET_CHECK_TRANSACTION_STATUS,
+  JOB_DETAILS_FETCHING_START,
+  RESET_CHECK_TRANSACTION_AND_DRAFT
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
-import { LANDMARK, PINCODE, ADDRESS_LINE_1, ADDRESS_LINE_2 } from '../lib/AttributeConstants'
 import Communications from 'react-native-communications'
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
@@ -79,7 +83,8 @@ function mapStateToProps(state) {
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
     isShowDropdown: state.jobDetails.isShowDropdown,
     jobExpiryTime: state.jobDetails.jobExpiryTime,
-    syncLoading: state.jobDetails.syncLoading
+    syncLoading: state.jobDetails.syncLoading,
+    checkTransactionStatus: state.jobDetails.checkTransactionStatus
   }
 }
 
@@ -96,7 +101,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransaction.id, this.props.navigation.navigate)
+    this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key, this.props.navigation.navigate, this.props.navigation.goBack)
   }
 
   componentWillUnmount() {
@@ -104,6 +109,9 @@ class JobDetailsV2 extends PureComponent {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
     // reset dropdown state only when required
+    if (this.props.checkTransactionStatus) {
+      this.props.actions.setState(SET_CHECK_TRANSACTION_STATUS, null)
+    }
     if (this.props.isShowDropdown) {
       this.props.actions.setState(SHOW_DROPDOWN, null)
     }
@@ -209,6 +217,7 @@ class JobDetailsV2 extends PureComponent {
       this.props.navigation.navigate)
     this._onCancel()
   }
+
   _onCancel = () => {
     this.props.actions.setState(IS_MISMATCHING_LOCATION, null)
   }
@@ -421,7 +430,8 @@ class JobDetailsV2 extends PureComponent {
     }
     else if (this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType) {
       { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
-    } else {
+    }
+    else {
       this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
     }
   }
@@ -556,7 +566,7 @@ class JobDetailsV2 extends PureComponent {
           {etaTimer}
           {statusView}
         </View>
-
+        {this.showMessages()}
         {/*Basic Details*/}
         {this.showJobDetails()}
 
@@ -565,7 +575,18 @@ class JobDetailsV2 extends PureComponent {
       </Content>
     )
   }
-
+  showMessages() {
+    if (!_.isEmpty(this.props.messageList)) {
+      return (
+        <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
+          <ExpandableHeader
+            title={'Messages'}
+            dataList={this.props.messageList}
+          />
+        </View>
+      )
+    }
+  }
   showJobDetails() {
     return (
       <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
@@ -573,8 +594,24 @@ class JobDetailsV2 extends PureComponent {
           title={'Basic Details'}
           navigateToDataStoreDetails={this.navigateToDataStoreDetails}
           dataList={this.props.jobDataList}
+          showDetailsList={true}
         />
       </View>
+    )
+  }
+  showPaymentSuccessfulScreen() {
+    return (
+      <Content>
+        <View style={[styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
+          <Image
+            style={style.imageSync}
+            source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
+          />
+          <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
+            {PAYMENT_SUCCESSFUL}
+          </Text>
+        </View>
+      </Content>
     )
   }
 
@@ -585,7 +622,8 @@ class JobDetailsV2 extends PureComponent {
           title={'Field Details'}
           dataList={this.props.fieldDataList}
           navigateToDataStoreDetails={this.navigateToDataStoreDetails}
-          navigateToCameraDetails={this.navigateToCameraDetails} />
+          navigateToCameraDetails={this.navigateToCameraDetails}
+          showDetailsList={true} />
       </View>
     )
   }
@@ -636,6 +674,49 @@ class JobDetailsV2 extends PureComponent {
     return null
   }
 
+  showPaymentFailedScreen() {
+    const { draftStatusInfo, jobTransaction } = this.props
+    const { params, key } = this.props.navigation.state
+    return (
+      <Content>
+        <View style={[styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
+          <View style={[styles.padding30]}>
+            <Image
+              style={style.imageSync}
+              source={require('../../images/fareye-default-iconset/checkTransactionError.png')}
+            />
+          </View>
+          <Text style={[styles.fontLg, styles.fontBlack, { marginTop: 27 }]}>
+            {this.props.checkTransactionStatus}
+          </Text>
+          <View>
+            <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 50, width: 200 }, styles.alignCenter, styles.justifyCenter, { marginTop: 183 }]}
+              onPress={() => { this.props.actions.checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, key, SET_CHECK_TRANSACTION_STATUS, JOB_DETAILS_FETCHING_START, null, this.props.navigation.goBack) }}
+              onLongPress={() => { this._goToFormLayoutWithoutDraft() }} >
+              <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontRegular]}> {'Check Transaction'}</Text>
+            </Button>
+          </View>
+        </View>
+      </Content>
+    )
+  }
+
+  _goToFormLayoutWithoutDraft = () => {
+    this.props.actions.deleteDraftAndNavigateToFormLayout({
+      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+      jobTransactionId: this.props.jobTransaction.id,
+      jobTransaction: this.props.jobTransaction,
+      statusId: this.props.draftStatusInfo.statusId,
+      statusName: this.props.draftStatusInfo.statusName,
+      jobMasterId: this.props.jobTransaction.jobMasterId,
+      pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
+      jobDetailsScreenKey: this.props.navigation.state.key
+    },
+      this.props.navigation.navigate
+    )
+    this.props.actions.setState(RESET_CHECK_TRANSACTION_AND_DRAFT)
+  }
+
   _goToFormLayoutWithDraft = () => {
     this.props.actions.restoreDraftAndNavigateToFormLayout(
       this.props.navigation.state.params.jobSwipableDetails.contactData,
@@ -649,28 +730,42 @@ class JobDetailsV2 extends PureComponent {
     this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
   }
 
+  renderView(checkTransactionStatus) {
+    switch (checkTransactionStatus) {
+      case null: {
+        return this.detailsContainerView()
+      }
+      case TRANSACTION_SUCCESSFUL: {
+        return this.showPaymentSuccessfulScreen()
+      }
+      default: {
+        return this.showPaymentFailedScreen()
+      }
+    }
+  }
+
+  detailsContainerView() {
+    const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
+    const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
+    return (
+      <StyleProvider style={getTheme(platform)}>
+        <Container style={[styles.bgLightGray]}>
+          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} /> : null}
+          {draftAlert}
+          {mismatchAlert}
+          {this.showHeaderView()}
+          {this.showContentView()}
+          {this.showFooterView()}
+        </Container>
+      </StyleProvider>
+    )
+  }
+
   render() {
     if (this.props.jobDetailsLoading) {
-      return (
-        <Loader />
-      )
+      return <Loader />
     }
-    else {
-      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
-      const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
-      return (
-        <StyleProvider style={getTheme(platform)}>
-          <Container style={[styles.bgLightGray]}>
-            {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} /> : null}
-            {draftAlert}
-            {mismatchAlert}
-            {this.showHeaderView()}
-            {this.showContentView()}
-            {this.showFooterView()}
-          </Container>
-        </StyleProvider>
-      )
-    }
+    return this.renderView(this.props.checkTransactionStatus)
   }
 }
 
@@ -728,6 +823,12 @@ const style = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#f3f3f3',
+  },
+  imageSync: {
+    paddingTop: 30,
+    width: 116,
+    height: 116,
+    resizeMode: 'contain'
   }
 
 });

@@ -17,9 +17,10 @@ import Draft from './schema/Draft'
 import DeviceInfo from 'react-native-device-info'
 import AesCtr from '../services/classes/AesCtr'
 import userExceptionLogs from './schema/userExceptionLogsDB'
+import messageInteracion from './schema/MessageInteractionSchema'
 
 const schemaVersion = 49;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs];
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs, messageInteracion];
 
 let realm = new Realm({
     schemaVersion,
@@ -38,6 +39,7 @@ import {
     TABLE_TRANSACTION_LOGS,
     TABLE_DRAFT,
     USER_EXCEPTION_LOGS,
+    TABLE_MESSAGE_INTERACTION
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -78,7 +80,6 @@ export function performBatchSave(...tableNamesVsDataList) {
                     }
                 }
             } catch (error) {
-                console.log(error)
             }
         })
     })
@@ -112,6 +113,7 @@ export function deleteRecords() {
         realm.delete(realm.objects(TABLE_TRANSACTION_LOGS))
         realm.delete(realm.objects(TABLE_DRAFT))
         realm.delete(realm.objects(USER_EXCEPTION_LOGS))
+        realm.delete(realm.objects(TABLE_MESSAGE_INTERACTION))
     });
 }
 

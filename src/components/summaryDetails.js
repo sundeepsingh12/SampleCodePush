@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react'
-import renderIf from '../lib/renderIf'
 import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Text, Left, Body, Right, Icon, List, StyleProvider, Footer, } from 'native-base';
+import { Container, Content, Header, Text, Left, Body, Icon, StyleProvider } from 'native-base'
 import { Parcel_Summary } from '../lib/AttributeConstants'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
@@ -21,7 +20,7 @@ export default class SummaryDetails extends PureComponent {
     }
 
     renderParcelItem = (item) => {
-        if (item.value) {
+        if (item.value && !item.hidden) {
             return (
                 <View style={[styles.row, styles.paddingRight5, styles.paddingLeft5]}>
                     <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>

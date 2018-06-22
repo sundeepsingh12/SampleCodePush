@@ -173,6 +173,7 @@ class LiveJob extends PureComponent {
                         <ExpandableHeader
                             title={'Basic Details'}
                             dataList={this.props.jobDataList}
+                            showDetailsList={true}
                         />
                     </View>)}
             </Content>
@@ -193,7 +194,7 @@ class LiveJob extends PureComponent {
     }
 
     onButtonPress = (status) => {
-        this.props.actions.acceptOrRejectJob(status, this.props.jobTransaction, this.props.navigation.state.params.liveJobList,this.props.navigation.goBack)
+        this.props.actions.acceptOrRejectJob(status, this.props.jobTransaction, this.props.navigation.state.params.liveJobList, this.props.navigation.goBack)
     }
 
     showAccepRejectButtons() {

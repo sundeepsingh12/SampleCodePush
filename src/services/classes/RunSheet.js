@@ -1,17 +1,7 @@
-import {
-  TABLE_RUNSHEET,
-  TABLE_JOB_TRANSACTION,
-  USER_SUMMARY,
-  JOB_MASTER
-} from '../../lib/constants'
-
+import { TABLE_RUNSHEET, TABLE_JOB_TRANSACTION, JOB_MASTER } from '../../lib/constants'
 import * as realm from '../../repositories/realmdb'
-import {
-  jobStatusService
-} from './JobStatus'
-import {
-  RUNSHEET_MISSING
-} from '../../lib/ContainerConstants'
+import { jobStatusService } from './JobStatus'
+import { RUNSHEET_MISSING } from '../../lib/ContainerConstants'
 import { keyValueDBService } from './KeyValueDBService'
 import { userSummaryService } from './UserSummary';
 import { jobSummaryService } from './JobSummary'
@@ -72,7 +62,7 @@ class RunSheet {
       if ((runsheetList[jobTransactionArray[index].runsheetId] && allStatusMap[jobTransactionArray[index].jobStatusId])) { // check for runSheetId in runSheetList and jobStatus in allStatusMapList
         runsheetList[jobTransactionArray[index].runsheetId][status[allStatusMap[jobTransactionArray[index].jobStatusId] - 1]] += 1
       }
-      if (runsheetList[jobTransactionArray[index].runsheetId] && moneyTypeCollectionTypeMap[jobTransactionArray[index].moneyTransactionType] && jobTransactionArray[index].actualAmount > 0){
+      if (runsheetList[jobTransactionArray[index].runsheetId] && moneyTypeCollectionTypeMap[jobTransactionArray[index].moneyTransactionType] && jobTransactionArray[index].actualAmount > 0) {
         runsheetList[jobTransactionArray[index].runsheetId][moneyTypeCollectionTypeMap[jobTransactionArray[index].moneyTransactionType]] += jobTransactionArray[index].actualAmount
       }
       if (statusCountMap[jobTransactionArray[index].jobStatusId]) { // check stausId count map for jobSummary
@@ -141,6 +131,31 @@ class RunSheet {
       jobTransactionQuery += isFutureDateRunsheetEnabled ? index == 0 ? `runsheetId = ${runsheetList[index].id}` : ` OR runsheetId = ${runsheetList[index].id}` : index == 0 ? `runsheetId != ${runsheetList[index].id}` : ` AND runsheetId != ${runsheetList[index].id}`;
     }
     return { runsheetMap, jobTransactionQuery };
+  }
+
+  /**
+   * This function filters job transaction list whose runsheet id is present and prepares job transaction query for that
+   * @param {*} transactionList 
+   * @returns
+   * {
+   *    jobTransactionListWithRunsheetId: [JobTransaction],
+   *    jobTransactionListWithRunsheetIdQuery: string
+   * }
+   */
+  filterTransactionOnRunsheetIdPresentAndPrepareTransactionQuery(transactionList) {
+    let jobTransactionListWithRunsheetId = [], jobTransactionListWithRunsheetIdQuery = '';
+    for (let index in transactionList) {
+      if (!transactionList[index].runsheetId) {
+        continue;
+      }
+      jobTransactionListWithRunsheetId.push(transactionList[index]);
+      if (index == 0) {
+        jobTransactionListWithRunsheetIdQuery += `id = ${transactionList[index].id}`
+      } else {
+        jobTransactionListWithRunsheetIdQuery += ` OR id = ${transactionList[index].id}`
+      }
+    }
+    return { jobTransactionListWithRunsheetId, jobTransactionListWithRunsheetIdQuery }
   }
 
 }

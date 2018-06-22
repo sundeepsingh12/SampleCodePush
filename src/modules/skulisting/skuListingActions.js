@@ -5,7 +5,6 @@ import {
     SKU_LIST_FETCHING_START,
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
-    SET_SHOW_VIEW_IMAGE,
     UPDATE_SKU_LIST_ITEMS,
     SkuListing,
     NEXT_FOCUS,
@@ -27,7 +26,6 @@ import {
     NA,
     SKUVALIDATION
 } from '../../lib/AttributeConstants'
-
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
 import {
@@ -93,15 +91,13 @@ export function scanSkuItem(functionParams) {
  *This method updates SkuActualQuantity of a particular list item and TotalActualQuantity,
  * TotalOriginalQuantity & SkuActualAmount as well,Called when actualQuantity is changed by user
  */
-export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId,goBack) {
+export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId,navigation) {
     return async function (dispatch) {
         try {
             if (rowItem.attributeTypeId == SKU_PHOTO || rowItem.attributeTypeId == SKU_REASON) {
                 if (rowItem.attributeTypeId == SKU_PHOTO) {
                     value = await signatureService.saveFile(value, moment(), true)
-                    // navDispatch(NavigationActions.back())
-                    goBack()
-                    dispatch(setState(SET_SHOW_VIEW_IMAGE, { imageData: '', showImage: false, viewData: '' }))
+                    navigation.pop(1)
                 }
                 let copyOfskuListItems = _.cloneDeep(skuListItems)
                 copyOfskuListItems[jobId][rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value
@@ -157,7 +153,7 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                     })
                 } else {
                     fieldDataListWithLatestPositionId.latestPositionId = positionId
-                    dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction,null,null,navigate))
+                    dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransactionList,null,null,navigate))
                 }
             }
             else {

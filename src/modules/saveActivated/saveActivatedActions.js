@@ -10,19 +10,21 @@ import {
     SAVE_ACTIVATED,
     SAVE_ACTIVATED_INITIAL_STATE,
     DELETE_ITEM_SAVE_ACTIVATED,
-    HomeTabNavigatorScreen,
     SaveActivated,
     SET_SAVE_ACTIVATED_TOAST_MESSAGE,
     USER,
     IS_COMPANY_CODE_DHL,
     EMAILID_VIEW_ARRAY,
-    SHOULD_RELOAD_START,
     SET_SAVE_ACTIVATED_DRAFT,
+    CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED
 } from '../../lib/constants'
 import _ from 'lodash'
 import { draftService } from '../../services/classes/DraftService'
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
 import { fetchJobs } from '../taskList/taskListActions';
+import { performSyncService } from '../home/homeActions'
+import { checkForPaymentAtEnd } from '../job-details/jobDetailsActions'
+
 
 export function addTransactionAndPopulateView(formLayoutState, recurringData, commonData, statusName, navigationParams, navigationFormLayoutStates) {
     return async function (dispatch) {
@@ -66,6 +68,7 @@ export function checkout(previousFormLayoutState, recurringData, jobMasterId, co
                 jobId: -1,
                 jobMasterId
             }, jobMasterId)
+            dispatch(performSyncService(true))
             dispatch(setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, responseMessage))
             dispatch(navigateToScene(CheckoutDetails, {
                 commonData: commonData.commonData,
@@ -168,13 +171,17 @@ export function deleteItem(itemId, recurringData, commonData, navigationParams, 
     }
 }
 
-export function checkIfDraftExists(jobMasterId) {
+export function checkIfDraftExists(jobMasterId, navigate) {
     return async function (dispatch) {
         try {
             const draftStatusInfo = draftService.getDraftForState(null, jobMasterId)
-            dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, draftStatusInfo))
+            if (!_.isEmpty(draftStatusInfo)) {
+                let checkTransactionStatus = await dispatch(checkForPaymentAtEnd(draftStatusInfo, null, null, null, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE, navigate))
+                if (!checkTransactionStatus) {
+                    dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, draftStatusInfo))
+                }
+            }
         } catch (error) {
-            console.log(error)
         }
     }
 }
@@ -192,7 +199,6 @@ export function restoreDraft(draft, contactData, recurringData, jobMasterId, nav
             dispatch(restoreDraftAndNavigateToFormLayout(contactData, cloneJobTransaction, draft, navigationFormLayoutStates, null, null, navigate))
             dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, {}))
         } catch (error) {
-            console.log(error)
         }
     }
 }

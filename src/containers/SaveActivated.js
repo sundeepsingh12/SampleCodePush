@@ -13,11 +13,14 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
-import { FormLayout, Discard, Keep, Cancel, Checkout, SHOW_DISCARD_ALERT, SET_SAVE_ACTIVATED_DRAFT } from '../lib/constants'
+import { FormLayout, Discard, Keep, Cancel, Checkout, SHOW_DISCARD_ALERT, SET_SAVE_ACTIVATED_DRAFT, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE, SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED } from '../lib/constants'
 import { Yes_Checkout, Total, } from '../lib/AttributeConstants'
-import { Discard_these_jobs, Do_you_want_to_checkout, EDIT } from '../lib/ContainerConstants'
+import { Discard_these_jobs, Do_you_want_to_checkout, EDIT, TRANSACTION_SUCCESSFUL, DELETE_DRAFT } from '../lib/ContainerConstants'
 import DraftModal from '../components/DraftModal'
 import _ from 'lodash'
+import { redirectToFormLayout } from '../modules/newJob/newJobActions'
+import { checkForPaymentAtEnd } from '../modules/job-details/jobDetailsActions'
+import TransactionAlert from '../components/TransactionAlert'
 import moment from 'moment'
 
 function mapStateToProps(state) {
@@ -28,13 +31,14 @@ function mapStateToProps(state) {
         loading: state.saveActivated.loading,
         headerTitle: state.saveActivated.headerTitle,
         showDiscardAlert: state.saveActivated.showDiscardAlert,
-        draftStatusInfo: state.saveActivated.draftStatusInfo
+        draftStatusInfo: state.saveActivated.draftStatusInfo,
+        checkTransactionSaveActivated: state.saveActivated.checkTransactionSaveActivated
     }
 };
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...globalActions, ...saveActivatedActions }, dispatch)
+        actions: bindActionCreators({ ...globalActions, ...saveActivatedActions, checkForPaymentAtEnd, redirectToFormLayout }, dispatch)
     }
 }
 
@@ -84,7 +88,7 @@ class SaveActivated extends PureComponent {
                 this.props.navigation.state.params.navigationFormLayoutStates
             )
         }
-        this.props.actions.checkIfDraftExists(this.props.navigation.state.params.jobMasterId)
+        this.props.actions.checkIfDraftExists(this.props.navigation.state.params.jobMasterId,this.props.navigation.push)
 
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
             BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
@@ -121,11 +125,12 @@ class SaveActivated extends PureComponent {
     navigateToFormLayout = (statusId, statusName) => {
         let cloneJobTransaction = _.cloneDeep(this.props.navigation.state.params.jobTransaction)
         let lastIndex = parseInt(_.findLastKey(this.props.recurringData))
+        let userHubId = cloneJobTransaction.referenceNumber.split('/')
         if (!lastIndex) {
             lastIndex = 0
         }
         cloneJobTransaction.jobId = cloneJobTransaction.id = --lastIndex
-        cloneJobTransaction.referenceNumber = cloneJobTransaction.referenceNumber.split('/')[0] +'/'+ cloneJobTransaction.referenceNumber.split('/')[1]+'/' + moment().valueOf()
+        cloneJobTransaction.referenceNumber = userHubId[0] + '/' + userHubId[1] + '/' + moment().valueOf()
         this.props.actions.navigateToScene(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: cloneJobTransaction.id,
@@ -273,6 +278,11 @@ class SaveActivated extends PureComponent {
     draftOkPress = () => {
         this.props.actions.restoreDraft(this.props.draftStatusInfo, this.props.navigation.state.params.contactData, this.props.recurringData, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.navigationFormLayoutStates, this.props.navigation.push)
     }
+
+    showCheckTransactionAlert(){
+        return <TransactionAlert checkTransactionAlert={this.props.checkTransactionSaveActivated} onCancelPress={() => this.props.actions.redirectToFormLayout({id : this.props.draftStatusInfo.statusId, name: this.props.draftStatusInfo.statusName} , -1, this.props.draftStatusInfo.jobMasterId,this.props.navigation.navigate, true, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED)} 
+                              onOkPress = {() => this.props.actions.checkForPaymentAtEnd(this.props.draftStatusInfo, null, null, null, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE,this.props.navigation.push  ) }      onRequestClose={() => this.props.actions.setState(SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED)} />
+      }
     draftModal() {
         if (!_.isEmpty(this.props.draftStatusInfo)) {
             return <DraftModal draftStatusInfo={this.props.draftStatusInfo} onOkPress={this.draftOkPress} onCancelPress={() => this.props.actions.setState(SET_SAVE_ACTIVATED_DRAFT, {})} onRequestClose={() => this.props.actions.setState(SET_SAVE_ACTIVATED_DRAFT, {})} />
@@ -282,7 +292,6 @@ class SaveActivated extends PureComponent {
     }
     render() {
         let textCounter = 1
-        let draftModalView = this.draftModal()
         if (this.props.loading) {
             return (
                 <Loader />
@@ -318,7 +327,7 @@ class SaveActivated extends PureComponent {
                     </SafeAreaView>
 
                     <Content style={[styles.flex1, styles.bgLightGray]}>
-                        {draftModalView}
+                        {(this.props.checkTransactionSaveActivated && this.props.checkTransactionSaveActivated != TRANSACTION_SUCCESSFUL && this.props.checkTransactionSaveActivated != DELETE_DRAFT) ?this.showCheckTransactionAlert() :this.draftModal()}
                         {/*Senders Details*/}
                         <View style={[styles.bgWhite]}>
                             <List>

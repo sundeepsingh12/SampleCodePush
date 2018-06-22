@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, Dimensions, Platform, View, FlatList, TouchableHighlight, TouchableOpacity } from 'react-native'
+import { StyleSheet, Dimensions, View, FlatList, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'

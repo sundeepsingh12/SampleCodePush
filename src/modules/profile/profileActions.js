@@ -17,7 +17,6 @@ import {
 } from '../../lib/ContainerConstants'
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { profileService } from '../../services/classes/ProfileService'
-import { NavigationActions } from 'react-navigation'
 
 /**This action is used to fetch details of user like contact name and email.
  * 

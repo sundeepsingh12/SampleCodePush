@@ -9,11 +9,11 @@ Draft.schema = {
     primaryKey: 'jobTransactionId',
     properties: {
         jobTransactionId: 'int',
+        referenceNumber: 'string',
         statusId: 'int',
         formLayoutObject: 'string',
         jobMasterId: 'int',
         navigationFormLayoutStates: { type: 'string', default: '{}' },
         statusName: 'string',
-        referenceNumber: 'string',
     }
 }

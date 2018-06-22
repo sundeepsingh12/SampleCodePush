@@ -45,7 +45,7 @@ import dataStoreFilterReducer from './dataStoreFilter/dataStoreFilterReducer'
 import backup from './backup/backupReducer'
 import mosambeeWalletPayment from './cardTypePaymentModules/mosambeeWalletPayment/mosambeeWalletReducer'
 import bluetooth from './bluetooth/bluetoothReducer'
-
+import messageReducer from './message/messageReducer'
 
 /**
  * ## CombineReducers
@@ -90,7 +90,8 @@ const rootReducer = combineReducers({
   backup,
   multipleOptionsAttribute,
   mosambeeWalletPayment,
-  bluetooth
+  bluetooth,
+  messageReducer
 })
 
 export default rootReducer

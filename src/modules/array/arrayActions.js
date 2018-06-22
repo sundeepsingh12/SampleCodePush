@@ -20,7 +20,7 @@ import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { DELETE_ROW_ERROR, ADD_ROW_ERROR, SAVE_ARRAY_ERROR, UNIQUE_VALIDATION_FAILED_FORMLAYOUT, ADD_TOAST } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 
-export function showOrDropModal(fieldAttributeMasterId, arrayElements, rowId, idToSet, isSaveDisabled) {
+export function showOrDropModal(arrayElements, rowId, idToSet, isSaveDisabled) {
     return async function (dispatch) {
         try {
             let newArray = _.cloneDeep(arrayElements)

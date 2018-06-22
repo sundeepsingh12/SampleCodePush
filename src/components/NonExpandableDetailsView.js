@@ -20,7 +20,6 @@ import {
     CAMERA,
     CAMERA_HIGH,
     CAMERA_MEDIUM,
-    SIGNATURE_AND_FEEDBACK,
     SKU_PHOTO
 } from '../lib/AttributeConstants'
 import {

@@ -9,7 +9,7 @@ import { multipleOptionsAttributeService } from '../../services/classes/Multiple
 import { fieldAttributeMasterService } from '../../services/classes/FieldAttributeMaster'
 import { fieldAttributeValueMasterService } from '../../services/classes/FieldAttributeValueMaster'
 import { CHECKBOX, ARRAY_SAROJ_FAREYE, OPTION_RADIO_FOR_MASTER, OBJECT_SAROJ_FAREYE, OPTION_RADIO_VALUE, ADVANCE_DROPDOWN } from '../../lib/AttributeConstants'
-import { FIELD_ATTRIBUTE_VALUE, FIELD_ATTRIBUTE, SET_OPTIONS_LIST, NEXT_FOCUS, SET_ADV_DROPDOWN_MESSAGE_OBJECT, SET_MODAL_FIELD_ATTRIBUTE, SET_OPTION_ATTRIBUTE_ERROR } from '../../lib/constants'
+import { FIELD_ATTRIBUTE_VALUE, FIELD_ATTRIBUTE, SET_OPTIONS_LIST, NEXT_FOCUS, SET_ADV_DROPDOWN_MESSAGE_OBJECT, SET_OPTION_ATTRIBUTE_ERROR } from '../../lib/constants'
 import _ from 'lodash'
 
 export function getOptionsList(fieldAttributeMasterId, formElement) {
