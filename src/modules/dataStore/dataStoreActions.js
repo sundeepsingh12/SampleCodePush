@@ -16,7 +16,7 @@ import {
     SET_DSF_REVERSE_MAP,
     SEARCH_DATA_STORE_RESULT,
     SET_ARRAY_DATA_STORE_FILTER_MAP,
-
+    SET_DS_KEYLABEL_MAP
 } from '../../lib/constants'
 import {
     DATA_STORE,
@@ -39,7 +39,9 @@ export function getFieldAttribute(fieldAttributeMasterId, value) {
             dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
             const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             let fieldAttribute = dataStoreService.getFieldAttribute(fieldAttributes.value, fieldAttributeMasterId)
+            let keyLabelAttributeMap = dataStoreService.prepareKeyLabelAttributeMap(null, fieldAttributes.value, fieldAttribute[0].jobMasterId)
             dispatch(getDataStoreAttrValueMap(value, fieldAttribute[0].dataStoreMasterId, fieldAttribute[0].dataStoreAttributeId, fieldAttribute[0].externalDataStoreMasterUrl, fieldAttribute[0].key))
+            dispatch(setState(SET_DS_KEYLABEL_MAP, keyLabelAttributeMap))
         } catch (error) {
             showToastAndAddUserExceptionLog(701, error.message, 'danger', 0)
             dispatch(setState(SHOW_ERROR_MESSAGE, {
@@ -251,7 +253,7 @@ export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMaster
             } else {
                 let formElementResult = await dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formLayoutState.formElement[rowId].formLayoutObject)
                 formLayoutState.formElement[rowId].formLayoutObject = formElementResult
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState,goBack))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState, goBack))
             }
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {

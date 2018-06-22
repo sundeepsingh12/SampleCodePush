@@ -721,10 +721,18 @@ class DataStoreService {
             return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: '', isDataStoreEditable, keyLabelAttributeMap }
         }
     }
-    prepareKeyLabelAttributeMap(formElement) {
+    prepareKeyLabelAttributeMap(formElement, fieldAttributeList, jobMasterId) {
         let keyLabelAttributeMap = {}
-        for (let [key, fieldAttribute] of formElement.entries()) {
-            keyLabelAttributeMap[fieldAttribute.key] = fieldAttribute.label
+        if (formElement) {
+            for (let [key, fieldAttribute] of formElement.entries()) {
+                keyLabelAttributeMap[fieldAttribute.key] = fieldAttribute.label
+            }
+        } else if (fieldAttributeList) {
+            for (let fieldAttribute of fieldAttributeList) {
+                if (fieldAttribute.jobMasterId == jobMasterId) {
+                    keyLabelAttributeMap[fieldAttribute.key] = fieldAttribute.label
+                }
+            }
         }
         return keyLabelAttributeMap
     }
