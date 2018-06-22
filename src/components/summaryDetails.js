@@ -20,7 +20,7 @@ export default class SummaryDetails extends PureComponent {
     }
 
     renderParcelItem = (item) => {
-        if (item.value) {
+        if (item.value && !item.hidden) {
             return (
                 <View style={[styles.row, styles.paddingRight5, styles.paddingLeft5]}>
                     <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>

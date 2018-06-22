@@ -10,7 +10,7 @@ import styles from '../themes/FeStyle'
 export default class ReviewSaveActivatedDetails extends PureComponent {
 
     renderData = (item) => {
-        if (item.value) {
+        if (item.value && !item.hidden) {
             return (
                 <View style={[styles.row, styles.paddingLeft10, styles.paddingRight10]}>
                     <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
