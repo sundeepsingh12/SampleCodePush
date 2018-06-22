@@ -93,18 +93,18 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formLayou
 export function setSequenceDataAndNextFocus(currentElement, formLayoutState, sequenceId, jobTransaction) {
     return async function (dispatch) {
         try {
-            formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).isLoading = true
-            formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).editable = false
+            formLayoutState.formElement[currentElement.fieldAttributeMasterId].isLoading = true
+            formLayoutState.formElement[currentElement.fieldAttributeMasterId].editable = false
             dispatch(setState(UPDATE_FIELD_DATA, formLayoutState.formElement))
             const sequenceData = await formLayoutEventsInterface.getSequenceData(sequenceId)
             if (sequenceData) {
-                formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).displayValue = sequenceData
-                formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).isLoading = false
+                formLayoutState.formElement[currentElement.fieldAttributeMasterId].displayValue = sequenceData
+                formLayoutState.formElement[currentElement.fieldAttributeMasterId].isLoading = false
                 dispatch(fieldValidations(currentElement, formLayoutState, AFTER, jobTransaction))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1003, error.message, 'danger', 1)
-            formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).isLoading = false
+            formLayoutState.formElement[currentElement.fieldAttributeMasterId].isLoading = false
             dispatch(setState(UPDATE_FIELD_DATA, formLayoutState.formElement))
         }
     }
@@ -162,7 +162,6 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
                     Toast.show({ text: cloneFormElement[attributeMasterId].alertMessage, position: 'bottom', buttonText: 'OK', duration: 5000 })
                 }
             }
-
         } catch (error) {
             //console.log(error)
             showToastAndAddUserExceptionLog(1006, error.message, 'danger', 1)
