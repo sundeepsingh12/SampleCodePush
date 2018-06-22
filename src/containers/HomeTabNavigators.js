@@ -9,7 +9,6 @@ import ErpSyncScreen from './ErpSyncScreen'
 import Home from './Home'
 import Menu from './Menu'
 import styles from '../themes/FeStyle'
-import ErpSyncTabIcon from '../svg_components/icons/ErpSyncTabIcon'
 import TabScreen from './TabScreen'
 import Payment from './Payment'
 import UPIPayment from './UPIPayment'
@@ -264,10 +263,10 @@ const Tabs = {
             title: 'ERP',
             gesturesEnabled: false,
             tabBarIcon: ({ tintColor }) => (
-                <View
-                    style={[styles.alignSelfCenter, styles.marginLeft5, { height: 30, marginTop: 15 }]}>
-                    <ErpSyncTabIcon width={50} height={50} color={tintColor} />
-                </View>
+                <Icon
+                name="ios-download"
+                style={[{fontSize:18,color:tintColor}]}
+                />
             ),
         }
     },

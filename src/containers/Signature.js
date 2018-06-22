@@ -142,7 +142,7 @@ class Signature extends PureComponent {
                                 {this.saveSignButton()}
                     </View>
                 </Container>
-            </StyleProvider >
+            </StyleProvider>
         )
     }
 }

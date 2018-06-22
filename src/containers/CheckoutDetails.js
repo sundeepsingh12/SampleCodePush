@@ -108,7 +108,6 @@ class CheckoutDetails extends PureComponent {
     }
 
     onBackButtonPressAndroid = () => {
-        this.props.actions.setState(RETURN_TO_HOME, true)
         return true;
     };
 
