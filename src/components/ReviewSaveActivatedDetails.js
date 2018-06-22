@@ -26,7 +26,7 @@ export default class ReviewSaveActivatedDetails extends PureComponent {
         let data = []
         if(this.props.commonData && this.props.commonData.length){
             this.props.commonData.forEach((item) => {
-                if(item.value){
+                if(item.value && !item.hidden){
                     data.push(item)
                 }
             })

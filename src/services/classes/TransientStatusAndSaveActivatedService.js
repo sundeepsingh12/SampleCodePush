@@ -150,6 +150,7 @@ class TransientStatusAndSaveActivatedService {
                     fieldDataElement.id = id
                     fieldDataElement.label = fieldDataObject.label
                     fieldDataElement.value = fieldDataObject.value
+                    fieldDataElement.hidden = fieldDataObject.hidden
                     elementsArray.push(fieldDataElement)
             }
             if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childDataList != null && fieldDataObject.childDataList.length > 0) {
