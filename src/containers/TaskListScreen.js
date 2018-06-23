@@ -187,7 +187,7 @@ class TaskListScreen extends PureComponent {
     return (
       <View key={item.title}>
         <View>
-          <Separator bordered>
+          <Separator>
             <Text>{moment(item.title).format('YYYY-MM-DD')}</Text>
           </Separator>
         </View>

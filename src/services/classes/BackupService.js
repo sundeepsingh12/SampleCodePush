@@ -1,7 +1,6 @@
 'use strict'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { logoutService } from '../../services/classes/Logout'
-import * as realm from '../../repositories/realmdb'
 import {
     TABLE_TRACK_LOGS,
     USER_SUMMARY,
@@ -9,9 +8,7 @@ import {
     TABLE_JOB_TRANSACTION,
     TABLE_JOB,
     TABLE_SERVER_SMS_LOG,
-    TABLE_RUNSHEET,
     TABLE_TRANSACTION_LOGS,
-    FIELD_ATTRIBUTE,
     USER,
     PENDING_SYNC_TRANSACTION_IDS,
     BACKUP_ALREADY_EXIST,
@@ -21,7 +18,6 @@ import {
 import { userEventLogService } from './UserEvent'
 import { jobSummaryService } from './JobSummary'
 import { keyValueDBService } from './KeyValueDBService'
-import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs'
 import moment from 'moment'
 import { zip } from 'react-native-zip-archive'

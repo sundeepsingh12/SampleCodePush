@@ -9,10 +9,6 @@ import {
 } from 'react-native'
 import styles from '../themes/FeStyle'
 
-import {
-    ARRAY_SAROJ_FAREYE
-} from '../lib/AttributeConstants'
-
 class MessagesListView extends PureComponent {
 
 

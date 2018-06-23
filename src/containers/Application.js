@@ -31,10 +31,6 @@ var styles = StyleSheet.create({
     }
 })
 
-/**
- * ## Application class
- */
-
 class Application extends PureComponent {
 
     componentDidMount() {

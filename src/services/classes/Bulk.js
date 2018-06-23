@@ -1,13 +1,8 @@
 'use strict'
-import { keyValueDBService } from './KeyValueDBService'
-import { jobStatusService } from './JobStatus'
-import { jobMasterService } from './JobMaster'
 import { jobTransactionService } from './JobTransaction'
 import { transactionCustomizationService } from './TransactionCustomization'
-import { UNSEEN, JOB_STATUS, CUSTOMIZATION_LIST_MAP, JOB_ATTRIBUTE, JOB_ATTRIBUTE_STATUS, CUSTOMER_CARE, SMS_TEMPLATE, JOB_MASTER, HUB, TABLE_JOB_TRANSACTION } from '../../lib/constants'
+import {  JOB_STATUS, CUSTOMIZATION_LIST_MAP, JOB_ATTRIBUTE, JOB_ATTRIBUTE_STATUS, CUSTOMER_CARE, SMS_TEMPLATE, JOB_MASTER, HUB, TABLE_JOB_TRANSACTION } from '../../lib/constants'
 import _ from 'lodash'
-import { moduleCustomizationService } from './ModuleCustomization'
-import { BULK_ID } from '../../lib/AttributeConstants'
 import { INVALID_SCAN, SELECT_ALL, SELECT_NONE } from '../../lib/ContainerConstants'
 
 class Bulk {

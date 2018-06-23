@@ -109,20 +109,6 @@ class TabScreen extends PureComponent {
     })
   }
 
-  //Renders calender component TaskListCalender
-  renderCalendar = () => {
-    if (!this.props.isFutureRunsheetEnabled) {
-      return null
-    }
-    return (
-      <TaskListCalender
-        isFutureRunsheetEnabled={this.props.isFutureRunsheetEnabled}
-        isCalendarVisible={this.props.isCalendarVisible}
-        setSelectedDate={this.setSelectedDate}
-        setCalendarState={this.setCalendarState} />
-    )
-  }
-
   render() {
     if (this.props.tabsLoading) {
       return (
@@ -139,10 +125,8 @@ class TabScreen extends PureComponent {
         </StyleProvider>
       )
     } else {
-      let scrollableTabView;
       const searchTextValue = (this.props.searchText) ? this.props.searchText.searchText : '';
       const viewTabList = this.renderTabs();
-      const calendarView = this.renderCalendar();
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container>

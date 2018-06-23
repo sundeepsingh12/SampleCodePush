@@ -18,7 +18,6 @@ import { setState, deleteSessionToken, showToastAndAddUserExceptionLog } from '.
 import { backupService } from '../../services/classes/BackupService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
-import { logoutService } from '../../services/classes/Logout'
 import { NavigationActions } from 'react-navigation'
 import { authenticationService } from '../../services/classes/Authentication'
 import {

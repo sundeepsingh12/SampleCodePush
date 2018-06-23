@@ -2,7 +2,6 @@
 
 import * as realm from '../../repositories/realmdb'
 
-import { jobDataService } from './JobData'
 import { jobTransactionService } from './JobTransaction'
 import { jobStatusService } from './JobStatus'
 import {

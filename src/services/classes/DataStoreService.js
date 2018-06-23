@@ -8,9 +8,7 @@ import {
     TABLE_FIELD_DATA,
     FIELD_ATTRIBUTE,
     Datastore_Master_DB,
-    Datastore_AttributeValue_DB,
     DataStore_DB,
-    LAST_DATASTORE_SYNC_TIME,
     _id
 } from '../../lib/constants'
 
@@ -714,7 +712,7 @@ class DataStoreService {
         let isDataStoreEditable = cloneFormElement[currentElement.fieldAttributeMasterId].editable
         if (isFiltersPresent) {
             return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject: validation, searchText: '', isDataStoreEditable: true, keyLabelAttributeMap }
-        } else if (!_.isEmpty(cloneFormElement.get(currentElement.fieldAttributeMasterId).value)) {
+        } else if (!_.isEmpty(cloneFormElement[currentElement.fieldAttributeMasterId].value)) {
             validationObject.isAutoStartScannerEnabled = false
             return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: cloneFormElement[currentElement.fieldAttributeMasterId].value, isDataStoreEditable, keyLabelAttributeMap }
         } else {
@@ -724,8 +722,8 @@ class DataStoreService {
     prepareKeyLabelAttributeMap(formElement, fieldAttributeList, jobMasterId) {
         let keyLabelAttributeMap = {}
         if (formElement) {
-            for (let [key, fieldAttribute] of formElement.entries()) {
-                keyLabelAttributeMap[fieldAttribute.key] = fieldAttribute.label
+            for (let key in formElement) {
+                keyLabelAttributeMap[key] = formElement[key].label
             }
         } else if (fieldAttributeList) {
             for (let fieldAttribute of fieldAttributeList) {

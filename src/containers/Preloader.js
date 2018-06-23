@@ -1,12 +1,11 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, Platform, View, Image, Text, WebView } from 'react-native'
+import {  Platform, View, Image, Text, WebView } from 'react-native'
 import CustomAlert from "../components/CustomAlert"
 import styles from '../themes/FeStyle'
 import { Container, Button } from 'native-base'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import ServiceStatusIcon from "../components/ServiceStatusIcon"
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import renderIf from '../lib/renderIf'
 import MobileOtpScreen from './MobileOtpScreen'

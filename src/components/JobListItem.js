@@ -1,24 +1,16 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, Alert } from 'react-native'
+import { StyleSheet, View, TouchableHighlight, Alert } from 'react-native'
 import styles from '../themes/FeStyle'
 
 import {
-  Container,
-  Content,
   Header,
   Button,
   Text,
   List,
-  ListItem,
   Left,
-  Body,
-  Right,
   Icon,
   Title,
-  Footer,
-  FooterTab,
   ActionSheet,
-  StyleProvider
 } from 'native-base'
 import moment from 'moment'
 import renderIf from '../lib/renderIf'

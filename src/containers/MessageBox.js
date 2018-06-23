@@ -1,6 +1,5 @@
 'use strict'
-import { Container, StyleProvider, Card, Input, Footer, Item, Content } from 'native-base';
-import { PureComponent } from 'react';
+import { Container, StyleProvider, Footer, Item, Content } from 'native-base';
 import { FlatList, View, Text, StyleSheet, TextInput } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';

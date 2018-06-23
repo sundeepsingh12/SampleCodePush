@@ -1,4 +1,3 @@
-import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs'
 import { zip } from 'react-native-zip-archive'
 import { keyValueDBService } from './KeyValueDBService'
@@ -16,9 +15,7 @@ import {
     TABLE_RUNSHEET,
     TABLE_TRANSACTION_LOGS,
     LAST_SYNC_WITH_SERVER,
-    FIELD_ATTRIBUTE,
     JOB_STATUS,
-    JOB_MASTER,
     UNSEEN,
     USER_EXCEPTION_LOGS
 } from '../../lib/constants'
@@ -27,8 +24,6 @@ import { trackingService } from './Tracking'
 import { userEventLogService } from './UserEvent'
 import { addServerSmsService } from './AddServerSms'
 import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, SIGNATURE_AND_FEEDBACK, PENDING, PATH, PATH_TEMP } from '../../lib/AttributeConstants'
-import { jobStatusService } from './JobStatus'
-import { jobMasterService } from './JobMaster'
 import { userExceptionLogsService } from './UserException'
 
 class SyncZip {

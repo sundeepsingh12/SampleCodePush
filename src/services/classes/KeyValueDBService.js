@@ -1,7 +1,6 @@
 import {
   keyValueDB
 } from '../../repositories/keyValueDb'
-import CONFIG from '../../lib/config'
 import validate from "json-schema"
 
 class KeyValueDB {

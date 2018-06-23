@@ -66,7 +66,7 @@ export default class DataStoreItemDetails extends PureComponent {
                     </Content>
                     <SafeAreaView style={[styles.bgWhite]}>
                         <Footer style={{ backgroundColor: 'white' }}>
-                            <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
+                            <FooterTab style={StyleSheet.flatten([ styles.bgWhite])}>
                                 <Button success full style={{ backgroundColor: styles.bgPrimaryColor }}
                                     onPress={() => {
                                         this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.uniqueKey])

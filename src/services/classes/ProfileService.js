@@ -1,7 +1,6 @@
 'use strict'
 
 import {
-    SEARCH_VALUE,
     LOGIN,
     POST,
     REGEX_TO_VALIDATE_PASSWORD,
@@ -9,16 +8,13 @@ import {
 import sha256 from 'sha256'
 import CONFIG from '../../lib/config'
 import RestAPIFactory from '../../lib/RestAPIFactory'
-import { Toast } from 'native-base'
 
 import {
-    CHECK_IF_PASSWORD_ENTERED,
     CHECK_CURRENT_PASSWORD,
     MATCH_NEW_AND_CONFIRM_PASSWORD,
     VALIDATE_PASSWORD,
     CURRENT_AND_NEW_PASSWORD_CHECK,
     UNSAVED_PASSWORD,
-    OK,
     USERNAME_IS_MISSING
 } from '../../lib/ContainerConstants'
 

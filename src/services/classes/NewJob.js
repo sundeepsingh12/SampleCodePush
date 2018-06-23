@@ -1,12 +1,10 @@
 import {
     JOB_STATUS,
-    PENDING,
     SaveActivated,
     FormLayout
 } from '../../lib/constants'
 import { transientStatusAndSaveActivatedService } from './TransientStatusAndSaveActivatedService.js'
 import { keyValueDBService } from './KeyValueDBService.js'
-import _ from 'lodash'
 import {
     CONFIGURATION_ISSUES_WITH_PENDING_STATUS,
     JOB_MASTER_MISSING

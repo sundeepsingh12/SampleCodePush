@@ -21,19 +21,13 @@ import {
   USER,
   UNSEEN,
   PENDING,
-  TABLE_JOB_TRANSACTION_CUSTOMIZATION,
   JOB_MASTER,
-  JOB_STATUS,
-  HUB,
-  DEVICE_IMEI,
-  CUSTOMIZATION_APP_MODULE,
   POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS,
   LAST_SYNC_WITH_SERVER,
   PAGES,
   TABLE_MESSAGE_INTERACTION
 } from '../../lib/constants'
 import { FAREYE_UPDATES, PAGE_OUTSCAN, PATH_TEMP } from '../../lib/AttributeConstants'
-import { Platform } from 'react-native'
 import { pages } from './Pages'
 import { JOBS_DELETED } from '../../lib/ContainerConstants'
 import { geoFencingService } from './GeoFencingService'

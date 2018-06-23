@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
 import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Left, Body, Right, Item, Input, Icon, List, Label, ListItem, StyleProvider, Footer, FooterTab, Toast, } from 'native-base';
+import { Container, Content, Header, Button, Text, Body, Right, Item, Input, Icon, List, ListItem, StyleProvider, Footer, FooterTab, Toast, } from 'native-base';
 import { Print, Receipt, SMS, TotalAmount, CONTACT_NUMBER_TO_SEND_SMS, SET_SAVE_ACTIVATED_TOAST_MESSAGE, EMAILID_VIEW_ARRAY, USER, RETURN_TO_HOME, } from '../lib/constants'
 import { EMAIL, Return_To_Home, View_SignOff_Summary, View_Parcel_Summary, Sign_Off_Summary, REGEX_TO_CHECK_PHONE_NUMBER } from '../lib/AttributeConstants'
 import Loader from '../components/Loader'
