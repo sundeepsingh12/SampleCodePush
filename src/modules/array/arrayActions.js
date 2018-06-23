@@ -31,10 +31,10 @@ export function showOrDropModal(arrayElements, rowId, idToSet, isSaveDisabled) {
         }
     }
 }
-export function addRowInArray(lastrowId, childElementsTemplate, arrayElements, jobTransaction, isSaveDisabled) {
+export function addRowInArray(lastrowId, childElementsTemplate, arrayElements, jobTransaction, isSaveDisabled, sequenceWiseMasterIds) {
     return async function (dispatch) {
         try {
-            const newArrayRow = arrayService.addArrayRow(lastrowId, childElementsTemplate, arrayElements, jobTransaction, isSaveDisabled)
+            const newArrayRow = arrayService.addArrayRow(lastrowId, childElementsTemplate, arrayElements, jobTransaction, isSaveDisabled, sequenceWiseMasterIds)
             if (!newArrayRow) throw new Error(ADD_ROW_ERROR)
             dispatch(setState(SET_NEW_ARRAY_ROW, newArrayRow))
         } catch (error) {
@@ -63,22 +63,22 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
         try {
             let cloneArrayElements = _.cloneDeep(arrayElements)
             let arrayRow = cloneArrayElements[rowId]
-            arrayRow.formLayoutObject.get(attributeMasterId).displayValue = value
-            arrayRow.formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
-            let validationsResult = fieldValidationService.fieldValidations(arrayRow.formLayoutObject.get(attributeMasterId), arrayRow.formLayoutObject, AFTER, null, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
-            arrayRow.formLayoutObject.get(attributeMasterId).value = (validationsResult) ? arrayRow.formLayoutObject.get(attributeMasterId).displayValue : null
-            arrayRow.formLayoutObject.get(attributeMasterId).containerValue = (validationsResult) ? containerValue : null
+            arrayRow.formLayoutObject[attributeMasterId].displayValue = value
+            arrayRow.formLayoutObject[attributeMasterId].childDataList = fieldDataList
+            let validationsResult = fieldValidationService.fieldValidations(arrayRow.formLayoutObject[attributeMasterId], arrayRow.formLayoutObject, AFTER, null, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
+            arrayRow.formLayoutObject[attributeMasterId].value = (validationsResult) ? arrayRow.formLayoutObject[attributeMasterId].displayValue : null
+            arrayRow.formLayoutObject[attributeMasterId].containerValue = (validationsResult) ? containerValue : null
             arrayRow.modalFieldAttributeMasterId = (validationsResult) ? null : (backPressOrModalPresent == 2) ? attributeMasterId : null
-            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, (validationsResult) ? value : null, (validationsResult) ? fieldDataList : null, event, formLayoutState.fieldAttributeMasterParentIdMap)
+            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, (validationsResult) ? value : null, (validationsResult) ? fieldDataList : null, event, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.sequenceWiseMasterIds)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
             if (validationsResult && backPressOrModalPresent == 1) {
                 goBack()
             }
-            if (!validationsResult && arrayRow.formLayoutObject.get(attributeMasterId).alertMessage) {
+            if (!validationsResult && arrayRow.formLayoutObject[attributeMasterId].alertMessage) {
                 if (backPressOrModalPresent == 2) {
-                    dispatch(setState(SET_OPTION_ATTRIBUTE_ERROR, { error: arrayRow.formLayoutObject.get(attributeMasterId).alertMessage }))
+                    dispatch(setState(SET_OPTION_ATTRIBUTE_ERROR, { error: arrayRow.formLayoutObject[attributeMasterId].alertMessage }))
                 } else {
-                    Toast.show({ text: arrayRow.formLayoutObject.get(attributeMasterId).alertMessage, position: 'bottom', buttonText: 'OK', duration: 5000 })
+                    Toast.show({ text: arrayRow.formLayoutObject[attributeMasterId].alertMessage, position: 'bottom', buttonText: 'OK', duration: 5000 })
                 }
             }
         } catch (error) {
@@ -90,7 +90,7 @@ export function getNextFocusableForArrayWithoutChildDatalist(attributeMasterId, 
     return async function (dispatch) {
         try {
             let cloneArrayElements = _.cloneDeep(arrayElements)
-            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, null, event, formLayoutState.fieldAttributeMasterParentIdMap)
+            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, null, event, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.sequenceWiseMasterIds)
             if (!newArrayElements) throw new Error(DELETE_ROW_ERROR)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
         } catch (error) {
@@ -142,13 +142,13 @@ export function fieldValidationsArray(currentElement, arrayElements, timeOfExecu
             let validationsResult = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
             if (timeOfExecution == AFTER) {
                 if (scanValue) {
-                    formElement.get(currentElement.fieldAttributeMasterId).displayValue = currentElement.displayValue = scanValue
+                    formElement[currentElement.fieldAttributeMasterId].displayValue = currentElement.displayValue = scanValue
                 }
                 isValuePresentInAnotherTransaction = (currentElement.attributeTypeId == TEXT || currentElement.attributeTypeId == SCAN_OR_TEXT || currentElement.attributeTypeId == STRING || currentElement.attributeTypeId == QR_SCAN || currentElement.attributeTypeId == NUMBER) ? arrayService.checkforUniqueValidation(currentElement, newArray, rowId) : false
-                formElement.get(currentElement.fieldAttributeMasterId).value = validationsResult && !isValuePresentInAnotherTransaction ? formElement.get(currentElement.fieldAttributeMasterId).displayValue : null
+                formElement[currentElement.fieldAttributeMasterId].value = validationsResult && !isValuePresentInAnotherTransaction ? formElement[currentElement.fieldAttributeMasterId].displayValue : null
             }
             if (isValuePresentInAnotherTransaction) {
-                formElement.get(currentElement.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
+                formElement[currentElement.fieldAttributeMasterId].alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
             }
             dispatch(getNextFocusableForArrayWithoutChildDatalist(currentElement.fieldAttributeMasterId, isSaveDisabled, (!scanValue) ? currentElement.displayValue : scanValue, newArray, rowId, NEXT_FOCUS, formLayoutState))
         } catch (error) {
@@ -161,17 +161,20 @@ export function setInitialArray(currentElement, formLayoutState, jobTransaction,
         try {
             dispatch(setState(SET_ARRAY_ISLOADING, true))
             const sequenceWiseRootFieldAttributes = await formLayoutService.getSequenceWiseRootFieldAttributes(formLayoutState.statusId, currentElement.fieldAttributeMasterId, jobTransaction)
-            if (!formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).value || formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).value == '') {
+            const sequenceWiseSortedFieldAttributesMasterIds = sequenceWiseRootFieldAttributes.sequenceWiseSortedFieldAttributesMasterIds
+            if (!formLayoutState.formElement[currentElement.fieldAttributeMasterId].value || formLayoutState.formElement[currentElement.fieldAttributeMasterId].value == '') {
                 const arrayDTO = await arrayService.getSortedArrayChildElements(sequenceWiseRootFieldAttributes, jobTransaction, arrayReverseDataStoreFilterMap, currentElement.fieldAttributeMasterId)
                 if (!arrayDTO) return
                 if (arrayDTO.errorMessage) {
                     dispatch(setState(SET_ERROR_MSG, arrayDTO.errorMessage))
                 } else {
+                    arrayDTO.sequenceWiseMasterIds = sequenceWiseSortedFieldAttributesMasterIds
                     dispatch(setState(SET_ARRAY_CHILD_LIST, arrayDTO))
                     dispatch(setState(SET_ARRAY_DATA_STORE_FILTER_MAP, arrayDTO.arrayReverseDataStoreFilterMap))  // set formLayout state of arrayReverseDataStoreFilterMap which is avilable globally
                 }
             } else {
                 let arrayState = arrayService.setInitialArray(currentElement, formLayoutState.formElement, sequenceWiseRootFieldAttributes)
+                arrayState.sequenceWiseMasterIds = sequenceWiseSortedFieldAttributesMasterIds
                 dispatch(setState(SET_ARRAY_CHILD_LIST, arrayState))
             }
         } catch (error) {

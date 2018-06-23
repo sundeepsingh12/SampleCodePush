@@ -45,11 +45,10 @@ class NewJob {
             }
         }//if saveActivated data is present and it has screenName of SaveActivated then navigate to SaveActivated Container
         else if (saveActivatedData.value[jobMasterId].screenName == SaveActivated) {
-            let result = transientStatusAndSaveActivatedService.convertMapToArrayOrArrayToMap(saveActivatedData.value[jobMasterId].saveActivatedState.differentData, saveActivatedData.value[jobMasterId].navigationFormLayoutStates, false)//we have to convert array to es6 Map
             stateParam = {//state of SaveActivated container
                 commonData: saveActivatedData.value[jobMasterId].saveActivatedState.commonData,
                 statusName: saveActivatedData.value[jobMasterId].saveActivatedState.statusName,
-                differentData: result.differentData,
+                differentData: saveActivatedData.value[jobMasterId].saveActivatedState.differentData,
                 isSignOffVisible: saveActivatedData.value[jobMasterId].saveActivatedState.isSignOffVisible,
             }
             navigationParams = {//navigation params which is passed to saveActivated container

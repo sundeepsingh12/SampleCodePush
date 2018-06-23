@@ -1,12 +1,6 @@
 'use strict'
 import _ from 'lodash'
 import {
-    DATA_STORE_ATTR_MASTER_ID,
-    DATA_STORE_MASTER_ID,
-    SEARCH_VALUE,
-    GET,
-    EXTERNAL_DATA_STORE_URL,
-    DATA_STORE_ATTR_KEY,
     SKU_ARRAY,
     CAMERA_HIGH,
     CAMERA_MEDIUM,
@@ -25,9 +19,6 @@ import {
     MONEY_COLLECT,
     MONEY_PAY,
     ACTUAL_AMOUNT,
-    PATH_TEMP,
-    SIGN,
-    IMAGE_EXTENSION,
     EXTERNAL_DATA_STORE,
     DATA_STORE,
     QR_SCAN,
@@ -84,27 +75,27 @@ class TransientStatusAndSaveActivatedService {
     saveRecurringData(formLayoutState, recurringData, jobTransaction, statusId) {
         let differentData = { ...recurringData }
         let priority = -1, textToShow = ''
-        let savedJobDetailsObject = {}
-        for (let [id, currentObject] of formLayoutState.formElement.entries()) {
-            if (currentObject.attributeTypeId == SCAN_OR_TEXT && currentObject.value && priority < 4) {
+        let formData = formLayoutState.formElement
+        for (let currentObject in formData) {
+            if (formData[currentObject].attributeTypeId == SCAN_OR_TEXT && formData[currentObject].value && priority < 4) {
                 priority = 4
-                textToShow = currentObject.value
+                textToShow = formData[currentObject].value
                 break
             }
-            else if (currentObject.attributeTypeId == EXTERNAL_DATA_STORE && currentObject.value && priority < 3) {
+            else if (formData[currentObject].attributeTypeId == EXTERNAL_DATA_STORE && formData[currentObject].value && priority < 3) {
                 priority = 3
-                textToShow = currentObject.value
+                textToShow = formData[currentObject].value
             }
-            else if (currentObject.attributeTypeId == DATA_STORE && currentObject.value && priority < 2) {
+            else if (formData[currentObject].attributeTypeId == DATA_STORE && formData[currentObject].value && priority < 2) {
                 priority = 2
-                textToShow = currentObject.value
+                textToShow = formData[currentObject].value
             }
-            else if (currentObject.attributeTypeId == QR_SCAN && priority < 1) {
+            else if (formData[currentObject].attributeTypeId == QR_SCAN && priority < 1) {
                 priority = 1
-                textToShow = currentObject.value
+                textToShow = formData[currentObject].value
             }
         }
-        let { elementsArray, amount } = this.getDataFromFormElement(formLayoutState.formElement)
+        let { elementsArray, amount } = this.getDataFromFormElement(formData)
         differentData[jobTransaction.id] = {
             id: jobTransaction.id,
             referenceNumber: jobTransaction.referenceNumber,
@@ -134,7 +125,7 @@ class TransientStatusAndSaveActivatedService {
     getDataFromFormElement(formElement) {
         let elementsArray = []
         let amount = 0
-        for (let [id, fieldDataObject] of formElement.entries()) {
+        for (let [id, fieldDataObject] of Object.entries(formElement)) {
             let fieldDataElement = {}
             switch (fieldDataObject.attributeTypeId) {
                 case CAMERA_HIGH:
@@ -159,6 +150,7 @@ class TransientStatusAndSaveActivatedService {
                     fieldDataElement.id = id
                     fieldDataElement.label = fieldDataObject.label
                     fieldDataElement.value = fieldDataObject.value
+                    fieldDataElement.hidden = fieldDataObject.hidden
                     elementsArray.push(fieldDataElement)
             }
             if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childDataList != null && fieldDataObject.childDataList.length > 0) {
@@ -221,9 +213,7 @@ class TransientStatusAndSaveActivatedService {
             if (!isCalledFromFormLayout) {
                 formLayoutObject = await formLayoutService.concatFormElementForTransientStatus(previousFormLayoutState, dataForSingleTransaction.formLayoutState.formElement)
             } else {
-                let formElement1 = JSON.parse(JSON.stringify([...previousFormLayoutState]))//deep cloning ES6 Map
-                let formElement2 = JSON.parse(JSON.stringify([...dataForSingleTransaction.formLayoutState.formElement]))
-                formLayoutObject = new Map(formElement1.concat(formElement2))// concatinating fieldAttributes i.e. formElement map of multiple status in case if saveActivated status have next status
+                formLayoutObject = _.assign({}, previousFormLayoutState, dataForSingleTransaction.formLayoutState.formElement)//new Map(formElement1.concat(formElement2))// concatinating fieldAttributes i.e. formElement map of multiple status in case if saveActivated status have next status
             }
             let returnParams = (formLayoutObject) ? this.prepareDTOOfFromLayoutObject(formLayoutObject, emailIdInFieldData, contactNumberInFieldData) : {}
             emailIdInFieldData = returnParams.emailIdInFieldData
@@ -296,16 +286,16 @@ class TransientStatusAndSaveActivatedService {
      */
     prepareDTOOfFromLayoutObject(formLayoutObject, emailIdInFieldData, contactNumberInFieldData) {
         let formattedFormLayoutObject = []
-        for (let [id, fieldDataObject] of formLayoutObject.entries()) {
-            if (fieldDataObject && !fieldDataObject.hidden) {
+        for (let fieldDataObject in formLayoutObject) {
+            if (formLayoutObject[fieldDataObject] && !formLayoutObject[fieldDataObject].hidden) {
                 formattedFormLayoutObject.push({
-                    key: fieldDataObject.key,
-                    label: fieldDataObject.label,
-                    value: (fieldDataObject.value && !_.isEmpty(fieldDataObject.value)) ? fieldDataObject.value : ""
+                    key: formLayoutObject[fieldDataObject].key,
+                    label: formLayoutObject[fieldDataObject].label,
+                    value: (formLayoutObject[fieldDataObject].value && !_.isEmpty(formLayoutObject[fieldDataObject].value)) ? formLayoutObject[fieldDataObject].value : ""
                 })
-                if (emailIdInFieldData != [] && _.includes(fieldDataObject.value, '@') && _.includes(fieldDataObject.value, '.')) {
-                    emailIdInFieldData.push(fieldDataObject.value)
-                } else if (!contactNumberInFieldData && (fieldDataObject.key == "mobile_phone")) {
+                if (emailIdInFieldData != [] && _.includes(formLayoutObject[fieldDataObject].value, '@') && _.includes(formLayoutObject[fieldDataObject].value, '.')) {
+                    emailIdInFieldData.push(formLayoutObject[fieldDataObject].value)
+                } else if (!contactNumberInFieldData && (formLayoutObject[fieldDataObject].key == "mobile_phone")) {
                     contactNumberInFieldData = true
                 }
             }
@@ -343,52 +333,13 @@ class TransientStatusAndSaveActivatedService {
         return cloneRecurringData
     }
 
-    /**
-    * This function deletes object from recurring data 
-    * @param {*} differentData // save activated data
-    * @param {*} navigationFormLayoutStates // data from previous states of save Activated
-    * @param {*} mapToArray 
-    * @returns{
-    * differentData,
-    * navigationFormLayoutStates
-    * }
-    */
-    convertMapToArrayOrArrayToMap(differentData, navigationFormLayoutStates, mapToArray) {
-        for (let differentDataCounter in differentData) {
-            let resultStructure
-            let formElement = differentData[differentDataCounter].formLayoutState.formElement
-            if (mapToArray) {
-                resultStructure = JSON.stringify([...formElement])
-            } else {
-                resultStructure = new Map(JSON.parse(formElement))
-            }
-            differentData[differentDataCounter].formLayoutState.formElement = resultStructure
-        }
-        for (let navigationFormLayoutStatesCounter in navigationFormLayoutStates) {
-            let resultStructure
-            let formElement = navigationFormLayoutStates[navigationFormLayoutStatesCounter].formElement
-            if (mapToArray) {
-                resultStructure = JSON.stringify([...formElement])
-            } else {
-                resultStructure = new Map(JSON.parse(formElement))
-            }
-            navigationFormLayoutStates[navigationFormLayoutStatesCounter].formElement = resultStructure
-        }
-        return {
-            differentData,
-            arrayFormElement: navigationFormLayoutStates
-        }
-    }
-
     createObjectForStore(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates) {
         let cloneSaveActivatedState = _.cloneDeep(saveActivatedState)
         let cloneNavigationFormLayoutStates = _.cloneDeep(navigationFormLayoutStates)
-        let { differentData, arrayFormElement } = this.convertMapToArrayOrArrayToMap(cloneSaveActivatedState.differentData, cloneNavigationFormLayoutStates, true)
-        cloneSaveActivatedState.differentData = differentData
-        cloneNavigationFormLayoutStates = arrayFormElement
         let storeObject = {}
         storeObject[jobMasterId] = {
-            saveActivatedState: cloneSaveActivatedState, screenName,
+            saveActivatedState: cloneSaveActivatedState, 
+            screenName,
             jobMasterId,
             navigationParams,
             navigationFormLayoutStates: cloneNavigationFormLayoutStates
