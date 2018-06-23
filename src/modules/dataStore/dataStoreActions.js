@@ -16,7 +16,7 @@ import {
     SET_DSF_REVERSE_MAP,
     SEARCH_DATA_STORE_RESULT,
     SET_ARRAY_DATA_STORE_FILTER_MAP,
-
+    SET_DS_KEYLABEL_MAP
 } from '../../lib/constants'
 import {
     DATA_STORE,
@@ -39,7 +39,9 @@ export function getFieldAttribute(fieldAttributeMasterId, value) {
             dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
             const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             let fieldAttribute = dataStoreService.getFieldAttribute(fieldAttributes.value, fieldAttributeMasterId)
+            let keyLabelAttributeMap = dataStoreService.prepareKeyLabelAttributeMap(null, fieldAttributes.value, fieldAttribute[0].jobMasterId)
             dispatch(getDataStoreAttrValueMap(value, fieldAttribute[0].dataStoreMasterId, fieldAttribute[0].dataStoreAttributeId, fieldAttribute[0].externalDataStoreMasterUrl, fieldAttribute[0].key))
+            dispatch(setState(SET_DS_KEYLABEL_MAP, keyLabelAttributeMap))
         } catch (error) {
             showToastAndAddUserExceptionLog(701, error.message, 'danger', 0)
             dispatch(setState(SHOW_ERROR_MESSAGE, {
@@ -92,7 +94,8 @@ export function checkForFiltersAndValidation(currentElement, formLayoutState, jo
                 isFiltersPresent: returnParams.isFiltersPresent,
                 validation: returnParams.validationObject,
                 searchText: returnParams.searchText,
-                isDataStoreEditable: returnParams.isDataStoreEditable
+                isDataStoreEditable: returnParams.isDataStoreEditable,
+                keyLabelAttributeMap: returnParams.keyLabelAttributeMap
             }))
             if (!returnParams.isFiltersPresent && !_.isEmpty(returnParams.searchText) && returnParams.validationObject.isSearchEnabled) {
                 dispatch(checkOfflineDS(returnParams.searchText, currentElement.dataStoreMasterId, currentElement.dataStoreAttributeId, currentElement.externalDataStoreMasterUrl, currentElement.key, currentElement.attributeTypeId))
@@ -185,13 +188,13 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function onSave(fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction,goBack) {
+export function onSave(fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction, goBack) {
     return async function (dispatch) {
         try {
             if (!calledFromArray) {
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction,null,null,goBack))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction, null, null, goBack))
             } else {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState,goBack))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState, goBack))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(705, error.message, 'danger', 0)
@@ -240,17 +243,17 @@ export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, it
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction,goBack) {
+export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction, goBack) {
     return async function (dispatch) {
         try {
             if (!calledFromArray) {
                 let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formLayoutState.formElement)
                 formLayoutState.formElement = formElementResult
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction,null,null,goBack))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction, null, null, goBack))
             } else {
                 let formElementResult = await dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formLayoutState.formElement[rowId].formLayoutObject)
                 formLayoutState.formElement[rowId].formLayoutObject = formElementResult
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState, goBack))
             }
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {
@@ -348,9 +351,10 @@ export function checkForFiltersAndValidationForArray(functionParamsFromDS) {
                 isFiltersPresent: returnParams.isFiltersPresent,
                 validation: returnParams.validationObject,
                 searchText: returnParams.searchText,
-                isDataStoreEditable: returnParams.isDataStoreEditable
+                isDataStoreEditable: returnParams.isDataStoreEditable,
+                keyLabelAttributeMap: returnParams.keyLabelAttributeMap
             }))
-            let currentElement=functionParamsFromDS.currentElement
+            let currentElement = functionParamsFromDS.currentElement
             if (!returnParams.isFiltersPresent && !_.isEmpty(returnParams.searchText) && returnParams.validationObject.isSearchEnabled) {
                 dispatch(checkOfflineDS(returnParams.searchText, currentElement.dataStoreMasterId, currentElement.dataStoreAttributeId, currentElement.externalDataStoreMasterUrl, currentElement.key, currentElement.attributeTypeId))
             }

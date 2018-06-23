@@ -383,6 +383,7 @@ module.exports = keyMirror({
     DISABLE_AUTO_START_SCANNER: null,
     SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP: null,
     SEARCH_DATA_STORE_RESULT: null,
+    SET_DS_KEYLABEL_MAP: null,
 
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,

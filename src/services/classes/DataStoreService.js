@@ -8,9 +8,7 @@ import {
     TABLE_FIELD_DATA,
     FIELD_ATTRIBUTE,
     Datastore_Master_DB,
-    Datastore_AttributeValue_DB,
     DataStore_DB,
-    LAST_DATASTORE_SYNC_TIME,
     _id
 } from '../../lib/constants'
 
@@ -584,12 +582,13 @@ class DataStoreService {
         if (!currentElement) {
             throw new Error(CURRENT_ELEMENT_MISSING)
         }
-
+        let keyLabelAttributeMap = this.prepareKeyLabelAttributeMap(formElement)
         if (!currentElement.dataStoreFilterMapping || _.isEqual(currentElement.dataStoreFilterMapping, '[]') || currentElement.attributeTypeId == EXTERNAL_DATA_STORE) {
             return {
                 dataStoreAttrValueMap: {},
                 dataStoreFilterReverseMap,
                 isFiltersPresent: false,
+                keyLabelAttributeMap
             }
         }
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
@@ -599,6 +598,7 @@ class DataStoreService {
             dataStoreAttrValueMap,
             dataStoreFilterReverseMap: returnParams.dataStoreFilterReverseMap,
             isFiltersPresent: true,
+            keyLabelAttributeMap
         }
     }
 
@@ -693,13 +693,14 @@ class DataStoreService {
             validationObject: returnParams.validationObject,
             isDataStoreEditable: returnParams.isDataStoreEditable,
             searchText: returnParams.searchText,
-            arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap
+            arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap,
+            keyLabelAttributeMap: returnParams.keyLabelAttributeMap
         }
     }
 
     async runDataStoreBeforeValidations(currentElement, formLayoutState, jobTransaction, cloneFormElement, dataStoreFilterReverse) {
         let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, BEFORE, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
-        let { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent } = await this.checkForFilters(currentElement, cloneFormElement, jobTransaction, dataStoreFilterReverse)
+        let { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, keyLabelAttributeMap } = await this.checkForFilters(currentElement, cloneFormElement, jobTransaction, dataStoreFilterReverse)
         let validation = {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
@@ -710,13 +711,28 @@ class DataStoreService {
         let validationObject = (currentElement.validation) ? this.getValidations(currentElement.validation) : validation
         let isDataStoreEditable = cloneFormElement[currentElement.fieldAttributeMasterId].editable
         if (isFiltersPresent) {
-            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject: validation, searchText: '', isDataStoreEditable: true }
+            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject: validation, searchText: '', isDataStoreEditable: true, keyLabelAttributeMap }
         } else if (!_.isEmpty(cloneFormElement[currentElement.fieldAttributeMasterId].value)) {
             validationObject.isAutoStartScannerEnabled = false
-            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: cloneFormElement[currentElement.fieldAttributeMasterId].value, isDataStoreEditable }
+            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: cloneFormElement[currentElement.fieldAttributeMasterId].value, isDataStoreEditable, keyLabelAttributeMap }
         } else {
-            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: '', isDataStoreEditable }
+            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: '', isDataStoreEditable, keyLabelAttributeMap }
         }
+    }
+    prepareKeyLabelAttributeMap(formElement, fieldAttributeList, jobMasterId) {
+        let keyLabelAttributeMap = {}
+        if (formElement) {
+            for (let fieldAttributeMasterId in formElement) {
+                keyLabelAttributeMap[formElement[fieldAttributeMasterId].key] = formElement[fieldAttributeMasterId].label
+            }
+        } else if (fieldAttributeList) {
+            for (let fieldAttribute of fieldAttributeList) {
+                if (fieldAttribute.jobMasterId == jobMasterId) {
+                    keyLabelAttributeMap[fieldAttribute.key] = fieldAttribute.label
+                }
+            }
+        }
+        return keyLabelAttributeMap
     }
 }
 

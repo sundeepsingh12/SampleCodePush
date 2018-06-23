@@ -1,6 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { Alert, StyleSheet, View, Text, Platform, TouchableHighlight, Image, TouchableOpacity, TextInput } from 'react-native'
+import { Alert, StyleSheet, View, Text, Image, TouchableOpacity, TextInput } from 'react-native'
 import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg, ActionSheet } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'

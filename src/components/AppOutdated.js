@@ -2,8 +2,6 @@
 
 import React, { PureComponent } from 'react'
 import {
-    StyleSheet,
-    Platform,
     View,
     Text,
     Modal,

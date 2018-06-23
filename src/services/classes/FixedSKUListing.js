@@ -1,7 +1,4 @@
 'use strict'
-import {
-    keyValueDBService,
-} from './KeyValueDBService'
 
 import {
     FIXED_SKU_QUANTITY,

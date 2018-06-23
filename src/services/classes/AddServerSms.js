@@ -3,13 +3,10 @@
 import { keyValueDBService } from './KeyValueDBService'
 import {
     SMS_JOB_STATUS,
-    TABLE_JOB_DATA,
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
     USER,
     TABLE_SERVER_SMS_LOG,
-    TABLE_JOB_TRANSACTION,
-    PENDING_SYNC_TRANSACTION_IDS
 } from '../../lib/constants'
 import * as realm from '../../repositories/realmdb'
 import moment from 'moment';

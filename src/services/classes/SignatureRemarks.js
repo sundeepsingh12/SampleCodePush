@@ -1,7 +1,6 @@
 'use strict'
 import RNFS from 'react-native-fs';
 import moment from 'moment'
-import CONFIG from '../../lib/config'
 import {
     SKU_ARRAY,
     CAMERA_HIGH,
@@ -27,7 +26,6 @@ import {
 } from '../../lib/AttributeConstants'
 import {
     USER,
-    FIELD_ATTRIBUTE,
     SPECIAL,
     REMARKS
 } from '../../lib/constants'

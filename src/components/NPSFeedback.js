@@ -1,8 +1,5 @@
 import StarRating from 'react-native-star-rating'
-import {
-    View,
-}
-    from 'react-native'
+import { View }from 'react-native'
 import React, { PureComponent } from 'react'
 
 class NPSFeedback extends PureComponent {

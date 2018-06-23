@@ -1,5 +1,4 @@
 'use strict'
-import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { TABLE_JOB, TABLE_JOB_DATA } from '../../lib/constants'
 import { jobTransactionService } from './JobTransaction'
 import { transactionCustomizationService } from './TransactionCustomization'
