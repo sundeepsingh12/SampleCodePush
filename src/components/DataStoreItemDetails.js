@@ -58,7 +58,7 @@ export default class DataStoreItemDetails extends PureComponent {
                         </Header>
                     </SafeAreaView>
                     <Content style={[styles.margin5]}>
-                        < FlatList
+                        <FlatList
                             data={this.createDetails(this.props.selectedElement.dataStoreAttributeValueMap)}
                             renderItem={({ item }) => this.renderData(item)}
                             keyExtractor={item => String(item.id)}

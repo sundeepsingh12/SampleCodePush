@@ -21,6 +21,7 @@ export default function arrayReducer(state = initialState, action) {
                 .set('errorMessage', '')
                 .set('arrayMainObject', action.payload.arrayMainObject)
                 .set('isLoading', false)
+                .set('sequenceWiseMasterIds',action.payload.sequenceWiseMasterIds)
         case SET_NEW_ARRAY_ROW:
             return state.set('arrayElements', action.payload.arrayElements)
                 .set('lastRowId', action.payload.lastRowId)

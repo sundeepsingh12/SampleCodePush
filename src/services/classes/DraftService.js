@@ -18,10 +18,10 @@ class DraftService {
         if (!formLayoutState || !formLayoutState.formElement) return
         let statusIdToFormLayoutMap = {}
         let navigationFormLayoutStatesForDb = {}
-        statusIdToFormLayoutMap[formLayoutState.statusId] = this.convertFormLayoutStateToString(formLayoutState)
+        statusIdToFormLayoutMap[formLayoutState.statusId] = formLayoutState
         if (navigationFormLayoutStates) {
             for (let index in navigationFormLayoutStates) {
-                navigationFormLayoutStatesForDb[navigationFormLayoutStates[index].statusId] = this.convertFormLayoutStateToString(navigationFormLayoutStates[index])
+                navigationFormLayoutStatesForDb[navigationFormLayoutStates[index].statusId] = navigationFormLayoutStates[index]
             }
         }
         let draftObject = {
@@ -39,14 +39,6 @@ class DraftService {
             return draftObjectCopy
         }
         return draftObject
-    }
-
-    convertFormLayoutStateToString(formLayoutState) {
-        let cloneFormLayoutState = JSON.parse(JSON.stringify(formLayoutState))
-        let formElement = formLayoutState.formElement
-        let formElementAsArray = JSON.stringify([...formElement])
-        cloneFormLayoutState.formElement = formElementAsArray
-        return cloneFormLayoutState
     }
 
     getDraftForState(jobTransaction, jobMasterId) {
@@ -81,6 +73,7 @@ class DraftService {
                 realm.deleteSingleRecord(TABLE_DRAFT, jobTransaction.id, 'jobTransactionId')
             }
         }
+<<<<<<< HEAD
         // let allData = realm.getRecordListOnQuery(TABLE_DRAFT)
         // for (let index in allData) {
         //     let draft = { ...allData[index] }
@@ -88,19 +81,16 @@ class DraftService {
         //         console.log('draft records', index, draft)
         //     }
         // }
+=======
+>>>>>>> master
     }
     getFormLayoutStateFromDraft(draft) {
         let statusIdToFormLayoutMap = JSON.parse(draft.formLayoutObject)
         let formLayoutState = statusIdToFormLayoutMap[draft.statusId]
-        let formElementAsMap = new Map(JSON.parse(formLayoutState.formElement))
-        formLayoutState.formElement = formElementAsMap
         let navigationFormLayoutStates = {}, navigationFormLayoutStatesForRestore = {}
         navigationFormLayoutStates = JSON.parse(draft.navigationFormLayoutStates)
         for (let index in navigationFormLayoutStates) {
-            let formLayout = navigationFormLayoutStates[index]
-            let formElementAsMap = new Map(JSON.parse(formLayout.formElement))
-            formLayout.formElement = formElementAsMap
-            navigationFormLayoutStatesForRestore[navigationFormLayoutStates[index].statusId] = formLayout
+            navigationFormLayoutStatesForRestore[navigationFormLayoutStates[index].statusId] = navigationFormLayoutStates[index]
         }
         return { formLayoutState, navigationFormLayoutStatesForRestore }
     }

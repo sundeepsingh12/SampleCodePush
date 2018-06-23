@@ -22,7 +22,7 @@ export function onSave(parentObject, formLayoutState, fixedSKUList, jobTransacti
         try {
             fixedSKUList = await fixedSKUDetailsService.calculateTotalAmount(fixedSKUList)
             let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(fixedSKUList, jobTransaction.id, parentObject.positionId, formLayoutState.latestPositionId)
-            formLayoutState.formElement.get(parentObject.fieldAttributeMasterId).editable = false
+            formLayoutState.formElement[parentObject.fieldAttributeMasterId].editable = false
             dispatch(setState(SET_FIXED_SKU, {
                 fixedSKUList,
                 isLoaderRunning: false

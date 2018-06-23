@@ -170,7 +170,7 @@ class AddServerSms {
                 let fieldData = fieldDataList.filter(data => data.fieldAttributeMasterId == fieldAttributesWithSameKey.id && data.jobTransactionId == jobTransaction.id)
                 fieldDataValueToReplace = (fieldData[0] && fieldData[0].value) ? fieldData[0].value : null
             } else if (formElement) {
-                let formElementForKey = formElement.get(fieldAttributesWithSameKey.id)
+                let formElementForKey = formElement[fieldAttributesWithSameKey.id]
                 fieldDataValueToReplace = (formElementForKey) ? formElementForKey.value : null
             }
             if (fieldDataValueToReplace) {

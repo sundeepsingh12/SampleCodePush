@@ -21,7 +21,7 @@ export function getOptionsList(fieldAttributeMasterId, formElement) {
                 return;
             }
             let childDataList = [];
-            childDataList = formElement.get(fieldAttributeMasterId).childDataList ? formElement.get(fieldAttributeMasterId).childDataList : formElement.get(fieldAttributeMasterId).value ? childDataList.concat(formElement.get(fieldAttributeMasterId)) : [];
+            childDataList = formElement[fieldAttributeMasterId].childDataList ? formElement[fieldAttributeMasterId].childDataList : formElement[fieldAttributeMasterId].value ? childDataList.concat(formElement[fieldAttributeMasterId]) : [];
             let selectedOptionsMap = {};
             for (let index in childDataList) {
                 selectedOptionsMap[childDataList[index].value] = true;
@@ -31,7 +31,6 @@ export function getOptionsList(fieldAttributeMasterId, formElement) {
             dispatch(setState(SET_OPTIONS_LIST, { optionsMap }));
         } catch (error) {
             showToastAndAddUserExceptionLog(1401, error.message, 'danger', 0);
-            dispatch(setState(ERROR_MESSAGE, error.message));
         }
     }
 }
@@ -63,7 +62,7 @@ export function getOptionsListFromJobData(currentElement, jobTransaction) {
             }))
         } catch (error) {
             showToastAndAddUserExceptionLog(1402, error.message, 'danger', 0)
-            dispatch(setState(ERROR_MESSAGE, error.message))
+            // dispatch(setState(ERROR_MESSAGE, error.message))
         }
     }
 }

@@ -28,14 +28,14 @@ class ArrayFieldAttribute {
 
     getSortedArrayChildElements(arrayDTO, jobTransaction, arrayReverseDataStoreFilterMap, fieldAttributeMasterId) {
         let errorMessage;
-        let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
+        let requiredFields = Object.values(arrayDTO.formLayoutObject).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
         if (requiredFields.length == 0) {
             errorMessage = INVALID_CONFIG_ERROR
             return { arrayRowDTO: {}, childElementsTemplate: arrayDTO, errorMessage }
         } else {
             let arrayMainObject = arrayDTO.arrayMainObject
-            let arrayTemplate = _.omit(arrayDTO, ['latestPositionId', 'isSaveDisabled', 'arrayMainObject'])
-            let arrayRowDTO = this.addArrayRow(0, arrayTemplate, {}, jobTransaction, arrayDTO.isSaveDisabled)
+            let arrayTemplate = _.omit(arrayDTO, ['latestPositionId', 'isSaveDisabled', 'arrayMainObject', 'sequenceWiseSortedFieldAttributesMasterIds', 'fieldAttributeMasterIdFromArray'])
+            let arrayRowDTO = this.addArrayRow(0, arrayTemplate, {}, jobTransaction, arrayDTO.isSaveDisabled, arrayDTO.sequenceWiseSortedFieldAttributesMasterIds)
             // Below two lines create a map which is used in case of DSF or DataStore which have mapping with other DSF attribute 
             let cloneArrayReverseDataStoreFilterMap = _.clone(arrayReverseDataStoreFilterMap)
             cloneArrayReverseDataStoreFilterMap[fieldAttributeMasterId] = {} // create map with fieldAttributeMasterId of array as key
@@ -43,12 +43,12 @@ class ArrayFieldAttribute {
         }
     }
 
-    addArrayRow(lastRowId, childElementsTemplate, arrayElements, jobTransaction, isSaveDisabled) {
+    addArrayRow(lastRowId, childElementsTemplate, arrayElements, jobTransaction, isSaveDisabled, sequenceWiseSortedFieldAttributesMasterIds) {
         let cloneArrayElements = _.cloneDeep(arrayElements)
         cloneArrayElements[lastRowId] = childElementsTemplate
         cloneArrayElements[lastRowId].rowId = lastRowId
         cloneArrayElements[lastRowId].allRequiredFieldsFilled = false
-        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, cloneArrayElements[lastRowId].formLayoutObject, isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction);
+        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, cloneArrayElements[lastRowId].formLayoutObject, isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction,null, null, sequenceWiseSortedFieldAttributesMasterIds);
         return {
             arrayElements: cloneArrayElements,
             lastRowId: (lastRowId + 1),
@@ -56,7 +56,7 @@ class ArrayFieldAttribute {
         }
     }
 
-    deleteArrayRow(arrayElements, rowId, lastRowId) {
+    deleteArrayRow(arrayElements, rowId) {
         let cloneArrayElements = _.cloneDeep(arrayElements)
         let newArrayElements = _.omit(cloneArrayElements, [rowId])
         return newArrayElements
@@ -68,15 +68,16 @@ class ArrayFieldAttribute {
         for (let rowId in arrayElements) {
             let arrayObject = {}
             let childDataList = []
-            for (let [key, arrayRowElement] of arrayElements[rowId].formLayoutObject) {
-                let afterValidationResult = fieldValidationService.fieldValidations(arrayRowElement, arrayElements[rowId].formLayoutObject, AFTER, jobTransaction)
-                let isValuePresentInAnotherTransaction = (arrayRowElement.attributeTypeId == TEXT || arrayRowElement.attributeTypeId == SCAN_OR_TEXT || arrayRowElement.attributeTypeId == STRING || arrayRowElement.attributeTypeId == QR_SCAN || arrayRowElement.attributeTypeId == NUMBER) ? this.checkforUniqueValidation(arrayRowElement, arrayElements, rowId) : false
-                arrayRowElement.value = afterValidationResult && !isValuePresentInAnotherTransaction ? arrayRowElement.displayValue : null
-                if (arrayRowElement.required && (!arrayRowElement.value || arrayRowElement.value == '')) {
+            let arrayData = arrayElements[rowId].formLayoutObject
+            for (let arrayRowElement in arrayData) {
+                let afterValidationResult = fieldValidationService.fieldValidations(arrayData[arrayRowElement], arrayElements[rowId].formLayoutObject, AFTER, jobTransaction)
+                let isValuePresentInAnotherTransaction = (arrayData[arrayRowElement].attributeTypeId == TEXT || arrayData[arrayRowElement].attributeTypeId == SCAN_OR_TEXT || arrayData[arrayRowElement].attributeTypeId == STRING || arrayData[arrayRowElement].attributeTypeId == QR_SCAN || arrayData[arrayRowElement].attributeTypeId == NUMBER) ? this.checkforUniqueValidation(arrayData[arrayRowElement], arrayElements, rowId) : false
+                arrayData[arrayRowElement].value = afterValidationResult && !isValuePresentInAnotherTransaction ? arrayData[arrayRowElement].displayValue : null
+                if (arrayData[arrayRowElement].required && (!arrayData[arrayRowElement].value || arrayData[arrayRowElement].value == '')) {
                     isSaveDisabled = true
                     break
                 }
-                childDataList.push(arrayRowElement)
+                childDataList.push(arrayData[arrayRowElement])
             }
             arrayObject = {
                 fieldAttributeMasterId: arrayMainObject.id,
@@ -106,9 +107,9 @@ class ArrayFieldAttribute {
         return isSaveDisabled
     }
 
-    findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, fieldDataList, event, fieldAttributeMasterParentIdMap) {
+    findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, fieldDataList, event, fieldAttributeMasterParentIdMap, sequenceWiseMasterIds) {
         let arrayRow = cloneArrayElements[rowId]
-        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, isSaveDisabled, value, fieldDataList, event, null, fieldAttributeMasterParentIdMap);
+        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, isSaveDisabled, value, fieldDataList, event, null, fieldAttributeMasterParentIdMap, null, sequenceWiseMasterIds);
         arrayRow.allRequiredFieldsFilled = (!sortedArrayElements.isSaveDisabled) ? true : false
         let _isSaveDisabled = this.enableSaveIfRequired(cloneArrayElements)
         return {
@@ -118,22 +119,21 @@ class ArrayFieldAttribute {
     }
 
     setInitialArray(currentElement, formElement, arrayTemplate) {
-        let arrayValue = formElement.get(currentElement.fieldAttributeMasterId)
+        let arrayValue = formElement[currentElement.fieldAttributeMasterId]
         let arrayElements = {}
         let rowId = 0
         let arrayMainObject = arrayTemplate.arrayMainObject
-        let childElementsTemplate = _.omit(arrayTemplate, ['latestPositionId', 'isSaveDisabled', 'arrayMainObject'])
+        let childElementsTemplate = _.omit(arrayTemplate, ['latestPositionId', 'isSaveDisabled', 'arrayMainObject', 'sequenceWiseSortedFieldAttributesMasterIds', 'fieldAttributeMasterIdFromArray'])
         if (arrayValue.value == ARRAY_SAROJ_FAREYE && arrayValue.childDataList) {
             for (let index in arrayValue.childDataList) {
                 let arrayObjectSarojFareye = arrayValue.childDataList[index].childDataList
-                let formLayoutObject = new Map()
-                let arrayRow = {}
+                let formLayoutObject = {}
                 for (let index in arrayObjectSarojFareye) {
-                    let fieldAttribute = { ...childElementsTemplate.formLayoutObject.get(arrayObjectSarojFareye[index].fieldAttributeMasterId) }
+                    let fieldAttribute = { ...childElementsTemplate.formLayoutObject[arrayObjectSarojFareye[index].fieldAttributeMasterId] }
                     fieldAttribute.value = fieldAttribute.displayValue = arrayObjectSarojFareye[index].value
                     fieldAttribute.editable = true
                     fieldAttribute.childDataList = arrayObjectSarojFareye[index].childDataList
-                    formLayoutObject.set(arrayObjectSarojFareye[index].fieldAttributeMasterId, fieldAttribute)
+                    formLayoutObject[arrayObjectSarojFareye[index].fieldAttributeMasterId] =  fieldAttribute
                 }
                 arrayElements[rowId] = { formLayoutObject, rowId, allRequiredFieldsFilled: true }
                 rowId++
@@ -157,7 +157,7 @@ class ArrayFieldAttribute {
             for (let rowId in arrayElements) {
                 if (rowId == currentRowId)
                     continue
-                if (arrayElements[rowId].formLayoutObject.get(currentElement.fieldAttributeMasterId).value && arrayElements[rowId].formLayoutObject.get(currentElement.fieldAttributeMasterId).value == currentElement.displayValue) {
+                if (arrayElements[rowId].formLayoutObject[currentElement.fieldAttributeMasterId].value && arrayElements[rowId].formLayoutObject[currentElement.fieldAttributeMasterId].value == currentElement.displayValue) {
                     isValuePresentInAnotherRow = true
                     break
                 }

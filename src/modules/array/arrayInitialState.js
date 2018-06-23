@@ -10,6 +10,7 @@ var InitialState = Record({
     childElementsTemplate: {},
     errorMessage: '',
     arrayMainObject: {},
+    sequenceWiseMasterIds: []
 })
 
 export default InitialState

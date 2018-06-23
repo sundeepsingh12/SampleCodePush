@@ -39,14 +39,13 @@ class SignatureRemarks {
         * creates remarks DataList object, which contains value and label of all remarks
         * @param {*formElement Map} nextEditable 
         */
-    filterRemarksList(fieldDataList) {
-        if (fieldDataList == undefined)
+    filterRemarksList(formElement) {
+        if (formElement == undefined)
             return []
         let checkCondition;
         let dataList = []
-        for (let [key, fieldDataObject] of fieldDataList.entries()) {
-            let dataObject = {}
-            switch (fieldDataObject.attributeTypeId) {
+        for (let [key, formElementData] of Object.entries(formElement)) {
+            switch (formElementData.attributeTypeId) {
                 case CAMERA_HIGH:
                 case CAMERA_MEDIUM:
                 case CAMERA:
@@ -69,14 +68,14 @@ class SignatureRemarks {
                 default:
                     checkCondition = true;
             }
-            if (fieldDataObject && !fieldDataObject.hidden && fieldDataObject.value != undefined && fieldDataObject.value.trim() != '' && (fieldDataObject.parentId == 0 || fieldDataObject.parentId == -1) && checkCondition) {
-                let { label, value, fieldAttributeMasterId } = fieldDataObject
+            if (formElementData && !formElementData.hidden && formElementData.value != undefined && formElementData.value.trim() != '' && (formElementData.parentId == 0 || formElementData.parentId == -1) && checkCondition) {
+                let { label, value, fieldAttributeMasterId } = formElementData
                 dataList.push({ label, value, fieldAttributeMasterId })
             }
-            if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childDataList != null && fieldDataObject.childDataList.length > 0) {
-                for (let childFieldData of fieldDataObject.childDataList) {
+            if ((formElementData.attributeTypeId == MONEY_COLLECT || formElementData.attributeTypeId == MONEY_PAY) && formElementData.childDataList != null && formElementData.childDataList.length > 0) {
+                for (let childFieldData of formElementData.childDataList) {
                     if (childFieldData.attributeTypeId == ACTUAL_AMOUNT) {
-                        let { label, fieldAttributeMasterId } = fieldDataObject
+                        let { label, fieldAttributeMasterId } = formElementData
                         let { value } = childFieldData
                         dataList.push({ label, value, fieldAttributeMasterId })
                     }

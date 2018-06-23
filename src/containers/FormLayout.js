@@ -33,6 +33,7 @@ function mapStateToProps(state) {
     pieChart: state.home.pieChart,
     updateDraft: state.formLayout.updateDraft,
     isFormValid: state.formLayout.isFormValid,
+    sequenceWiseFieldAttributeMasterIds: state.formLayout.sequenceWiseFieldAttributeMasterIds,
     dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
     fieldAttributeMasterParentIdMap: state.formLayout.fieldAttributeMasterParentIdMap,
     noFieldAttributeMappedWithStatus: state.formLayout.noFieldAttributeMappedWithStatus,
@@ -109,11 +110,12 @@ class FormLayout extends PureComponent {
       updateDraft: this.props.updateDraft,
       arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
       jobMasterId: this.props.navigation.state.params.jobMasterId,
-      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList
+      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList,
+      sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds
     }
     return (
       <BasicFormElement
-        item={item}
+        item={item.item}
         jobTransaction={this.props.navigation.state.params.jobTransaction}
         jobStatusId={this.props.navigation.state.params.statusId}
         formLayoutState={formLayoutState}
@@ -155,7 +157,8 @@ class FormLayout extends PureComponent {
       currentElement: this.props.currentElement,
       fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
       noFieldAttributeMappedWithStatus: this.props.noFieldAttributeMappedWithStatus,
-      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList
+      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList,
+      sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds
     }
 
     let taskListScreenDetails = {
@@ -194,7 +197,7 @@ class FormLayout extends PureComponent {
     }
   }
 
-  _keyExtractor = (item, index) => String(item[1].key);
+  _keyExtractor = (item, index) => String(item.key);
 
   showInvalidFormAlert() {
     let draftMessage = INVALID_FORM_ALERT
@@ -239,9 +242,18 @@ class FormLayout extends PureComponent {
     }
   }
 
+  _renderFormData(){
+    let formData  = []
+    for(let id in this.props.sequenceWiseFieldAttributeMasterIds){
+      formData.push(this.props.formElement[this.props.sequenceWiseFieldAttributeMasterIds[id]])
+    }
+    return formData
+  }
+
   render() {
     const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
     let emptyFieldAttributeForStatusView = this.emptyFieldAttributeForStatusView()
+    const footerView = this.getFooterView()
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
@@ -257,7 +269,6 @@ class FormLayout extends PureComponent {
         </Footer>
       </SafeAreaView>
     }
-    const footerView = this.getFooterView()
     if (Platform.OS == 'ios') {
       formView = <KeyboardAvoidingView style={[{ flex: 1 }, styles.bgWhite]} behavior="padding">
         {invalidFormAlert}
@@ -265,9 +276,9 @@ class FormLayout extends PureComponent {
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>
             <FlatList
-              data={Array.from(this.props.formElement)}
+              data={this._renderFormData()}
               extraData={this.state}
-              renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
+              renderItem={(item) => this.renderData(item)} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
               keyExtractor={this._keyExtractor}>
             </FlatList>
           </View>
@@ -281,9 +292,9 @@ class FormLayout extends PureComponent {
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>
             <FlatList
-              data={Array.from(this.props.formElement)}
+              data={ this._renderFormData()}
               extraData={this.state}
-              renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
+              renderItem={(item) => this.renderData(item)} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
               keyExtractor={this._keyExtractor}>
             </FlatList>
           </View>

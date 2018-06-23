@@ -158,11 +158,11 @@ class DataStoreService {
         if (!formElements) {
             throw new Error('formElements not present')
         }
-        for (let [id, currentObject] of formElements.entries()) {
-            if (dataStoreAttributeValueMap[currentObject.key]) {
-                currentObject.value = dataStoreAttributeValueMap[currentObject.key]
-                currentObject.displayValue = dataStoreAttributeValueMap[currentObject.key]
-                currentObject.editable = true // set editable to true so that view of single entity of mapped key fieldAttribute will change in formLayout
+        for (let currentObject in formElements) {
+            if (dataStoreAttributeValueMap[formElements[currentObject].key]) {
+                formElements[currentObject].value = dataStoreAttributeValueMap[formElements[currentObject].key]
+                formElements[currentObject].displayValue = dataStoreAttributeValueMap[formElements[currentObject].key]
+                formElements[currentObject].editable = true // set editable to true so that view of single entity of mapped key fieldAttribute will change in formLayout
             }
         }
         return formElements
@@ -708,12 +708,12 @@ class DataStoreService {
             isAllowFromFieldInExternalDS: false
         }
         let validationObject = (currentElement.validation) ? this.getValidations(currentElement.validation) : validation
-        let isDataStoreEditable = cloneFormElement.get(currentElement.fieldAttributeMasterId).editable
+        let isDataStoreEditable = cloneFormElement[currentElement.fieldAttributeMasterId].editable
         if (isFiltersPresent) {
             return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject: validation, searchText: '', isDataStoreEditable: true }
-        } else if (!_.isEmpty(cloneFormElement.get(currentElement.fieldAttributeMasterId).value)) {
+        } else if (!_.isEmpty(cloneFormElement[currentElement.fieldAttributeMasterId].value)) {
             validationObject.isAutoStartScannerEnabled = false
-            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: cloneFormElement.get(currentElement.fieldAttributeMasterId).value, isDataStoreEditable }
+            return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: cloneFormElement[currentElement.fieldAttributeMasterId].value, isDataStoreEditable }
         } else {
             return { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validationObject, searchText: '', isDataStoreEditable }
         }
