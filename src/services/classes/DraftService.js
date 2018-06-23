@@ -73,16 +73,6 @@ class DraftService {
                 realm.deleteSingleRecord(TABLE_DRAFT, jobTransaction.id, 'jobTransactionId')
             }
         }
-<<<<<<< HEAD
-        // let allData = realm.getRecordListOnQuery(TABLE_DRAFT)
-        // for (let index in allData) {
-        //     let draft = { ...allData[index] }
-        //     if (draft) {
-        //         console.log('draft records', index, draft)
-        //     }
-        // }
-=======
->>>>>>> master
     }
     getFormLayoutStateFromDraft(draft) {
         let statusIdToFormLayoutMap = JSON.parse(draft.formLayoutObject)
