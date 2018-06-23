@@ -251,7 +251,7 @@ class SaveActivated extends PureComponent {
             navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
             editableFormLayoutState: this.props.recurringData[itemId].formLayoutState
         },
-            this.props.navigation.navigate
+            this.props.navigation.push
         )
     }
     draftOkPress = () => {

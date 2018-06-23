@@ -117,16 +117,16 @@ class DataStoreFilterService {
     parseKey(key, fieldAttributeMasterId, formElement, jobTransaction, jobAttributes, dataStoreAttributeIdtoValueMap, dataStoreFilterReverseMap) {
         if (key[0] == 'F') {
             let fieldAttributeKey = fieldValidationService.splitKey(key, false)
-            for (let [id, currentObject] of formElement.entries()) {
-                if (_.isEqual(fieldAttributeKey, currentObject.key)) {
-                    if (currentObject.value) {
-                        dataStoreAttributeIdtoValueMap[currentObject.dataStoreAttributeId] = currentObject.value
+            for (let currentObject in formElement) {
+                if (_.isEqual(fieldAttributeKey, formElement[currentObject].key)) {
+                    if (formElement[currentObject].value) {
+                        dataStoreAttributeIdtoValueMap[formElement[currentObject].dataStoreAttributeId] = formElement[currentObject].value
                     }
-                    if (dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId] && !_.includes(dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId], fieldAttributeMasterId)) { // check if variable is initialized with empty array and if present then check if it contains an entry of fieldAttributeMasterId or not to avoid duplicate entry in map
-                        dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId].push(fieldAttributeMasterId)
+                    if (dataStoreFilterReverseMap[formElement[currentObject].fieldAttributeMasterId] && !_.includes(dataStoreFilterReverseMap[formElement[currentObject].fieldAttributeMasterId], fieldAttributeMasterId)) { // check if variable is initialized with empty array and if present then check if it contains an entry of fieldAttributeMasterId or not to avoid duplicate entry in map
+                        dataStoreFilterReverseMap[formElement[currentObject].fieldAttributeMasterId].push(fieldAttributeMasterId)
                     } else {
-                        dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId] = []
-                        dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId].push(fieldAttributeMasterId)
+                        dataStoreFilterReverseMap[formElement[currentObject].fieldAttributeMasterId] = []
+                        dataStoreFilterReverseMap[formElement[currentObject].fieldAttributeMasterId].push(fieldAttributeMasterId)
                     }
                 }
             }
@@ -199,7 +199,7 @@ class DataStoreFilterService {
         let fieldAttributeMasterIdList = dataStoreFilterReverseMap[fieldAttributeMasterId]
         for (let childFieldAttributeMasterIdCounter in fieldAttributeMasterIdList) {
             let childFieldAttributeMasterId = fieldAttributeMasterIdList[childFieldAttributeMasterIdCounter]
-            let singleFormElement = formElement.get(childFieldAttributeMasterId)
+            let singleFormElement = formElement[childFieldAttributeMasterId]
             if (singleFormElement) {
                 singleFormElement.value = singleFormElement.displayValue = singleFormElement.value ? null : singleFormElement.value
             }

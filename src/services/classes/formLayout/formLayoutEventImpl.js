@@ -24,22 +24,17 @@ export default class FormLayoutEventImpl {
      * @param {*isSaveDisabled} isSaveDisabled 
      * @param {*fieldAttribute value} value 
      */
-    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
+    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds) {
         let isAllAttributeHidden = true //this is a check if there are all hidden attribute or not
-        if (attributeMasterId && formLayoutObject.get(attributeMasterId)) {
+        if (attributeMasterId && formLayoutObject[attributeMasterId]) {
             this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
         }
         isSaveDisabled = false
-
-        for (var [key, value] of formLayoutObject) {
-
-            if (key != attributeMasterId || event == NEXT_FOCUS) {
+        for (var ids in sequenceWiseSortedFieldAttributesMasterIds) {
+            value = formLayoutObject[sequenceWiseSortedFieldAttributesMasterIds[ids]]
+            if (sequenceWiseSortedFieldAttributesMasterIds[ids] != attributeMasterId || event == NEXT_FOCUS) {
                 value.focus = false
             }
-            // if (!value.value && value.value !== 0 && value.required) {
-            //     isSaveDisabled = true
-            // }
-
             if (value.displayValue || value.displayValue === 0) {
                 continue
             }
@@ -56,7 +51,7 @@ export default class FormLayoutEventImpl {
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
                 let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
-                let valueAfterValidation = formLayoutObject.get(value.fieldAttributeMasterId).value
+                let valueAfterValidation = formLayoutObject[value.fieldAttributeMasterId].value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
                     if (value.required) {
                         isSaveDisabled = true
@@ -66,7 +61,7 @@ export default class FormLayoutEventImpl {
                         continue
                     }
                 }
-                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject[value.fieldAttributeMasterId], formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 if (!afterValidationResult && value.required) {
                     break
                 } else {
@@ -79,8 +74,8 @@ export default class FormLayoutEventImpl {
             }
         }
         if (!isSaveDisabled) {
-            if (formLayoutObject.get(attributeMasterId)) {
-                formLayoutObject.get(attributeMasterId).focus = true
+            if (formLayoutObject[attributeMasterId]) {
+                formLayoutObject[attributeMasterId].focus = true
             }
         }
         return { formLayoutObject, isSaveDisabled, isAllAttributeHidden }
@@ -96,8 +91,8 @@ export default class FormLayoutEventImpl {
      */
     disableSave(attributeMasterId, isSaveDisabled, formLayoutObject, value) {
         this.updateFieldInfo(attributeMasterId, value, formLayoutObject);
-        if (formLayoutObject.get(attributeMasterId) && formLayoutObject.get(attributeMasterId).required) {
-            formLayoutObject.get(attributeMasterId).showCheckMark = false;
+        if (formLayoutObject[attributeMasterId] && formLayoutObject[attributeMasterId].required) {
+            formLayoutObject[attributeMasterId].showCheckMark = false;
             return true;
         }
         return isSaveDisabled
@@ -113,11 +108,11 @@ export default class FormLayoutEventImpl {
      * @param {*} calledFrom 
      */
     updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom, fieldDataList) {
-        formLayoutObject.get(attributeMasterId).displayValue = (value != null && value != undefined && calledFrom == NEXT_FOCUS && value.length != 0 && value.length < 64 &&
-            formLayoutObject.get(attributeMasterId).attributeTypeId == 61) ? sha256(value) : value;
-        formLayoutObject.get(attributeMasterId).childDataList = fieldDataList ? fieldDataList : formLayoutObject.get(attributeMasterId).childDataList
+        formLayoutObject[attributeMasterId].displayValue = (value != null && value != undefined && calledFrom == NEXT_FOCUS && value.length != 0 && value.length < 64 &&
+            formLayoutObject[attributeMasterId].attributeTypeId == 61) ? sha256(value) : value;
+        formLayoutObject[attributeMasterId].childDataList = fieldDataList ? fieldDataList : formLayoutObject[attributeMasterId].childDataList
         if (!calledFrom) {
-            formLayoutObject.get(attributeMasterId).alertMessage = null
+            formLayoutObject[attributeMasterId].alertMessage = null
         }
         return formLayoutObject;
     }
@@ -395,7 +390,8 @@ export default class FormLayoutEventImpl {
             actualAmount: null,
             moneyTransactionType: null
         }
-        for (var [key, value] of formLayoutObject) {
+        for (var  data in formLayoutObject) {
+            let value = formLayoutObject[data]
             if (value.attributeTypeId == 61) {
                 continue
             } else if (value.attributeTypeId == NPS_FEEDBACK) {
