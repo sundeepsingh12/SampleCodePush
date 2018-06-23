@@ -722,8 +722,8 @@ class DataStoreService {
     prepareKeyLabelAttributeMap(formElement, fieldAttributeList, jobMasterId) {
         let keyLabelAttributeMap = {}
         if (formElement) {
-            for (let key in formElement) {
-                keyLabelAttributeMap[key] = formElement[key].label
+            for (let fieldAttributeMasterId in formElement) {
+                keyLabelAttributeMap[formElement[fieldAttributeMasterId].key] = formElement[fieldAttributeMasterId].label
             }
         } else if (fieldAttributeList) {
             for (let fieldAttribute of fieldAttributeList) {
