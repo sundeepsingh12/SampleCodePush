@@ -14,8 +14,7 @@ class Bulk {
      * @returns
      * {
      *      jobTransactionId : jobTransactionCustomization {
-     *                    import { SSL_OP_NO_TICKET } from 'constants';
-                      circleLine1
+                                                circleLine1
      *                                          circleLine2
      *                                          id
      *                                          jobMasterId

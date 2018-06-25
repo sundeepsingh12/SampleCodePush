@@ -41,10 +41,11 @@ class JobData {
      *               }
      * }
      */
-    getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap) {
+    getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap,jobIdJobTransactionStatusIdMap,jobAttributeStatusMap) {
         let jobDataMap = {}, contactMap = {}, addressMap = {},jobExpiryMap = {}
         for (let index in jobDataList) {
             const { jobAttributeMasterId, jobId, parentId, value } = jobDataList[index];
+            const jobStatusId = jobIdJobTransactionStatusIdMap[jobId]
             let jobData = { jobId, jobAttributeMasterId, value };
             if (parentId !== 0) {
                 continue;
@@ -57,7 +58,7 @@ class JobData {
             } else if (this.checkAddressField(jobAttributeMasterId, value, jobAttributeMasterMap)) {
                 addressMap[jobId] = addressMap[jobId] ? addressMap[jobId] : [];
                 addressMap[jobId].push(jobData);
-            } else if(this.checkJobExpiryAttribute(jobAttributeMasterId, value, jobAttributeMasterMap)){
+            } else if(this.checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId,jobAttributeMasterMap,jobStatusId,jobAttributeStatusMap)){
                 jobExpiryMap[jobId] = jobData;
             }
         }
@@ -107,14 +108,19 @@ class JobData {
         return false
     }
 
-    /**
-     * This method checks if job attribute is of job expiry type
+    /**This method checks if job expiry attribute is present
+     * 
      * @param {*} jobAttributeMasterId 
-     * @param {*} value 
      * @param {*} jobAttributeMasterMap 
+     * @param {*} jobStatusId 
+     * @param {*} jobAttributeStatusMap 
      */
-    checkJobExpiryAttribute(jobAttributeMasterId, value, jobAttributeMasterMap){
+    checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId,jobAttributeMasterMap,jobStatusId,jobAttributeStatusMap){
         if (!jobAttributeMasterMap[jobAttributeMasterId]) {
+            return false
+        }
+        //Check if job expiry is mapped to the status in which job transaction is currently prresent
+        if(!jobAttributeStatusMap[jobStatusId]){
             return false
         }
         if (jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId !== JOB_EXPIRY_TIME) {

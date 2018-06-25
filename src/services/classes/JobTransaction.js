@@ -31,8 +31,7 @@ import { messageService } from '../../services/classes/MessageService'
 
 class JobTransaction {
 
-    /**A Generic method for filtering out jobtransactions whose job statimport { log } from 'util';
-us ids lie in 'statusids'  
+    /**A Generic method for filtering out jobtransactions whose job status ids lie in 'statusids'  
      * 
      * @param {*} allJobTransactions 
      * @param {*} statusIds 
@@ -115,7 +114,7 @@ us ids lie in 'statusids'
      * FieldDataQuery
      */
     getJobTransactionMapAndQuery(jobTransactionList) {
-        let jobQuery = '', jobTransactionQuery = '', fieldDataQuery = '', jobTransactionMap = {};
+        let jobQuery = '', jobTransactionQuery = '', fieldDataQuery = '', jobTransactionMap = {},jobIdJobTransactionStatusIdMap = {};
         for (let index in jobTransactionList) {
             const transaction = jobTransactionList[index];
             const { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual } = transaction;
@@ -129,8 +128,9 @@ us ids lie in 'statusids'
                 fieldDataQuery += ' OR jobTransactionId = ' + id;
             }
             jobTransactionMap[id] = { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual };
+            jobIdJobTransactionStatusIdMap[transaction.jobId] = transaction.jobStatusId
         }
-        return { jobTransactionMap, jobQuery, jobTransactionQuery, fieldDataQuery };
+        return { jobTransactionMap, jobQuery, jobTransactionQuery, fieldDataQuery, jobIdJobTransactionStatusIdMap};
     }
 
 
@@ -198,7 +198,7 @@ us ids lie in 'statusids'
         let jobMapAndJobDataQuery = jobService.getJobMapAndJobDataQuery(jobsList);
         jobTransactionDTO.jobMap = jobMapAndJobDataQuery.jobMap;
         jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobMapAndJobDataQuery.jobDataQuery);
-        jobTransactionDTO.jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap);
+        jobTransactionDTO.jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap,jobTransactionObject.jobIdJobTransactionStatusIdMap,jobTransactionCustomizationListParametersMaps.jobAttributeStatusMap);
         fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, jobTransactionObject.fieldDataQuery);
         jobTransactionDTO.fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList);
         let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionDTO, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobTransactionCustomizationListParametersMaps, runsheetObject.runsheetMap);
