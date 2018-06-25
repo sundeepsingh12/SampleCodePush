@@ -5,12 +5,7 @@ import {
 import {
     TABLE_JOB_TRANSACTION,
     TABLE_RUNSHEET,
-    JOB_MASTER
 } from '../../lib/constants'
-
-import {
-    keyValueDBService
-} from './KeyValueDBService'
 
 import moment from 'moment'
 

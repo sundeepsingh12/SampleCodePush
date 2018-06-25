@@ -8,7 +8,6 @@ import {
 
 import moment from 'moment'
 import _ from 'lodash'
-import * as realm from '../../repositories/realmdb'
 import {
   UNABLE_TO_UPDATE_JOB_SUMMARY,
 } from '../../lib/ContainerConstants'

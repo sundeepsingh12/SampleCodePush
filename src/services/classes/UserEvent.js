@@ -9,7 +9,6 @@ import {
 } from './KeyValueDBService'
 
 import moment from 'moment'
-import _ from 'lodash'
 
 class UserEvent {
 

@@ -1,12 +1,7 @@
 'use strict'
 import {
     SET_FIELD_DATA_LIST,
-    SAVE_SIGNATURE,
-    USER,
-    FormLayout,
-    SET_REMARKS_VALIDATION,
     FIELD_ATTRIBUTE,
-    NEXT_FOCUS
 } from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'

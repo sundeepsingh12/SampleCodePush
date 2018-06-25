@@ -54,7 +54,7 @@ import {
     ADVANCE_DROPDOWN
 } from '../lib/AttributeConstants'
 
-import { NEXT_FOCUS, CameraAttribute, Payment, SET_MODAL_FIELD_ATTRIBUTE } from '../lib/constants'
+import { CameraAttribute, Payment, SET_MODAL_FIELD_ATTRIBUTE } from '../lib/constants'
 import { OPTIONAL, SELECTED } from '../lib/ContainerConstants'
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'

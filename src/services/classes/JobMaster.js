@@ -23,11 +23,9 @@ import {
   FIELD_ATTRIBUTE_STATUS,
   FIELD_ATTRIBUTE_VALIDATION,
   FIELD_ATTRIBUTE_VALIDATION_CONDITION,
-  JOB_LIST_CUSTOMIZATION,
   CUSTOMIZATION_APP_MODULE,
   USER,
   CUSTOMIZATION_LIST_MAP,
-  TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   CUSTOM_NAMING,
   TRANSACTION_TIME_SPENT,
@@ -41,9 +39,7 @@ import {
   APP_THEME,
 } from '../../lib/constants'
 import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER } from '../../lib/AttributeConstants'
-import { DOWNLOAD_LATEST_APP_VERSION } from '../../lib/ContainerConstants'
 import _ from 'lodash'
-import package_json from '../../../package.json'
 
 
 class JobMaster {

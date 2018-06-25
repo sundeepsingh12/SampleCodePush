@@ -13,10 +13,9 @@ import {
     SKU_ACTUAL_QUANTITY,
     SKU_REASON,
     SKU_PHOTO,
-    REASON,
     NA
 } from '../lib/AttributeConstants'
-import { CheckBox, Picker, Content, Icon, Toast } from 'native-base'
+import { CheckBox, Picker, Icon, Toast } from 'native-base'
 import _ from 'lodash'
 import {
     CameraAttribute,

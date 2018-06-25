@@ -1,6 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { Platform, View, Text, WebView, BackHandler } from 'react-native'
+import {  Platform, View, Image, Text, WebView, BackHandler } from 'react-native'
 import CustomAlert from "../components/CustomAlert"
 import styles from '../themes/FeStyle'
 import { Container } from 'native-base'

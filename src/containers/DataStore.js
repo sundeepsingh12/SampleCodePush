@@ -32,7 +32,8 @@ function mapStateToProps(state) {
         cloneDataStoreAttrValueMap: state.dataStore.cloneDataStoreAttrValueMap,
         arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
         isAllowFromFieldInExternalDS: state.dataStore.isAllowFromFieldInExternalDS,
-        isDataStoreEditable: state.dataStore.isDataStoreEditable
+        isDataStoreEditable: state.dataStore.isDataStoreEditable,
+        keyLabelAttributeMap: state.dataStore.keyLabelAttributeMap
     }
 };
 
@@ -266,7 +267,8 @@ class DataStore extends PureComponent {
             <DataStoreItemDetails
                 selectedElement={this.props.dataStoreAttrValueMap[this.props.detailsVisibleFor]}
                 goBack={this.showDetails}
-                onSave={this.onSave} />
+                onSave={this.onSave}
+                keyLabelAttributeMap={this.props.keyLabelAttributeMap} />
         )
     }
 
