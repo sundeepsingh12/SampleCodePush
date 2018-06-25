@@ -46,37 +46,8 @@ import MosambeeWalletPayment from './MosambeeWalletPayment'
 import SplitPayment from './SplitPayment'
 import CameraFieldAttribute from './CameraFieldAttribute'
 import QrCodeScanner from './QrCodeScanner'
+import MenuStack from '../modules/navigators/MenuStackNavigator'
 
-const MenuStack = createStackNavigator({
-    MenuScreen: {
-        screen: Menu,
-        navigationOptions:{
-            header:null
-        }
-    },
-    Backup: {
-        screen: Backup,
-    },
-    OfflineDS: {
-        screen: OfflineDS
-    },
-    ProfileView: {
-        screen: ProfileView
-    },
-    BluetoothListing: {
-        screen: BluetoothListing
-    },
-    ResetPassword: {
-        screen: ResetPassword
-    },
-    Statistics: {
-        screen: Statistics,
-        navigationOptions: {
-            header: null,
-        }
-    },
-}, 
-)
 MenuStack.navigationOptions = ({ navigation }) => {
     let tabBarVisible = true;
     if (navigation.state.index > 0) {

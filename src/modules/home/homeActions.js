@@ -423,7 +423,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       const autoLogoutEnabled = userData ? userData.company ? userData.company.autoLogoutFromDevice : null : null
       const lastLoginTime = userData ? userData.lastLoginTime : null
       if (!calledFromAutoLogout && autoLogoutEnabled && !moment(moment(lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
-        dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
+        navDispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
         return
       }
       let syncCount = 0
