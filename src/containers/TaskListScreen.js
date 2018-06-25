@@ -101,7 +101,7 @@ class TaskListScreen extends PureComponent {
     let result = false;
     let searchText = _.toLower(trimmedSearchText);
     let values = [jobTransaction.referenceNumber, jobTransaction.runsheetNo, jobTransaction.line1, jobTransaction.line2, jobTransaction.circleLine1, jobTransaction.circleLine2];
-    if (_.isEqual(_.toLower(jobTransaction.referenceNumber), searchText) || _.isEqual(_.toLower(jobTransaction.runsheetNo), searchText)) {
+    if (!jobTransaction.isJobUnseen && _.isEqual(_.toLower(jobTransaction.referenceNumber), searchText) || _.isEqual(_.toLower(jobTransaction.runsheetNo), searchText)) {
       if (this.props.searchText.scanner) {
         searchEqualTransactionList.push(jobTransaction);
       }

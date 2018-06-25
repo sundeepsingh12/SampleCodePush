@@ -344,6 +344,7 @@ class JobTransaction {
             jobTransactionCustomization.jobEndTime = job.jobEndTime;
             jobTransactionCustomization.isNextStatusPresent = jobTransaction.jobStatusId ? jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList && jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList.length > 0 : null;
             jobTransactionCustomization.jobPriority = jobTransactionCustomizationListParametersMaps.jobMasterIdMap[jobMasterId].enableJobPriority ? job.jobPriority : 0;
+            jobTransactionCustomization.isJobUnseen = jobTransactionCustomizationListParametersMaps.jobStatusObject.unseenStatusIdCodeMap[ jobTransaction.jobStatusId] ? true :false
             jobTransactionCustomizationList.push(jobTransactionCustomization);
         }
         return jobTransactionCustomizationList;
