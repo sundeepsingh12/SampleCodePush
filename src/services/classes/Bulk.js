@@ -4,6 +4,7 @@ import { transactionCustomizationService } from './TransactionCustomization'
 import {  JOB_STATUS, CUSTOMIZATION_LIST_MAP, JOB_ATTRIBUTE, JOB_ATTRIBUTE_STATUS, CUSTOMER_CARE, SMS_TEMPLATE, JOB_MASTER, HUB, TABLE_JOB_TRANSACTION } from '../../lib/constants'
 import _ from 'lodash'
 import { INVALID_SCAN, SELECT_ALL, SELECT_NONE } from '../../lib/ContainerConstants'
+import moment from 'moment'
 
 class Bulk {
 
@@ -13,7 +14,8 @@ class Bulk {
      * @returns
      * {
      *      jobTransactionId : jobTransactionCustomization {
-     *                                          circleLine1
+     *                    import { SSL_OP_NO_TICKET } from 'constants';
+                      circleLine1
      *                                          circleLine2
      *                                          id
      *                                          jobMasterId
@@ -37,7 +39,8 @@ class Bulk {
         queryDTO.jobTransactionQuery = `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND jobStatusId = ${bulkParamas.pageObject.additionalParams.statusId} AND jobId > 0`;
         queryDTO.jobQuery = bulkParamas.pageObject.groupId ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = "${bulkParamas.pageObject.groupId}"` : jobMaster.enableMultipartAssignment ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = null` : `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]}`;
         let jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO)
-        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id');
+        const nonExpiredTransactionCustomizationList = this.removeExpiredJobTransactions(jobTransactionCustomizationList)
+        const idJobTransactionCustomizationListMap = _.mapKeys(nonExpiredTransactionCustomizationList, 'id');
         return idJobTransactionCustomizationListMap;
     }
 
@@ -232,6 +235,7 @@ class Bulk {
         }
         return { displayText, selectAll }
     }
+
     performFilterBeforeSelectAll(bulkTransaction, searchText) {
         if (!searchText || searchText == '') {
             return true
@@ -241,6 +245,19 @@ class Bulk {
                 return true
             }
         }
+    }
+
+    /**This method returns non expired jobTransactions only
+     * 
+     * @param {*} jobTransactionCustomizationList 
+     */
+    removeExpiredJobTransactions(jobTransactionCustomizationList){
+        for(let index in jobTransactionCustomizationList){
+            if( moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobTransactionCustomizationList[index].jobExpiryData.value)){
+                jobTransactionCustomizationList.splice(index,1)
+            }
+        }
+        return jobTransactionCustomizationList
     }
 }
 

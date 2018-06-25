@@ -7,7 +7,6 @@ import {
     TABLE_FIELD_DATA,
     TABLE_JOB_DATA,
     TAB,
-    JOB_ATTRIBUTE,
     TABLE_RUNSHEET,
     PENDING_SYNC_TRANSACTION_IDS,
     TABLE_MESSAGE_INTERACTION
@@ -32,7 +31,8 @@ import { messageService } from '../../services/classes/MessageService'
 
 class JobTransaction {
 
-    /**A Generic method for filtering out jobtransactions whose job status ids lie in 'statusids'  
+    /**A Generic method for filtering out jobtransactions whose job statimport { log } from 'util';
+us ids lie in 'statusids'  
      * 
      * @param {*} allJobTransactions 
      * @param {*} statusIds 
@@ -344,6 +344,7 @@ class JobTransaction {
             jobTransactionCustomization.jobEndTime = job.jobEndTime;
             jobTransactionCustomization.isNextStatusPresent = jobTransaction.jobStatusId ? jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList && jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList.length > 0 : null;
             jobTransactionCustomization.jobPriority = jobTransactionCustomizationListParametersMaps.jobMasterIdMap[jobMasterId].enableJobPriority ? job.jobPriority : 0;
+            jobTransactionCustomization.jobExpiryData = jobTransactionDTO.jobDataDetailsForListing.jobExpiryMap[jobId] ? jobTransactionDTO.jobDataDetailsForListing.jobExpiryMap[jobId] :{}
             jobTransactionCustomizationList.push(jobTransactionCustomization);
         }
         return jobTransactionCustomizationList;

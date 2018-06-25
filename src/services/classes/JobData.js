@@ -16,7 +16,9 @@ import {
     ADDRESS_LINE_2,
     CONTACT_NUMBER,
     LANDMARK,
-    PINCODE
+    PINCODE,
+    JOB_EXPIRY_TIME,
+
 } from '../../lib/AttributeConstants'
 
 class JobData {
@@ -40,7 +42,7 @@ class JobData {
      * }
      */
     getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap) {
-        let jobDataDetailsForListing = {}, jobDataMap = {}, contactMap = {}, addressMap = {}
+        let jobDataMap = {}, contactMap = {}, addressMap = {},jobExpiryMap = {}
         for (let index in jobDataList) {
             const { jobAttributeMasterId, jobId, parentId, value } = jobDataList[index];
             let jobData = { jobId, jobAttributeMasterId, value };
@@ -55,9 +57,11 @@ class JobData {
             } else if (this.checkAddressField(jobAttributeMasterId, value, jobAttributeMasterMap)) {
                 addressMap[jobId] = addressMap[jobId] ? addressMap[jobId] : [];
                 addressMap[jobId].push(jobData);
+            } else if(this.checkJobExpiryAttribute(jobAttributeMasterId, value, jobAttributeMasterMap)){
+                jobExpiryMap[jobId] = jobData;
             }
         }
-        return { jobDataMap, contactMap, addressMap };
+        return { jobDataMap, contactMap, addressMap,jobExpiryMap };
     }
 
     /**
@@ -81,7 +85,7 @@ class JobData {
     }
 
     /**
-     * This method checks if job attrinute is of address type
+     * This method checks if job attribute is of address type
      * @param {*} jobAttributeMasterId 
      * @param {*} value 
      * @param {*} jobAttributeMasterMap 
@@ -101,6 +105,22 @@ class JobData {
             return true
         }
         return false
+    }
+
+    /**
+     * This method checks if job attribute is of job expiry type
+     * @param {*} jobAttributeMasterId 
+     * @param {*} value 
+     * @param {*} jobAttributeMasterMap 
+     */
+    checkJobExpiryAttribute(jobAttributeMasterId, value, jobAttributeMasterMap){
+        if (!jobAttributeMasterMap[jobAttributeMasterId]) {
+            return false
+        }
+        if (jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId !== JOB_EXPIRY_TIME) {
+            return false
+        }
+        return true
     }
 
     /**
