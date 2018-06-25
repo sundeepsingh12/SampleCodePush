@@ -21,7 +21,6 @@ import {
     UNTRACKED_JOBS_MESSAGE,
     TOKEN_MISSING,
     INVALID_SCAN,
-    JOB_NOT_PRESENT
 } from '../../lib/ContainerConstants'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import CONFIG from '../../lib/config'

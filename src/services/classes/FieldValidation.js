@@ -2,11 +2,9 @@
 import * as realm from '../../repositories/realmdb'
 import { TABLE_JOB_DATA } from '../../lib/constants'
 import moment from 'moment'
-import { fieldAttributeMasterService } from './FieldAttributeMaster'
 import { jobDataService } from './JobData'
 import { addServerSmsService } from './AddServerSms'
 import {
-    AFTER,
     ALERT_MESSAGE,
     ARRAY_SAROJ_FAREYE,
     ASSIGN,

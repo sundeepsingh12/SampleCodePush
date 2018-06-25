@@ -11,7 +11,6 @@ import {
 } from '../../lib/AttributeConstants'
 import * as realm from '../../repositories/realmdb'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { keyValueDb } from '../../repositories/keyValueDb'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
 import {
     SEARCH_TEXT_MISSING,

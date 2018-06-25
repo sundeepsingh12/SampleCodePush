@@ -18,7 +18,8 @@ function mapStateToProps(state) {
         dataStoreAttrValueMap: state.dataStore.dataStoreAttrValueMap,
         errorMessage: state.dataStore.errorMessage,
         loaderRunning: state.dataStore.loaderRunning,
-        value: state.dataStore.value
+        value: state.dataStore.value,
+        keyLabelAttributeMap: state.dataStore.keyLabelAttributeMap
     }
 };
 
@@ -50,7 +51,7 @@ class DataStoreDetails extends PureComponent {
             if (attribute != _id) {
                 let attributeObject = {
                     id: id++,
-                    key: attribute,
+                    key: (this.props.keyLabelAttributeMap && this.props.keyLabelAttributeMap[attribute]) ? this.props.keyLabelAttributeMap[attribute] : attribute,
                     value: dataStoreAttributeValueMap.dataStoreAttributeValueMap[attribute]
                 }
                 attributeArray.push(attributeObject)

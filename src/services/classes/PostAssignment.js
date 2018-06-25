@@ -19,7 +19,6 @@ import { keyValueDBService } from './KeyValueDBService'
 import { formLayoutEventsInterface } from '../classes/formLayout/FormLayoutEventInterface'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
-import _ from 'lodash'
 import moment from 'moment'
 
 class PostAssignment {

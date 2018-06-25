@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Button, Header, Body, Content, Icon, Card, CardItem, Toast, Footer, StyleProvider } from 'native-base';
+import { Container, Button, Header, Body, Content, Icon, Toast, Footer, StyleProvider } from 'native-base';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import { connect } from 'react-redux'

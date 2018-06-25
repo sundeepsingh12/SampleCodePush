@@ -20,7 +20,6 @@ import {
   SELECT_NUMBER_FOR_CALL,
   CONFIRMATION,
   CALL_CONFIRM,
-  DRAFT_RESTORE_MESSAGE,
   YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE,
   SELECT_ADDRESS_NAVIGATION,
   REVERT_STATUS,
@@ -32,7 +31,7 @@ import {
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert, Image } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, StyleProvider, List, ListItem, Footer, FooterTab, Card, ActionSheet, Toast } from 'native-base'
+import { Container, Content, Header, Button, Text,  Body, Right, Icon, StyleProvider, List, ListItem, Footer, FooterTab, Card, ActionSheet, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import Loader from '../components/Loader'
@@ -42,7 +41,6 @@ import {
   DataStoreDetails,
   ImageDetailsView,
   RESET_STATE_FOR_JOBDETAIL,
-  BulkListing,
   SHOW_DROPDOWN,
   SET_JOBDETAILS_DRAFT_INFO,
   SET_LOADER_FOR_SYNC_IN_JOBDETAIL,

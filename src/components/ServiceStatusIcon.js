@@ -12,11 +12,7 @@ import React from 'react';
 import feStyle from '../themes/FeStyle'
 import { Spinner } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import
-{
-  StyleSheet,
-  View
-} from 'react-native'
+import { View } from 'react-native'
 
 import {
   SERVICE_PENDING,

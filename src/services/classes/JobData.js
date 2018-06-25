@@ -1,8 +1,5 @@
 'use strict'
 
-import {
-    jobAttributeMasterService
-} from './JobAttributeMaster'
 import * as realm from '../../repositories/realmdb'
 import {
     jobDetailsService
@@ -12,7 +9,6 @@ import {
     TABLE_JOB_TRANSACTION,
     TABLE_JOB,
     TABLE_RUNSHEET,
-    TABLE_FIELD_DATA,
 } from '../../lib/constants'
 
 import {
