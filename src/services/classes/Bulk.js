@@ -252,7 +252,7 @@ class Bulk {
      */
     removeExpiredJobTransactions(jobTransactionCustomizationList){
         for(let index in jobTransactionCustomizationList){
-            if( moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobTransactionCustomizationList[index].jobExpiryData.value)){
+            if( jobTransactionCustomizationList[index].jobExpiryData.value !=null && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobTransactionCustomizationList[index].jobExpiryData.value)){
                 jobTransactionCustomizationList.splice(index,1)
             }
         }
