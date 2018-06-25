@@ -85,10 +85,8 @@ class CameraFieldAttribute extends PureComponent {
             takePhotoButtonTitle: 'Take Photo...',
             chooseFromLibraryButtonTitle: 'Choose from Library...',
             quality: 0.5,
-            allowsEditing: true,
             storageOptions: {
                 skipBackup: true,
-                waitUntilSaved: true
             }
         }
         ImagePicker.launchImageLibrary(options, (response) => {
