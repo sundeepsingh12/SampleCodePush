@@ -230,7 +230,7 @@ class FormLayout {
         }
         else if (currentStatus.transient) {
             routeName = Transient
-            let { jobDetailsScreenKey, pageObjectAdditionalParams } = taskListScreenDetails
+            let {jobDetailsScreenKey, pageObjectAdditionalParams}  = taskListScreenDetails 
             routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams }
         }
         else {

@@ -440,7 +440,7 @@ class CheckoutDetails extends PureComponent {
                         <Footer style={[style.footer]}>
                             <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
                                 <Button onPress={() => {
-                                    this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId, this.props.navigation.navigate)
+                                    this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId)
                                 }}>
                                     <Text style={[{ color: styles.fontPrimaryColor }, styles.fontDefault]}>{Return_To_Home}</Text>
                                 </Button>

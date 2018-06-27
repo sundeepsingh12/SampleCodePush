@@ -11,6 +11,7 @@ import { SET_FORM_LAYOUT_STATE, FormLayout, SET_TRANSIENT_BACK_PRESSED } from '.
 import { Select_Next_Status } from '../lib/AttributeConstants'
 import { Container, Text, Icon, Content, List, ListItem, Right, } from 'native-base'
 import TitleHeader from '../components/TitleHeader'
+import { push } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
     return {
@@ -47,10 +48,8 @@ class Transient extends PureComponent {
         this.props.navigation.setParams({ backForTransient: this._goBack });
         this.props.actions.setStateFromNavigationParams(
             this.props.navigation.state.params,
-            this.props.formLayoutStates,
-            this.props.navigation.push
+            this.props.formLayoutStates
         )
-
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
             BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
         );
@@ -67,7 +66,7 @@ class Transient extends PureComponent {
     };
 
     navigateToFormLayout(statusId, statusName) {
-        this.props.actions.navigateToScene(FormLayout, {
+        push(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: this.props.navigation.state.params.jobTransaction.id,
             jobTransaction: this.props.navigation.state.params.jobTransaction,
@@ -77,9 +76,7 @@ class Transient extends PureComponent {
             navigationFormLayoutStates: this.props.formLayoutStates,
             jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
             pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
-        },
-            this.props.navigation.push
-        )
+        })
     }
 
     componentDidUpdate() {

@@ -1,4 +1,4 @@
-import { NavigationActions } from 'react-navigation';
+import { NavigationActions, StackActions } from 'react-navigation';
 
 let _navigator = null;
 
@@ -25,4 +25,13 @@ function navigate(routeName, params) {
   );
 }
 
-export { getState, navDispatch, setTopLevelNavigator, navigate, _navigator}; 
+function push(routeName, params) {
+  _navigator.dispatch(
+    StackActions.push({
+      routeName,
+      params,
+    })
+  );
+}
+
+export { getState, navDispatch, setTopLevelNavigator, navigate, _navigator, push}; 

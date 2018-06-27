@@ -78,7 +78,7 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import { trackingService } from '../../services/classes/Tracking'
 import { userEventLogService } from '../../services/classes/UserEvent'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog, deleteSessionToken } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog, deleteSessionToken } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
 import { Platform } from 'react-native'
@@ -100,7 +100,7 @@ import FCM, { FCMEvent, NotificationType, RemoteNotificationResult, WillPresentN
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
-import { navDispatch } from '../navigators/NavigationService';
+import { navDispatch, navigate } from '../navigators/NavigationService';
 import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR,FCM_PERMISSION_DENIED,OK } from '../../lib/ContainerConstants'
 
 /**
@@ -167,7 +167,7 @@ export function navigateToPage(pageObject, navigationProps) {
     try {
       switch (pageObject.screenTypeId) {
         case PAGE_BACKUP:
-          dispatch(navigateToScene(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' }, navigationProps));
+          navigate(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' })
           break;
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
@@ -177,7 +177,7 @@ export function navigateToPage(pageObject, navigationProps) {
         }
         case PAGE_CUSTOM_WEB_PAGE:
           let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
-          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null },navigationProps)) : dispatch(customAppSelection(customRemarks,navigationProps))
+          !_.size(customRemarks) || customRemarks.length == 1 ? navigate(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null }) : dispatch(customAppSelection(customRemarks,navigationProps))
           break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -186,7 +186,7 @@ export function navigateToPage(pageObject, navigationProps) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          dispatch(navigateToScene(LiveJobs, { pageObject }, navigationProps));
+          navigate(LiveJobs, { pageObject })
           break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -197,10 +197,10 @@ export function navigateToPage(pageObject, navigationProps) {
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
-          dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' }, navigationProps))
+          navigate(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' })
           break;
         case PAGE_OUTSCAN:
-          dispatch(navigateToScene(PostAssignmentScanner, { pageObject }, navigationProps))
+          navigate(PostAssignmentScanner, { pageObject })
 
           break
         case PAGE_PAYNEAR_INITIALIZE:
@@ -208,20 +208,20 @@ export function navigateToPage(pageObject, navigationProps) {
         case PAGE_PICKUP:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PROFILE:
-          dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' }, navigationProps))
+          navigate(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' })
           break;
         case PAGE_SEQUENCING: {
           dispatch(getRunsheetsForSequence(pageObject, navigationProps));
           break;
         }
         case PAGE_SORTING_PRINTING:
-          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' }, navigationProps))
+          navigate(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' })
           break;
         case PAGE_STATISTICS:
-          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' }, navigationProps))
+          navigate(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' })
           break;
         case PAGE_TABS:
-          dispatch(navigateToScene(TabScreen, { pageObject }, navigationProps));
+          navigate(TabScreen, { pageObject })
           break;
         default:
           throw new Error("Unknown page type " + pageObject.screenTypeId + ". Contact support");
@@ -245,7 +245,7 @@ export function customAppSelection(appModule, navigationProps) {
           destructiveButtonIndex: BUTTONS.length - 1
         },
         buttonIndex => {
-          (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? dispatch(navigateToScene(CustomApp, { customUrl: appModule[buttonIndex].customUrl }, navigationProps)) : null
+          (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? navigate(CustomApp, { customUrl: appModule[buttonIndex].customUrl }, navigationProps) : null
         }
       )
     } catch (error) {
@@ -274,7 +274,7 @@ export function checkCustomErpPullActivated() {
   }
 }
 
-export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader, navigate) {
+export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) {
   return async function (dispatch) {
     try {
       if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
@@ -283,9 +283,9 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader, 
         if (message === true) {
           dispatch(setState(syncLoader, false))
           if (!isBulk) {
-            dispatch(redirectToContainer(pageObject, navigate))
+            dispatch(redirectToContainer(pageObject))
           } else {
-            dispatch(navigateToScene(BulkListing, { pageObject }, navigate))
+            navigate(BulkListing, { pageObject })
           }
         } else {
           dispatch(setState(syncLoader, false))
@@ -294,9 +294,9 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader, 
       }
       else {
         if (!isBulk) {
-          dispatch(redirectToContainer(pageObject, navigate))
+          dispatch(redirectToContainer(pageObject))
         } else {
-          dispatch(navigateToScene(BulkListing, { pageObject }, navigate))
+          navigate(BulkListing, { pageObject })
         }
       }
     } catch (error) {
@@ -651,13 +651,13 @@ export function resetFailCountInStore() {
 }
 
 
-export function restoreNewJobDraft(draftStatusInfo, restoreDraft, navigate) {
+export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
   return async function (dispatch) {
     try {
       if (restoreDraft) {
-        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft, null, null, null, navigate))
+        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft))
       } else {
-        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId, navigate))
+        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId))
       }
       dispatch(setState(SET_NEWJOB_DRAFT_INFO, {}))
     } catch (error) {

@@ -75,7 +75,6 @@ class TabScreen extends PureComponent {
               searchText={this.props.searchText}
               pageObject={this.props.navigation.state.params.pageObject}
               isFutureRunsheetEnabled={this.props.isFutureRunsheetEnabled}
-              navigationProps = {this.props.navigation.navigate}
             />
           </Tab>
         )

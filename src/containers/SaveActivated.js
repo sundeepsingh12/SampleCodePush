@@ -22,6 +22,8 @@ import { redirectToFormLayout } from '../modules/newJob/newJobActions'
 import { checkForPaymentAtEnd } from '../modules/job-details/jobDetailsActions'
 import TransactionAlert from '../components/TransactionAlert'
 import moment from 'moment'
+import { push } from '../modules/navigators/NavigationService';
+
 
 function mapStateToProps(state) {
     return {
@@ -88,7 +90,7 @@ class SaveActivated extends PureComponent {
                 this.props.navigation.state.params.navigationFormLayoutStates
             )
         }
-        this.props.actions.checkIfDraftExists(this.props.navigation.state.params.jobMasterId,this.props.navigation.push)
+        this.props.actions.checkIfDraftExists(this.props.navigation.state.params.jobMasterId)
 
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
             BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
@@ -106,7 +108,7 @@ class SaveActivated extends PureComponent {
     };
 
     signOff = (statusId) => {
-        this.props.actions.navigateToScene(FormLayout, {
+        push(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: this.props.navigation.state.params.jobTransaction.id,
             jobTransaction: this.props.navigation.state.params.jobTransaction,
@@ -118,8 +120,7 @@ class SaveActivated extends PureComponent {
                 commonData: this.props.commonData,
                 recurringData: this.props.recurringData,
             }
-        },
-            this.props.navigation.push)
+        })
     }
 
     navigateToFormLayout = (statusId, statusName) => {
@@ -131,7 +132,7 @@ class SaveActivated extends PureComponent {
         }
         cloneJobTransaction.jobId = cloneJobTransaction.id = --lastIndex
         cloneJobTransaction.referenceNumber = userHubId[0] + '/' + userHubId[1] + '/' + moment().valueOf()
-        this.props.actions.navigateToScene(FormLayout, {
+        push(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: cloneJobTransaction.id,
             jobTransaction: cloneJobTransaction,
@@ -139,13 +140,11 @@ class SaveActivated extends PureComponent {
             statusName,
             jobMasterId: this.props.navigation.state.params.jobMasterId,
             navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
-        },
-            this.props.navigation.push
-        )
+        })
     }
 
     _discard = () => {
-        this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId, this.props.navigation.navigate)
+        this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId)
     }
 
     _goBack = () => {
@@ -228,7 +227,6 @@ class SaveActivated extends PureComponent {
             this.props.navigation.state.params.jobMasterId,
             this.props.commonData,
             this.props.navigation.state.params.currentStatus.id,
-            this.props.navigation.navigate
         )
     }
 
@@ -262,7 +260,7 @@ class SaveActivated extends PureComponent {
             jobId: itemId,
             referenceNumber: this.props.recurringData[itemId].referenceNumber
         }
-        this.props.actions.navigateToScene(FormLayout, {
+        push(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: itemId,
             jobTransaction,
@@ -271,17 +269,15 @@ class SaveActivated extends PureComponent {
             jobMasterId: this.props.navigation.state.params.jobMasterId,
             navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
             editableFormLayoutState: this.props.recurringData[itemId].formLayoutState
-        },
-            this.props.navigation.push
-        )
+        })
     }
     draftOkPress = () => {
-        this.props.actions.restoreDraft(this.props.draftStatusInfo, this.props.navigation.state.params.contactData, this.props.recurringData, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.navigationFormLayoutStates, this.props.navigation.push)
+        this.props.actions.restoreDraft(this.props.draftStatusInfo, this.props.navigation.state.params.contactData, this.props.recurringData, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.navigationFormLayoutStates)
     }
 
     showCheckTransactionAlert(){
-        return <TransactionAlert checkTransactionAlert={this.props.checkTransactionSaveActivated} onCancelPress={() => this.props.actions.redirectToFormLayout({id : this.props.draftStatusInfo.statusId, name: this.props.draftStatusInfo.statusName} , -1, this.props.draftStatusInfo.jobMasterId,this.props.navigation.navigate, true, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED)} 
-                              onOkPress = {() => this.props.actions.checkForPaymentAtEnd(this.props.draftStatusInfo, null, null, null, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE,this.props.navigation.push  ) }      onRequestClose={() => this.props.actions.setState(SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED)} />
+        return <TransactionAlert checkTransactionAlert={this.props.checkTransactionSaveActivated} onCancelPress={() => this.props.actions.redirectToFormLayout({id : this.props.draftStatusInfo.statusId, name: this.props.draftStatusInfo.statusName} , -1, this.props.draftStatusInfo.jobMasterId, true, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED)} 
+                              onOkPress = {() => this.props.actions.checkForPaymentAtEnd(this.props.draftStatusInfo, null, null, null, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE)}      onRequestClose={() => this.props.actions.setState(SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED)} />
       }
     draftModal() {
         if (!_.isEmpty(this.props.draftStatusInfo)) {
