@@ -3,7 +3,9 @@ import {
     StyleSheet,
     View,
     Text,
-    Image
+    Image,
+    Linking,
+    Platform
 } from 'react-native'
 import { StyleProvider, Container, Content, Button, List, ListItem, Left, Right } from 'native-base'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
@@ -22,7 +24,7 @@ import {
     CANCEL,
     RETRY
 } from '../lib/ContainerConstants'
-
+import DeviceSettings from 'react-native-device-settings';
 function mapStateToProps(state) {
     return {
         configDownloadService: state.preloader.configDownloadService,
@@ -129,7 +131,20 @@ class InitialSetup extends PureComponent {
             </StyleProvider>
         )
     }
-
+    goToSettings() {
+        if (Platform.OS == 'android') {
+            DeviceSettings.open();
+        } else {
+            Linking.canOpenURL("App-Prefs:root=General&path=DATE_AND_TIME").then(supported => {
+                if (!supported) {
+                    console.log('Can\'t handle url: ' + url);
+                } else {
+                    return Linking.openURL("App-Prefs:root=General&path=DATE_AND_TIME");
+                }
+            }).catch(err => console.log('An error occurred', err));
+            // Linking.openURL("App-Prefs:root=General&path=DATE_AND_TIME");
+        }
+    }
     _renderErrorMessage() {
         if (!_.isEmpty(this.props.error)) {
             return (
@@ -145,6 +160,11 @@ class InitialSetup extends PureComponent {
                             <Text style={{ color: '#ffffff' }}>{RETRY}</Text>
                         </Button>
                     </View> : null}
+                    <View style={[feStyle.justifyCenter, feStyle.alignCenter, feStyle.padding5, feStyle.row]}>
+                        {(this.props.error != 'Logging out' && this.props.error == 'Time mismatch. Please correct time on Device') ? <Button onPress={this.goToSettings} rounded color={'#a3a3a3'}>
+                            <Text style={{ color: '#ffffff' }}>Open Settings</Text>
+                        </Button> : null}
+                    </View>
                 </View>
             )
         }
