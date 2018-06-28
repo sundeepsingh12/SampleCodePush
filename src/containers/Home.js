@@ -38,7 +38,8 @@ function mapStateToProps(state) {
     pieChartSummaryCount: state.home.pieChartSummaryCount,
     trackingServiceStarted: state.home.trackingServiceStarted,
     checkNewJobTransactionStatus: state.home.checkNewJobTransactionStatus,
-    customErpPullActivated: state.home.customErpPullActivated
+    customErpPullActivated: state.home.customErpPullActivated,
+    logo: state.home.logo
   }
 }
 
@@ -90,10 +91,10 @@ class Home extends PureComponent {
   }
 
 
-showCheckTransactionAlert(){
-  return <TransactionAlert checkTransactionAlert={this.props.checkNewJobTransactionStatus} onCancelPress={() => this.props.actions.redirectToFormLayout({id : this.props.draftNewJobInfo.draft.statusId, name: this.props.draftNewJobInfo.draft.statusName} , -1, this.props.draftNewJobInfo.draft.jobMasterId, this.props.navigation.navigate,  true, CHECK_TRANSACTION_STATUS_NEW_JOB)} 
-                        onOkPress = {() => this.props.actions.checkForPaymentAtEnd(this.props.draftNewJobInfo.draft, null, null, null, CHECK_TRANSACTION_STATUS_NEW_JOB, PAGES_LOADING, this.props.navigation.push ) }      onRequestClose={() => this.props.actions.setState(SET_CHECK_TRANSACTION_AND_DRAFT)} />
-}
+  showCheckTransactionAlert() {
+    return <TransactionAlert checkTransactionAlert={this.props.checkNewJobTransactionStatus} onCancelPress={() => this.props.actions.redirectToFormLayout({ id: this.props.draftNewJobInfo.draft.statusId, name: this.props.draftNewJobInfo.draft.statusName }, -1, this.props.draftNewJobInfo.draft.jobMasterId, this.props.navigation.navigate, true, CHECK_TRANSACTION_STATUS_NEW_JOB)}
+      onOkPress={() => this.props.actions.checkForPaymentAtEnd(this.props.draftNewJobInfo.draft, null, null, null, CHECK_TRANSACTION_STATUS_NEW_JOB, PAGES_LOADING, this.props.navigation.push)} onRequestClose={() => this.props.actions.setState(SET_CHECK_TRANSACTION_AND_DRAFT)} />
+  }
   pieChartView() {
     if (!this.props.utilities.pieChartEnabled) {
       return null
@@ -127,16 +128,27 @@ showCheckTransactionAlert(){
     if (this.props.pagesLoading) {
       return (<Loader />)
     }
+    let sourceOptions
+    if (this.props.logo) {
+      sourceOptions = {
+        isStatic: true,
+        uri: 'data:image/jpeg;base64,' + this.props.logo
+      }
+    } else {
+      sourceOptions = FareyeLogo
+    }
+
     return (
       <StyleProvider style={getTheme(platform)}>
-        <Container style={StyleSheet.flatten([styles.bgWhite])}>
+        <Container style={[styles.bgWhite]}>
           <SafeAreaView>
-            <Header searchBar style={StyleSheet.flatten([styles.bgWhite])}>
-              <Body>
-                <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}><View><View style={{ width: 90 }}>
-                  <Image style={StyleSheet.flatten([styles.width100, { resizeMode: 'contain' }])} source={FareyeLogo} />
-                </View></View></View>
-              </Body>
+            <Header style={[styles.bgWhite, styles.paddingTop0]}>
+              <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                <View style={[styles.paddingVertical5, { flexDirection: 'row', flex: .5 }]}>
+                  <Image resizeMode={'contain'} style={[{ flex: 1, height: null, width: null }]} source={sourceOptions} />
+                  {/* <Image source={{ uri: 'https://s3-us-west-2.amazonaws.com/fareye.development/images.jpeg' }} style={{ flex: 1, height: null, width: null }} resizeMode='contain' /> */}
+                </View>
+              </View>
             </Header>
           </SafeAreaView>
           <Content>
@@ -165,7 +177,7 @@ const style = StyleSheet.create({
     width: 116,
     height: 116,
     resizeMode: 'contain'
-}
+  }
 });
 
 

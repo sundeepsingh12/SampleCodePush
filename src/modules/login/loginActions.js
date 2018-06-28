@@ -21,12 +21,14 @@ import {
   RESET_STATE,
   BACKUP_UPLOAD_FAIL_COUNT,
   UnsyncBackupUpload,
-  DOMAIN_URL
+  DOMAIN_URL,
+  SET_LOGIN_PARAMETERS
 } from '../../lib/constants'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import moment from 'moment'
 import { logoutService } from '../../services/classes/Logout'
-
+import { PATH_COMPANY_LOGO_IMAGE } from '../../lib/AttributeConstants'
+import RNFS from 'react-native-fs'
 
 import {
   authenticationService
@@ -187,14 +189,17 @@ export function forgetPasswordRequest(username) {
 export function checkRememberMe() {
   return async function (dispatch) {
     try {
+      let file, username, password;
+      let fileExits = await RNFS.exists(PATH_COMPANY_LOGO_IMAGE);
+      if (fileExits) {
+        file = await RNFS.readFile(PATH_COMPANY_LOGO_IMAGE, 'base64')
+      }
       let rememberMe = await keyValueDBService.getValueFromStore(REMEMBER_ME)
       if (rememberMe) {
-        let username = await keyValueDBService.getValueFromStore(USERNAME)
-        let password = await keyValueDBService.getValueFromStore(PASSWORD)
-        dispatch(onChangeUsername(username.value))
-        dispatch(onChangePassword(password.value))
-        dispatch(rememberMeSetTrue())
+        username = await keyValueDBService.getValueFromStore(USERNAME)
+        password = await keyValueDBService.getValueFromStore(PASSWORD)
       }
+      dispatch(setState(SET_LOGIN_PARAMETERS, { username: username ? username.value : null, password: password ? password.value : null, logo: file, rememberMe: rememberMe ? true : false }))
     } catch (error) {
       showToastAndAddUserExceptionLog(1304, error.message, 'danger', 1)
     } finally {

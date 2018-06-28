@@ -12,7 +12,6 @@ import { QrCodeScanner } from '../lib/constants'
 import CONFIG from '../lib/config'
 import { OK, CANCEL, CONFIRM_RESET, RESET_ACCOUNT_SETTINGS, REMEMBER_ME } from '../lib/ContainerConstants'
 
-
 var style = StyleSheet.create({
   container: {
     flex: 1,
@@ -116,12 +115,21 @@ class Login extends PureComponent {
     if (this.props.auth.form.authenticationService || this.props.auth.form.isLongPress) {
       return <Spinner />
     }
+    let sourceOptions;
+    if (this.props.auth.form.logo) {
+      sourceOptions = {
+        isStatic: true,
+        uri: 'data:image/jpeg;base64,' + this.props.auth.form.logo
+      }
+    } else {
+      sourceOptions = require('../../images/fareye-logo.png')
+    }
     if (!this.props.auth.form.authenticationService) {
       return (
-        <TouchableOpacity onLongPress={this.onLongPress}>
+        <TouchableOpacity style={[styles.width100, { height: 'auto' }]} onLongPress={this.onLongPress}>
           <Image
-            style={styles.logoStyle}
-            source={require('../../images/fareye-logo.png')}
+            source={sourceOptions}
+            style={[{ height: 100, width: 100, resizeMode: Image.resizeMode.contain }]}
           />
         </TouchableOpacity >
       )

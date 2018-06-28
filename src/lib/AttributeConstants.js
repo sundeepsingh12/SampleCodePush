@@ -245,6 +245,8 @@ module.exports = {
     DATA_STORE_ATTR_KEY: "&dataStoreAttributeKey=",
 
     //Location where zip contents are temporarily added and then removed
+    PATH_COMPANY_LOGO_DIR: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/LOGO',
+    PATH_COMPANY_LOGO_IMAGE: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/LOGO/companyLogo.jpg',
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP',
     PATH_CUSTOMER_IMAGES: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/CustomerImages/',
     PATH: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER,

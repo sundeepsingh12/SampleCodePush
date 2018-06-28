@@ -37,22 +37,23 @@ export default function homeReducer(state = initialState, action) {
       return state.set('pagesLoading', true)
     }
 
-    case  CHECK_TRANSACTION_STATUS_NEW_JOB: {
-      if(action.payload == TRANSACTION_SUCCESSFUL || action.payload == DELETE_DRAFT){
-      return state.set('checkNewJobTransactionStatus',action.payload)
-                  .set('draftNewJobInfo', null)
-      }else{
-        return state.set('checkNewJobTransactionStatus',action.payload)
-                  .set('pagesLoading', false)
+    case CHECK_TRANSACTION_STATUS_NEW_JOB: {
+      if (action.payload == TRANSACTION_SUCCESSFUL || action.payload == DELETE_DRAFT) {
+        return state.set('checkNewJobTransactionStatus', action.payload)
+          .set('draftNewJobInfo', null)
+      } else {
+        return state.set('checkNewJobTransactionStatus', action.payload)
+          .set('pagesLoading', false)
       }
-     }
+    }
 
     case SET_PAGES_UTILITY_N_PIESUMMARY: {
       return state.set('mainMenuList', action.payload.sortedMainMenuAndSubMenuList.mainMenuSectionList)
         .set('subMenuList', action.payload.sortedMainMenuAndSubMenuList.subMenuSectionList)
         .set('utilities', action.payload.utilities)
         .set('pieChartSummaryCount', action.payload.pieChartSummaryCount)
-        .set('pagesLoading', false);
+        .set('pagesLoading', false)
+        .set('logo', action.payload.logo)
     }
 
     case SET_ERP_PULL_ACTIVATED: {
@@ -69,7 +70,7 @@ export default function homeReducer(state = initialState, action) {
         .set('lastErpSyncTime', action.payload.lastErpSyncTime)
     }
 
-    case LOADER_FOR_SYNCING:{
+    case LOADER_FOR_SYNCING: {
       return state.set('moduleLoading', action.payload)
     }
 
@@ -89,7 +90,7 @@ export default function homeReducer(state = initialState, action) {
 
     case SET_UNSYNC_TRANSACTION_PRESENT:
       return state.set('isUnsyncTransactionOnLogout', action.payload.isUnsyncTransactionOnLogout)
-                  .set('isLoggingOut',action.payload.isLoggingOut)
+        .set('isLoggingOut', action.payload.isLoggingOut)
 
     case SET_BACKUP_UPLOAD_VIEW:
       return state.set('backupUploadView', action.payload)
@@ -105,10 +106,10 @@ export default function homeReducer(state = initialState, action) {
 
     case SET_NEWJOB_DRAFT_INFO:
       return state.set('draftNewJobInfo', action.payload)
-      
-    case SET_CHECK_TRANSACTION_AND_DRAFT: 
-    return state.set('draftNewJobInfo', {})
-                .set('checkNewJobTransactionStatus', null)
+
+    case SET_CHECK_TRANSACTION_AND_DRAFT:
+      return state.set('draftNewJobInfo', {})
+        .set('checkNewJobTransactionStatus', null)
     case SET_TRANSACTION_SERVICE_STARTED:
       return state.set('trackingServiceStarted', action.payload)
   }
