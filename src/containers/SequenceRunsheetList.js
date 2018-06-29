@@ -14,6 +14,7 @@ import * as sequenceActions from '../modules/sequence/sequenceActions'
 import * as globalActions from '../modules/global/globalActions'
 import { SELECT_RUNSHEET_NUMBER, OK } from './../lib/ContainerConstants'
 import { Sequence, SET_RUNSHEET_NUMBER_LIST } from './../lib/constants'
+import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
     return {
@@ -57,12 +58,11 @@ class SequenceRunsheetList extends Component {
 
     renderData = (item) => {
         return (
-            <ListItem style={[style.jobListItem]} onPress={() => this.props.actions.navigateToScene(Sequence, {
+            <ListItem style={[style.jobListItem]} onPress={() => navigate(Sequence, {
                 runsheetNumber: item,
                 displayName: this.props.navigation.state.params.displayName,
                 jobMasterIds: this.props.navigation.state.params.jobMasterIds
-            },
-            this.props.navigation.navigate)}>
+            })}>
                 <Text style={[styles.fontDefault, styles.fontWeight500]}>{item}</Text>
                 <Right>
                     <Icon name="ios-arrow-forward" style={[styles.fontDefault, styles.fontBlack]} />

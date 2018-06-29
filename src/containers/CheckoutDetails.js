@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, Modal, BackHandler } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Body, Right, Item, Input, Icon, List, ListItem, StyleProvider, Footer, FooterTab, Toast, } from 'native-base';
 import { Print, Receipt, SMS, TotalAmount, CONTACT_NUMBER_TO_SEND_SMS, SET_SAVE_ACTIVATED_TOAST_MESSAGE, EMAILID_VIEW_ARRAY, USER, RETURN_TO_HOME, } from '../lib/constants'
@@ -49,12 +49,18 @@ function mapDispatchToProps(dispatch) {
     }
 }
 class CheckoutDetails extends PureComponent {
+    _didFocusSubscription;
+    _willBlurSubscription;
 
     constructor(props) {
         super(props)
         this.state = {
             isModalVisible: -1,
         }
+
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
+            BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
 
     componentDidMount() {
@@ -70,6 +76,10 @@ class CheckoutDetails extends PureComponent {
             })
         }
         this.props.actions.fetchUserData(this.props.navigation.state.params.emailIdInFieldData, this.props.inputTextEmailIds)
+
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
 
     componentDidUpdate() {
@@ -88,9 +98,18 @@ class CheckoutDetails extends PureComponent {
         }
     }
 
+    componentWillUnmount() {
+        this._didFocusSubscription && this._didFocusSubscription.remove();
+        this._willBlurSubscription && this._willBlurSubscription.remove();
+    }
+
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
+
+    onBackButtonPressAndroid = () => {
+        return true;
+    };
 
     renderData = (item) => {
         if (item.value) {
@@ -421,7 +440,7 @@ class CheckoutDetails extends PureComponent {
                         <Footer style={[style.footer]}>
                             <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
                                 <Button onPress={() => {
-                                    this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId, this.props.navigation.navigate)
+                                    this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId)
                                 }}>
                                     <Text style={[{ color: styles.fontPrimaryColor }, styles.fontDefault]}>{Return_To_Home}</Text>
                                 </Button>

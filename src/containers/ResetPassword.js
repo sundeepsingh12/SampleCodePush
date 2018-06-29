@@ -62,7 +62,7 @@ class ResetPassword extends PureComponent {
     }
   }
   _onResetPress = () => {
-    this.props.actions.checkAndResetPassword(this.props.currentPassword, this.props.newPassword, this.props.confirmNewPassword,this.props.navigation.goBack)
+    this.props.actions.checkAndResetPassword(this.props.currentPassword, this.props.newPassword, this.props.confirmNewPassword)
   }
 
   _getHeaderView() {

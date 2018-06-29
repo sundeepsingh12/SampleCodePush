@@ -29,13 +29,14 @@ import {
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
 import {
-    setState, navigateToScene, showToastAndAddUserExceptionLog
+    setState, showToastAndAddUserExceptionLog
 } from '../global/globalActions'
 import {
     Toast
 } from 'native-base'
 import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
 import { SKIP_SKU_MESSAGE, OK } from '../../lib/ContainerConstants'
+import { navigate } from '../navigators/NavigationService';
 
 export function prepareSkuList(fieldAttributeMaster, jobId) {
     return async function (dispatch) {
@@ -123,7 +124,7 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionList, parentObject, formLayoutState, skuValidationForImageAndReason, skuObjectAttributeKey,navigate) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionList, parentObject, formLayoutState, skuValidationForImageAndReason, skuObjectAttributeKey) {
     return async function (dispatch) {
         try {
             let jobTransaction = _.isArray(jobTransactionList) ? jobTransactionList : [jobTransactionList]
@@ -153,7 +154,7 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                     })
                 } else {
                     fieldDataListWithLatestPositionId.latestPositionId = positionId
-                    dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransactionList,null,null,navigate))
+                    dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransactionList))
                 }
             }
             else {
@@ -184,7 +185,7 @@ export function changeSkuCode(skuCode) {
  * else open SkuListing
  * @param {*} routeParams 
  */
-export function checkForNewJob(routeParams,navigate) {
+export function checkForNewJob(routeParams) {
     return async function (dispatch) {
         try {
             let { currentElement, jobTransaction } = routeParams
@@ -197,7 +198,7 @@ export function checkForNewJob(routeParams,navigate) {
                 })
                 dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, routeParams.formLayoutState, NA, NEXT_FOCUS, jobTransaction))// save NA as value
             } else {
-                dispatch(navigateToScene(SkuListing, routeParams,navigate))//navigate to SkuListing
+                navigate(SkuListing, routeParams)//navigate to SkuListing
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(2205, error.message, 'danger', 1)

@@ -17,7 +17,7 @@ import _ from 'lodash'
 import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED,  NO_JOBS_PRESENT, TOTAL_COUNT } from '../lib/ContainerConstants'
 import { FormLayout, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-
+import { navigate } from '../modules/navigators/NavigationService';
 function mapStateToProps(state) {
   return {
     bulkTransactionList: state.bulk.bulkTransactionList,
@@ -264,14 +264,12 @@ class BulkListing extends PureComponent {
   }
 
   goToFormLayout(statusId, statusName) {
-    this.props.actions.navigateToScene(FormLayout, {
+    navigate(FormLayout, {
       statusId,
       statusName,
       jobMasterId: JSON.parse(this.props.navigation.state.params.pageObject.jobMasterIds)[0],
       jobTransaction: Object.values(this.props.selectedItems),
-    },
-    this.props.navigation.navigate
-    )
+    })
   }
 }
 

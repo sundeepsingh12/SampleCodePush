@@ -1,6 +1,5 @@
 'use strict'
 import {
-  HomeTabNavigatorScreen,
   IS_PRELOADER_COMPLETE,
   LoginScreen,
   LOGIN_FAILURE,
@@ -35,7 +34,8 @@ import {
 import CONFIG from '../../lib/config'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { NavigationActions } from 'react-navigation'
-import { setState, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
+import { navDispatch } from '../navigators/NavigationService';
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 
 /**
  * ## Login actions
@@ -128,8 +128,9 @@ export function authenticateUser(username, password, rememberMe) {
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)
       await authenticationService.saveLoginCredentials(username, password, rememberMe)
       dispatch(loginSuccess())
-      dispatch(NavigationActions.navigate({
-        routeName: PreloaderScreen
+      keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','PreloaderScreen')
+      navDispatch(NavigationActions.navigate({
+        routeName: 'PreloaderScreen'
       }))
     } catch (error) {
       showToastAndAddUserExceptionLog(1301, error.message, 'danger', 0)
@@ -210,43 +211,49 @@ export function checkRememberMe() {
  * so set the state to logout.
  * Otherwise, the user will default to the login in screen.
  */
-export function getSessionToken() {
-  return async function (dispatch) {
-    try {
-      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-      const isPreloaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
-      const userData = await keyValueDBService.getValueFromStore(USER)
-      const backupUploadFailCount = await keyValueDBService.getValueFromStore(BACKUP_UPLOAD_FAIL_COUNT)
-      if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')) && token) {
-        dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
-      } else {
-        if (token && isPreloaderComplete && isPreloaderComplete.value && backupUploadFailCount && backupUploadFailCount.value > 0) {
-          dispatch(NavigationActions.navigate({
-            routeName: UnsyncBackupUpload,
-            params: backupUploadFailCount.value
-          }))
-        }
-        else if (token && isPreloaderComplete && isPreloaderComplete.value) {
-          dispatch(NavigationActions.navigate({
-            routeName: HomeTabNavigatorScreen
-          }))
-          // dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
-        }
-        else if (token) {
-          dispatch(NavigationActions.navigate({
-            routeName: PreloaderScreen
-          }))
-        } else {
-          dispatch(NavigationActions.navigate({
-            routeName: LoginScreen
-          }))
-        }
-      }
-    } catch (error) {
-      showToastAndAddUserExceptionLog(1305, error.message, 'danger', 1)
-      dispatch(NavigationActions.navigate({
-        routeName: LoginScreen
-      }))
-    }
-  }
-}
+// function getSessionToken() {
+//   return async function (dispatch) {
+//     try {
+//       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+//       const isPreloaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
+//       const userData = await keyValueDBService.getValueFromStore(USER)
+//       const backupUploadFailCount = await keyValueDBService.getValueFromStore(BACKUP_UPLOAD_FAIL_COUNT)
+//       if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')) && token) {
+//         navDispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
+//       } else {
+//         if (token && isPreloaderComplete && isPreloaderComplete.value && backupUploadFailCount && backupUploadFailCount.value > 0) {
+//           keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','UnsyncBackupUpload')
+//           navDispatch(NavigationActions.navigate({
+//             routeName: UnsyncBackupUpload,
+//             params: backupUploadFailCount.value
+//           }))
+//         }
+//         else if (token && isPreloaderComplete && isPreloaderComplete.value) {
+//           const { value: { company: { customErpPullActivated: ErpCheck }}} = await keyValueDBService.getValueFromStore(USER)
+//             if(ErpCheck) {
+//               keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','LoggedInERP')
+//               navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
+//             }
+//             else {
+//               keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','LoggedIn')
+//               navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+//             }
+//         }
+//         else if (token) {
+//           navDispatch(NavigationActions.navigate({
+//             routeName: PreloaderScreen
+//           }))
+//         } else {
+//           navDispatch(NavigationActions.navigate({
+//             routeName: LoginScreen
+//           }))
+//         }
+//       }
+//     } catch (error) {
+//       showToastAndAddUserExceptionLog(1305, error.message, 'danger', 1)
+//       navDispatch(NavigationActions.navigate({
+//         routeName: LoginScreen
+//       }))
+//     }
+//   }
+// }

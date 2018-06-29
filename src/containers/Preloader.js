@@ -1,9 +1,9 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import {  Platform, View, Image, Text, WebView } from 'react-native'
+import {  Platform, View, Image, Text, WebView, BackHandler } from 'react-native'
 import CustomAlert from "../components/CustomAlert"
 import styles from '../themes/FeStyle'
-import { Container, Button } from 'native-base'
+import { Container } from 'native-base'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
@@ -40,6 +40,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class Preloader extends PureComponent {
+    _didFocusSubscription;
+    _willBlurSubscription;
 
     constructor(props) {
         super(props)
@@ -48,10 +50,29 @@ class Preloader extends PureComponent {
             showDownloadProgressBar: false,
             errorInDownload: false,
         }
+        BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid);
+        this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload =>{
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+            BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        });
     }
 
     componentDidMount() {
         this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
+    }
+
+    onBackButtonPressAndroid = () => {
+        BackHandler.exitApp()
+        return true;
+    };
+    
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        this._didFocusSubscription && this._didFocusSubscription.remove();
+        this._willBlurSubscription && this._willBlurSubscription.remove();
     }
 
     startLoginScreenWithoutLogout = () => {
