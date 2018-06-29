@@ -81,7 +81,7 @@ export function deleteSessionToken() {
  */
 export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
   if (isToastShow == 1) {
-    Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
+    Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, buttonText: OK, duration: 1000000, style: { position: 'absolute', bottom: -30, left: 0, right: 0, borderRadius: 0 } })
   }
   userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
 }

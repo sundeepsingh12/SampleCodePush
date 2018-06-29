@@ -113,7 +113,7 @@ import RNFS from 'react-native-fs'
 export function fetchPagesAndPiechart() {
   return async function (dispatch) {
     try {
-      dispatch(setState(PAGES_LOADING));
+      dispatch(setState(PAGES_LOADING, true));
       let user = await keyValueDBService.getValueFromStore(USER);
       //Fetching list of Pages
       let pageList = await keyValueDBService.getValueFromStore(PAGES);
@@ -125,6 +125,7 @@ export function fetchPagesAndPiechart() {
       let mainMenuAndSubMenuObject = moduleCustomizationService.getPagesMainMenuAndSubMenuObject(pageList ? pageList.value : null, user ? user.value : null);
       let sortedMainMenuAndSubMenuList = moduleCustomizationService.sortMenuAndSubMenuGroupList(mainMenuAndSubMenuObject.mainMenuObject, mainMenuAndSubMenuObject.subMenuObject);
       //Fetching list of Home screen Utilities 
+      throw new Error('Pages Loading Failed')
       const utilityList = await keyValueDBService.getValueFromStore(PAGES_ADDITIONAL_UTILITY);
       //Looping over Utility list to check if Piechart and Messaging are enabled
       let utilities = {}
@@ -144,6 +145,7 @@ export function fetchPagesAndPiechart() {
       //TODO : show proper error code message ERROR CODE 600
       //Save the error in exception logs
       showToastAndAddUserExceptionLog(2701, error.message, 'danger', 1)
+      dispatch(setState(PAGES_LOADING, false));
     }
   }
 }
@@ -450,6 +452,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
           syncStatus: 'Downloading'
         }))
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, syncStoreDTO);
+        throw new Error()
         // check if live job module is present
         const isLiveJobModulePresent = syncStoreDTO.pageList ? syncStoreDTO.pageList.filter((module) => module.screenTypeId == PAGE_LIVE_JOB).length > 0 : false
         if (isLiveJobModulePresent) {

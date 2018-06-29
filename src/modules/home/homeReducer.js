@@ -34,7 +34,7 @@ export default function homeReducer(state = initialState, action) {
   }
   switch (action.type) {
     case PAGES_LOADING: {
-      return state.set('pagesLoading', true)
+      return state.set('pagesLoading', action.payload)
     }
 
     case CHECK_TRANSACTION_STATUS_NEW_JOB: {
