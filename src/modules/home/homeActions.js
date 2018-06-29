@@ -452,7 +452,6 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
           syncStatus: 'Downloading'
         }))
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, syncStoreDTO);
-        throw new Error()
         // check if live job module is present
         const isLiveJobModulePresent = syncStoreDTO.pageList ? syncStoreDTO.pageList.filter((module) => module.screenTypeId == PAGE_LIVE_JOB).length > 0 : false
         if (isLiveJobModulePresent) {
