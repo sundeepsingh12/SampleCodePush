@@ -125,7 +125,6 @@ export function fetchPagesAndPiechart() {
       let mainMenuAndSubMenuObject = moduleCustomizationService.getPagesMainMenuAndSubMenuObject(pageList ? pageList.value : null, user ? user.value : null);
       let sortedMainMenuAndSubMenuList = moduleCustomizationService.sortMenuAndSubMenuGroupList(mainMenuAndSubMenuObject.mainMenuObject, mainMenuAndSubMenuObject.subMenuObject);
       //Fetching list of Home screen Utilities 
-      throw new Error('Pages Loading Failed')
       const utilityList = await keyValueDBService.getValueFromStore(PAGES_ADDITIONAL_UTILITY);
       //Looping over Utility list to check if Piechart and Messaging are enabled
       let utilities = {}
