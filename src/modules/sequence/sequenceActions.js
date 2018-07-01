@@ -21,12 +21,12 @@ import {
     UNTRACKED_JOBS_MESSAGE,
     TOKEN_MISSING,
     INVALID_SCAN,
-    JOB_NOT_PRESENT
 } from '../../lib/ContainerConstants'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions';
+import { navigate } from '../navigators/NavigationService';
 
 /**
  * @param {*} runsheetNumber 
@@ -113,15 +113,15 @@ export function getRunsheetsForSequence(pageObject,props) {
             dispatch(setState(SET_RUNSHEET_NUMBER_LIST, runsheetNumberList))
             //In case of single runsheet navigate to sequence container
             if (_.size(runsheetNumberList) == 1) {
-                dispatch(navigateToScene(Sequence, {
+                navigate(Sequence, {
                     runsheetNumber: runsheetNumberList[0],
                     jobMasterIds: pageObject.jobMasterIds
-                },props))
+                })
             } else if (_.size(runsheetNumberList) > 1) {//if more than 1 runsheet present then show list
-                dispatch(navigateToScene(SequenceRunsheetList, {
+                navigate(SequenceRunsheetList, {
                     displayName: pageObject.name,
                     jobMasterIds: pageObject.jobMasterIds
-                },props))
+                })
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(2603, error.message, null, 0)

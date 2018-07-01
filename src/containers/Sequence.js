@@ -1,4 +1,3 @@
-
 'use strict'
 
 import { bindActionCreators } from 'redux'
@@ -7,7 +6,7 @@ import * as sequenceActions from '../modules/sequence/sequenceActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Alert, TouchableOpacity, Modal } from 'react-native'
+import { StyleSheet, View, Alert, TouchableOpacity, Modal, BackHandler } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { ROUTE_OPTIMIZATION, FILTER_REF_NO } from '../lib/AttributeConstants'
 import {
@@ -56,6 +55,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class Sequence extends PureComponent {
+  _didFocusSubscription;
+  _willBlurSubscription;
 
   //newSequenceNumber :- used for new sequence entered by the user in input
   //alertMessage :- alert message used when user enter wrong sequence in input
@@ -68,8 +69,18 @@ class Sequence extends PureComponent {
     return { header: null }
   }
 
+  constructor(props) {
+    super(props);
+    this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
+      BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+    );
+  }
+
   componentDidMount() {
     this.props.actions.prepareListForSequenceModule(this.props.navigation.state.params.runsheetNumber, this.props.navigation.state.params.jobMasterIds)
+    this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+      BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+    );
   }
 
   /** 
@@ -84,6 +95,16 @@ class Sequence extends PureComponent {
       this.props.actions.setState(SET_SEQUENCE_BACK_ENABLED, false)
     }
   }
+
+  componentWillUnmount() {
+    this._didFocusSubscription && this._didFocusSubscription.remove();
+    this._willBlurSubscription && this._willBlurSubscription.remove();
+  }
+
+  onBackButtonPressAndroid = () => {
+    this.props.actions.setState(SET_SEQUENCE_BACK_ENABLED, true)
+    return true;
+};
 
   /** 
    * This method will sort list of trasaction according to seqSelected and will return it to SortableListView

@@ -13,6 +13,7 @@ import {  LISTING_SEARCH_VALUE, BulkListing, JobDetailsV2} from '../lib/constant
 import JobListItem from '../components/JobListItem';
 import { NO_NEXT_STATUS, OK, ALL } from '../lib/ContainerConstants';
 import moment from 'moment';
+import { navigate } from '../modules/navigators/NavigationService';
 
 
 function mapStateToProps(state) {
@@ -43,15 +44,13 @@ class TaskListScreen extends PureComponent {
 
   navigateToScene = (item) => {
     let countOfGroup = this.props.jobTransactionCustomizationList.filter(jobTransaction => jobTransaction.groupId == item.groupId).length;
-    this.props.actions.navigateToScene(JobDetailsV2,
+    navigate(JobDetailsV2,
       {
         jobSwipableDetails: item.jobSwipableDetails,
         jobTransaction: item,
         groupId: item.groupId == 'nullGroup' || countOfGroup < 2 ? null : item.groupId,
         pageObjectAdditionalParams: this.props.pageObject.additionalParams
-      },
-      this.props.navigationProps
-    )
+      })
     this.props.actions.setState(LISTING_SEARCH_VALUE, {})
   }
 
@@ -79,7 +78,7 @@ class TaskListScreen extends PureComponent {
   updateTransactionForGroupId(item) {
     let jobTransaction = item.data[0];
     if (jobTransaction.isNextStatusPresent) {
-      this.props.actions.navigateToScene(BulkListing, {
+      navigate(BulkListing, {
         pageObject: {
           jobMasterIds: JSON.stringify([jobTransaction.jobMasterId]),
           additionalParams: JSON.stringify({ statusId: jobTransaction.statusId }),
@@ -187,7 +186,7 @@ class TaskListScreen extends PureComponent {
     return (
       <View key={item.title}>
         <View>
-          <Separator bordered>
+          <Separator>
             <Text>{moment(item.title).format('YYYY-MM-DD')}</Text>
           </Separator>
         </View>
@@ -232,7 +231,6 @@ class TaskListScreen extends PureComponent {
   render() {
     let jobMasterMap = _.mapKeys(JSON.parse(this.props.pageObject.jobMasterIds));
     let jobTransactionViewStructure = this.getTransactionView(jobMasterMap)
-    let jobList = null;
     if (this.props.isRefreshing) {
       return <Loader />
     } else {

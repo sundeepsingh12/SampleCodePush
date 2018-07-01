@@ -3,13 +3,10 @@
 import { keyValueDBService } from './KeyValueDBService'
 import {
     SMS_JOB_STATUS,
-    TABLE_JOB_DATA,
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
     USER,
     TABLE_SERVER_SMS_LOG,
-    TABLE_JOB_TRANSACTION,
-    PENDING_SYNC_TRANSACTION_IDS
 } from '../../lib/constants'
 import * as realm from '../../repositories/realmdb'
 import moment from 'moment';
@@ -170,7 +167,7 @@ class AddServerSms {
                 let fieldData = fieldDataList.filter(data => data.fieldAttributeMasterId == fieldAttributesWithSameKey.id && data.jobTransactionId == jobTransaction.id)
                 fieldDataValueToReplace = (fieldData[0] && fieldData[0].value) ? fieldData[0].value : null
             } else if (formElement) {
-                let formElementForKey = formElement.get(fieldAttributesWithSameKey.id)
+                let formElementForKey = formElement[fieldAttributesWithSameKey.id]
                 fieldDataValueToReplace = (formElementForKey) ? formElementForKey.value : null
             }
             if (fieldDataValueToReplace) {

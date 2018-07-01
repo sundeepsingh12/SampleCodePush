@@ -19,6 +19,7 @@ var InitialState = Record({
     cloneDataStoreAttrValueMap: {},
     isAllowFromFieldInExternalDS: false,
     isDataStoreEditable: true,
+    keyLabelAttributeMap: {}
 })
 
 export default InitialState

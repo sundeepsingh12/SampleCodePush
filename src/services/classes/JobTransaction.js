@@ -2,8 +2,6 @@ import * as realm from '../../repositories/realmdb'
 import {
     TABLE_JOB_TRANSACTION,
     UNSEEN,
-    PENDING,
-    CUSTOMIZATION_LIST_MAP,
     TABIDMAP,
     TABLE_JOB,
     TABLE_FIELD_DATA,
@@ -15,7 +13,7 @@ import {
     TABLE_MESSAGE_INTERACTION
 } from '../../lib/constants'
 
-import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE, SEQ_SELECTED, JOB_EXPIRY_TIME } from '../../lib/AttributeConstants'
+import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, SEQ_SELECTED, JOB_EXPIRY_TIME } from '../../lib/AttributeConstants'
 import { ATTEMPT, SLOT, START, END, DISTANCE, HALT_DURATION, CALL_COUNT, CALL_DURATION, SMS, TIME_SPENT, SEQUENCE } from '../../lib/ContainerConstants'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
@@ -26,7 +24,6 @@ import { jobAttributeMasterService } from './JobAttributeMaster'
 import { customerCareService } from './CustomerCare'
 import { smsTemplateService } from './SMSTemplate'
 import { fieldAttributeMasterService } from './FieldAttributeMaster'
-import { jobMasterService } from './JobMaster'
 import _ from 'lodash'
 import moment from 'moment'
 import { formLayoutEventsInterface } from './formLayout/FormLayoutEventInterface'
@@ -469,9 +466,9 @@ class JobTransaction {
     async checkIdToBeSync(jobTransactionId) {
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
         let checkId = false
-        if (pendingSyncTransactionIds && pendingSyncTransactionIds.value.length > 0) {
-            for (let item of pendingSyncTransactionIds.value) {
-                if (item.id == jobTransactionId) {
+        if (pendingSyncTransactionIds && pendingSyncTransactionIds.value && _.size(pendingSyncTransactionIds.value) > 0) {
+            for (let item in pendingSyncTransactionIds.value) {
+                if (pendingSyncTransactionIds.value[item].id == jobTransactionId) {
                     checkId = true
                     break
                 }

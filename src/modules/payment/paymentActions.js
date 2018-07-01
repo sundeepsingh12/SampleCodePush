@@ -98,7 +98,7 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
  * @param {*} receipt 
  * @param {*} jobTransactionIdAmountMap 
  */
-export function saveMoneyCollectObject(actualAmount, currentElement, jobTransaction, moneyCollectMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt, jobTransactionIdAmountMap, formLayoutState,goBack) {
+export function saveMoneyCollectObject(actualAmount, currentElement, jobTransaction, moneyCollectMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt, jobTransactionIdAmountMap, formLayoutState) {
     return async function (dispatch) {
         try {
             //While saving actual amount should be a number
@@ -124,16 +124,16 @@ export function saveMoneyCollectObject(actualAmount, currentElement, jobTransact
             } else {
                 jobTransactionIdAmountMap.moneyTransactionType = COLLECTION_SOD
             }
-            formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).jobTransactionIdAmountMap = jobTransactionIdAmountMap
+            formLayoutState.formElement[currentElement.fieldAttributeMasterId].jobTransactionIdAmountMap = jobTransactionIdAmountMap
             formLayoutState.formElement = CashTenderingService.checkForCashTenderingAndResetValue(formLayoutState.formElement, currentElement)
             let paymentAtEnd = {
-                currentElement: formLayoutState.formElement.get(currentElement.fieldAttributeMasterId),
+                currentElement: formLayoutState.formElement[currentElement.fieldAttributeMasterId],
                 modeTypeId: selectedPaymentMode,
                 parameters: null,
                 isCardPayment
             }
             formLayoutState.paymentAtEnd = paymentAtEnd
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction,null,null,goBack))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
             dispatch(setState(UPDATE_PAYMENT_AT_END, {
                 paymentAtEnd
             }))
@@ -168,12 +168,12 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formLa
             //     modeTypeId: selectedPaymentMode,
             //     isCardPayment
             // }
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction,null,null,navigation.goBack))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
             // dispatch(setState(UPDATE_PAYMENT_AT_END, {
             //     paymentAtEnd
             // }))
             // dispatch(setState(CLEAR_PAYMENT_STATE))
-            // dispatch(NavigationActions.back())
+            // navDispatch(NavigationActions.back())
             navigation.pop(1)
         } catch (error) {
             showToastAndAddUserExceptionLog(1603, error.message, 'danger', 1)

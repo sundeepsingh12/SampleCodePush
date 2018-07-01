@@ -19,7 +19,7 @@ import AesCtr from '../services/classes/AesCtr'
 import userExceptionLogs from './schema/userExceptionLogsDB'
 import messageInteracion from './schema/MessageInteractionSchema'
 
-const schemaVersion = 48;
+const schemaVersion = 49;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs, messageInteracion];
 
 let realm = new Realm({
@@ -34,14 +34,10 @@ import {
     TABLE_JOB_DATA,
     USER,
     TABLE_RUNSHEET,
-    TABLE_JOB_TRANSACTION_CUSTOMIZATION,
     TABLE_TRACK_LOGS,
     TABLE_SERVER_SMS_LOG,
     TABLE_TRANSACTION_LOGS,
-    DataStore_DB,
-    Datastore_Master_DB,
     TABLE_DRAFT,
-    DEVICE_IMEI,
     USER_EXCEPTION_LOGS,
     TABLE_MESSAGE_INTERACTION
 } from '../lib/constants'

@@ -1,6 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, Platform, FlatList, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, View, Text, Platform, FlatList, KeyboardAvoidingView, BackHandler } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Button, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
 import styles from '../themes/FeStyle'
@@ -13,10 +13,11 @@ import { connect } from 'react-redux'
 import BasicFormElement from '../components/FormLayoutBasicComponent.js'
 import Loader from '../components/Loader'
 import { NET_BANKING, NET_BANKING_LINK, NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, UPI, MOSAMBEE_WALLET } from '../lib/AttributeConstants'
-import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID } from '../lib/constants'
+import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_STATE } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
 import { ALERT, INVALID_FORM_ALERT, OK } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
+import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
   return {
@@ -33,6 +34,7 @@ function mapStateToProps(state) {
     pieChart: state.home.pieChart,
     updateDraft: state.formLayout.updateDraft,
     isFormValid: state.formLayout.isFormValid,
+    sequenceWiseFieldAttributeMasterIds: state.formLayout.sequenceWiseFieldAttributeMasterIds,
     dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
     fieldAttributeMasterParentIdMap: state.formLayout.fieldAttributeMasterParentIdMap,
     noFieldAttributeMappedWithStatus: state.formLayout.noFieldAttributeMappedWithStatus,
@@ -48,9 +50,18 @@ function mapDispatchToProps(dispatch) {
 }
 
 class FormLayout extends PureComponent {
+  _didFocusSubscription;
+  _willBlurSubscription;
 
   static navigationOptions = ({ navigation, props }) => {
-    return { header: <TitleHeader pageName={navigation.state.params.statusName} goBack={navigation.goBack} /> }
+    return { header: <TitleHeader pageName={navigation.state.params.statusName} goBack={navigation.state.params.backForTransient} /> }
+  }
+
+  constructor(props) {
+    super(props);
+    this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
+      BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+    );
   }
 
   componentDidUpdate() {
@@ -73,14 +84,40 @@ class FormLayout extends PureComponent {
   // }
 
   componentDidMount() {
+    this.props.navigation.setParams({ backForTransient: this._goBack });
     if (!this.props.navigation.state.params.isDraftRestore) {
       this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId)
       if (this.props.navigation.state.params.jobTransaction.length || this.props.navigation.state.params.editableFormLayoutState || this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
         this.props.actions.setState(SET_UPDATE_DRAFT, false)
       }
     }
+
+    this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+      BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+    );
   }
 
+  componentWillUnmount() {
+    this._didFocusSubscription && this._didFocusSubscription.remove();
+    this._willBlurSubscription && this._willBlurSubscription.remove();
+  }
+
+  onBackButtonPressAndroid = () => {
+    this._goBack();
+    return true;
+  };
+
+  _goBack = () => {
+
+    //Set previous status form layout state in case of transient single status
+    if (this.props.navigation.state.params.navigationFormLayoutStates && this.props.navigation.state.params.previousStatus) {
+      this.props.actions.setState(SET_FORM_LAYOUT_STATE, {
+        editableFormLayoutState: this.props.navigation.state.params.navigationFormLayoutStates[this.props.navigation.state.params.previousStatus.id],
+        statusName: this.props.navigation.state.params.previousStatus.name
+      })
+    }
+    this.props.navigation.pop(1)
+  }
   renderData = (item) => {
     let formLayoutState = {
       formElement: this.props.formElement,
@@ -98,15 +135,15 @@ class FormLayout extends PureComponent {
       updateDraft: this.props.updateDraft,
       arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
       jobMasterId: this.props.navigation.state.params.jobMasterId,
-      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList
+      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList,
+      sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds
     }
     return (
       <BasicFormElement
-        item={item}
+        item={item.item}
         jobTransaction={this.props.navigation.state.params.jobTransaction}
         jobStatusId={this.props.navigation.state.params.statusId}
         formLayoutState={formLayoutState}
-        navigate={this.props.navigation.navigate}
       />
     )
   }
@@ -144,16 +181,16 @@ class FormLayout extends PureComponent {
       currentElement: this.props.currentElement,
       fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
       noFieldAttributeMappedWithStatus: this.props.noFieldAttributeMappedWithStatus,
-      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList
+      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList,
+      sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds
     }
 
     let taskListScreenDetails = {
       jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
       pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
     }
-
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
-      this.props.actions.navigateToScene(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
+      navigate(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
         {
           contactData: this.props.navigation.state.params.contactData,
           formElement: this.props.formElement,
@@ -163,10 +200,9 @@ class FormLayout extends PureComponent {
           jobMasterId: this.props.navigation.state.params.jobMasterId,
           navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
           saveActivatedStatusData: this.props.navigation.state.params.saveActivatedStatusData,
-          pieChart: this.props.pieChart,
           taskListScreenDetails
         },
-        this.props.navigation.push)
+      )
     } else {
       this.props.actions.saveJobTransaction(
         formLayoutState,
@@ -175,15 +211,12 @@ class FormLayout extends PureComponent {
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
         this.props.navigation.state.params.saveActivatedStatusData,
-        this.props.pieChart,
         taskListScreenDetails,
-        this.props.navigation.push,
-        this.props.navigation.goBack
       )
     }
   }
 
-  _keyExtractor = (item, index) => String(item[1].key);
+  _keyExtractor = (item, index) => String(item.key);
 
   showInvalidFormAlert() {
     let draftMessage = INVALID_FORM_ALERT
@@ -228,9 +261,18 @@ class FormLayout extends PureComponent {
     }
   }
 
+  _renderFormData(){
+    let formData  = []
+    for(let id in this.props.sequenceWiseFieldAttributeMasterIds){
+      formData.push(this.props.formElement[this.props.sequenceWiseFieldAttributeMasterIds[id]])
+    }
+    return formData
+  }
+
   render() {
     const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
     let emptyFieldAttributeForStatusView = this.emptyFieldAttributeForStatusView()
+    const footerView = this.getFooterView()
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
@@ -246,7 +288,6 @@ class FormLayout extends PureComponent {
         </Footer>
       </SafeAreaView>
     }
-    const footerView = this.getFooterView()
     if (Platform.OS == 'ios') {
       formView = <KeyboardAvoidingView style={[{ flex: 1 }, styles.bgWhite]} behavior="padding">
         {invalidFormAlert}
@@ -254,9 +295,9 @@ class FormLayout extends PureComponent {
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>
             <FlatList
-              data={Array.from(this.props.formElement)}
+              data={this._renderFormData()}
               extraData={this.state}
-              renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
+              renderItem={(item) => this.renderData(item)} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
               keyExtractor={this._keyExtractor}>
             </FlatList>
           </View>
@@ -270,9 +311,9 @@ class FormLayout extends PureComponent {
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>
             <FlatList
-              data={Array.from(this.props.formElement)}
+              data={ this._renderFormData()}
               extraData={this.state}
-              renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
+              renderItem={(item) => this.renderData(item)} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
               keyExtractor={this._keyExtractor}>
             </FlatList>
           </View>

@@ -1,6 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { Alert, StyleSheet, View, Text, Platform, TouchableHighlight, Image, TouchableOpacity, TextInput } from 'react-native'
+import { Alert, StyleSheet, View, Text, Image, TouchableOpacity, TextInput } from 'react-native'
 import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg, ActionSheet } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -54,9 +54,11 @@ function mapStateToProps(state) {
 }
 
 class Login extends PureComponent {
+  _didFocusSubscription;
 
   componentDidMount() {
     this.props.checkRememberMe()
+    this._didFocusSubscription = this.props.navigation.addListener('didFocus',payload => this.props.checkRememberMe());
   }
 
   onChangeUsername = (value) => {
@@ -123,7 +125,7 @@ class Login extends PureComponent {
             style={styles.logoStyle}
             source={require('../../images/fareye-logo.png')}
           />
-        </TouchableOpacity >
+        </TouchableOpacity>
       )
     }
   }

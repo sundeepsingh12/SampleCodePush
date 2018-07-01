@@ -8,10 +8,11 @@ import styles from '../themes/FeStyle'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, StyleProvider } from 'native-base'
+import { Container, Content, Header, Button, Text,  Body, Right, Icon, StyleProvider } from 'native-base'
 import * as profileActions from '../modules/profile/profileActions'
 import * as globalActions from '../modules/global/globalActions'
 import { RESET_PASSWORD, CONTACT_NUMBER, EMAIL, PROFILE, } from '../lib/ContainerConstants'
+import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
   return {
@@ -40,7 +41,7 @@ class ProfileView extends PureComponent {
   }
 
   _onResetButtonPress = () => {
-    this.props.actions.navigateToScene('ResetPassword',null,this.props.navigation.navigate)
+    navigate('ResetPassword',null)
   }
 
   _getHeaderView() {
