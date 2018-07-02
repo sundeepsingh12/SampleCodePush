@@ -359,7 +359,7 @@ export default class FormLayoutEventImpl {
             }
             runsheetMap[jobTransactionList[id].runsheetId][status[statusCategory - 1]] += 1;
             if (jobTransactionList[id].moneyTransactionType && jobTransactionList[id].actualAmount > 0) { // check for moneyTransactionType and  actualAmount
-                if (prevJobTransactionMap[jobTransactionList[id].id].moneyTransactionType == jobTransactionList[id].moneyTransactionType && prevJobTransactionMap[jobTransactionList[id].id].actualAmount > 0) {
+                if (prevJobTransactionMap[jobTransactionList[id].id] && prevJobTransactionMap[jobTransactionList[id].id].moneyTransactionType == jobTransactionList[id].moneyTransactionType && prevJobTransactionMap[jobTransactionList[id].id].actualAmount > 0) {
                     runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount - prevJobTransactionMap[jobTransactionList[id].id].actualAmount
                 } else {
                     runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount
