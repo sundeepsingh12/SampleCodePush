@@ -29,6 +29,7 @@ const Form = Record({
   isEditTextDisabled: false,
   rememberMe: false,
   isLongPress: false,
+  logo: null
 })
 
 /**
