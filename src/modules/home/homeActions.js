@@ -498,6 +498,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       if (!erpPull) {
         const difference = await sync.calculateDifference()
         dispatch(setState(LAST_SYNC_TIME, difference))
+        dispatch(syncTimer())
       }
       await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, {
         syncRunning: false
@@ -527,6 +528,21 @@ export function syncService() {
   }
 }
 
+export function syncTimer() {
+  return async (dispatch) => {
+    try {
+      if (CONFIG.syncId) {
+        return
+      }
+      CONFIG.syncId =  setInterval(async () => {
+        const difference = await sync.calculateDifference()
+        dispatch(setState(LAST_SYNC_TIME, difference)) },10000
+      )
+    } catch (error) {
+      //Update UI here
+    }
+  }
+}
 export function pieChartCount() {
   return async (dispatch) => {
     try {

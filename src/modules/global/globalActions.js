@@ -67,7 +67,9 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore('LOGGED_IN_ROUTE')
       await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
+      clearInterval(CONFIG.syncId)
       CONFIG.intervalId = 0
+      CONFIG.syncId = 0
       dispatch(setState(RESET_STATE))
     } catch (error) {
     }
