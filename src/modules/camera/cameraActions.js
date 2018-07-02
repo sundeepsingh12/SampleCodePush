@@ -15,14 +15,14 @@ import _ from 'lodash'
 
 var PATH_COMPRESS_IMAGE = '/compressImages';
 
-export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack) {
+export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_CAMERA_LOADER, true))
             if (Platform.OS == 'android') {
                 CompressImage.createCompressedImage(result.uri, PATH_COMPRESS_IMAGE).then((resizedImage) => {
                     ImageStore.getBase64ForTag(resizedImage.uri, (base64Data) => {
-                        dispatch(saveImageInFormLayout(base64Data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack))
+                        dispatch(saveImageInFormLayout(base64Data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction))
                         RNFS.unlink(resizedImage.path)
                     }, (reason) => {
                         dispatch(setState(SET_CAMERA_LOADER, false))
@@ -33,7 +33,7 @@ export function saveImage(result, fieldAttributeMasterId, formLayoutState, calle
                     showToastAndAddUserExceptionLog(311, error.message, 'danger', 1)
                 });
             } else {
-                dispatch(saveImageInFormLayout(result.data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack))
+                dispatch(saveImageInFormLayout(result.data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction))
             }
         } catch (error) {
             dispatch(setState(SET_CAMERA_LOADER, false))
@@ -70,14 +70,14 @@ export function takePicture(ref) {
     }
 }
 
-export function saveImageInFormLayout(data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack) {
+export function saveImageInFormLayout(data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction) {
     return async function (dispatch) {
         try {
             const value = await signatureService.saveFile(data, moment(), true)
             if (calledFromArray) {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState, goBack))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState))
             } else {
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction, null, null, goBack))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(312, error.message, 'danger', 1)

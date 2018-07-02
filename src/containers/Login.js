@@ -54,9 +54,11 @@ function mapStateToProps(state) {
 }
 
 class Login extends PureComponent {
+  _didFocusSubscription;
 
   componentDidMount() {
     this.props.checkRememberMe()
+    this._didFocusSubscription = this.props.navigation.addListener('didFocus',payload => this.props.checkRememberMe());
   }
 
   onChangeUsername = (value) => {
@@ -123,7 +125,7 @@ class Login extends PureComponent {
             style={styles.logoStyle}
             source={require('../../images/fareye-logo.png')}
           />
-        </TouchableOpacity >
+        </TouchableOpacity>
       )
     }
   }

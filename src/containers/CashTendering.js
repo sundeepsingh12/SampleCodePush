@@ -9,6 +9,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
+import { navigate } from '../modules/navigators/NavigationService';
 import CashTenderingView from '../components/CashTenderingView'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
 import { IS_RECEIVE_TOGGLE, CHANGE_AMOUNT, CHANGE_AMOUNT_RETURN } from '../lib/constants'
@@ -49,7 +50,7 @@ class CashTendering extends PureComponent {
     _onSavePressReturn() {
         let cashToReturn = this.props.totalAmount - this.props.navigation.state.params['cash']
         if (cashToReturn == this.props.totalAmountReturn) {
-            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params.formLayoutState, this.props.cashTenderingList, this.props.cashTenderingListReturn, this.props.navigation.state.params['jobTransaction'], this.props.isReceive, this.props.navigation.goBack)
+            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params.formLayoutState, this.props.cashTenderingList, this.props.cashTenderingListReturn, this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
             this.props.actions.setState(IS_RECEIVE_TOGGLE, true)
             this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
             this.props.actions.setState(CHANGE_AMOUNT_RETURN, { cashTenderingList: {}, totalAmount: 0 })
@@ -59,22 +60,20 @@ class CashTendering extends PureComponent {
 
     _onSavePress() {
         if (this.props.navigation.state.params['cash'] > 0 && this.props.navigation.state.params['cash'] == this.props.totalAmount) {
-            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params.formLayoutState, this.props.cashTenderingList, null, this.props.navigation.state.params['jobTransaction'], this.props.isReceive, this.props.navigation.goBack)
+            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params.formLayoutState, this.props.cashTenderingList, null, this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
             this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
         } else if (this.props.navigation.state.params['cash'] > this.props.totalAmount) {
             Toast.show({ text: MORE_MONEY_TO_PAY, position: 'bottom', buttonText: OK, duration: 3000 })
         }
         else {
             this.props.actions.getCashTenderingListReturn(JSON.parse(JSON.stringify(this.props.cashTenderingList)))
-            this.props.actions.navigateToScene('CashTendering',
+            navigate('CashTendering',
                 {
                     currentElement: this.props.navigation.state.params['currentElement'],
                     formElements: this.props.navigation.state.params.formLayoutState,
                     jobTransaction: this.props.navigation.state.params['jobTransaction'],
                     cash: this.props.navigation.state.params['cash']
-                },
-                this.props.navigation.navigate
-            )
+                })
             this.props.actions.setState(IS_RECEIVE_TOGGLE, false)
         }
     }

@@ -9,7 +9,6 @@
 import auth from './login/loginReducer'
 import global from './global/globalReducer'
 import preloader from './pre-loader/preloaderReducer'
-import nav from './navigators/navigatorReducer'
 import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
@@ -36,7 +35,6 @@ import liveJobList from './liveJobListing/liveJobListingReducer'
 import liveJob from './liveJob/liveJobReducer'
 
 import { combineReducers } from 'redux'
-import { PRE_LOGOUT_SUCCESS } from '../lib/constants'
 import summary from './summary/summaryReducer'
 import customApp from './customApp/customAppReducers'
 import postAssignment from './postAssignment/postAssignmentReducer'
@@ -46,7 +44,6 @@ import cameraReducer from './camera/cameraReducer'
 import dataStoreFilterReducer from './dataStoreFilter/dataStoreFilterReducer'
 import backup from './backup/backupReducer'
 import mosambeeWalletPayment from './cardTypePaymentModules/mosambeeWalletPayment/mosambeeWalletReducer'
-// import profile from './profile/profileReducer'
 import bluetooth from './bluetooth/bluetoothReducer'
 import messageReducer from './message/messageReducer'
 
@@ -57,7 +54,6 @@ import messageReducer from './message/messageReducer'
  * EVERY TIME there is a basic action
  */
 const rootReducer = combineReducers({
-  nav,
   auth,
   global,
   home,
@@ -97,13 +93,5 @@ const rootReducer = combineReducers({
   bluetooth,
   messageReducer
 })
-
-// const rootReducer = (state, action) => {
-//   //Reset state of Redux Store
-//   // if (action.type == PRE_LOGOUT_SUCCESS) {
-//   //   state = undefined
-//   // }
-//   // return appReducer(state, action)
-// }
 
 export default rootReducer

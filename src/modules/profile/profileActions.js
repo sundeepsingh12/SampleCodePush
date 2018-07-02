@@ -8,6 +8,8 @@ import {
     CLEAR_PASSWORD_TEXTINPUT,
     IS_PROFILE_LOADING,
 } from '../../lib/constants'
+import { StackActions } from 'react-navigation'
+import { navDispatch } from '../navigators/NavigationService'
 import sha256 from 'sha256'
 import CONFIG from '../../lib/config'
 import { Toast } from 'native-base'
@@ -46,7 +48,7 @@ export function fetchUserList() {
  * @param {*} newPassword // sets new password
  * @param {*} confirmNewPassword // sets confirm new password
  */
-export function checkAndResetPassword(currentPassword, newPassword, confirmNewPassword,goBack) {
+export function checkAndResetPassword(currentPassword, newPassword, confirmNewPassword) {
     return async function (dispatch) {
         try {
             dispatch(setState(IS_PROFILE_LOADING, true))
@@ -58,7 +60,7 @@ export function checkAndResetPassword(currentPassword, newPassword, confirmNewPa
             await keyValueDBService.validateAndSaveData(PASSWORD, sha256(newPassword)) // new password gets saved after the response status is checked
             Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', buttonText: OK, duration: 6000 })
             dispatch(setState(CLEAR_PASSWORD_TEXTINPUT))
-            goBack()
+            navDispatch(StackActions.pop())
         } catch (error) {
             showToastAndAddUserExceptionLog(1902, error.message, 'danger', 1)
         } finally {

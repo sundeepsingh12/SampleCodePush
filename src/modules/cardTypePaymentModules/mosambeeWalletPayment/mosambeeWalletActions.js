@@ -12,6 +12,8 @@ import { TRANSACTION_SUCCESSFUL } from '../../../lib/ContainerConstants'
 import { saveJobTransaction } from '../../form-layout/formLayoutActions';
 import { paymentService } from '../../../services/payment/Payment';
 import _ from 'lodash'
+import { StackActions} from 'react-navigation'
+import { navDispatch } from '../../navigators/NavigationService'
 
 
 export function setWalletParametersAndGetWalletList(contactNumber, jobTransaction, jobTransactionIdAmountMap) {
@@ -52,7 +54,7 @@ export function hitOtpUrlToGetOtp(contactNumber, walletParameters, selectedWalle
     }
 }
 
-export function hitPaymentUrlforPayment(contactNumber, walletParameters, selectedWalletDetails, otpNumber, navigationParams, navigate, goBack, key) {
+export function hitPaymentUrlforPayment(contactNumber, walletParameters, selectedWalletDetails, otpNumber, navigationParams) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 4))
@@ -61,7 +63,10 @@ export function hitPaymentUrlforPayment(contactNumber, walletParameters, selecte
             if (_.isEqual(responseMessage.status, 'SUCCESS') &&  _.isEqual(responseMessage.message, 'Transaction Successfull')) {
                 paymentService.addPaymentObjectToDetailsArray(walletParameters.actualAmount, 14, responseMessage.transId, selectedWalletDetails.code, responseMessage, formLayoutState)
                 setTimeout(() => { dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, { errorMessage: TRANSACTION_SUCCESSFUL, isModalVisible: 4 })) }, 1000);
-                dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, navigate, goBack, key))
+                if(jobTransaction.id < 0) {
+                    navDispatch(StackActions.pop())
+                }
+                dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
             }else{
                 throw new Error('Failed')
             }

@@ -53,6 +53,7 @@ import NPSFeedback from '../components/NPSFeedback'
 import MultipleOptionsAttribute from '../containers/MultipleOptionsAttribute'
 import * as globalActions from '../modules/global/globalActions'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { navigate } from '../modules/navigators/NavigationService';
 import {
     ON_BLUR,
     NEXT_FOCUS,
@@ -95,7 +96,7 @@ class ArrayBasicComponent extends PureComponent {
     }
 
     onSaveDateTime = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, 2, null, this.props.formLayoutState,this.props.goBack);
+        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, 2, null, this.props.formLayoutState);
     }
     onPressModal = (fieldAttributeMasterId) => {
         this.props.actions.showOrDropModal(this.props.arrayElements, this.props.arrayRow.rowId, fieldAttributeMasterId, this.props.isSaveDisabled)
@@ -113,7 +114,7 @@ class ArrayBasicComponent extends PureComponent {
         return editable ? styles.fontDarkGray : styles.fontLowGray
     }
     goToQRCode = (item) => {
-        this.props.actions.navigateToScene('QrCodeScanner',
+        navigate('QrCodeScanner',
             {
                 currentElement: item,
                 formLayoutState: this.props.formLayoutState,
@@ -123,8 +124,7 @@ class ArrayBasicComponent extends PureComponent {
                 isSaveDisabled: this.props.isSaveDisabled,
                 returnData: this._searchForReferenceValue.bind(this),
                 calledFromArray: true
-            },
-        this.props.navigate)
+            })
     }
     getModalView(item) {
         if (!this.props.arrayRow.modalFieldAttributeMasterId || this.props.arrayRow.modalFieldAttributeMasterId !== item.fieldAttributeMasterId) {
@@ -339,7 +339,7 @@ class ArrayBasicComponent extends PureComponent {
                         <FormLayoutActivityComponent item={item} press={
                             () => {
                                 //this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
-                                this.props.actions.navigateToScene('DataStore',
+                                navigate('DataStore',
                                     {
                                         currentElement: item,
                                         formLayoutState: this.props.formLayoutState,
@@ -351,8 +351,7 @@ class ArrayBasicComponent extends PureComponent {
                                         rowId: this.props.arrayRow.rowId,
                                         fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
                                         arrayFieldAttributeMasterId: this.props.arrayFieldAttributeMasterId
-                                    },
-                                this.props.navigate)
+                                    })
                             }} />
                     </View>
                 )
@@ -381,7 +380,7 @@ class ArrayBasicComponent extends PureComponent {
                     <FormLayoutActivityComponent item={item} press={
                         () => {
                             this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
-                            this.props.actions.navigateToScene(CameraAttribute,
+                            navigate(CameraAttribute,
                                 {
                                     currentElement: item,
                                     formLayoutState: this.props.formLayoutState,
@@ -392,8 +391,7 @@ class ArrayBasicComponent extends PureComponent {
                                     calledFromArray: true,
                                     rowId: this.props.arrayRow.rowId,
                                     fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
-                                },
-                            this.props.navigate)
+                                })
                         }} />
                 </View>
                 )

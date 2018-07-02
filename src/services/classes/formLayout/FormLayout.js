@@ -59,7 +59,7 @@ class FormLayout {
         }
         let fieldAttributesMappedToStatus = fieldAttributeStatusList.filter(fieldAttributeStatus => fieldAttributeStatus.statusId == statusId).sort((a, b) => a.sequence - b.sequence)
         // first find list of fieldAttributeStatus mapped to a status using filter, then sort them on their sequence and then get list of fieldAttributeIds using map
-        if (_.isEmpty(fieldAttributesMappedToStatus)) {
+        if (!fieldAttributesMappedToStatus) {
             return []
         }
         let fieldAttributeMap = {}, arrayMainObject = {} //map for root field attributes
@@ -230,7 +230,7 @@ class FormLayout {
         }
         else if (currentStatus.transient) {
             routeName = Transient
-            let { jobDetailsScreenKey, pageObjectAdditionalParams } = taskListScreenDetails
+            let {jobDetailsScreenKey, pageObjectAdditionalParams}  = taskListScreenDetails 
             routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams }
         }
         else {

@@ -2,7 +2,7 @@
 
 var actions = require('../jobDetailsActions')
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
-import { setState, navigateToScene } from '../../global/globalActions'
+import { setState } from '../../global/globalActions'
 import { jobDetailsService } from '../../../services/classes/JobDetails'
 import { jobMasterService } from '../../../services/classes/JobMaster'
 import * as realm from '../../../repositories/realmdb'

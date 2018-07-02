@@ -14,6 +14,8 @@ import {
 } from '../../lib/constants'
 import { ARRAY_SAROJ_FAREYE, AFTER, TEXT, STRING, SCAN_OR_TEXT, QR_SCAN, NUMBER } from '../../lib/AttributeConstants'
 import _ from 'lodash'
+import { StackActions } from 'react-navigation'
+import { navDispatch } from '../navigators/NavigationService'
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
@@ -58,7 +60,7 @@ export function deleteArrayRow(arrayElements, rowId, lastrowId) {
     }
 }
 
-export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisabled, value, arrayElements, rowId, fieldDataList, event, backPressOrModalPresent, containerValue, formLayoutState,goBack) {
+export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisabled, value, arrayElements, rowId, fieldDataList, event, backPressOrModalPresent, containerValue, formLayoutState) {
     return async function (dispatch) {
         try {
             let cloneArrayElements = _.cloneDeep(arrayElements)
@@ -72,7 +74,7 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
             let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, (validationsResult) ? value : null, (validationsResult) ? fieldDataList : null, event, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.sequenceWiseMasterIds)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
             if (validationsResult && backPressOrModalPresent == 1) {
-                goBack()
+                navDispatch(StackActions.pop())
             }
             if (!validationsResult && arrayRow.formLayoutObject[attributeMasterId].alertMessage) {
                 if (backPressOrModalPresent == 2) {
@@ -98,7 +100,7 @@ export function getNextFocusableForArrayWithoutChildDatalist(attributeMasterId, 
         }
     }
 }
-export function saveArray(arrayElements, arrayParentItem, jobTransaction, formLayoutState, arrayMainObject, arrayReverseDataStoreFilterMap,goBack) {
+export function saveArray(arrayElements, arrayParentItem, jobTransaction, formLayoutState, arrayMainObject, arrayReverseDataStoreFilterMap) {
     return async function (dispatch) {
         try {
             if (!_.isEmpty(arrayElements)) {
@@ -109,12 +111,12 @@ export function saveArray(arrayElements, arrayParentItem, jobTransaction, formLa
                     Toast.show({ text: ADD_TOAST, position: 'bottom', buttonText: OK, duration: 5000 })
                 } else {
                     formLayoutState.arrayReverseDataStoreFilterMap = arrayReverseDataStoreFilterMap
-                    dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListSaveDisabled.fieldDataListWithLatestPositionId, jobTransaction,null,null,goBack))
+                    dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListSaveDisabled.fieldDataListWithLatestPositionId, jobTransaction))
                     dispatch(setState(CLEAR_ARRAY_STATE))
                 }
             } else {
                 formLayoutState.arrayReverseDataStoreFilterMap = arrayReverseDataStoreFilterMap
-                dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formLayoutState, '', { latestPositionId: formLayoutState.latestPositionId }, jobTransaction,null,null,goBack))
+                dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formLayoutState, '', { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
                 dispatch(setState(CLEAR_ARRAY_STATE))
             }
         } catch (error) {

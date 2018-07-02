@@ -9,13 +9,15 @@ import {
     PAGES_LOADING
 } from '../../lib/constants'
 import { newJob } from '../../services/classes/NewJob'
-import { setState, navigateToScene } from '../global/globalActions'
+import { setState } from '../global/globalActions'
 import { checkForPaymentAtEnd } from '../job-details/jobDetailsActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import _ from 'lodash'
 import { draftService } from '../../services/classes/DraftService'
 import { DELETE_DRAFT } from '../../lib/ContainerConstants'
 import moment from 'moment';
+import { navigate } from '../navigators/NavigationService';
+
 
 /**
  * It will navigate to FormLayout container
@@ -23,7 +25,7 @@ import moment from 'moment';
  * @param {*} negativeId 
  * @param {*} jobMasterId 
  */
-export function redirectToFormLayout(status, negativeId, jobMasterId, navigate, deleteDraft, action) {
+export function redirectToFormLayout(status, negativeId, jobMasterId, deleteDraft, action) {
     return async function (dispatch) {
         try {
             const user = await keyValueDBService.getValueFromStore(USER)
@@ -32,7 +34,7 @@ export function redirectToFormLayout(status, negativeId, jobMasterId, navigate, 
                 dispatch(setState(action, DELETE_DRAFT))
                 draftService.deleteDraftFromDb({ id: -1, jobId: -1, jobMasterId }, jobMasterId)
             }
-            dispatch(navigateToScene(FormLayout, {
+            navigate(FormLayout, {
                 statusId: status.id,
                 statusName: status.name,
                 jobTransactionId: negativeId,
@@ -43,8 +45,7 @@ export function redirectToFormLayout(status, negativeId, jobMasterId, navigate, 
                     jobId: negativeId,
                     referenceNumber
                 }
-            },
-                navigate))
+            })
         } catch (error) {
             //TODO
         }
@@ -54,7 +55,7 @@ export function redirectToFormLayout(status, negativeId, jobMasterId, navigate, 
 /**
  * This method is called from home container and is use to check which container to navigate to
  */
-export function redirectToContainer(pageObject, navigate) {
+export function redirectToContainer(pageObject) {
     return async function (dispatch) {
         try {
             let jobMasterId = JSON.parse(pageObject.jobMasterIds)[0]
@@ -64,9 +65,9 @@ export function redirectToContainer(pageObject, navigate) {
                 const draftStatusInfo = draftService.getDraftForState(null, jobMasterId)
                 const nextStatus = await newJob.getNextPendingStatusForJobMaster(jobMasterId, JSON.parse(pageObject.additionalParams).statusId)
                 if (_.isEmpty(draftStatusInfo)) {
-                    dispatch(redirectToFormLayout(nextStatus, -1, jobMasterId, navigate))
+                    dispatch(redirectToFormLayout(nextStatus, -1, jobMasterId))
                 } else {
-                    let checkTransactionStatus = await dispatch(checkForPaymentAtEnd(draftStatusInfo, null, null, null, CHECK_TRANSACTION_STATUS_NEW_JOB, PAGES_LOADING , navigate))
+                    let checkTransactionStatus = await dispatch(checkForPaymentAtEnd(draftStatusInfo, null, null, null, CHECK_TRANSACTION_STATUS_NEW_JOB, PAGES_LOADING))
                     if(checkTransactionStatus !== true){ 
                         dispatch(setState(SET_NEWJOB_DRAFT_INFO, { draft: draftStatusInfo, nextStatus }))
                     }
@@ -75,7 +76,7 @@ export function redirectToContainer(pageObject, navigate) {
                 if (returnParams.stateParam) { //if state params is present then populate state of saveActivated
                     await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
                 }
-                dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams, navigate))
+                navigate(returnParams.screenName, returnParams.navigationParams)
             }
         } catch (error) {
             //TODO

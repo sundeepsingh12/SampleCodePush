@@ -180,7 +180,6 @@ class DataStore extends PureComponent {
             this.props.navigation.state.params.calledFromArray,
             this.props.navigation.state.params.rowId,
             this.props.navigation.state.params.jobTransaction,
-            this.props.navigation.goBack
         )
     }
 
@@ -252,7 +251,6 @@ class DataStore extends PureComponent {
                                                 this.props.navigation.state.params.calledFromArray,
                                                 this.props.navigation.state.params.rowId,
                                                 this.props.navigation.state.params.jobTransaction,
-                                                this.props.navigation.goBack
                                             )
                                         }}>
                                         <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
