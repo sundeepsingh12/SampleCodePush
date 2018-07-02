@@ -27,6 +27,7 @@ import {
     ACTUAL_QUANTITY_INPUT_ERROR,
 } from '../lib/ContainerConstants'
 import { Platform } from 'react-native'
+import { navigate } from '../modules/navigators/NavigationService';
 const Item = Picker.Item;
 
 class SkuListItem extends PureComponent {
@@ -133,7 +134,7 @@ class SkuListItem extends PureComponent {
             return (
                 <View style={[styles.row, styles.flexBasis50, styles.alignCenter, styles.marginTop15]}>
                     <Text style={[styles.fontDefault, styles.padding10, styles.paddingLeft0, {color : styles.fontPrimaryColor}]}
-                        onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) },this.props.navigate) }}>
+                        onPress={() => { navigate('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
                         {OPEN_CAMERA}
                     </Text>
                     {this._getIconForImageAlreadyCaptured(rowItem)}

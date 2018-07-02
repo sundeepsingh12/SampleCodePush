@@ -23,6 +23,8 @@ import {
 import { OK } from '../../lib/ContainerConstants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
+import { StackActions } from 'react-navigation'
+import { navDispatch } from '../navigators/NavigationService'
 
 export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
@@ -53,7 +55,7 @@ export function endFetchingJobDetails(jobDataList, currentStatus, jobTransaction
         }
     }
 }
-export function acceptOrRejectJob(status, job, liveJobList,goBack) {
+export function acceptOrRejectJob(status, job, liveJobList) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LIVE_JOB_LOADER, true))
@@ -63,8 +65,8 @@ export function acceptOrRejectJob(status, job, liveJobList,goBack) {
                 dispatch(setState(SET_MESSAGE, serverResponse.toastMessage))
             }
             dispatch(fetchAllLiveJobsList())
-            // dispatch(NavigationActions.back())
-            goBack()
+            // navDispatch(NavigationActions.back())
+            navDispatch(StackActions.pop())
         } catch (error) {
             dispatch(setState(SET_LIVE_JOB_LOADER, false))
             showToastAndAddUserExceptionLog(1202, error.message, 'danger', 1)

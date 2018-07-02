@@ -8,8 +8,10 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { APP_VERSION_NUMBER } from '../lib/AttributeConstants'
 
+console.disableYellowBox = true;
 
 import * as authActions from '../modules/login/loginActions'
+import * as initialLoadActions from '../modules/intialLoad/initialLoadActions'
 
 import {
     StyleSheet,
@@ -34,14 +36,8 @@ var styles = StyleSheet.create({
 class Application extends PureComponent {
 
     componentDidMount() {
-        // Use a timer so Application screen is displayed
-        setTimeout(
-            () => {
-                this.props.getSessionToken()
-            },
-            1000 //change 100 to 2500
-        )
-    }
+        this.props.initialLoadAction()
+     }
 
     render() {
         return (
@@ -56,4 +52,4 @@ class Application extends PureComponent {
 /**
  * Connect the properties
  */
-export default connect(null, authActions)(Application)
+export default connect(null, {...authActions, ...initialLoadActions})(Application)

@@ -24,6 +24,7 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import CONFIG from '../../lib/config'
 import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions, StackActions } from 'react-navigation'
+import { navDispatch } from '../navigators/NavigationService';
 import { trackingService } from '../../services/classes/Tracking'
 import { Toast } from 'native-base'
 import { userExceptionLogsService } from '../../services/classes/UserException'
@@ -63,6 +64,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(BACKUP_ALREADY_EXIST)
       await keyValueDBService.deleteValueFromStore(USER_EXCEPTION_LOGS)
       await keyValueDBService.deleteValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING)
+      await keyValueDBService.deleteValueFromStore('LOGGED_IN_ROUTE')
       await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
@@ -86,13 +88,11 @@ export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, i
   userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
 }
 //Use to reset navigation state
-export function resetNavigationState(index, actions) {
-  return async function (dispatch) {
-    dispatch(StackActions.reset({
-      index,
-      actions
-    }))
-  }
+function resetNavigationState(index, actions, key = 'StackRouterRoot') {
+  navDispatch(StackActions.reset({
+    index,
+    actions
+  }));
 }
 
 
@@ -102,7 +102,7 @@ export function resetApp() {
       await logoutService.deleteDataBase()
       const allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
       await keyValueDBService.deleteValueFromStore(allSchemaInstance)
-      dispatch(NavigationActions.reset({ index: 0, actions: [NavigationActions.navigate({ routeName: LoginScreen })] }))
+      navDispatch(NavigationActions.reset({ index: 0, actions: [NavigationActions.navigate({ routeName: LoginScreen })] }))
       dispatch(setState(RESET_STATE))
       // dispatch(setState(DOWNLOAD_LATEST_APP, {displayMessage:null}))
     } catch (error) {

@@ -5,7 +5,6 @@ import thunk from 'redux-thunk'
 import { jobMasterService } from '../../../services/classes/JobMaster'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { authenticationService } from '../../../services/classes/Authentication'
-import { deviceVerificationService } from '../../../services/classes/DeviceVerification'
 import { logoutService } from '../../../services/classes/Logout'
 
 var actions = require('../loginActions')
@@ -43,6 +42,7 @@ import {
 
 
 import { NavigationActions,StackNavigator } from 'react-navigation'
+import { navDispatch } from '../navigators/NavigationService';
 
  const Application = () => {}
  const Login = () =>{}
@@ -321,7 +321,7 @@ describe('loginActions', () => {
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(navigationContainer.dispatch(NavigationActions.navigate({ routeName: 'main' }))).toEqual(true);
+                expect(navigationContainer.navDispatch(NavigationActions.navigate({ routeName: 'main' }))).toEqual(true);
             })
     })
 
