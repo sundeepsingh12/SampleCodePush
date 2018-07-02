@@ -56,8 +56,8 @@ class JobMaster {
    *
    * @param deviceIMEI
    * @param deviceSIM
-   * @param currentJobMasterVersion
-   * @param deviceCompanyId
+   * @param userObject
+   * @param token
    *
    *
    * * @return

@@ -74,22 +74,18 @@ class SyncZip {
         return userSummary;
     }
 
-    /**
-    * expects transactionIds whose data is to be synced
-    * and returns the object containing data from realm
-    * @param {*} transactionIds whose data is to be synced
-    */
+    
     _getSyncDataFromDb(transactionIdsObject) {
-        let userExceptionLog = _getDataFromRealm([], null, USER_EXCEPTION_LOGS)
-        let runSheetSummary = _getDataFromRealm([], null, TABLE_RUNSHEET)
-        let trackLogs = _getDataFromRealm([], null, TABLE_TRACK_LOGS)
+        let userExceptionLog = this._getDataFromRealm([], null, USER_EXCEPTION_LOGS)
+        let runSheetSummary = this._getDataFromRealm([], null, TABLE_RUNSHEET)
+        let trackLogs = this._getDataFromRealm([], null, TABLE_TRACK_LOGS)
         let transactionList = [],
             fieldDataList = [],
             jobList = [],
             serverSmsLogs = [],
             transactionLogs = []
         if (!transactionIdsObject || !transactionIdsObject.value) {
-            serverSmsLogs = _getDataFromRealm([], null, TABLE_SERVER_SMS_LOG)
+            serverSmsLogs = this._getDataFromRealm([], null, TABLE_SERVER_SMS_LOG)
             return {
                 fieldDataList,
                 transactionList,

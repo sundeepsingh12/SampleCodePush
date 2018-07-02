@@ -19,11 +19,8 @@ import {
   LOGIN_START,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
-  LOGIN_CAMERA_SCANNER,
   FORGET_PASSWORD,
   ON_LONG_PRESS_ICON,
-
-  SET_STATE,
   ON_LOGIN_USERNAME_CHANGE,
   ON_LOGIN_PASSWORD_CHANGE,
   TOGGLE_CHECKBOX,
@@ -52,7 +49,7 @@ export default function authReducer(state = initialState, action) {
       return state.setIn(['form', 'authenticationService'], true)
         .setIn(['form', 'displayMessage'], '')
         .setIn(['form', 'isButtonDisabled'], true)
-        .setIn(['form','isEditTextDisabled'],true)
+        .setIn(['form','isEditTextEnabled'],false)
 
 
     /**
@@ -64,7 +61,7 @@ export default function authReducer(state = initialState, action) {
       return state.setIn(['form', 'authenticationService'], false)
         .setIn(['form', 'displayMessage'], '')
         .setIn(['form', 'isButtonDisabled'], false)
-        .setIn(['form','isEditTextDisabled'],false)
+        .setIn(['form','isEditTextEnabled'],true)
 
 
     case ON_LONG_PRESS_ICON:
@@ -76,7 +73,7 @@ export default function authReducer(state = initialState, action) {
       return state.setIn(['form', 'authenticationService'], false)
         .setIn(['form', 'displayMessage'], action.payload)
         .setIn(['form','password'],'')
-        .setIn(['form','isEditTextDisabled'],false)
+        .setIn(['form','isEditTextEnabled'],true)
         .setIn(['form','isButtonDisabled'],true)
 
     case ON_LOGIN_USERNAME_CHANGE:

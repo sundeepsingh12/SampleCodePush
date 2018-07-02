@@ -130,7 +130,7 @@ class TransactionCustomization {
             jobAttributes: jobAttributes ? jobAttributes.value : jobAttributes,
             user: user ? user.value : user,
             hub: hub ? hub.value : hub,
-            fieldAttributeStatusList: fieldAttributeStatusList ? fieldAttributeStatusList.value : jobMasterIdCustomizationMap,
+            fieldAttributeStatusList: fieldAttributeStatusList ? fieldAttributeStatusList.value : [],
             fieldAttributeMasterValidation: fieldAttributeMasterValidation ? fieldAttributeMasterValidation.value : fieldAttributeMasterValidation,
             fieldAttributeValidationCondition: fieldAttributeValidationCondition ? fieldAttributeValidationCondition.value : fieldAttributeValidationCondition
         }

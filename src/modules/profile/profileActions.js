@@ -20,8 +20,6 @@ import { profileService } from '../../services/classes/ProfileService'
 
 /**This action is used to fetch details of user like contact name and email.
  * 
- * @param {*} 
- *  
  */
 export function fetchUserList() {
     return async function (dispatch) {

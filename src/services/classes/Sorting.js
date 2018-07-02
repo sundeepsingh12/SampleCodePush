@@ -1,4 +1,4 @@
-
+'use strict'
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import _ from 'lodash'
@@ -40,7 +40,7 @@ class Sorting {
   /**This method first set data to display on screen. 
 * 
 * @param {*} jsonData 
-* @param {*} referenceNumber 
+* 
 * @Return type
 *       object
 * 
@@ -53,8 +53,8 @@ class Sorting {
 * }
 */
 
-  setSortingData(jsonData, referenceNumber) {
-    let sortingList = {}, id = 0;
+  setSortingData(jsonData) {
+    let sortingList = {}, id = 0,label = [];
     if (jsonData.jobTransaction) {
       label = ['', 'Name', 'Employee Code', 'Sequence Number', 'Address']
       sortingList[id] = (jsonData.jobTransaction.referenceNumber) ? { id, value: jsonData.jobTransaction.referenceNumber, label: label[id++] } : { id: id++, value: NA }

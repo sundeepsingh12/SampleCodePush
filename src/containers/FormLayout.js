@@ -58,7 +58,7 @@ class FormLayout extends PureComponent {
     if (this.props.errorMessage && this.props.errorMessage != '') {
       Toast.show({
         text: this.props.errorMessage,
-        position: "bottom" | "center",
+        position: "bottom",
         buttonText: OK,
         type: 'danger',
         duration: 10000

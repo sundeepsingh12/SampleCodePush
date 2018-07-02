@@ -60,7 +60,7 @@ class Signature extends PureComponent {
         if (this.state.isSaveDisabled) {
             Toast.show({
                 text: IMPROPER_SIGNATURE,
-                position: "bottom" | "center",
+                position: "bottom",
                 buttonText: OK,
                 duration: 5000
             })

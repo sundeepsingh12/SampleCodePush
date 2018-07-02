@@ -66,10 +66,7 @@ class Authentication {
         }
     }
 
-    /**
-     * LOGOUT API (GET)
-     * @param {*} token 
-     */
+    
     async logout(calledFromAutoLogout, isPreLoaderComplete) {
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (!token || !token.value) {

@@ -130,13 +130,12 @@ class Sync {
 
   /**This iterates over the Json array response returned from API and correspondingly Realm db is updated
    * 
-   * @param {*} tdcResponse 
+   * 
    */
   async processTdcResponse(tdcContentArray, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
     let tdcContentObject, jobMasterIds, messageIdDto = []
     //Prepare jobMasterWithAssignOrderToHubEnabledhere only and if it is non empty,then only hit store for below 4 lines
     // const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
-    const { jobMasterList } = syncStoreDTO
     //This loop gets jobMaster map for job master of which assignOrderToHub is enabled
     for (tdcContentObject of tdcContentArray) {
       let contentQuery = JSON.parse(tdcContentObject.query)
@@ -172,7 +171,7 @@ class Sync {
           valueList: jobIds,
           propertyName: 'jobId'
         }
-        realm.deleteRecordsInBatch(deleteJobTransactions, deleteJobData)
+        realm.deleteRecordsInBatch(deleteJobs, deleteJobData)
       } else if (queryType == 'message') {
         messageIdDto = messageIdDto.concat(this.saveMessagesInDb(tdcContentObject))
       }
@@ -206,7 +205,7 @@ class Sync {
 
   getDefaultValuesForJobTransaction(id, statusid, referenceNumber, user, hub, imei, jobMaster) {
     //TODO some values like lat/lng and battery are not valid values, update them as their library is added
-    return jobTransaction = {
+    return {
       id,
       runsheetNo: "AUTO-GEN",
       syncErp: false,
@@ -253,10 +252,7 @@ class Sync {
 
   }
 
-  /**
-   * 
-   * @param {*} query 
-   */
+ 
   async saveDataFromServerInDB(contentQuery, isLiveJob) {
     const jobIds = contentQuery.job.map(jobObject => jobObject.id)
     const existingJobDatas = {
@@ -324,7 +320,7 @@ class Sync {
 
   /**
    * 
-   * @param {*} query 
+   * @param {*} contentQuery 
    */
   async updateDataInDB(contentQuery) {
     /*TODO Current logic of deleting field data and job data is wrong.
@@ -501,7 +497,7 @@ class Sync {
 
   /**This will give value of 'id' key from tdc response
    * 
-   * @param {*} tdcResponse 
+   * @param {*} content 
    */
   getSyncIdFromResponse(content) {
     const successSyncIds = content.map(contentData => contentData.id)
@@ -576,6 +572,7 @@ class Sync {
     let outScanModuleJobMasterIds = pages.getJobMasterIdListForScreenTypeId(pagesList.value, PAGE_OUTSCAN)
     const unseenStatusIds = !_.isEmpty(outScanModuleJobMasterIds) ? jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(syncStoreDTO.statusList, outScanModuleJobMasterIds, UNSEEN) : jobStatusService.getAllIdsForCode(syncStoreDTO.statusList, UNSEEN)
     let jobMasterTitleList = []
+    let { user } = syncStoreDTO
     while (!isLastPageReached) {
       const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob, erpPull)
       if (tdcResponse) {
@@ -663,6 +660,7 @@ class Sync {
       show_in_foreground: true
     });
   }
+  
   async calculateDifference() {
     const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
     const differenceInDays = moment().diff(lastSyncTime.value, 'days')
@@ -756,7 +754,7 @@ class Sync {
     let transactionToBeSynced = await keyValueDBService.getValueFromStore(schemaName);
     let originalTransactionsToBeSynced = transactionToBeSynced ? transactionToBeSynced.value : {}
     for (let index in transactionIdsSynced) {
-      if (moment(originalTransactionsToBeSynced[index].syncTime).isBefore(moment(date).format('YYYY-MM-DD HH:mm:ss')) || moment(originalTransactionsToBeSynced[index].syncTime.isSame(moment(date).format('YYYY-MM-DD HH:mm:ss')))) {
+      if (moment(originalTransactionsToBeSynced[index].syncTime).isBefore(moment(date).format('YYYY-MM-DD HH:mm:ss')) || (moment(originalTransactionsToBeSynced[index].syncTime).isSame(moment(date).format('YYYY-MM-DD HH:mm:ss')))) {
         delete originalTransactionsToBeSynced[index]
       }
     }

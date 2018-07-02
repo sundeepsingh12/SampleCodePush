@@ -78,7 +78,7 @@ export function getJobAttribute(jobAttributeMasterId, value) {
 /**
  * 
  * @param {*} currentElement 
- * @param {*} formElement 
+ * @param {*} formLayoutState 
  * @param {*} jobTransaction 
  * @param {*} dataStoreFilterReverseMap 
  * this actions check for filters and validations
@@ -181,12 +181,6 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
 }
 
 /**This is called when save button is clicked in case of minMaxValidation (i.e. allow from field is true) for Data Store 
- * 
- * @param {*} fieldAttributeMasterId 
- * @param {*} formElements 
- * @param {*} nextEditable 
- * @param {*} isSaveDisabled 
- * @param {*} dataStorevalue 
  */
 export function onSave(fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction, goBack) {
     return async function (dispatch) {
@@ -236,12 +230,6 @@ export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, it
 
 /**This is called when save button is clicked 
  * Fills all the corresponding matched key fieldAttributes from dataStoreAttributeMap and update formLayout state
- * 
- * @param {*} dataStoreAttributeValueMap 
- * @param {*} fieldAttributeMasterId 
- * @param {*} formElements  
- * @param {*} isSaveDisabled 
- * @param {*} dataStorevalue 
  */
 export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formLayoutState, dataStorevalue, calledFromArray, rowId, jobTransaction, goBack) {
     return async function (dispatch) {

@@ -169,9 +169,9 @@ class FormLayout {
 
     /**
      * creates fieldAttributeDto
-     * @param {*fieldAttribute} fieldAttribute 
-     * @param {*validationArray} validationArray 
-     * @param {*positionId} positionId 
+     * @param  fieldAttribute 
+     * @param  validationArray 
+     * @param  positionId 
      */
     getFieldAttributeObject(fieldAttribute, validationArray, positionId) {
         const { label, subLabel, helpText, key, required, hidden, attributeTypeId, dataStoreAttributeId, dataStoreMasterId, externalDataStoreMasterUrl, dataStoreFilterMapping } = fieldAttribute

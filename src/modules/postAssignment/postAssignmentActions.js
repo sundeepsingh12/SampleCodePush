@@ -16,8 +16,8 @@ import {jobMasterService} from '../../services/classes/JobMaster'
  
 
 /**
- * This function fetch job transactions based on job master
- * @param {*} jobMaster 
+ * This function fetch job transactions based on job master id
+ * @param {*} jobMasterId 
  */
 export function fetchUnseenJobs(jobMasterId) {
     return async function (dispatch) {

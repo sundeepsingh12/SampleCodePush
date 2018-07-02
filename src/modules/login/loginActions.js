@@ -37,9 +37,7 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { NavigationActions } from 'react-navigation'
 import { setState, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
 
-/**
- * ## Login actions
- */
+
 export function loginRequest() {
   return {
     type: LOGIN_START

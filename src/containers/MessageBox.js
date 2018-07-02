@@ -22,6 +22,7 @@ import {
 } from '../lib/constants'
 import MessageSendIcon from '../svg_components/icons/MessageSendIcon'
 import MessageReceiveIcon from '../svg_components/icons/MessageReceiveIcon'
+import _ from 'lodash'
 
 function mapStateToProps(state) {
     return {

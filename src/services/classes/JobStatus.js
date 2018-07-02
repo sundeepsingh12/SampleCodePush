@@ -30,7 +30,7 @@ class JobStatus {
   /**Generic method for getting particular status id of a particular job master and job status code
    * 
    * @param {*} jobMasterId 
-   * @param {*} code 
+   * @param {*} jobStatusCode 
    */
   async getStatusIdForJobMasterIdAndCode(jobMasterId, jobStatusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
@@ -276,7 +276,6 @@ class JobStatus {
   /**
    * This function prepares map of tabId on basis of jobStatusList
    * @param {*} jobStatusList 
-   * @param {*} tabMap 
    * {
    *    tabId : {
    *                [statusIds]

@@ -13,7 +13,7 @@ import CashTenderingView from '../components/CashTenderingView'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
 import { IS_RECEIVE_TOGGLE, CHANGE_AMOUNT, CHANGE_AMOUNT_RETURN } from '../lib/constants'
 import styles from '../themes/FeStyle'
-import { MORE_MONEY_TO_PAY, LESS_MONEY_TO_PAY, AMOUNT_TO_COLLECT, AMOUNT_TO_RETURN, TOTAL_AMOUNT, TOTAL_AMOUNT_RETURNING, SAVE, COLLECT_CASH, RETURN_CASH, OK } from '../lib/ContainerConstants'
+import { MORE_MONEY_TO_PAY, LESS_MONEY_TO_PAY, AMOUNT_TO_COLLECT, AMOUNT_TO_RETURN, TOTAL_AMOUNT, TOTAL_AMOUNT_RETURNING, SAVE, OK } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {

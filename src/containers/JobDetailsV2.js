@@ -424,10 +424,10 @@ class JobDetailsV2 extends PureComponent {
 
   selectStatusToRevert = () => {
     if (this.props.statusRevertList[0] == 1) {
-      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
+      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom', buttonText: OK, type: 'danger', duration: 5000 }) }
     }
     else if (this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType) {
-      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
+      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom', buttonText: OK, type: 'danger', duration: 5000 }) }
     }
     else {
       this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
@@ -453,9 +453,7 @@ class JobDetailsV2 extends PureComponent {
       }
     )
   }
-  _onCancelDraft = () => {
-    this.props.actions.setState(SET_DRAFT_INFO_JOBDETAILS, {})
-  }
+ 
   showDraftAlert() {
     return <DraftModal draftStatusInfo={this.props.draftStatusInfo} onOkPress={() => this._goToFormLayoutWithDraft()} onCancelPress={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} onRequestClose={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} />
   }

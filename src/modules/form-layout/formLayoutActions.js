@@ -40,17 +40,17 @@ import _ from 'lodash'
 import { performSyncService, pieChartCount } from '../home/homeActions'
 import { draftService } from '../../services/classes/DraftService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
-import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../lib/ContainerConstants'
+import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT,OK } from '../../lib/ContainerConstants'
 import moment from 'moment'
 import { Toast } from 'native-base'
 import { fetchJobs } from '../taskList/taskListActions';
 
 
-export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
+export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobTransaction) {
     return async function (dispatch) {
         try {
             dispatch(setState(CLEAR_FORM_LAYOUT_WITH_LOADER))
-            const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
+            let sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
             let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
             sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds);
@@ -286,7 +286,7 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDr
                 dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
             }
             else {
-                dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction))
+                dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobTransaction))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1011, error.message, 'danger', 1)

@@ -6,9 +6,7 @@ import {
 } from './JobDetails'
 import {
     TABLE_JOB_DATA,
-    TABLE_JOB_TRANSACTION,
     TABLE_JOB,
-    TABLE_RUNSHEET,
 } from '../../lib/constants'
 
 import {

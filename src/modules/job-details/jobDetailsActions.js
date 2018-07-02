@@ -12,7 +12,7 @@ import { MosambeeWalletPaymentServices } from '../../services/payment/MosambeeWa
 import _ from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions'
 import { paymentService } from '../../services/payment/Payment'
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,OK } from '../../lib/ContainerConstants'
 import { saveJobTransaction } from '../form-layout/formLayoutActions'
 import { Toast } from 'native-base'
 
@@ -69,7 +69,7 @@ export function getJobDetails(params, key, navigate, goBack) {
             dispatch(startFetchingJobDetails())
             const jobTransactionId = params.jobTransaction.id
             const { statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, fieldAttributeStatusList, jobAttributeStatusList } = await jobDetailsService.getJobDetailsParameters()
-            const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
+            const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, statusList.value)
             if (details.checkForSeenStatus) dispatch(performSyncService())
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(details.jobTransactionDisplay.jobMasterId)
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery,
@@ -105,7 +105,7 @@ export function checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, ke
                     paymentService.addPaymentObjectToDetailsArray(walletParameters.actualAmount, 14, responseMessage.transId, walletParameters.selectedWalletDetails.code, responseMessage, formLayoutState)
                     setTimeout(() => { dispatch(setState(checkTransactionState, TRANSACTION_SUCCESSFUL)) }, 1000);
                     if (!jobTransaction) {
-                        Toast.show({ text: TRANSACTION_SUCCESSFUL, position: 'bottom', buttonText: "OK", type: 'success', duration: 5000 })
+                        Toast.show({ text: TRANSACTION_SUCCESSFUL, position: 'bottom', buttonText: OK, type: 'success', duration: 5000 })
                         jobTransaction = { id: formLayoutState.jobTransactionId, jobMasterId: draftStatusInfo.jobMasterId, jobId: formLayoutState.jobTransactionId, referenceNumber: draftStatusInfo.referenceNumber }
                     }
                     await dispatch(saveJobTransaction(formLayoutState, draftStatusInfo.jobMasterId, walletParameters.contactData, jobTransaction, navigationFormLayoutStatesForRestore, null, null, taskListScreenDetails, navigate, goBack))

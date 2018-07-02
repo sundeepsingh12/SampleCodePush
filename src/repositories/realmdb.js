@@ -32,16 +32,11 @@ import {
     TABLE_FIELD_DATA,
     TABLE_JOB,
     TABLE_JOB_DATA,
-    USER,
     TABLE_RUNSHEET,
-    TABLE_JOB_TRANSACTION_CUSTOMIZATION,
     TABLE_TRACK_LOGS,
     TABLE_SERVER_SMS_LOG,
     TABLE_TRANSACTION_LOGS,
-    DataStore_DB,
-    Datastore_Master_DB,
     TABLE_DRAFT,
-    DEVICE_IMEI,
     USER_EXCEPTION_LOGS,
     TABLE_MESSAGE_INTERACTION
 } from '../lib/constants'
@@ -138,10 +133,6 @@ export function deleteRecordsInBatch(...tableNameVsDataList) {
 
 /**A generic method for filtering out records which are in ValueList and then updating 'property'
  *  with 'newValue'
- * 
- * @param {*} tableName 
- * @param {*} property 
- * @param {*} value 
  */
 export function updateTableRecordOnProperty(tableName, property, valueList, newValue) {
     let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));

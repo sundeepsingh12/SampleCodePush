@@ -42,7 +42,7 @@ class SequenceRunsheetList extends Component {
         if (this.props.responseMessage) {
             Toast.show({
                 text: this.props.responseMessage,
-                position: "bottom" | "center",
+                position: "bottom",
                 buttonText: OK,
                 type: 'danger',
                 duration: 10000,
