@@ -38,6 +38,7 @@ module.exports = keyMirror({
     LOGOUT_START: null,
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
+    SET_LOGIN_PARAMETERS:null,
 
     //Preloader Actions
     MASTER_DOWNLOAD_START: null,

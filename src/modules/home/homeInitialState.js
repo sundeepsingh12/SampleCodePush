@@ -29,7 +29,8 @@ var InitialState = Record({
     erpModalVisible: false,
     lastErpSyncTime: null,
     draftNewJobInfo: null,
-    checkNewJobTransactionStatus: null
+    checkNewJobTransactionStatus: null,
+    logo: null
 })
 export default InitialState
 

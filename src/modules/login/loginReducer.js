@@ -25,7 +25,8 @@ import {
   ON_LOGIN_PASSWORD_CHANGE,
   TOGGLE_CHECKBOX,
   REMEMBER_ME_SET_TRUE,
-  RESET_STATE
+  RESET_STATE,
+  SET_LOGIN_PARAMETERS
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -65,8 +66,8 @@ export default function authReducer(state = initialState, action) {
 
 
     case ON_LONG_PRESS_ICON:
-          
-    return state.setIn(['form', 'isLongPress'], action.payload)
+
+      return state.setIn(['form', 'isLongPress'], action.payload)
 
 
     case LOGIN_FAILURE:
@@ -79,7 +80,7 @@ export default function authReducer(state = initialState, action) {
     case ON_LOGIN_USERNAME_CHANGE:
       const username = action.payload
       const passwordState = state.form.password
-      if (username  && passwordState ) {
+      if (username && passwordState) {
         return state.setIn(['form', 'username'], username)
           .setIn(['form', 'isButtonDisabled'], false)
       } else {
@@ -98,14 +99,22 @@ export default function authReducer(state = initialState, action) {
           .setIn(['form', 'isButtonDisabled'], true)
       }
 
-      case TOGGLE_CHECKBOX:
-       return state.setIn(['form','rememberMe'],!state.form.rememberMe)
+    case TOGGLE_CHECKBOX:
+      return state.setIn(['form', 'rememberMe'], !state.form.rememberMe)
 
-      case REMEMBER_ME_SET_TRUE:
-        return state.setIn(['form','rememberMe'],true)
+    case REMEMBER_ME_SET_TRUE:
+      return state.setIn(['form', 'rememberMe'], true)
 
-      case RESET_STATE: 
-          return initialState  
+    case SET_LOGIN_PARAMETERS:
+      let isButtonDisabled = action.payload.password && action.payload.username ? false : true;
+      return state.setIn(['form', 'password'], action.payload.password)
+        .setIn(['form', 'username'], action.payload.username)
+        .setIn(['form', 'logo'], action.payload.logo)
+        .setIn(['form', 'rememberMe'], action.payload.rememberMe)
+        .setIn(['form', 'isButtonDisabled'], isButtonDisabled)
+
+    case RESET_STATE:
+      return initialState
   }
   return state
 }

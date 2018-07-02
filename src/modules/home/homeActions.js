@@ -72,6 +72,7 @@ import {
   SERVER_REACHABLE,
   SERVER_UNREACHABLE,
   Piechart,
+  PATH_COMPANY_LOGO_IMAGE
 } from '../../lib/AttributeConstants'
 import { Toast, ActionSheet, } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -100,8 +101,9 @@ import FCM, { FCMEvent, NotificationType, RemoteNotificationResult, WillPresentN
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK } from '../../lib/ContainerConstants'
+import RNFS from 'react-native-fs'
 import { navDispatch, navigate } from '../navigators/NavigationService';
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR,FCM_PERMISSION_DENIED,OK } from '../../lib/ContainerConstants'
 
 /**
  * Function which updates STATE when component is mounted
@@ -112,10 +114,15 @@ import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION
 export function fetchPagesAndPiechart() {
   return async function (dispatch) {
     try {
-      dispatch(setState(PAGES_LOADING));
-      const user = await keyValueDBService.getValueFromStore(USER);
+      dispatch(setState(PAGES_LOADING, true));
+      let user = await keyValueDBService.getValueFromStore(USER);
       //Fetching list of Pages
-      const pageList = await keyValueDBService.getValueFromStore(PAGES);
+      let pageList = await keyValueDBService.getValueFromStore(PAGES);
+      let file;
+      let fileExits = await RNFS.exists(PATH_COMPANY_LOGO_IMAGE);
+      if (fileExits) {
+        file = await RNFS.readFile(PATH_COMPANY_LOGO_IMAGE, 'base64')
+      }
       let mainMenuAndSubMenuObject = moduleCustomizationService.getPagesMainMenuAndSubMenuObject(pageList ? pageList.value : null, user ? user.value : null);
       let sortedMainMenuAndSubMenuList = moduleCustomizationService.sortMenuAndSubMenuGroupList(mainMenuAndSubMenuObject.mainMenuObject, mainMenuAndSubMenuObject.subMenuObject);
       //Fetching list of Home screen Utilities 
@@ -133,11 +140,12 @@ export function fetchPagesAndPiechart() {
       //Fetching Summary count for Pie-chart
       const pieChartSummaryCount = (Piechart.enabled) ? await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params) : null
       //Finally updating state
-      dispatch(setState(SET_PAGES_UTILITY_N_PIESUMMARY, { sortedMainMenuAndSubMenuList, utilities, pieChartSummaryCount }));
+      dispatch(setState(SET_PAGES_UTILITY_N_PIESUMMARY, { sortedMainMenuAndSubMenuList, utilities, pieChartSummaryCount, logo: file }));
     } catch (error) {
       //TODO : show proper error code message ERROR CODE 600
       //Save the error in exception logs
       showToastAndAddUserExceptionLog(2701, error.message, 'danger', 1)
+      dispatch(setState(PAGES_LOADING, false));
     }
   }
 }
@@ -177,7 +185,7 @@ export function navigateToPage(pageObject, navigationProps) {
         }
         case PAGE_CUSTOM_WEB_PAGE:
           let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
-          !_.size(customRemarks) || customRemarks.length == 1 ? navigate(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null }) : dispatch(customAppSelection(customRemarks,navigationProps))
+          !_.size(customRemarks) || customRemarks.length == 1 ? navigate(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null }) : dispatch(customAppSelection(customRemarks, navigationProps))
           break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -321,25 +329,25 @@ export function startTracking(trackingServiceStarted) {
 
 export function startFCM() {
   return async function (dispatch) {
-    try{
-    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    if (token && token.value) {
+    try {
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      if (token && token.value) {
 
-      //these callback will be triggered only when app is foreground or background
-      FCM.on(FCMEvent.Notification, notif => {
-        if (notif.Notification == 'Android push notification') {
-          dispatch(performSyncService(true))
-        }
-        else if (notif.Notification == 'Live Job Notification') {
-          keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-          dispatch(performSyncService(true, true))
-        }
-        if (notif.local_notification) {
-          return
-        }
-        if (notif.opened_from_tray) {
-          return
-        }
+        //these callback will be triggered only when app is foreground or background
+        FCM.on(FCMEvent.Notification, notif => {
+          if (notif.Notification == 'Android push notification') {
+            dispatch(performSyncService(true))
+          }
+          else if (notif.Notification == 'Live Job Notification') {
+            keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+            dispatch(performSyncService(true, true))
+          }
+          if (notif.local_notification) {
+            return
+          }
+          if (notif.opened_from_tray) {
+            return
+          }
           if (Platform.OS === 'ios') {
             switch (notif._notificationType) {
               case NotificationType.Remote:
@@ -354,54 +362,54 @@ export function startFCM() {
             }
           }
         })
-        
-      FCM.enableDirectChannel();
-      FCM.on(FCMEvent.DirectChannelConnectionChanged, (data) => {
-      });
-      setTimeout(function() {
-        FCM.isDirectChannelEstablished().then(d =>  {});
-      }, 1000);
 
-      FCM.getInitialNotification().then(notif => {
-      });
-      try {
-        let result = await FCM.requestPermissions({
-          badge: false,
-          sound: true,
-          alert: true
+        FCM.enableDirectChannel();
+        FCM.on(FCMEvent.DirectChannelConnectionChanged, (data) => {
         });
-      } catch (e) {
-        showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED, 'danger', 1)
+        setTimeout(function () {
+          FCM.isDirectChannelEstablished().then(d => { });
+        }, 1000);
+
+        FCM.getInitialNotification().then(notif => {
+        });
+        try {
+          let result = await FCM.requestPermissions({
+            badge: false,
+            sound: true,
+            alert: true
+          });
+        } catch (e) {
+          showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED, 'danger', 1)
+        }
+        const userObject = await keyValueDBService.getValueFromStore(USER)
+        const topic = `FE_${userObject.value.id}`
+
+        FCM.getFCMToken().then(async fcmToken => {
+          await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+          await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+
+        }, (error) => {
+        }).catch(() => showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR, 'danger', 1))
+
+        if (Platform.OS === 'ios') {
+          FCM.getAPNSToken().then(token => {
+          }).catch(() => showToastAndAddUserExceptionLog(2718, APNS_TOKEN_ERROR, 'danger', 1))
+        }
+
+        // fcm token may not be available on first load, catch it here
+        FCM.on(FCMEvent.RefreshToken, async fcmToken => {
+          await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+          await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+        });
+
+        FCM.subscribeToTopic(topic)
       }
-      const userObject = await keyValueDBService.getValueFromStore(USER)
-      const topic = `FE_${userObject.value.id}`
-
-      FCM.getFCMToken().then(async fcmToken => {
-        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
-        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
-
-      }, (error) => {
-      }).catch( () =>  showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR, 'danger', 1))
-      
-          if (Platform.OS === 'ios') {
-            FCM.getAPNSToken().then(token => {
-            }).catch(() =>  showToastAndAddUserExceptionLog(2718, APNS_TOKEN_ERROR, 'danger', 1))
-          }
-
-       // fcm token may not be available on first load, catch it here
-      FCM.on(FCMEvent.RefreshToken, async fcmToken => {
-        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
-        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
-      });
-
-      FCM.subscribeToTopic(topic)
+      else {
+        Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
+      }
+    } catch (error) {
+      showToastAndAddUserExceptionLog(2715, error.message, 'danger', 1)
     }
-    else {
-      Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
-    }
-  }catch(error){
-    showToastAndAddUserExceptionLog(2715, error.message, 'danger', 1)    
-  }
   }
 }
 
@@ -635,13 +643,13 @@ export function resetFailCountInStore() {
   return async function (dispatch) {
     try {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
-      const { value: { company: { customErpPullActivated: ErpCheck }}} = await keyValueDBService.getValueFromStore(USER)
-      if(ErpCheck) {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','LoggedInERP')
+      const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
+      if (ErpCheck) {
+        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
         navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
       }
       else {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','LoggedIn')
+        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
         navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
       }
     } catch (error) {
