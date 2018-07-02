@@ -36,6 +36,7 @@ import {
 } from 'native-base'
 import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
 import { SKIP_SKU_MESSAGE, OK } from '../../lib/ContainerConstants'
+import _ from 'lodash'
 import { navigate } from '../navigators/NavigationService';
 
 export function prepareSkuList(fieldAttributeMaster, jobId) {
@@ -84,10 +85,6 @@ export function scanSkuItem(functionParams) {
 }
 
 /**
- * 
- * @param {*} value 
- * @param {*} parentId 
- * @param {*} skuListItems 
  * 
  *This method updates SkuActualQuantity of a particular list item and TotalActualQuantity,
  * TotalOriginalQuantity & SkuActualAmount as well,Called when actualQuantity is changed by user

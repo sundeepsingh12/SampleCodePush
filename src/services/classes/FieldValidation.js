@@ -36,6 +36,7 @@ import {
     TIME,
     TIME_COMPARATOR,
 } from '../../lib/AttributeConstants'
+import _ from 'lodash'
 
 class FieldValidation {
 
@@ -96,7 +97,6 @@ class FieldValidation {
     validationStringMap(validationReferenceMap) {
         let validationStringMap = {}
         for (let index in validationReferenceMap['root']) {
-            let validationObject = {}
             validationStringMap[validationReferenceMap['root'][index]] = validationReferenceMap['root'][index] + this.addOperatorAndValidationId(validationReferenceMap[validationReferenceMap['root'][index]], validationReferenceMap)
         }
         return validationStringMap

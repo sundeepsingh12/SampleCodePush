@@ -20,12 +20,8 @@ import _ from 'lodash'
 
 class SummaryAndPieChart {
 
-    /**@function getAllStatusIdsCount()
-    * 
+    /**
     * function return count object for piechart of user
-    *
-    *@return {pendingCounts : a, successCounts : b, failCounts : c}
-    *
     */
     async getAllStatusIdsCount(jobMasterList) {
         const { allStatusMap, noNextStatusMap } = await jobStatusService.getStatusIdsForAllStatusCategory() // get all status list

@@ -166,7 +166,7 @@ class Login extends PureComponent {
           placeholder='Username'
           underlineColorAndroid='transparent'
           onChangeText={this.onChangeUsername}
-          disabled={this.props.auth.form.isEditTextDisabled}
+          editable={this.props.auth.form.isEditTextEnabled}
           style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, styles.width100, { height: 40 }]}
         />
       </Item>
@@ -183,7 +183,7 @@ class Login extends PureComponent {
           secureTextEntry={true}
           onChangeText={this.onChangePassword}
           onSubmitEditing={this.loginButtonPress}
-          disabled={this.props.auth.form.isEditTextDisabled}
+          editable={this.props.auth.form.isEditTextEnabled}
           style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, styles.width100, { height: 40 }]}
         />
         {this.showForgetPasswordView()}
@@ -212,18 +212,6 @@ class Login extends PureComponent {
         style={[styles.marginTop15]}
       >
         <Text style={[styles.fontWhite]}>Log In</Text>
-      </Button>
-    )
-  }
-
-  showCodePush() {
-    return (
-      <Button
-        full rounded success
-        onPress={this.codepushSync}
-        style={[styles.marginTop15]}
-      >
-        <Text style={[styles.fontWhite]}>Code Push</Text>
       </Button>
     )
   }

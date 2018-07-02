@@ -61,7 +61,7 @@ class CashTenderingView extends PureComponent {
 
     _onChangeText = (quantity) => {
         if (quantity && !parseInt(quantity) && parseInt(quantity) != 0) {
-            { Toast.show({ text: QUANTITY_NOT_A_NUMBER + quantity, position: "bottom" | "center", buttonText: OK, duration: 3000 }) }
+            { Toast.show({ text: QUANTITY_NOT_A_NUMBER + quantity, position: "bottom", buttonText: OK, duration: 3000 }) }
             return
         }
         {

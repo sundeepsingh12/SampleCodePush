@@ -115,7 +115,7 @@ class Sorting extends PureComponent {
         if (_.size(this.props.errorMessage)) {
             Toast.show({
                 text: this.props.errorMessage,
-                position: 'bottom' | "center",
+                position: 'bottom',
                 buttonText: OK,
                 type: 'danger',
                 duration: 5000,

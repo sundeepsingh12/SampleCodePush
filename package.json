@@ -1,6 +1,6 @@
 {
   "name": "Fareye",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
@@ -25,7 +25,7 @@
     "react-native-background-timer": "2.0.1",
     "react-native-camera": "git+https://git@github.com/react-native-community/react-native-camera",
     "react-native-cancelable-fetch": "0.1.1",
-    "react-native-code-push": "5.3.4",
+    "react-native-code-push": "5.3.5",
     "react-native-communications": "2.2.1",
     "react-native-compress-image": "2.0.1",
     "react-native-device-info": "0.21.5",
@@ -49,7 +49,7 @@
     "react-native-zip-archive": "2.2.6",
     "react-navigation": "2.4.1",
     "react-redux": "5.0.7",
-    "realm": "2.8.4",
+    "realm": "2.11.0",
     "redux": "4.0.0",
     "redux-mock-store": "1.5.3",
     "redux-thunk": "2.3.0",
