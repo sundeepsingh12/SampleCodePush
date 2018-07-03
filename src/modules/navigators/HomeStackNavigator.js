@@ -61,21 +61,12 @@ const HomeStack = createStackNavigator({
       },
       SaveActivated: {
         screen: SaveActivated,
-        navigationOptions: {
-          gesturesEnabled: false,
-        }
       },
       Transient: {
         screen: Transient,
-        navigationOptions: {
-          gesturesEnabled: false,
-        }
       },
       CheckoutDetails: {
         screen: CheckoutDetails,
-        navigationOptions: {
-          gesturesEnabled: false,
-        }
       },
       SignatureAndNps: {
         screen: SignatureAndNps

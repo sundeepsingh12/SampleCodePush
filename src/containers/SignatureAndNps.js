@@ -75,7 +75,7 @@ class SignatureAndNps extends PureComponent {
     }
 
     static navigationOptions = ({ navigation }) => {
-        return { header: null }
+        return { header: null,gesturesEnabled:false }
     }
     saveSign = () => {
         if (this.state.isSaveDisabled) {
