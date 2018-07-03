@@ -38,10 +38,10 @@ import {
   APP_VERSION,
   APP_THEME,
 } from '../../lib/constants'
-import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER } from '../../lib/AttributeConstants'
+import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER, PATH_COMPANY_LOGO_DIR, PATH_COMPANY_LOGO_IMAGE } from '../../lib/AttributeConstants'
 import _ from 'lodash'
-
-
+import RNFS from 'react-native-fs'
+import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
 class JobMaster {
   /**
    *## This will Download Job Master from server
@@ -56,8 +56,8 @@ class JobMaster {
    *
    * @param deviceIMEI
    * @param deviceSIM
-   * @param currentJobMasterVersion
-   * @param deviceCompanyId
+   * @param userObject
+   * @param token
    *
    *
    * * @return
@@ -137,15 +137,16 @@ class JobMaster {
       throw ({ errorCode: MAJOR_VERSION_OUTDATED, downloadUrl: json.androidDownloadUrl })
     }
     const minorPatchVersion = json.minorPatchVersion
+    await this.downloadCompanyLogoAndSaveToDevice(json.companyLogo)
 
-     //Check if minor or patch version from server is greater than current minor/patch version installed in phone
+    //Check if minor or patch version from server is greater than current minor/patch version installed in phone
     if (parseInt(json.applicationVersion) == packageJsonMajorVersion && minorPatchVersion) {
       const [minorVersionFromServer, patchVersionFromServer] = minorPatchVersion.split('.')
       const [appMajorVersion, appMinorVersion, appPatchVersion] = APP_VERSION_NUMBER.split('.')
       if (parseInt(minorVersionFromServer) > parseInt(appMinorVersion) || parseInt(patchVersionFromServer) > parseInt(appPatchVersion)) {
         throw ({ errorCode: MINOR_PATCH_OUTDATED, androidDeploymentKey: json.androidDeployementKey, iosDeploymentKey: json.iosDeployementKey })
+      }
     }
-  }
 
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);
@@ -329,6 +330,31 @@ class JobMaster {
       }
     }
     return jobMasterWithAssignOrderToHubEnabled
+  }
+
+  /**
+   * This function download logo of company from url and stores in the internal store of device
+   * @param {*} url 
+   */
+  async downloadCompanyLogoAndSaveToDevice(url) {
+    try {
+      if (url) {
+        RNFS.mkdir(PATH_COMPANY_LOGO_DIR);
+        let download = RNFS.downloadFile({
+          fromUrl: url,
+          toFile: PATH_COMPANY_LOGO_IMAGE,
+        });
+        //To wait for download
+        let result = await download.promise
+      } else {
+        let fileExists = RNFS.exists(PATH_COMPANY_LOGO_IMAGE);
+        if (fileExists) {
+          RNFS.unlink(PATH_COMPANY_LOGO_IMAGE)
+        }
+      }
+    } catch (error) {
+      showToastAndAddUserExceptionLog(1304, error.message, 'danger', 0)
+    }
   }
 
 }

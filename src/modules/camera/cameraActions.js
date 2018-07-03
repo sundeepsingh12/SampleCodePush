@@ -11,6 +11,7 @@ import { PATH_CUSTOMER_IMAGES } from '../../lib/AttributeConstants'
 import { OPEN_CAMERA } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import ImageCropPicker from 'react-native-image-crop-picker';
+import _ from 'lodash'
 
 var PATH_COMPRESS_IMAGE = '/compressImages';
 
@@ -88,7 +89,7 @@ export function setCameraInitialView(item) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_CAMERA_LOADER_INITIAL_SET_UP))
-            const validation = null, data = null
+            let validation = null, data = null
             if (!_.isEmpty(item.validation)) {
                 validation = await signatureService.getValidations(item.validation)
             }

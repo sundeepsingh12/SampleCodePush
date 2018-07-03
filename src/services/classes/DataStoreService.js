@@ -196,7 +196,7 @@ class DataStoreService {
     /**
       * This function checks for fieldAttributeValue present in TABLE_FIELD_DATA
       * @param {*} fieldAttributeValue
-      * @param {*} fieldAttributeMasterId
+      * @param {*} fieldAttribute
       * @returns 
       * boolean
       */

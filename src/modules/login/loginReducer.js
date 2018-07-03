@@ -19,16 +19,14 @@ import {
   LOGIN_START,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
-  LOGIN_CAMERA_SCANNER,
   FORGET_PASSWORD,
   ON_LONG_PRESS_ICON,
-
-  SET_STATE,
   ON_LOGIN_USERNAME_CHANGE,
   ON_LOGIN_PASSWORD_CHANGE,
   TOGGLE_CHECKBOX,
   REMEMBER_ME_SET_TRUE,
-  RESET_STATE
+  RESET_STATE,
+  SET_LOGIN_PARAMETERS
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -52,7 +50,7 @@ export default function authReducer(state = initialState, action) {
       return state.setIn(['form', 'authenticationService'], true)
         .setIn(['form', 'displayMessage'], '')
         .setIn(['form', 'isButtonDisabled'], true)
-        .setIn(['form','isEditTextDisabled'],true)
+        .setIn(['form','isEditTextEnabled'],false)
 
 
     /**
@@ -64,25 +62,25 @@ export default function authReducer(state = initialState, action) {
       return state.setIn(['form', 'authenticationService'], false)
         .setIn(['form', 'displayMessage'], '')
         .setIn(['form', 'isButtonDisabled'], false)
-        .setIn(['form','isEditTextDisabled'],false)
+        .setIn(['form','isEditTextEnabled'],true)
 
 
     case ON_LONG_PRESS_ICON:
-          
-    return state.setIn(['form', 'isLongPress'], action.payload)
+
+      return state.setIn(['form', 'isLongPress'], action.payload)
 
 
     case LOGIN_FAILURE:
       return state.setIn(['form', 'authenticationService'], false)
         .setIn(['form', 'displayMessage'], action.payload)
         .setIn(['form','password'],'')
-        .setIn(['form','isEditTextDisabled'],false)
+        .setIn(['form','isEditTextEnabled'],true)
         .setIn(['form','isButtonDisabled'],true)
 
     case ON_LOGIN_USERNAME_CHANGE:
       const username = action.payload
       const passwordState = state.form.password
-      if (username  && passwordState ) {
+      if (username && passwordState) {
         return state.setIn(['form', 'username'], username)
           .setIn(['form', 'isButtonDisabled'], false)
       } else {
@@ -101,14 +99,22 @@ export default function authReducer(state = initialState, action) {
           .setIn(['form', 'isButtonDisabled'], true)
       }
 
-      case TOGGLE_CHECKBOX:
-       return state.setIn(['form','rememberMe'],!state.form.rememberMe)
+    case TOGGLE_CHECKBOX:
+      return state.setIn(['form', 'rememberMe'], !state.form.rememberMe)
 
-      case REMEMBER_ME_SET_TRUE:
-        return state.setIn(['form','rememberMe'],true)
+    case REMEMBER_ME_SET_TRUE:
+      return state.setIn(['form', 'rememberMe'], true)
 
-      case RESET_STATE: 
-          return initialState  
+    case SET_LOGIN_PARAMETERS:
+      let isButtonDisabled = action.payload.password && action.payload.username ? false : true;
+      return state.setIn(['form', 'password'], action.payload.password)
+        .setIn(['form', 'username'], action.payload.username)
+        .setIn(['form', 'logo'], action.payload.logo)
+        .setIn(['form', 'rememberMe'], action.payload.rememberMe)
+        .setIn(['form', 'isButtonDisabled'], isButtonDisabled)
+
+    case RESET_STATE:
+      return initialState
   }
   return state
 }

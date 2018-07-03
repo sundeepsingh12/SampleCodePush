@@ -29,12 +29,9 @@ import DataStoreDetails from './DataStoreDetails'
 import OfflineDS from './OfflineDS'
 import ImageDetailsView from './ImageDetailsView'
 import PostAssignmentScanner from './PostAssignmentScanner'
-import Backup from './Backup'
-import ProfileView from './ProfileView'
 import BluetoothListing from './BluetoothListing'
 import SequenceRunsheetList from './SequenceRunsheetList'
 import Sequence from './Sequence'
-import ResetPassword from './ResetPassword'
 import JobDetailsV2 from './JobDetailsV2'
 import DataStore from './DataStore'
 import BulkListing from './BulkListing'
@@ -82,21 +79,12 @@ const HomeStack = createStackNavigator({
       },
       SaveActivated: {
         screen: SaveActivated,
-        navigationOptions: {
-          gesturesEnabled: false,
-        }
       },
       Transient: {
         screen: Transient,
-        navigationOptions: {
-          gesturesEnabled: false,
-        }
       },
       CheckoutDetails: {
         screen: CheckoutDetails,
-        navigationOptions: {
-          gesturesEnabled: false,
-        }
       },
       SignatureAndNps: {
         screen: SignatureAndNps

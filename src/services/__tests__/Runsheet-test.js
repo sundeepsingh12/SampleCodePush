@@ -5,6 +5,7 @@ import { userSummaryService } from '../classes/UserSummary';
 import * as realm from '../../repositories/realmdb'
 import { RUNSHEET_MISSING } from '../../lib/ContainerConstants'
 import { runSheetService } from '../classes/RunSheet'
+import JobTransaction from '../../repositories/schema/jobTransaction';
 
 
 describe('test for build runsheetList and update user and job summary', () => {
@@ -225,5 +226,44 @@ describe('test cases for getOpenRunsheets', () => {
     realm.getRecordListOnQuery = jest.fn()
     realm.getRecordListOnQuery.mockReturnValue([{ runsheetNumber: 123 }])
     expect(runSheetService.getOpenRunsheets()).toEqual([{ runsheetNumber: 123 }])
+  })
+})
+
+describe('test cases for filterTransactionOnRunsheetIdPresentAndPrepareTransactionQuery', () => {
+  const jobTransactionList = [{
+    id: 2521299,
+    jobMasterId: 3,
+    jobStatusId: 11,
+    runsheetId: 1,
+  },
+  {
+    id: 2521219,
+    jobMasterId: 4,
+    jobStatusId: 12,
+    runsheetId: 2,
+  },
+  {
+    id: 2521229,
+    jobMasterId: 3,
+    jobStatusId: 11,
+    runsheetId: 3,
+  },
+  {
+    id: 2521239,
+    jobMasterId: 3,
+    jobStatusId: 13,
+    runsheetId: 4,
+  },
+  ]
+  it('should filter Transaction On RunsheetId Present And PrepareTransaction Query', () => {
+    let data = {
+      "jobTransactionListWithRunsheetId":
+        [{ "id": 2521299, "jobMasterId": 3, "jobStatusId": 11, "runsheetId": 1 },
+        { "id": 2521219, "jobMasterId": 4, "jobStatusId": 12, "runsheetId": 2 },
+        { "id": 2521229, "jobMasterId": 3, "jobStatusId": 11, "runsheetId": 3 },
+        { "id": 2521239, "jobMasterId": 3, "jobStatusId": 13, "runsheetId": 4 }],
+      "jobTransactionListWithRunsheetIdQuery": "id = 2521299 OR id = 2521219 OR id = 2521229 OR id = 2521239"
+    }
+    expect(runSheetService.filterTransactionOnRunsheetIdPresentAndPrepareTransactionQuery(jobTransactionList)).toEqual(data)
   })
 })

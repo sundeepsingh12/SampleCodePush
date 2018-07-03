@@ -14,7 +14,7 @@ import * as postAssignmentActions from '../modules/postAssignment/postAssignment
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import { SET_POST_ASSIGNMENT_ERROR, SET_POST_SCAN_SUCCESS, } from '../lib/constants'
-import { FORCE_ASSIGNED, POST_SEARCH_PLACEHOLDER, } from '../lib/ContainerConstants'
+import { FORCE_ASSIGNED, POST_SEARCH_PLACEHOLDER,OK } from '../lib/ContainerConstants'
 import { Piechart } from '../lib/AttributeConstants'
 import * as homeActions from '../modules/home/homeActions'
 import * as taskListActions from '../modules/taskList/taskListActions'
@@ -173,7 +173,7 @@ class PostAssignmentScanner extends PureComponent {
         if (this.props.error) {
             Alert.alert('Error', this.props.error,
                 [{
-                    text: 'OK', onPress: () => this.props.actions.setState(SET_POST_ASSIGNMENT_ERROR, {
+                    text: OK, onPress: () => this.props.actions.setState(SET_POST_ASSIGNMENT_ERROR, {
                         error: null
                     }), style: 'cancel'
                 }],

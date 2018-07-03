@@ -65,7 +65,7 @@ class SaveActivated extends PureComponent {
     }
 
     static navigationOptions = ({ navigation }) => {
-        return { header: null }
+        return { header: null,gesturesEnabled:false }
     }
 
     componentDidUpdate() {

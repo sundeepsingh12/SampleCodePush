@@ -52,4 +52,4 @@ class ServiceStatusIcon extends React.PureComponent {
   }
 }
 
-module.exports = ServiceStatusIcon
+export default ServiceStatusIcon

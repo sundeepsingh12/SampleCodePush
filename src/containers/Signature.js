@@ -71,14 +71,15 @@ class Signature extends PureComponent {
     }
 
     static navigationOptions = ({ navigation }) => {
-        return { header: null }
+       
+        return { header: null, gesturesEnabled: false }
     }
 
     saveSign = () => {
         if (this.state.isSaveDisabled) {
             Toast.show({
                 text: IMPROPER_SIGNATURE,
-                position: "bottom" | "center",
+                position: "bottom",
                 buttonText: OK,
                 duration: 5000
             })

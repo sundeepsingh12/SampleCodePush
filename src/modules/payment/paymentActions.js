@@ -147,7 +147,7 @@ export function saveMoneyCollectObject(actualAmount, currentElement, jobTransact
  * This action preapres and saves money collect field data in form layout state for split payment mode
  * @param {*} actualAmount 
  * @param {*} currentElement 
- * @param {*} formElement 
+ * @param {*} formLayoutState 
  * @param {*} jobTransaction 
  * @param {*} latestPositionId 
  * @param {*} moneyCollectMaster 
