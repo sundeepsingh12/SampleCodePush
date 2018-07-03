@@ -33,6 +33,7 @@ class Transient extends PureComponent {
 
     static navigationOptions = ({ navigation }) => {
         return {
+            gesturesEnabled:false,
             header: <TitleHeader pageName={navigation.state.params.currentStatus.name} goBack={navigation.state.params.backForTransient} />
         }
     }
