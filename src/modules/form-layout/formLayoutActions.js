@@ -46,11 +46,11 @@ import { Toast } from 'native-base'
 import { fetchJobs } from '../taskList/taskListActions';
 
 
-export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobTransaction) {
+export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobTransaction,transientAndSaveActivated) {
     return async function (dispatch) {
         try {
             dispatch(setState(CLEAR_FORM_LAYOUT_WITH_LOADER))
-            let sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
+            let sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction,latestPositionId)
             let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
             sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds);
@@ -270,14 +270,14 @@ export function fieldValidations(currentElement, formLayoutState, timeOfExecutio
     }
 }
 
-export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, latestPositionId) {
+export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, jobTransactionId, jobTransaction, latestPositionId,statusData) {
     return async function (dispatch) {
         try {
             if (editableFormLayoutState) {
-                dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
+                dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName:statusData.statusName }))
             }
             else {
-                dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobTransaction))
+                dispatch(getSortedRootFieldAttributes(statusData.statusId, statusData.statusName, jobTransactionId, jobTransaction,latestPositionId))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1011, error.message, 'danger', 1)

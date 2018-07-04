@@ -2,7 +2,6 @@ import { keyValueDBService } from '../KeyValueDBService.js'
 import { transientStatusAndSaveActivatedService } from '../TransientStatusAndSaveActivatedService.js'
 import {
     AFTER,
-    BEFORE,
     OBJECT,
     STRING,
     TEXT,
@@ -13,22 +12,13 @@ import {
 } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
 import {
-    HomeTabNavigatorScreen,
     SaveActivated,
     Transient,
     CheckoutDetails,
     TabScreen,
     SHOULD_RELOAD_START,
-    GEO_FENCING,
-    FIELD_ATTRIBUTE,
-    FIELD_ATTRIBUTE_STATUS,
-    FIELD_ATTRIBUTE_VALIDATION,
-    FIELD_ATTRIBUTE_VALIDATION_CONDITION,
     BACKUP_ALREADY_EXIST,
     TABLE_FIELD_DATA,
-    JOB_ATTRIBUTE,
-    USER,
-    HUB
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'

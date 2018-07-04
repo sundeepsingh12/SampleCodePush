@@ -84,9 +84,11 @@ class FormLayout extends PureComponent {
   // }
 
   componentDidMount() {
+    const {saveActivated, transient,statusId,statusName} = this.props.navigation.state.params
+    const statusData = {saveActivated, transient,statusId,statusName}
     this.props.navigation.setParams({ backForTransient: this._goBack });
     if (!this.props.navigation.state.params.isDraftRestore) {
-      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId)
+      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,statusData)
       if (this.props.navigation.state.params.jobTransaction.length || this.props.navigation.state.params.editableFormLayoutState || this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
         this.props.actions.setState(SET_UPDATE_DRAFT, false)
       }
@@ -232,7 +234,7 @@ class FormLayout extends PureComponent {
     return view
   }
 
-  getFooterView() {
+  getFooterView(transient,saveActivated) {
     return (
       <SafeAreaView style={[styles.bgWhite]}>
         <Footer style={[style.footer]}>
@@ -240,7 +242,7 @@ class FormLayout extends PureComponent {
             <Button success full
               onPress={() => this.saveJobTransaction()}
               disabled={this.props.isSaveDisabled}>
-              <Text style={[styles.fontLg, styles.fontWhite]}>{!_.isEmpty(this.props.paymentAtEnd) ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{!_.isEmpty(this.props.paymentAtEnd) ? (this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName) : (saveActivated || transient) ? 'Continue' : this.props.statusName}</Text>
             </Button>
           </FooterTab>
         </Footer>
@@ -270,9 +272,10 @@ class FormLayout extends PureComponent {
   }
 
   render() {
+    const { saveActivated,transient } = this.props.navigation.state.params
     const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
     let emptyFieldAttributeForStatusView = this.emptyFieldAttributeForStatusView()
-    const footerView = this.getFooterView()
+    const footerView = this.getFooterView(transient,saveActivated)
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
@@ -282,7 +285,7 @@ class FormLayout extends PureComponent {
             <Button success full
               onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
               disabled={this.props.isSaveDisabled}>
-              <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{(this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : (saveActivated || transient) ? 'Continue' : this.props.statusName)}</Text>
             </Button>
           </FooterTab>
         </Footer>

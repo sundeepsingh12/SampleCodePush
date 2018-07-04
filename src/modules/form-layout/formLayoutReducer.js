@@ -1,7 +1,6 @@
 'use strict'
 
 import InitialState from './formLayoutInitialState.js'
-import _ from 'lodash'
 
 import {
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
