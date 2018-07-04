@@ -234,6 +234,7 @@ module.exports = keyMirror({
     MDM_POLICIES: null,
     FCM_TOKEN: null,
     APP_THEME: null,
+    LAST_CALL_AND_SMS_TIME: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,

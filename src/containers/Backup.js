@@ -37,7 +37,6 @@ import {
 } from '../lib/ContainerConstants'
 import { SET_BACKUP_VIEW, SET_BACKUP_TOAST } from '../lib/constants'
 import _ from 'lodash'
-//let calls = require('../wrapper/CALLS')
 
 import TitleHeader from '../components/TitleHeader'
 
@@ -84,12 +83,6 @@ class Backup extends Component {
     }
 
     componentDidMount() {
-        // //let x = moment()
-        // calls.getCallLogs('1524584505232', (status) => {
-        //     console.log(JSON.parse(status))
-        //     //    this.setState({calllog: JSON.parse(status)})
-        // }
-        // )
         this.props.actions.setState(SET_BACKUP_VIEW, 0)
         this.props.actions.getBackupList()
     }

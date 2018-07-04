@@ -1,7 +1,7 @@
 'use strict'
 
 import { keyValueDBService } from './KeyValueDBService'
-import { CUSTOMER_CARE, CUSTOMIZATION_LIST_MAP, JOB_ATTRIBUTE, JOB_ATTRIBUTE_STATUS, JOB_MASTER, JOB_STATUS, SMS_TEMPLATE, TAB, USER, LAST_SYNC_WITH_SERVER, FIELD_ATTRIBUTE, SMS_JOB_STATUS, IS_SERVER_REACHABLE, USER_SUMMARY, JOB_SUMMARY, HUB, DEVICE_IMEI, USER_EVENT_LOG, PENDING_SYNC_TRANSACTION_IDS, CUSTOM_NAMING, PAGES } from '../../lib/constants'
+import { CUSTOMER_CARE, CUSTOMIZATION_LIST_MAP, JOB_ATTRIBUTE, JOB_ATTRIBUTE_STATUS, JOB_MASTER, JOB_STATUS, SMS_TEMPLATE, TAB, USER, LAST_SYNC_WITH_SERVER, FIELD_ATTRIBUTE, SMS_JOB_STATUS, IS_SERVER_REACHABLE, USER_SUMMARY, JOB_SUMMARY, HUB, DEVICE_IMEI, USER_EVENT_LOG, PENDING_SYNC_TRANSACTION_IDS, CUSTOM_NAMING, PAGES, DEVICE_SIM } from '../../lib/constants'
 
 class TransactionCustomization {
 
@@ -74,6 +74,7 @@ class TransactionCustomization {
         const userEventsLogsList = await keyValueDBService.getValueFromStore(USER_EVENT_LOG);
         const transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         const pageList = await keyValueDBService.getValueFromStore(PAGES);
+        const deviceSim = await keyValueDBService.getValueFromStore(DEVICE_SIM);
         return {
             user: user ? user.value : user,
             jobMasterList: jobMasterList ? jobMasterList.value : jobMasterList,
@@ -89,7 +90,8 @@ class TransactionCustomization {
             imei: imei ? imei.value : imei,
             userEventsLogsList: userEventsLogsList ? userEventsLogsList.value : userEventsLogsList,
             transactionIdToBeSynced: transactionIdToBeSynced ? transactionIdToBeSynced.value : transactionIdToBeSynced,
-            pageList: pageList ? pageList.value : pageList
+            pageList: pageList ? pageList.value : pageList,
+            deviceSim: deviceSim && deviceSim.value ? deviceSim.value : deviceSim
         }
     }
 }

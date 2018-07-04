@@ -30,7 +30,7 @@ import {
   POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS,
   LAST_SYNC_WITH_SERVER,
   PAGES,
-  TABLE_MESSAGE_INTERACTION
+  TABLE_MESSAGE_INTERACTION,
 } from '../../lib/constants'
 import { FAREYE_UPDATES, PAGE_OUTSCAN, PATH_TEMP } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
@@ -40,7 +40,7 @@ import { geoFencingService } from './GeoFencingService'
 import FCM from "react-native-fcm"
 import RNFS from 'react-native-fs'
 import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
-
+import { communicationLogsService } from './CommunicationLogs'
 class Sync {
 
   async createAndUploadZip(syncStoreDTO, currentDate) {
@@ -52,8 +52,9 @@ class Sync {
     if (!token) {
       throw new Error('Token Missing')
     }
-    await syncZipService.createZip(syncStoreDTO)
+    let { lastCallTime, lastSmsTime } = await syncZipService.createZip(syncStoreDTO)
     const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO)
+    await communicationLogsService.updateLastCallSmsTime(lastCallTime, lastSmsTime)
     return responseBody
   }
 

@@ -30,6 +30,7 @@ import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, SIGNATURE_AND_FEEDBACK, 
 import { jobStatusService } from './JobStatus'
 import { jobMasterService } from './JobMaster'
 import { userExceptionLogsService } from './UserException'
+import { communicationLogsService } from './CommunicationLogs'
 
 class SyncZip {
 
@@ -49,12 +50,13 @@ class SyncZip {
         SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, syncStoreDTO.lastSyncWithServer);
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
-        SYNC_RESULTS.userCommunicationLog = [];
+        const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
+        let { communicationLogs, lastCallTime, lastSmsTime } = await communicationLogsService.getCallLogs(syncStoreDTO)
+        SYNC_RESULTS.userCommunicationLog = communicationLogs
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.userExceptionLog = userExceptionLogsService.getUserExceptionLog(realmDbData.userExceptionLog, lastSyncTime)
         let jobSummary = jobSummaryService.getJobSummaryListForSync(syncStoreDTO.jobSummaryList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.jobSummary = jobSummary || {}
-        const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
         await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
@@ -64,6 +66,7 @@ class SyncZip {
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
+        return { lastCallTime, lastSmsTime }
         //Deleting TEMP folder location
         // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }
