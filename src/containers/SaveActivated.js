@@ -312,7 +312,7 @@ class SaveActivated extends PureComponent {
                                         <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                                     </TouchableOpacity>
                                     <View style={[style.headerBody]}>
-                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.headerTitle}</Text>
+                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.navigation.state.params.currentStatus) ? this.props.navigation.state.params.currentStatus.name : 'Save Activated'}</Text>
                                     </View>
                                     <View style={[style.headerRight]}>
                                     </View>
