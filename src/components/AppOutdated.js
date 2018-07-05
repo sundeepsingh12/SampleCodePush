@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 
 import styles from '../themes/FeStyle'
-import { Container, Right, StyleProvider, Content, Button } from 'native-base'
+import { StyleProvider, Content, Button } from 'native-base'
 
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'

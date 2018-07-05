@@ -16,7 +16,7 @@ export default class DownloadProgressbar extends PureComponent {
                 transparent={false}
                 onRequestClose={() => null}>
                 <StyleProvider style={getTheme(platform)}>
-                    {(Platform.OS == 'android') ? this.renderProgressBarForAndroid() : this.renderIOSAppLinkView()}
+                    {this.renderProgressBarForAndroid()}
                 </StyleProvider>
             </Modal>
         )

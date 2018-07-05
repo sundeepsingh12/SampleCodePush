@@ -17,9 +17,10 @@ import RNFS from 'react-native-fs'
 import RNFetchBlob from 'react-native-fetch-blob'
 import { keyValueDBService } from '../services/classes/KeyValueDBService.js'
 import { PENDING_SYNC_TRANSACTION_IDS, LAST_SYNC_WITH_SERVER, DOMAIN_URL } from './constants'
-import moment from 'moment'
 import { sync } from '../services/classes/Sync'
 const fetch = require('react-native-cancelable-fetch');
+import CookieManager from 'react-native-cookies';
+
 class RestAPI {
   /**
    * ## API.js client
@@ -32,10 +33,6 @@ class RestAPI {
       throw new Error('TokenMissing')
     }
     this._sessionToken = _.isNull(token) ? null : token
-
-    // this.API_BASE_URL = CONFIG.backend.fareyeProduction ?
-    //   CONFIG.FAREYE.production.url :
-    //   CONFIG.FAREYE.staging.url
   }
 
   /**
@@ -62,6 +59,7 @@ class RestAPI {
     if (opts.method == 'WALLET') opts.method = 'POST'
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
+      CookieManager.clearAll()
     }
     const response = await fetch(url, opts, fetchRequestId)
     const { status, code, headers, _bodyText } = response;
@@ -126,6 +124,7 @@ class RestAPI {
   * }
   */
   serviceCall(body, url, method) {
+    
     let opts;
     if (method === 'POST' || method === 'WALLET') {
       opts = {
@@ -209,7 +208,6 @@ class RestAPI {
           if (syncStoreDTO) {
             await sync.deleteSpecificTransactionFromStoreList(syncStoreDTO.transactionIdToBeSynced, PENDING_SYNC_TRANSACTION_IDS, currenDate)
           }
-          // await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         }
         else if (message != 'success') {
           throw new Error(responseBody)

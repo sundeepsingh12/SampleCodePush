@@ -49,7 +49,7 @@ export default class DataStoreItemDetails extends PureComponent {
                                         style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{CONFIRM}</Text>
                                     <View />
                                 </View>
-                                <View style={[styles.row,]}>
+                                <View style={[styles.row]}>
                                     <View
                                         style={[styles.row, styles.flex1, styles.justifySpaceBetween, styles.relative]}>
                                     </View>

@@ -101,8 +101,6 @@ export function downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
 }
 
 /**This method logs out the user and deletes session token from store
- * @param {*} createBackup if it is called from backup class 
- * @return {Function}
  */
 
 export function invalidateUserSession(isPreLoader, calledFromAutoLogout) {

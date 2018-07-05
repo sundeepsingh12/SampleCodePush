@@ -30,7 +30,7 @@ class JobStatus {
   /**Generic method for getting particular status id of a particular job master and job status code
    * 
    * @param {*} jobMasterId 
-   * @param {*} code 
+   * @param {*} jobStatusCode 
    */
   async getStatusIdForJobMasterIdAndCode(jobMasterId, jobStatusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
@@ -119,17 +119,22 @@ class JobStatus {
    * }
    */
   getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap) {
-    let jobMasterIdJobAttributeStatusMap = {}, statusIdStatusMap = {}
+    let jobMasterIdJobAttributeStatusMap = {}, statusIdStatusMap = {},unseenStatusIdCodeMap={}
     statusList = statusList ? statusList : []
     statusList.forEach(status => {
       statusIdStatusMap[status.id] = status
+
+      if(status.code===UNSEEN){
+        unseenStatusIdCodeMap[status.id] = status.code
+      }
+
       if (!jobAttributeStatusMap[status.id]) {
         return
       }
       jobMasterIdJobAttributeStatusMap[status.jobMasterId] = jobMasterIdJobAttributeStatusMap[status.jobMasterId] ? jobMasterIdJobAttributeStatusMap[status.jobMasterId] : {}
       jobMasterIdJobAttributeStatusMap[status.jobMasterId][status.id] = jobAttributeStatusMap[status.id]
     })
-    return { jobMasterIdJobAttributeStatusMap, statusIdStatusMap }
+    return { jobMasterIdJobAttributeStatusMap, statusIdStatusMap,unseenStatusIdCodeMap }
   }
 
   /** Returns statusIds based on particular status category 
@@ -271,7 +276,6 @@ class JobStatus {
   /**
    * This function prepares map of tabId on basis of jobStatusList
    * @param {*} jobStatusList 
-   * @param {*} tabMap 
    * {
    *    tabId : {
    *                [statusIds]

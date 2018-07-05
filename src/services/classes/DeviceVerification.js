@@ -6,6 +6,7 @@ import { userEventLogService } from './UserEvent'
 import CONFIG from '../../lib/config'
 import DeviceInfo from 'react-native-device-info'
 import { Platform } from 'react-native'
+import _ from 'lodash'
 let imei = require('../../wrapper/IMEI')
 
 import {

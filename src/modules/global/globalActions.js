@@ -67,9 +67,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore('LOGGED_IN_ROUTE')
       await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
-      clearInterval(CONFIG.syncId)
       CONFIG.intervalId = 0
-      CONFIG.syncId = 0
       dispatch(setState(RESET_STATE))
     } catch (error) {
     }
@@ -85,7 +83,7 @@ export function deleteSessionToken() {
  */
 export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
   if (isToastShow == 1) {
-    Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
+    Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, buttonText: OK, duration: 10000 })
   }
   userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
 }

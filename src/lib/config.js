@@ -3,7 +3,6 @@ module.exports = {
   APP_FOLDER: 'FAREYE',
   SYNC_SERVICE_DELAY: 120,
   intervalId: 0,
-  syncId: 0,
   FAREYE: {
     domain: [
       {
