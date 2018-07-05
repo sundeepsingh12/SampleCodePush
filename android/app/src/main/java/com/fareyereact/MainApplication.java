@@ -4,6 +4,7 @@ import android.app.Application;
 import com.emekalites.react.compress.image.ImageCompressPackage;
 import com.facebook.react.ReactApplication;
 import com.rjblopes.opensettings.OpenSettingsPackage;
+import com.psykar.cookiemanager.CookieManagerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.cnull.apkinstaller.ApkInstallerPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
@@ -49,6 +50,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
             new OpenSettingsPackage(),
+            new CookieManagerPackage(),
           new ImagePickerPackage(),
             new PickerPackage(),
            new ImageCompressPackage(), 

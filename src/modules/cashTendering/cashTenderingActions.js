@@ -19,8 +19,10 @@ import {
     ARRAY_SAROJ_FAREYE,
 } from '../../lib/AttributeConstants'
 import { Toast } from 'native-base'
+import { navigate } from '../navigators/NavigationService';
 
-import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
+
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import {
     SKIP_CASH_TENDERING,
     OK,
@@ -30,7 +32,7 @@ import {
     FIELD_ATTRIBUTE_NOT_SET,
 } from '../../lib/ContainerConstants'
 
-export function onSave(parentObject, formLayoutState, cashTenderingList, cashTenderingListReturn, jobTransaction, isReceive,goBack) {
+export function onSave(parentObject, formLayoutState, cashTenderingList, cashTenderingListReturn, jobTransaction, isReceive) {
     return async function (dispatch) {
         try {
             if (!cashTenderingList) {
@@ -41,7 +43,7 @@ export function onSave(parentObject, formLayoutState, cashTenderingList, cashTen
             if (cashTenderingListReturn != null) {
                 dispatch(setState(IS_RECEIVE_TOGGLE, true))
             }
-            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction,null,null,goBack))
+            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
         } catch (error) {
             showToastAndAddUserExceptionLog(601, error.message, 'danger', 1)
         }
@@ -67,7 +69,7 @@ export function getCashTenderingListReturn(cashTenderingList) {
     }
 }
 
-export function checkForCash(routeParams,navigate) {
+export function checkForCash(routeParams) {
     return async function (dispatch) {
         try {
             if (!routeParams || !routeParams.formLayoutState.formElement || !routeParams.currentElement) {
@@ -76,7 +78,7 @@ export function checkForCash(routeParams,navigate) {
             let cash = CashTenderingService.checkForCashInMoneyCollect(routeParams.formLayoutState.formElement, routeParams.currentElement)
             if (cash > 0) {
                 routeParams.cash = cash
-                dispatch(navigateToScene('CashTendering', routeParams,navigate))
+                navigate('CashTendering', routeParams)
             } else {
                 dispatch(getNextFocusableAndEditableElements(routeParams.currentElement.fieldAttributeMasterId, routeParams.formLayoutState, 'N.A.', NEXT_FOCUS, routeParams.jobTransaction))
                 { Toast.show({ text: SKIP_CASH_TENDERING, position: 'bottom', buttonText: OK, duration: 5000 }) }

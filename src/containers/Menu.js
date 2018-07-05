@@ -19,6 +19,7 @@ import {
   SET_UNSYNC_TRANSACTION_PRESENT,
 } from '../lib/constants'
 import { OK, CANCEL, LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE, UNTITLED, APP, LOGOUT } from '../lib/ContainerConstants'
+import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
   return {
@@ -78,7 +79,7 @@ class Menu extends PureComponent {
 
   getPageView(page) {
     return (
-      <TouchableOpacity key={page.id} onPress={() => this.props.actions.navigateToPage(page, this.props.navigation.navigate)}>
+      <TouchableOpacity key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
         <View style={[styles.bgWhite, styles.borderBottomGray]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             <View style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter]}>
@@ -120,7 +121,7 @@ class Menu extends PureComponent {
   messageView() {
     let view
     if (this.props.utilities.messagingEnabled) {
-      view = <TouchableOpacity onPress={() => this.props.actions.navigateToScene('MessageBox', null, this.props.navigation.navigate)}>
+      view = <TouchableOpacity onPress={() => navigate('MessageBox', null)}>
         <View style={[styles.bgWhite, styles.borderBottomGray]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>

@@ -110,18 +110,6 @@ class TransientStatusAndSaveActivatedService {
         }
     }
 
-    /**
-      * This function returns recurring data object 
-      * by adding the new object to the  previous object 
-      * using jobTransactionId as a key
-      * @param {*} formElement 
-      * @param {*} recurringData 
-      * @param {*} jobTransaction 
-      * @param {*} statusId
-      * @returns  
-      *  elementsArray, //details of recurring data , some field attributes are filtered
-         amount //amount collected if any
-      */
     getDataFromFormElement(formElement) {
         let elementsArray = []
         let amount = 0

@@ -6,11 +6,12 @@ import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
-import { View, FlatList, StyleSheet } from 'react-native'
+import { View, FlatList, StyleSheet, BackHandler } from 'react-native'
 import { SET_FORM_LAYOUT_STATE, FormLayout, SET_TRANSIENT_BACK_PRESSED } from '../lib/constants'
 import { Select_Next_Status } from '../lib/AttributeConstants'
-import { Container, Text,Icon, Content, List, ListItem, Right, } from 'native-base'
+import { Container, Text, Icon, Content, List, ListItem, Right, } from 'native-base'
 import TitleHeader from '../components/TitleHeader'
+import { push } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
     return {
@@ -27,24 +28,46 @@ function mapDispatchToProps(dispatch) {
 }
 
 class Transient extends PureComponent {
+    _didFocusSubscription;
+    _willBlurSubscription;
 
     static navigationOptions = ({ navigation }) => {
         return {
+            gesturesEnabled:false,
             header: <TitleHeader pageName={navigation.state.params.currentStatus.name} goBack={navigation.state.params.backForTransient} />
         }
+    }
+
+    constructor(props) {
+        super(props);
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
+          BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
 
     componentDidMount() {
         this.props.navigation.setParams({ backForTransient: this._goBack });
         this.props.actions.setStateFromNavigationParams(
             this.props.navigation.state.params,
-            this.props.formLayoutStates,
-            this.props.navigation.push
+            this.props.formLayoutStates
         )
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
 
+    componentWillUnmount() {
+        this._didFocusSubscription && this._didFocusSubscription.remove();
+        this._willBlurSubscription && this._willBlurSubscription.remove();
+    }
+
+    onBackButtonPressAndroid = () => {
+        this.props.actions.setState(SET_TRANSIENT_BACK_PRESSED, true)
+        return true;
+    };
+
     navigateToFormLayout(statusId, statusName) {
-        this.props.actions.navigateToScene(FormLayout, {
+        push(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: this.props.navigation.state.params.jobTransaction.id,
             jobTransaction: this.props.navigation.state.params.jobTransaction,
@@ -54,9 +77,7 @@ class Transient extends PureComponent {
             navigationFormLayoutStates: this.props.formLayoutStates,
             jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
             pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
-        },
-            this.props.navigation.push
-        )
+        })
     }
 
     componentDidUpdate() {

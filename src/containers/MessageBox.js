@@ -22,6 +22,8 @@ import {
 } from '../lib/constants'
 import MessageSendIcon from '../svg_components/icons/MessageSendIcon'
 import MessageReceiveIcon from '../svg_components/icons/MessageReceiveIcon'
+import _ from 'lodash'
+import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
     return {
@@ -79,13 +81,11 @@ class MessageBox extends Component {
 
     }
     navigateToScene = (item) => {
-        this.props.actions.navigateToScene(JobDetailsV2,
+        navigate(JobDetailsV2,
             {
                 jobSwipableDetails: item.jobSwipableDetails,
                 jobTransaction: item,
-            },
-            this.props.navigation.navigate
-        )
+            })
     }
 
     renderData = (item, transactionIdToCustomisationMap) => {

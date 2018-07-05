@@ -58,7 +58,7 @@ export function shouldFetchJobsOrNot(jobTransactionCustomizationList, pageObject
     try {
       let shouldFetchJobs = await keyValueDBService.getValueFromStore(SHOULD_RELOAD_START)
       if ((shouldFetchJobs && shouldFetchJobs.value) || _.isEmpty(jobTransactionCustomizationList)) {
-        dispatch(fetchJobs(moment().format('YYYY-MM-DD'), pageObject))
+        dispatch(fetchJobs())
       }
       // Sets SHOULD_RELOAD_START to false so jobs are not fetched unnecessesarily 
       await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(false))

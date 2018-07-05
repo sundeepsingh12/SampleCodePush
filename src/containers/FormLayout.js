@@ -1,6 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, Platform, FlatList, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, View, Text, Platform, FlatList, KeyboardAvoidingView, BackHandler } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Button, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
 import styles from '../themes/FeStyle'
@@ -17,6 +17,7 @@ import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_S
 import CustomAlert from "../components/CustomAlert"
 import { ALERT, INVALID_FORM_ALERT, OK } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
+import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
   return {
@@ -49,16 +50,25 @@ function mapDispatchToProps(dispatch) {
 }
 
 class FormLayout extends PureComponent {
+  _didFocusSubscription;
+  _willBlurSubscription;
 
   static navigationOptions = ({ navigation, props }) => {
     return { header: <TitleHeader pageName={navigation.state.params.statusName} goBack={navigation.state.params.backForTransient} /> }
+  }
+
+  constructor(props) {
+    super(props);
+    this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
+      BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+    );
   }
 
   componentDidUpdate() {
     if (this.props.errorMessage && this.props.errorMessage != '') {
       Toast.show({
         text: this.props.errorMessage,
-        position: "bottom" | "center",
+        position: "bottom",
         buttonText: OK,
         type: 'danger',
         duration: 10000
@@ -81,7 +91,22 @@ class FormLayout extends PureComponent {
         this.props.actions.setState(SET_UPDATE_DRAFT, false)
       }
     }
+
+    this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+      BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+    );
   }
+
+  componentWillUnmount() {
+    this._didFocusSubscription && this._didFocusSubscription.remove();
+    this._willBlurSubscription && this._willBlurSubscription.remove();
+  }
+
+  onBackButtonPressAndroid = () => {
+    this._goBack();
+    return true;
+  };
+
   _goBack = () => {
 
     //Set previous status form layout state in case of transient single status
@@ -119,7 +144,6 @@ class FormLayout extends PureComponent {
         jobTransaction={this.props.navigation.state.params.jobTransaction}
         jobStatusId={this.props.navigation.state.params.statusId}
         formLayoutState={formLayoutState}
-        navigate={this.props.navigation.navigate}
       />
     )
   }
@@ -165,9 +189,8 @@ class FormLayout extends PureComponent {
       jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
       pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
     }
-
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
-      this.props.actions.navigateToScene(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
+      navigate(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
         {
           contactData: this.props.navigation.state.params.contactData,
           formElement: this.props.formElement,
@@ -177,10 +200,9 @@ class FormLayout extends PureComponent {
           jobMasterId: this.props.navigation.state.params.jobMasterId,
           navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
           saveActivatedStatusData: this.props.navigation.state.params.saveActivatedStatusData,
-          pieChart: this.props.pieChart,
           taskListScreenDetails
         },
-        this.props.navigation.push)
+      )
     } else {
       this.props.actions.saveJobTransaction(
         formLayoutState,
@@ -189,10 +211,7 @@ class FormLayout extends PureComponent {
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
         this.props.navigation.state.params.saveActivatedStatusData,
-        this.props.pieChart,
         taskListScreenDetails,
-        this.props.navigation.push,
-        this.props.navigation.goBack
       )
     }
   }

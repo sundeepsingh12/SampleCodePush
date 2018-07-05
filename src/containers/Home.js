@@ -22,6 +22,8 @@ import DraftModal from '../components/DraftModal'
 import TransactionAlert from '../components/TransactionAlert'
 import SyncLoader from '../components/SyncLoader'
 import { redirectToFormLayout } from '../modules/newJob/newJobActions'
+import { navigate } from '../modules/navigators/NavigationService';
+
 
 function mapStateToProps(state) {
   return {
@@ -38,7 +40,8 @@ function mapStateToProps(state) {
     pieChartSummaryCount: state.home.pieChartSummaryCount,
     trackingServiceStarted: state.home.trackingServiceStarted,
     checkNewJobTransactionStatus: state.home.checkNewJobTransactionStatus,
-    customErpPullActivated: state.home.customErpPullActivated
+    customErpPullActivated: state.home.customErpPullActivated,
+    logo: state.home.logo
   }
 }
 
@@ -59,7 +62,7 @@ class Home extends PureComponent {
 
   getPageView(page) {
     return (
-      <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page, this.props.navigation.navigate)}>
+      <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
         <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon, { backgroundColor: styles.primaryColor }]} />
         <Body><Text style={[styles.fontWeight500, styles.fontLg]}>{page.name}</Text></Body>
         <Right><Icon name="ios-arrow-forward" /></Right>
@@ -89,11 +92,10 @@ class Home extends PureComponent {
     )
   }
 
-
-showCheckTransactionAlert(){
-  return <TransactionAlert checkTransactionAlert={this.props.checkNewJobTransactionStatus} onCancelPress={() => this.props.actions.redirectToFormLayout({id : this.props.draftNewJobInfo.draft.statusId, name: this.props.draftNewJobInfo.draft.statusName} , -1, this.props.draftNewJobInfo.draft.jobMasterId, this.props.navigation.navigate,  true, CHECK_TRANSACTION_STATUS_NEW_JOB)} 
-                        onOkPress = {() => this.props.actions.checkForPaymentAtEnd(this.props.draftNewJobInfo.draft, null, null, null, CHECK_TRANSACTION_STATUS_NEW_JOB, PAGES_LOADING, this.props.navigation.push ) }      onRequestClose={() => this.props.actions.setState(SET_CHECK_TRANSACTION_AND_DRAFT)} />
-}
+  showCheckTransactionAlert() {
+    return <TransactionAlert checkTransactionAlert={this.props.checkNewJobTransactionStatus} onCancelPress={() => this.props.actions.redirectToFormLayout({ id: this.props.draftNewJobInfo.draft.statusId, name: this.props.draftNewJobInfo.draft.statusName }, -1, this.props.draftNewJobInfo.draft.jobMasterId, true, CHECK_TRANSACTION_STATUS_NEW_JOB)}
+      onOkPress={() => this.props.actions.checkForPaymentAtEnd(this.props.draftNewJobInfo.draft, null, null, null, CHECK_TRANSACTION_STATUS_NEW_JOB, PAGES_LOADING)} onRequestClose={() => this.props.actions.setState(SET_CHECK_TRANSACTION_AND_DRAFT)} />
+  }
   pieChartView() {
     if (!this.props.utilities.pieChartEnabled) {
       return null
@@ -112,12 +114,12 @@ showCheckTransactionAlert(){
     return null
   }
   _onPieChartPress = () => {
-    this.props.actions.navigateToScene(Summary, null, this.props.navigation.navigate)
+    navigate(Summary, null)
   }
 
   getNewJobDraftModal() {
     if (!_.isEmpty(this.props.draftNewJobInfo)) {
-      return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true, this.props.navigation.navigate)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false, this.props.navigation.navigate)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
+      return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
     }
     return null
   }
@@ -127,16 +129,27 @@ showCheckTransactionAlert(){
     if (this.props.pagesLoading) {
       return (<Loader />)
     }
+    let sourceOptions
+    if (this.props.logo) {
+      sourceOptions = {
+        isStatic: true,
+        uri: 'data:image/jpeg;base64,' + this.props.logo
+      }
+    } else {
+      sourceOptions = FareyeLogo
+    }
+
     return (
       <StyleProvider style={getTheme(platform)}>
-        <Container style={StyleSheet.flatten([styles.bgWhite])}>
+        <Container style={[styles.bgWhite]}>
           <SafeAreaView>
-            <Header searchBar style={StyleSheet.flatten([styles.bgWhite])}>
-              <Body>
-                <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}><View><View style={{ width: 90 }}>
-                  <Image style={StyleSheet.flatten([styles.width100, { resizeMode: 'contain' }])} source={FareyeLogo} />
-                </View></View></View>
-              </Body>
+            <Header style={[styles.bgWhite, styles.paddingTop0]}>
+              <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                <View style={[styles.paddingVertical5, { flexDirection: 'row', flex: .5 }]}>
+                  <Image resizeMode={'contain'} style={[{ flex: 1, height: null, width: null }]} source={sourceOptions} />
+                  {/* <Image source={{ uri: 'https://s3-us-west-2.amazonaws.com/fareye.development/images.jpeg' }} style={{ flex: 1, height: null, width: null }} resizeMode='contain' /> */}
+                </View>
+              </View>
             </Header>
           </SafeAreaView>
           <Content>
@@ -165,7 +178,7 @@ const style = StyleSheet.create({
     width: 116,
     height: 116,
     resizeMode: 'contain'
-}
+  }
 });
 
 

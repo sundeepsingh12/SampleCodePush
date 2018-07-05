@@ -12,6 +12,8 @@ import * as cashTenderingActions from '../modules/cashTendering/cashTenderingAct
 import MultipleOptionsAttribute from '../containers/MultipleOptionsAttribute'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import DataStoreFilter from '../containers/DataStoreFilter'
+import { navigate } from '../modules/navigators/NavigationService';
+
 import {
     MONEY_COLLECT,
     MONEY_PAY,
@@ -96,8 +98,7 @@ class BasicFormElement extends PureComponent {
                     jobTransaction: this.props.jobTransaction,
                     returnData: this._searchForReferenceValue.bind(this),
                     formLayoutState: this.props.formLayoutState
-                },
-            this.props.navigate)
+                })
                 break
             }
             case SIGNATURE: {
@@ -110,8 +111,7 @@ class BasicFormElement extends PureComponent {
                     jobTransaction: this.props.jobTransaction,
                     returnData: this._searchForReferenceValue.bind(this),
                     formLayoutState: this.props.formLayoutState
-                },
-                this.props.navigate)
+                })
                 break
             }
             case EXTERNAL_DATA_STORE:
@@ -142,14 +142,13 @@ class BasicFormElement extends PureComponent {
             }
         }
         if (screenName) {
-            this.props.actions.navigateToScene(screenName,
+            navigate(screenName,
                 {
                     currentElement: item,
                     formLayoutState: this.props.formLayoutState,
                     jobTransaction: this.props.jobTransaction,
                     returnData: this._searchForReferenceValue.bind(this),
                 },
-                this.props.navigate
             )
         }
     }
@@ -267,11 +266,10 @@ class BasicFormElement extends PureComponent {
     }
 
     goToQRCode = () => {
-        this.props.actions.navigateToScene('QrCodeScanner',
+        navigate('QrCodeScanner',
             {
                 returnData: this._searchForReferenceValue.bind(this)
-            },
-        this.props.navigate)
+            })
     }
 
     getValueTextForMultipleOption() {

@@ -302,7 +302,7 @@ class Payment {
 
     /**
      * This function returns actual amount of attribute based on its childList and property
-     * @param {*} childList 
+     * @param {*} formElement 
      * @param {*} property 
      * @returns
      * actualAmount : integer

@@ -19,6 +19,7 @@ import { backupService } from '../../services/classes/BackupService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 import { NavigationActions } from 'react-navigation'
+import { navDispatch } from '../navigators/NavigationService';
 import { authenticationService } from '../../services/classes/Authentication'
 import {
     USER_MISSING,
@@ -136,7 +137,7 @@ export function autoLogoutAfterUpload(calledFromHome) {
             dispatch(setState(PRE_LOGOUT_START))
             let response = await authenticationService.logout(true, {value : true}) // hit logout api
             dispatch(setState(PRE_LOGOUT_SUCCESS))
-            dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+            navDispatch(NavigationActions.navigate({ routeName: LoginScreen }))
             dispatch(deleteSessionToken())
         } catch (error) {
             showToastAndAddUserExceptionLog(205, error.message, 'danger', 1)

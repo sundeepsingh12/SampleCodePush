@@ -50,7 +50,7 @@ export default class FormLayoutEventImpl {
                 }
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
-                let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+             fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 let valueAfterValidation = formLayoutObject[value.fieldAttributeMasterId].value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
                     if (value.required) {
@@ -121,8 +121,6 @@ export default class FormLayoutEventImpl {
      * It hits api to get sequence attr data from server.
      * 
      * @param {Number} sequenceMasterId 
-     * 
-     * @returns {float}  -> data
      */
 
     async getSequenceAttrData(sequenceMasterId) {
@@ -143,10 +141,6 @@ export default class FormLayoutEventImpl {
     /**
      * called on saving button and saves Data in db or store
      * currently saving fieldData, jobTransaction and job
-     * @param {*formLayoutMap} formLayoutObject 
-     * @param {*transactionId} jobTransactionId 
-     * @param {*statusId} statusId 
-     * @param {*jobMasterId} jobMasterId
      */
     async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionList) {
         let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -243,7 +237,7 @@ export default class FormLayoutEventImpl {
     _prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user, dateTime, lastTrackLog) {
         let transactionLogs = []
         for (let job in jobTransaction) {
-            transactionLog = {
+            let transactionLog = {
                 userId: user.id,
                 transactionId: jobTransaction[job].id,
                 jobMasterId: jobMasterId,
@@ -299,7 +293,7 @@ export default class FormLayoutEventImpl {
      * update jobSummaryDb count after completing transactions.
      * 
      * @param {object} jobTransaction 
-     * @param {Array} jobTransactionIdList // case of bulk
+     * @param {Array} jobTransactionList // case of bulk
      * @param {Number} statusId // new transaction status Id
      * 
      */
@@ -327,7 +321,7 @@ export default class FormLayoutEventImpl {
       *   and returns an object containing tablename and runSheetArray
       * 
       * @param {Number} prevStatusId 
-      * @param {Array} jobTransactionList 
+      * @param {Array} dbJobTransactionList 
       * @param {Number} statusCategory // next status category
       * 
       * @returns {Object}  -> { tablename : TABLE, value : []}
@@ -359,7 +353,7 @@ export default class FormLayoutEventImpl {
             }
             runsheetMap[jobTransactionList[id].runsheetId][status[statusCategory - 1]] += 1;
             if (jobTransactionList[id].moneyTransactionType && jobTransactionList[id].actualAmount > 0) { // check for moneyTransactionType and  actualAmount
-                if (prevJobTransactionMap[jobTransactionList[id].id].moneyTransactionType == jobTransactionList[id].moneyTransactionType && prevJobTransactionMap[jobTransactionList[id].id].actualAmount > 0) {
+                if (prevJobTransactionMap[jobTransactionList[id].id] && prevJobTransactionMap[jobTransactionList[id].id].moneyTransactionType == jobTransactionList[id].moneyTransactionType && prevJobTransactionMap[jobTransactionList[id].id].actualAmount > 0) {
                     runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount - prevJobTransactionMap[jobTransactionList[id].id].actualAmount
                 } else {
                     runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount
@@ -375,8 +369,6 @@ export default class FormLayoutEventImpl {
      * creates fieldData db structure for current transaction
      * and returns an object containing fieldDataArrayinue
      * 
-     * @param {*formLayoutMap} formLayoutObject 
-     * @param {*jobTransactionId} jobTransactionId 
      */
     _saveFieldData(formLayoutObject, jobTransactionId, isBulk, currentTime) {
         let currentFieldDataObject = {} // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
@@ -384,7 +376,8 @@ export default class FormLayoutEventImpl {
         let fieldDataArray = []
         let npsFeedbackValue = null
         let reAttemptDate = null
-        let moneyCollectObject = skuArrayObject = null
+        let moneyCollectObject = null
+        let skuArrayObject = null
         let amountMap = {
             originalAmount: null,
             actualAmount: null,
@@ -682,12 +675,6 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    /**
-     * updates jobStatus on the basis of action on status
-     * 
-     * @param {*statusObject} status 
-     * @param {*jobId} jobId 
-     */
     _setJobDbValues(status, jobId, jobMasterId, user, hub, referenceNumber, currentTime, reAttemptDate, lastTrackLog) {
         let jobArray = []
         let realmJobObject = null
@@ -753,7 +740,7 @@ export default class FormLayoutEventImpl {
      * @param {*} id 
      */
     _getDefaultValuesForJob(jobMasterId, id, user, hub, referenceNumber, currentTime) {
-        return job = {
+        return  {
             id,
             referenceNo: referenceNumber,
             hubId: (hub) ? hub.id : null,
@@ -776,7 +763,7 @@ export default class FormLayoutEventImpl {
 
     _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei, currentTime, referenceNumber) {
         //TODO some values like lat/lng and battery are not valid values, update them as their library is added
-        return jobTransaction = {
+        return  {
             id,
             runsheetNo: "AUTO-GEN",
             syncErp: false,
