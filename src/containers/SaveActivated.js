@@ -13,8 +13,8 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
-import { FormLayout, Discard, Keep, Cancel, Checkout, SHOW_DISCARD_ALERT, SET_SAVE_ACTIVATED_DRAFT, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE, SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED } from '../lib/constants'
-import { Yes_Checkout, Total, } from '../lib/AttributeConstants'
+import { FormLayout, Discard, Keep, Checkout, SHOW_DISCARD_ALERT, SET_SAVE_ACTIVATED_DRAFT, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE, SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED } from '../lib/constants'
+import { Yes_Checkout, Total, NO} from '../lib/AttributeConstants'
 import { Discard_these_jobs, Do_you_want_to_checkout, EDIT, TRANSACTION_SUCCESSFUL, DELETE_DRAFT } from '../lib/ContainerConstants'
 import DraftModal from '../components/DraftModal'
 import _ from 'lodash'
@@ -214,7 +214,7 @@ class SaveActivated extends PureComponent {
             Do_you_want_to_checkout,
             '',
             [
-                { text: Cancel, style: 'cancel' },
+                { text: NO,  style: 'cancel'},
                 { text: Yes_Checkout, onPress: () => this.checkout() },
             ],
         )
@@ -343,7 +343,7 @@ class SaveActivated extends PureComponent {
 
                         <View style={[styles.row, styles.bgWhite, styles.justifySpaceBetween, styles.alignCenter, styles.padding10, { borderBottomColor: '#f5f5f5', borderBottomWidth: 1 }, styles.marginTop10]}>
 
-                            <Button style={{ borderColor: '#338FFC', paddingLeft: 5, paddingRight: 5, height: 25 }} bordered small
+                            <Button style={{ borderColor: '#338FFC' }} bordered small
                                 onPress={() => this.navigateToFormLayout(this.props.navigation.state.params.currentStatus.id, this.props.navigation.state.params.currentStatus.name)}>
                                 <Icon name="md-add" style={[styles.fontLg, { color: styles.fontPrimaryColor }]} />
                                 <Text style={{ color: styles.fontPrimaryColor }}>Add</Text>
