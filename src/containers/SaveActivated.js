@@ -343,7 +343,7 @@ class SaveActivated extends PureComponent {
 
                         <View style={[styles.row, styles.bgWhite, styles.justifySpaceBetween, styles.alignCenter, styles.padding10, { borderBottomColor: '#f5f5f5', borderBottomWidth: 1 }, styles.marginTop10]}>
 
-                            <Button style={{ borderColor: '#338FFC', paddingLeft: 5, paddingRight: 5, height: 25 }} bordered small
+                            <Button style={{ borderColor: '#338FFC' }} bordered small
                                 onPress={() => this.navigateToFormLayout(this.props.navigation.state.params.currentStatus.id, this.props.navigation.state.params.currentStatus.name)}>
                                 <Icon name="md-add" style={[styles.fontLg, { color: styles.fontPrimaryColor }]} />
                                 <Text style={{ color: styles.fontPrimaryColor }}>Add</Text>

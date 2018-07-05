@@ -40,9 +40,7 @@ function mapStateToProps(state) {
     }
 };
 
-/*
- * Bind all the actions
- */
+
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...globalActions, ...saveActivatedActions }, dispatch)
