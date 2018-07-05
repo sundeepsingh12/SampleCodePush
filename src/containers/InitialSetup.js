@@ -16,15 +16,16 @@ import platform from '../../native-base-theme/variables/platform'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
+import TimeMismatchSetting from '../components/TimeMismatchSetting'
 import {
     SETTING_UP,
     DOWNLOAD_SETTINGS,
     APPLYING_SETTINGS,
     VERIFY_HANDSET,
     CANCEL,
-    RETRY
+    RETRY,
+    TIME_ERROR_MESSAGE
 } from '../lib/ContainerConstants'
-import DeviceSettings from 'react-native-device-settings';
 function mapStateToProps(state) {
     return {
         configDownloadService: state.preloader.configDownloadService,
@@ -42,8 +43,8 @@ function mapDispatchToProps(dispatch) {
 
 class InitialSetup extends PureComponent {
 
-    invalidateSession = () => {
-        this.props.actions.invalidateUserSession(true)
+    invalidateSession = (message) => {
+        this.props.actions.invalidateUserSession(true, false, message)
     }
 
     retry = () => {
@@ -111,6 +112,9 @@ class InitialSetup extends PureComponent {
     }
 
     render() {
+        if(this.props.error == TIME_ERROR_MESSAGE || this.props.error == 'mismatchLoading'){
+            return <TimeMismatchSetting retry = {this.retry} invalidateSession={this.invalidateSession} error = {this.props.error}/>
+        }else{
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
@@ -131,19 +135,6 @@ class InitialSetup extends PureComponent {
             </StyleProvider>
         )
     }
-    goToSettings() {
-        if (Platform.OS == 'android') {
-            DeviceSettings.open();
-        } else {
-            Linking.canOpenURL("App-Prefs:root=General&path=DATE_AND_TIME").then(supported => {
-                if (!supported) {
-                    console.log('Can\'t handle url: ' + url);
-                } else {
-                    return Linking.openURL("App-Prefs:root=General&path=DATE_AND_TIME");
-                }
-            }).catch(err => console.log('An error occurred', err));
-            // Linking.openURL("App-Prefs:root=General&path=DATE_AND_TIME");
-        }
     }
     _renderErrorMessage() {
         if (!_.isEmpty(this.props.error)) {
@@ -160,11 +151,6 @@ class InitialSetup extends PureComponent {
                             <Text style={{ color: '#ffffff' }}>{RETRY}</Text>
                         </Button>
                     </View> : null}
-                    <View style={[feStyle.justifyCenter, feStyle.alignCenter, feStyle.padding5, feStyle.row]}>
-                        {(this.props.error != 'Logging out' && this.props.error == 'Time mismatch. Please correct time on Device') ? <Button onPress={this.goToSettings} rounded color={'#a3a3a3'}>
-                            <Text style={{ color: '#ffffff' }}>Open Settings</Text>
-                        </Button> : null}
-                    </View>
                 </View>
             )
         }

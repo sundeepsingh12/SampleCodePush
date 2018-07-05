@@ -41,7 +41,6 @@ module.exports = {
     SECONDS_AGO: ' seconds ago',
     RESYNC_IN: 'Resync in',
     ERP_SYNC: 'ERP Sync',
-
     //Post Assignment Container
     SHIPMENT_NOT_FOUND: 'Scanned Shipment Not Found',
     SHIPMENT_ALREADY_SCANNED: 'Shipment is already scanned',
@@ -367,6 +366,12 @@ module.exports = {
     ONE_TIME_PASSOWRD_WILL_BE_SENT_TO_MOBILE_NO: 'A One Time Password will be sent to this mobile number',
     SHOW_MOBILE_SCREEN: 'SHOW_MOBILE_SCREEN',
     SHOW_OTP: 'SHOW_OTP_SCREEN',
+    TIME_MISMATCH_ERROR: 'The time on your phone does not match with the server, please set it according to your region.',
+    GO_TO_SETTINGS: 'Go to settings',
+    TIME_MISMATCH: 'Time Mismatch',
+    TIME_ERROR_MESSAGE: 'Time mismatch. Please correct time on Device',
+
+
 
     //Mosambee Wallet
     FAILED: 'Failed',
