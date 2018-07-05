@@ -40,7 +40,6 @@ function mapStateToProps(state) {
     }
 };
 
-
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...globalActions, ...saveActivatedActions }, dispatch)
@@ -102,7 +101,7 @@ class CheckoutDetails extends PureComponent {
     }
 
     static navigationOptions = ({ navigation }) => {
-        return { header: null }
+        return { header: null,gesturesEnabled:false }
     }
 
     onBackButtonPressAndroid = () => {

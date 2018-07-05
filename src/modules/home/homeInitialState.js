@@ -26,7 +26,6 @@ var InitialState = Record({
     failedUploadCount: 0,
     unsyncBackupFilesList: [],
     trackingServiceStarted: false,
-    customErpPullActivated: null,
     erpModalVisible: false,
     lastErpSyncTime: null,
     draftNewJobInfo: null,

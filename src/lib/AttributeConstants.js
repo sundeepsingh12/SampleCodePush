@@ -1,8 +1,7 @@
 import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
 module.exports = {
-
-    APP_VERSION_NUMBER: '0.3.1',
+    APP_VERSION_NUMBER: '0.4.0',
     /**
      * TODO : Change money collect details object keys to attribute type id
      */

@@ -94,7 +94,6 @@ class Payment extends PureComponent {
                 <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
                     <Input
                         keyboardType="numeric"
-                        KeyboardTypeIOS="number-pad"
                         returnKeyType='done'
                         value={this.props.transactionNumber}
                         placeholder='Regular Textbox'
@@ -256,7 +255,6 @@ class Payment extends PureComponent {
                         placeholder="Enter Amount"
                         editable={this.props.isAmountEditable}
                         keyboardType="numeric"
-                        KeyboardTypeIOS="decimal-pad"
                         returnKeyType='done'
                         onChangeText={value => this.onTextChange(
                             'SET_ACTUAL_AMOUNT',

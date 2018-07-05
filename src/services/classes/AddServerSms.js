@@ -31,7 +31,7 @@ class AddServerSms {
    * @param {*} statusId 
    * @param {*} jobMasterId 
    * @param {*} fieldData
-   * @param {*} jobTransaction
+   * @param {*} jobTransactionList
    * @returns
    * {
    *      serverSmsLogs,
@@ -108,15 +108,7 @@ class AddServerSms {
     }
 
 
-    /**
-     * This function sets message body with job data values
-     * @param {String} messageBody 
-     * @param {*} jobDataList
-     * @param {*} jobTransaction
-     * @param {*} jobAttributesList
-     * @returns
-     * messageBody: string
-     */
+  
     setSmsBodyJobData(messageBody, jobDataMap, jobTransaction, keyToJobAttributeMap, jobDataList, setNA) { //TODO combine setSmsBodyJobData and setSmsBodyFieldData
         let reqEx = /\{.*?\}/g
         let keys = messageBody.match(reqEx)
@@ -324,10 +316,7 @@ class AddServerSms {
         let jobMasterIdToFieldAtrributesMap = (fieldAttributesList && fieldAttributesList.value && fieldAttributesList.value.length > 0) ? _.groupBy(fieldAttributesList.value, 'jobMasterId') : {}
         return { jobMasterIdToJobAtrributesMap, jobMasterIdToFieldAtrributesMap }
     }
-    /**
-    * This function checks if a sms is mapped to transaction's pending status and saves server sms log
-    * @param {String} transactionIdDtos 
-    */
+   
     async setServerSmsMapForPendingStatus(updatedTransactionList) {
         if (_.isEmpty(updatedTransactionList)) {
             return

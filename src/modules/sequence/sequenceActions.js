@@ -100,7 +100,6 @@ export function resequenceJobsFromServer(sequenceList) {
 /**
  * This method get all runsheet available and if only one runsheet is present
  * then navigate to sequence container if no runsheet is present then show a toast
- * @param {*String} pageObject //pageobject from server 
  */
 export function getRunsheetsForSequence(pageObject,props) {
     return async function (dispatch) {
@@ -155,7 +154,7 @@ export function rowMoved(rowParam, sequenceList, transactionsWithChangedSeqeunce
 }
 
 /**
- * @param {*Object} transactionsWithChangedSeqeunceMap 
+ * @param  transactionsWithChangedSeqeunceMap 
  * 
  * This method saves transactions which have changed sequence
  */

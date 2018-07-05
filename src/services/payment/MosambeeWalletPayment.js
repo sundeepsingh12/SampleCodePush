@@ -1,10 +1,8 @@
 'use strict'
 
-import * as realm from '../../repositories/realmdb'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import { keyValueDBService } from '../classes/KeyValueDBService'
 import {
-    TABLE_JOB_DATA,
     CUSTOMIZATION_APP_MODULE
 } from '../../lib/constants'
 import {MOSAMBEE_WALLET_ID} from '../../lib/AttributeConstants'
@@ -12,6 +10,8 @@ import CONFIG from '../../lib/config'
 import jsSha512 from 'js-sha512'
 import { draftService } from '../classes/DraftService'
 import { moduleCustomizationService } from '../classes/ModuleCustomization'
+import _ from 'lodash'
+
 class MosambeeWalletPayment {
 
     async hitWalletUrlToGetWalletList(walletParameters) {

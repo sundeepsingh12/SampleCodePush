@@ -1,4 +1,3 @@
-
 var themeColor = '#00796B'
 export default {
     primaryColor: themeColor,

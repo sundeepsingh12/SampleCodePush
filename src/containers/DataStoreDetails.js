@@ -163,7 +163,6 @@ const style = StyleSheet.create({
     },
     headerRight: {
         width: '20%',
-        paddingRight: 20,
         paddingTop: 15,
         paddingBottom: 15,
         paddingRight: 15
