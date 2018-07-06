@@ -52,10 +52,10 @@ export function loginSuccess() {
   }
 }
 
-export function loginFailure(error) {
+export function loginFailure(error, code) {
   return {
     type: LOGIN_FAILURE,
-    payload: error
+    payload: {error, code}
   }
 }
 
@@ -134,7 +134,7 @@ export function authenticateUser(username, password, rememberMe) {
       }))
     } catch (error) {
       showToastAndAddUserExceptionLog(1301, error.message, 'danger', 0)
-      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
+      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, ""), error.code))
     }
   }
 }
@@ -180,7 +180,7 @@ export function forgetPasswordRequest(username) {
       dispatch(loginFailure(response.json.message.replace(/<\/?[^>]+(>|$)/g, "")))
     } catch (error) {
       showToastAndAddUserExceptionLog(1303, error.message, 'danger', 0)
-      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
+      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, ""), error.code))
     }
   }
 }
