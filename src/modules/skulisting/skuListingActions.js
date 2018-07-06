@@ -8,32 +8,17 @@ import {
     UPDATE_SKU_LIST_ITEMS,
     SkuListing,
     NEXT_FOCUS,
+    SET_SKU_CODE
 } from '../../lib/constants'
-
-import {
-    skuListing
-} from '../../services/classes/SkuListing'
-import {
-    fieldAttributeValidation
-} from '../../services/classes/FieldAttributeValidation'
+import { skuListing } from '../../services/classes/SkuListing'
+import { fieldAttributeValidation } from '../../services/classes/FieldAttributeValidation'
 import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
-
-import {
-    ARRAY_SAROJ_FAREYE,
-    SKU_PHOTO,
-    SKU_REASON,
-    NA,
-    SKUVALIDATION
-} from '../../lib/AttributeConstants'
+import { ARRAY_SAROJ_FAREYE, SKU_PHOTO, SKU_REASON, NA, SKUVALIDATION } from '../../lib/AttributeConstants'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
-import {
-    setState, showToastAndAddUserExceptionLog
-} from '../global/globalActions'
-import {
-    Toast
-} from 'native-base'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import { Toast } from 'native-base'
 import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
 import { SKIP_SKU_MESSAGE, OK } from '../../lib/ContainerConstants'
 import _ from 'lodash'
@@ -70,6 +55,7 @@ export function scanSkuItem(functionParams) {
         try {
             let { errorMessage, cloneSKUListItems, cloneSkuChildItems } = await skuListing.scanSKUCode(functionParams)
             if (errorMessage) {
+                dispatch(setState(SET_SKU_CODE, ''))
                 Toast.show({
                     text: errorMessage,
                     position: 'bottom',
@@ -89,7 +75,7 @@ export function scanSkuItem(functionParams) {
  *This method updates SkuActualQuantity of a particular list item and TotalActualQuantity,
  * TotalOriginalQuantity & SkuActualAmount as well,Called when actualQuantity is changed by user
  */
-export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId,navigation) {
+export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId, navigation) {
     return async function (dispatch) {
         try {
             if (rowItem.attributeTypeId == SKU_PHOTO || rowItem.attributeTypeId == SKU_REASON) {
