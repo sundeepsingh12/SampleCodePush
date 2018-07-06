@@ -4,7 +4,6 @@ import { setState, showToastAndAddUserExceptionLog } from '../global/globalActio
 import {
     ADD_FORM_LAYOUT_STATE,
     LOADER_IS_RUNNING,
-    FormLayout
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService'
 import _ from 'lodash'
