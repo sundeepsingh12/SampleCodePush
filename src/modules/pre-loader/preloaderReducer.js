@@ -34,7 +34,7 @@ import {
   RESET_STATE,
   SET_IOS_UPGRADE_SCREEN
 } from '../../lib/constants'
-
+import { TIMEMISMATCH } from '../../lib/ContainerConstants'
 /**
  * ## preloaderReducer function
  * @param {Object} state - initialState
@@ -89,7 +89,7 @@ export default function preloaderReducer(state = initialState, action) {
         .set('otpNumber', '')
 
     case PRE_LOGOUT_START:
-      return state.set('error', action.payload == 'Time_Mismatch' ? 'mismatchLoading' : 'Logging out')
+      return state.set('error', action.payload == TIMEMISMATCH ? 'mismatchLoading' : 'Logging out')
         .set('mobileOtpDisplayMessage', false)
     case PRE_LOGOUT_SUCCESS:
       return state.set('deviceVerificationService', SERVICE_PENDING)

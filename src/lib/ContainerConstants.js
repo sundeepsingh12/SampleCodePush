@@ -369,6 +369,7 @@ module.exports = {
     TIME_MISMATCH_ERROR: 'The time on your phone does not match with the server, please set it according to your region.',
     GO_TO_SETTINGS: 'Go to settings',
     TIME_MISMATCH: 'Time Mismatch',
+    TIMEMISMATCH:'Time_Mismatch',
     TIME_ERROR_MESSAGE: 'Time mismatch. Please correct time on Device',
 
 
