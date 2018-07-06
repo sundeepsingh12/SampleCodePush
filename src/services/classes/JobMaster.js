@@ -40,6 +40,7 @@ import {
 } from '../../lib/constants'
 import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER, PATH_COMPANY_LOGO_DIR, PATH_COMPANY_LOGO_IMAGE } from '../../lib/AttributeConstants'
 import _ from 'lodash'
+import { TIME_ERROR_MESSAGE } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
 class JobMaster {
@@ -285,7 +286,7 @@ class JobMaster {
     const currentTimeInMillis = moment()
     let diffIntime = Math.abs(moment(currentTimeInMillis).diff(serverTimeInMillis, 'minutes'))
     if (diffIntime > 15) {
-      throw new Error("Time mismatch. Please correct time on Device")
+      throw new Error(TIME_ERROR_MESSAGE)
     }
     return true
   }
