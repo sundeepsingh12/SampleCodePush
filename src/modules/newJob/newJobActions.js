@@ -44,7 +44,9 @@ export function redirectToFormLayout(status, negativeId, jobMasterId, deleteDraf
                     jobMasterId,
                     jobId: negativeId,
                     referenceNumber
-                }
+                },
+                transient:status.transient,
+                saveActivated:status.saveActivated
             })
         } catch (error) {
             //TODO

@@ -18,6 +18,7 @@ import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED,  
 import { FormLayout, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { navigate } from '../modules/navigators/NavigationService';
+
 function mapStateToProps(state) {
   return {
     bulkTransactionList: state.bulk.bulkTransactionList,
@@ -177,11 +178,16 @@ class BulkListing extends PureComponent {
     let nextStatusNames = []
     this.props.nextStatusList.forEach(object => {
       let statusObject =
-        { text: object.name, icon: "md-arrow-dropright", iconColor: "#000000" }
-      nextStatusNames.push(statusObject)
-    })
+        nextStatusNames.push({
+          text: object.name,
+          icon: "md-arrow-dropright",
+          iconColor: "#000000",
+          transient:object.transient,
+          saveActivated:object.saveActivated,
+          id:object.id
+        })
+        })
     nextStatusNames.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
-    const nextStatusIds = this.props.nextStatusList.map(nextStatus => nextStatus.id)
 
     return (
       <StyleProvider style={getTheme(platform)}>
@@ -229,9 +235,9 @@ class BulkListing extends PureComponent {
                     title: NEXT_POSSIBLE_STATUS
                   }, buttonIndex => {
                     if (buttonIndex >= 0 && buttonIndex != nextStatusNames.length - 1) {
-                      this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex].text)
+                      this.goToFormLayout( nextStatusNames[buttonIndex].id, nextStatusNames[buttonIndex].text,nextStatusNames[buttonIndex].transient,nextStatusNames[buttonIndex].saveActivated)
                     }
-                  }) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0].text)
+                  }) : this.goToFormLayout(nextStatusNames[0].id, nextStatusNames[0].text,nextStatusNames[0].transient,nextStatusNames[0].saveActivated)
                 }}
                 success full
                 disabled={_.isEmpty(this.props.selectedItems) || (this.props.navigation.state.params.pageObject.groupId && !_.isEqual(_.size(this.props.bulkTransactionList), _.size(this.props.selectedItems)))}
@@ -263,10 +269,12 @@ class BulkListing extends PureComponent {
     }
   }
 
-  goToFormLayout(statusId, statusName) {
+  goToFormLayout(statusId, statusName,transient,saveActivated) {
     navigate(FormLayout, {
       statusId,
       statusName,
+      transient,
+      saveActivated,
       jobMasterId: JSON.parse(this.props.navigation.state.params.pageObject.jobMasterIds)[0],
       jobTransaction: Object.values(this.props.selectedItems),
     })
