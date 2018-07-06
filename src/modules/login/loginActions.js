@@ -35,7 +35,7 @@ import {
 
 import CONFIG from '../../lib/config'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions,StackActions } from 'react-navigation'
 import { navDispatch } from '../navigators/NavigationService';
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 
@@ -129,9 +129,10 @@ export function authenticateUser(username, password, rememberMe) {
       await authenticationService.saveLoginCredentials(username, password, rememberMe)
       dispatch(loginSuccess())
       keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','PreloaderScreen')
-      navDispatch(NavigationActions.navigate({
-        routeName: 'PreloaderScreen'
-      }))
+      navDispatch(StackActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({ routeName: 'PreloaderScreen' })],
+      }));
     } catch (error) {
       showToastAndAddUserExceptionLog(1301, error.message, 'danger', 0)
       dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
