@@ -87,8 +87,8 @@ class FormLayout extends PureComponent {
    
     this.props.navigation.setParams({ backForTransient: this._goBack });
     if (!this.props.navigation.state.params.isDraftRestore) {
-      let {saveActivated, transient,statusId,statusName} = this.props.navigation.state.params
-      const statusData = {saveActivated, transient,statusId,statusName}
+      let {statusId,statusName} = this.props.navigation.state.params
+      const statusData = {statusId,statusName}
       this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,statusData)
       if (this.props.navigation.state.params.jobTransaction.length || this.props.navigation.state.params.editableFormLayoutState || this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
         this.props.actions.setState(SET_UPDATE_DRAFT, false)
@@ -111,7 +111,6 @@ class FormLayout extends PureComponent {
   };
 
   _goBack = () => {
-
     //Set previous status form layout state in case of transient single status
     if (this.props.navigation.state.params.navigationFormLayoutStates && this.props.navigation.state.params.previousStatus) {
       this.props.actions.setState(SET_FORM_LAYOUT_STATE, {

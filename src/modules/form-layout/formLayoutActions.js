@@ -55,8 +55,6 @@ export function getSortedRootFieldAttributes(statusData, jobTransactionId, jobTr
             dispatch(setState(SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT, {
                 statusId:statusData.statusId,
                 statusName:statusData.statusName,
-                saveActivated:statusData.saveActivated,
-                transient:statusData.transient,
                 jobTransactionId,
                 latestPositionId,
                 fieldAttributeMasterParentIdMap,
@@ -212,6 +210,8 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                                 jobTransaction: jobTransaction,
                                 statusId: currentStatus.nextStatusList[0].id,
                                 statusName: currentStatus.nextStatusList[0].name,
+                                saveActivated:currentStatus.nextStatusList[0].saveActivated,
+                                transient:currentStatus.nextStatusList[0].transient,
                                 jobMasterId: jobMasterId,
                                 navigationFormLayoutStates: cloneTransientFormLayoutMap,
                                 latestPositionId: formLayoutState.latestPositionId,
