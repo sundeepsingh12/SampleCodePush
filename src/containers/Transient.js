@@ -66,13 +66,15 @@ class Transient extends PureComponent {
         return true;
     };
 
-    navigateToFormLayout(statusId, statusName) {
+    navigateToFormLayout(item) {
         push(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: this.props.navigation.state.params.jobTransaction.id,
             jobTransaction: this.props.navigation.state.params.jobTransaction,
-            statusId,
-            statusName,
+            statusId:item.id,
+            statusName:item.name,
+            saveActivated:item.saveActivated,
+            transient:item.transient,
             jobMasterId: this.props.navigation.state.params.jobMasterId,
             navigationFormLayoutStates: this.props.formLayoutStates,
             jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
@@ -97,7 +99,7 @@ class Transient extends PureComponent {
 
     renderData = (item) => {
         return (
-            <ListItem style={[style.jobListItem]} onPress={() => this.navigateToFormLayout(item.id, item.name)}>
+            <ListItem style={[style.jobListItem]} onPress={() => this.navigateToFormLayout(item)}>
                 <View style={[styles.row, styles.alignCenter]}>
                     <View style={[style.statusCircle, { backgroundColor: item.buttonColor }]}></View>
                     <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{item.name}</Text>
@@ -174,7 +176,5 @@ const style = StyleSheet.create({
         borderRadius: 5
     }
 });
-/**
- * Connect the properties
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(Transient)

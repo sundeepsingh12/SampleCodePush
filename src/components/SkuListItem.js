@@ -57,7 +57,7 @@ class SkuListItem extends PureComponent {
     _getViewOfHeader(rowItem, originalQuantityValue) {
         if (rowItem.attributeTypeId == SKU_PHOTO) {
             return <Icon name="ios-camera" style={[styles.flexBasis50, styles.fontDefault, styles.fontXxl, styles.marginTop15, {color : styles.fontPrimaryColor}]} />
-        } else if (!(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY && originalQuantityValue > 1 && originalQuantityValue <= 1000)) {
+        } else if (!(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY && originalQuantityValue > 1)) {
             return <View style={[styles.flexBasis50, styles.column, styles.justifyCenter, { height: 60 }]}>
                 <Text style={[styles.fontSm]}>
                     {rowItem.label}
@@ -148,7 +148,7 @@ class SkuListItem extends PureComponent {
                         <CheckBox color={ styles.bgPrimaryColor } style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value, this.props.title)} />
                     </View>
             }
-            else if (originalQuantityValue > 1 && originalQuantityValue <= 1000) {
+            else if (originalQuantityValue > 1) {
                 quantitySelector = this.renderQuantitySelectorForLargeQuantity(rowItem,originalQuantityValue)
             }
             return (

@@ -80,7 +80,8 @@ class PostAssignment {
         let transactionDTO = {
             id: jobTransaction.id,
             referenceNumber: jobTransaction.referenceNumber,
-            jobId: jobTransaction.jobId
+            jobId: jobTransaction.jobId,
+            syncTime: moment().format('YYYY-MM-DD HH:mm:ss')
         }
         const runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction.jobStatusId, pendingStatus.statusCategory, [jobTransaction])
         await formLayoutEventsInterface._updateJobSummary(jobTransaction, pendingStatus.id)
@@ -99,7 +100,6 @@ class PostAssignment {
         let jobTransactionTableDTO = {
             tableName: TABLE_JOB_TRANSACTION,
             value: transactionList,
-            syncTime: moment().format('YYYY-MM-DD HH:mm:ss')
         }
         realm.performBatchSave(jobTransactionTableDTO, runSheet)
         await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionDTOMap)

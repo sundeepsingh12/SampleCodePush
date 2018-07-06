@@ -104,10 +104,10 @@ export function downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
 /**This method logs out the user and deletes session token from store
  */
 
-export function invalidateUserSession(isPreLoader, calledFromAutoLogout) {
+export function invalidateUserSession(isPreLoader, calledFromAutoLogout, message) {
   return async function (dispatch) { // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "") /* uncomment this code when run sync in logout */
-    try {
-      dispatch(setState(PRE_LOGOUT_START))
+   try {
+      dispatch(setState(PRE_LOGOUT_START,message))
       const isPreLoaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       let response = await authenticationService.logout(calledFromAutoLogout, isPreLoaderComplete) // create backup, hit logout api and delete dataBase
       dispatch(setState(PRE_LOGOUT_SUCCESS))

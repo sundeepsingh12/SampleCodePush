@@ -31,7 +31,7 @@ import {
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert, Image } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text,  Body, Right, Icon, StyleProvider, List, ListItem, Footer, FooterTab, Card, ActionSheet, Toast } from 'native-base'
+import { Container, Content, Header, Button, Text, Right, Icon, StyleProvider, ListItem, Footer, FooterTab, ActionSheet, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import Loader from '../components/Loader'
@@ -119,6 +119,7 @@ class JobDetailsV2 extends PureComponent {
   navigateToDataStoreDetails = (navigationParam) => {
     navigate(DataStoreDetails, navigationParam)
   }
+  
   navigateToCameraDetails = (navigationParam) => {
     navigate(ImageDetailsView, navigationParam)
   }
