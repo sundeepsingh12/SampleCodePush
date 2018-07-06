@@ -37,6 +37,7 @@ import {
   MDM_POLICIES,
   APP_VERSION,
   APP_THEME,
+  LONG_CODE_SIM_VERIFICATION
 } from '../../lib/constants'
 import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER, PATH_COMPANY_LOGO_DIR, PATH_COMPANY_LOGO_IMAGE } from '../../lib/AttributeConstants'
 import _ from 'lodash'
@@ -179,6 +180,7 @@ class JobMaster {
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.appTheme, APP_THEME)
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.companyMDM, MDM_POLICIES)
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.hubLatLng, HUB_LAT_LONG)
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.deviceSimVerification, LONG_CODE_SIM_VERIFICATION)
   }
 
 

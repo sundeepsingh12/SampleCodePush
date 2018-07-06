@@ -27,6 +27,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.imeigetter.RNIMEIPackage;
+import com.smsinbackground.SendSMSPackage;
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,27 +49,28 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new CookieManagerPackage(),
+          new CookieManagerPackage(),
           new ImagePickerPackage(),
-            new PickerPackage(),
-           new ImageCompressPackage(), 
+          new PickerPackage(),
+          new ImageCompressPackage(), 
           new ApkInstallerPackage(),
-            new RNCameraPackage(),
-            new FIRMessagingPackage(),
-            new RNBackgroundFetchPackage(),
-            new RealmReactPackage(),
-            new LinearGradientPackage(),
-            new RSSignatureCapturePackage(),
-            new SvgPackage(),
-            new RNBackgroundGeolocation(),
-            new RNZipArchivePackage(),
-            new RNFSPackage(),
-            new RNFetchBlobPackage(),
-            new VectorIconsPackage(),
-            new RNDeviceInfo(),
-            new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
-            new BackgroundTimerPackage() ,
-            new RNIMEIPackage()
+          new RNCameraPackage(),
+          new FIRMessagingPackage(),
+          new RNBackgroundFetchPackage(),
+          new RealmReactPackage(),
+          new LinearGradientPackage(),
+          new RSSignatureCapturePackage(),
+          new SvgPackage(),
+          new RNBackgroundGeolocation(),
+          new RNZipArchivePackage(),
+          new RNFSPackage(),
+          new RNFetchBlobPackage(),
+          new VectorIconsPackage(),
+          new RNDeviceInfo(),
+          new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
+          new BackgroundTimerPackage() ,
+          new RNIMEIPackage(),
+          new SendSMSPackage()
       );
     }
 

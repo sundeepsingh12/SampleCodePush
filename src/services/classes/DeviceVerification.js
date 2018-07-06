@@ -8,12 +8,15 @@ import DeviceInfo from 'react-native-device-info'
 import { Platform } from 'react-native'
 import _ from 'lodash'
 let imei = require('../../wrapper/IMEI')
+let SendSMSBackGroundService = require('../../wrapper/SendSMSBackGround')
 
 import {
   DEVICE_IMEI,
   DEVICE_SIM,
   IS_PRELOADER_COMPLETE,
-  IS_SHOW_MOBILE_OTP_SCREEN
+  IS_SHOW_MOBILE_OTP_SCREEN,
+  USER,
+  DOMAIN_URL
 } from '../../lib/constants'
 import {
   LOGIN_SUCCESSFUL
@@ -89,16 +92,16 @@ class DeviceVerification {
    * @param {*} user 
    */
   async populateDeviceImeiAndDeviceSim(user) {
-      let imeiNumber, simNumber
-      if (Platform.OS === 'ios') {
-        imeiNumber = DeviceInfo.getUniqueID()
-        simNumber = imeiNumber
-      } else {
-        imeiNumber = await imei.getIMEI()
-        simNumber = await imei.getSim()
-      }
-      await this.populateDeviceImei(user, imeiNumber)
-      await this.populateDeviceSim(user, simNumber)
+    let imeiNumber, simNumber
+    if (Platform.OS === 'ios') {
+      imeiNumber = DeviceInfo.getUniqueID()
+      simNumber = imeiNumber
+    } else {
+      imeiNumber = await imei.getIMEI()
+      simNumber = await imei.getSim()
+    }
+    await this.populateDeviceImei(user, imeiNumber)
+    await this.populateDeviceSim(user, simNumber)
   }
 
   /**Saves deviceIMEI in store
@@ -218,24 +221,42 @@ class DeviceVerification {
   }
 
 
-  async checkAssetApiAndSimVerificationOnServer(token) {
+  async checkAssetApiAndSimVerificationOnServer(token, deviceObject) {
     if (!token || !token.value) {
       throw new Error('Token Missing')
     }
-    const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-    const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+    const deviceIMEI = deviceObject.deviceIMEI
+    const deviceSIM = deviceObject.deviceSIM
     const response = await this.checkAssetAPI(deviceIMEI.value, deviceSIM.value, token)
     if (!response || !response.json) {
       throw new Error('No response returned from server')
     }
     await keyValueDBService.validateAndSaveData(DEVICE_IMEI, response.json.deviceIMEI)
     await keyValueDBService.validateAndSaveData(DEVICE_SIM, response.json.deviceSIM)
-    if(response.json.deviceSIM && response.json.deviceSIM.isVerified){
+    if (response.json.deviceSIM && response.json.deviceSIM.isVerified) {
       await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
-    }else{
+    } else {
       await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_OTP_SCREEN, true)
     }
     return response.json.deviceSIM ? response.json.deviceSIM.isVerified : false
+  }
+
+  async sendLongSms(deviceObject) {
+    let user = await keyValueDBService.getValueFromStore(USER);
+    let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL);
+    let domain = domainUrl && domainUrl.value ? domainUrl.value.split('//')[1].split('.')[0] : '';
+    let longCodePreAppendText = deviceObject.longCodeConfiguration && deviceObject.longCodeConfiguration.value ? deviceObject.longCodeConfiguration.value.longCodePreAppendText : '';
+    let simNumber = deviceObject.deviceSIM && deviceObject.deviceSIM.value ? deviceObject.deviceSIM.value.simNumber : '';
+    let imeiId = deviceObject.deviceIMEI && deviceObject.deviceIMEI.value ? deviceObject.deviceIMEI.value.id : '';
+    let companyCode = user && user.value && user.value.company ? user.value.company.code : '';
+    let employeeCode = user && user.value ? user.value.employeeCode : '';
+    let messageBody = longCodePreAppendText + '$' + simNumber + '$' + imeiId + '$' + companyCode + '$' + domain + '$' + employeeCode;
+    let recipientPhoneNumber = deviceObject.longCodeConfiguration && deviceObject.longCodeConfiguration.value ? deviceObject.longCodeConfiguration.value.longCodeNumber : '';
+    if (Platform.OS === 'ios') {
+    } else {
+      await SendSMSBackGroundService.sendLongCodeSMS(messageBody, recipientPhoneNumber);
+    }
+    return
   }
 }
 
