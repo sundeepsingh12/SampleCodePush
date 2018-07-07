@@ -364,7 +364,6 @@ export function checkIfSimValidOnServer(user, token, longCodeConfiguration) {
       const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
       const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
       let responseIsVerified = await deviceVerificationService.checkAssetApiAndSimVerificationOnServer(token, { deviceIMEI, deviceSIM })
-      responseIsVerified = false;
       if (responseIsVerified) {
         dispatch(setState(PRELOADER_SUCCESS))
         dispatch(checkForUnsyncBackupFilesAndNavigate(user))
