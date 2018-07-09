@@ -13,7 +13,7 @@ class Bulk {
      * @returns
      * {
      *      jobTransactionId : jobTransactionCustomization {
-     *                                          circleLine1
+                                                circleLine1
      *                                          circleLine2
      *                                          id
      *                                          jobMasterId
@@ -232,6 +232,7 @@ class Bulk {
         }
         return { displayText, selectAll }
     }
+
     performFilterBeforeSelectAll(bulkTransaction, searchText) {
         if (!searchText || searchText == '') {
             return true
@@ -242,6 +243,7 @@ class Bulk {
             }
         }
     }
+
 }
 
 export let bulkService = new Bulk()
