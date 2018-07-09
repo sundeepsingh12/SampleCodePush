@@ -17,6 +17,7 @@ import _ from 'lodash'
 import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED,  NO_JOBS_PRESENT, TOTAL_COUNT } from '../lib/ContainerConstants'
 import { FormLayout, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import moment from 'moment'
 import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
@@ -50,11 +51,14 @@ class BulkListing extends PureComponent {
   }
 
   renderData = (item) => {
-    return (
-      <JobListItem data={item}
-        onPressItem={() => this.onClickRowItem(item)}
-      />
-    )
+    if(_.isEmpty(item.jobExpiryData.value) ||  moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(item.jobExpiryData.value)){
+      return (
+        <JobListItem data={item}
+          onPressItem={() => this.onClickRowItem(item)}
+        />
+      )
+    }
+    
   }
 
   componentDidUpdate() {
@@ -130,6 +134,7 @@ class BulkListing extends PureComponent {
       jobTransactionArray = Object.values(this.props.bulkTransactionList)
     }
     else {
+      
       let searchText = this.props.searchText
       // Function for filtering on basis of reference number, runsheet number, line1, line2, circleline1, circleline2
       _.forEach(this.props.bulkTransactionList, function (value) {

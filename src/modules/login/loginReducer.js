@@ -72,10 +72,10 @@ export default function authReducer(state = initialState, action) {
 
     case LOGIN_FAILURE:
       return state.setIn(['form', 'authenticationService'], false)
-        .setIn(['form', 'displayMessage'], action.payload)
-        .setIn(['form','password'],'')
+        .setIn(['form', 'displayMessage'], action.payload.error)
+        .setIn(['form','password'],(action.payload.code == 401) ? '' : state.form.password)
         .setIn(['form','isEditTextEnabled'],true)
-        .setIn(['form','isButtonDisabled'],true)
+        .setIn(['form','isButtonDisabled'],(action.payload.code == 401) ? true : false)
 
     case ON_LOGIN_USERNAME_CHANGE:
       const username = action.payload
