@@ -104,8 +104,8 @@ class JobMaster {
       if ((!deviceIMEI || !deviceSIM)) {
         deviceIMEI = {}
         deviceSIM = {}
-        currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
-        deviceCompanyId = userObject.value.company.id
+        currentJobMasterVersion = userObject.company.currentJobMasterVersion
+        deviceCompanyId = userObject.company.id
         postData = JSON.stringify({
           deviceIMEI,
           deviceSIM,
@@ -113,8 +113,8 @@ class JobMaster {
           deviceCompanyId
         })
       } else {
-        currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
-        deviceCompanyId = userObject.value.company.id
+        currentJobMasterVersion = userObject.company.currentJobMasterVersion
+        deviceCompanyId = userObject.company.id
         postData = JSON.stringify({
           deviceIMEI: deviceIMEI.value,
           deviceSIM: deviceSIM.value,

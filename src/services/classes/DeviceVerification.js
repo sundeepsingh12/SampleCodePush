@@ -8,7 +8,7 @@ import DeviceInfo from 'react-native-device-info'
 import { Platform } from 'react-native'
 import _ from 'lodash'
 let imei = require('../../wrapper/IMEI')
-let SendSMSBackGroundService = require('../../wrapper/SendSMSBackGround')
+let sendSMSBackGroundService = require('../../wrapper/SendSMSBackGround')
 
 import {
   DEVICE_IMEI,
@@ -71,16 +71,18 @@ class DeviceVerification {
    */
 
   async checkAssetLocal(deviceIMEI, deviceSIM, user) {
-    if (!user || !user.value) throw new Error('Value of user missing')
-    const companyId = (user.value.company) ? user.value.company.id : 0;
+    if (!user) {
+      throw new Error('Value of user missing')
+    }
+    const companyId = (user.company) ? user.company.id : 0;
     if (!deviceIMEI || !deviceSIM || !deviceSIM.value.isVerified || deviceSIM.value.companyId != companyId) {
       await this.populateDeviceImeiAndDeviceSim(user)
       return false
     } else {
       await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
       await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
-      if (user.value.hubId != deviceIMEI.value.hubId) {
-        deviceIMEI.value.hubId = user.value.hubId;
+      if (user.hubId != deviceIMEI.value.hubId) {
+        deviceIMEI.value.hubId = user.hubId;
         await keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI)
       }
     }
@@ -111,10 +113,10 @@ class DeviceVerification {
    */
   async populateDeviceImei(user, imeiNumber) {
     const deviceImei = {
-      hubId: user.value.hubId,
-      cityId: user.value.cityId,
-      companyId: user.value.company.id,
-      userId: user.value.id,
+      hubId: user.hubId,
+      cityId: user.cityId,
+      companyId: user.company.id,
+      userId: user.id,
       imeiNumber
     }
     await keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceImei)
@@ -127,10 +129,10 @@ class DeviceVerification {
    */
   async populateDeviceSim(user, simNumber) {
     const deviceSim = {
-      hubId: user.value.hubId,
-      cityId: user.value.cityId,
-      companyId: user.value.company.id,
-      userId: user.value.id,
+      hubId: user.hubId,
+      cityId: user.cityId,
+      companyId: user.company.id,
+      userId: user.id,
       simNumber,
       isVerified: false,
     }
@@ -241,22 +243,20 @@ class DeviceVerification {
     return response.json.deviceSIM ? response.json.deviceSIM.isVerified : false
   }
 
-  async sendLongSms(deviceObject) {
-    let user = await keyValueDBService.getValueFromStore(USER);
+  async sendLongSms(user, deviceObject) {
     let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL);
     let domain = domainUrl && domainUrl.value ? domainUrl.value.split('//')[1].split('.')[0] : '';
-    let longCodePreAppendText = deviceObject.longCodeConfiguration && deviceObject.longCodeConfiguration.value ? deviceObject.longCodeConfiguration.value.longCodePreAppendText : '';
-    let simNumber = deviceObject.deviceSIM && deviceObject.deviceSIM.value ? deviceObject.deviceSIM.value.simNumber : '';
-    let imeiId = deviceObject.deviceIMEI && deviceObject.deviceIMEI.value ? deviceObject.deviceIMEI.value.id : '';
-    let companyCode = user && user.value && user.value.company ? user.value.company.code : '';
-    let employeeCode = user && user.value ? user.value.employeeCode : '';
+    let longCodePreAppendText = deviceObject.longCodeConfiguration && deviceObject.longCodeConfiguration.value && deviceObject.longCodeConfiguration.value.longCodePreAppendText ? deviceObject.longCodeConfiguration.value.longCodePreAppendText : '';
+    let simNumber = deviceObject.deviceSIM && deviceObject.deviceSIM.value && deviceObject.deviceSIM.value.simNumber ? deviceObject.deviceSIM.value.simNumber : '';
+    let imeiId = deviceObject.deviceSIM && deviceObject.deviceSIM.value && deviceObject.deviceSIM.value.deviceIMEI && deviceObject.deviceSIM.value.deviceIMEI.id ? deviceObject.deviceSIM.value.deviceIMEI.id : '';
+    let companyCode = user && user.company && user.company.code ? user.company.code : '';
+    let employeeCode = user && user.employeeCode ? user.employeeCode : '';
     let messageBody = longCodePreAppendText + '$' + simNumber + '$' + imeiId + '$' + companyCode + '$' + domain + '$' + employeeCode;
-    let recipientPhoneNumber = deviceObject.longCodeConfiguration && deviceObject.longCodeConfiguration.value ? deviceObject.longCodeConfiguration.value.longCodeNumber : '';
+    let recipientPhoneNumber = deviceObject.longCodeConfiguration && deviceObject.longCodeConfiguration.value && deviceObject.longCodeConfiguration.value.longCodeNumber ? deviceObject.longCodeConfiguration.value.longCodeNumber : '';
     if (Platform.OS === 'ios') {
     } else {
-      await SendSMSBackGroundService.sendLongCodeSMS(messageBody, recipientPhoneNumber);
+      await sendSMSBackGroundService.sendLongCodeSMS(messageBody, recipientPhoneNumber);
     }
-    return
   }
 }
 

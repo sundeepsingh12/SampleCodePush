@@ -2,8 +2,8 @@ const deviceSimVerification = {
     "id": "/deviceSimVerification",
     "type": "object",
     "properties": {
-        "longCodeNumber": { "type": "string", "required": true },
-        "longCodePreAppendText": { "type": "string", "required": true },
+        "longCodeNumber": { "type": "string" },
+        "longCodePreAppendText": { "type": "string" },
         "simVerificationType": { "type": "string", "required": true },
     }
 };

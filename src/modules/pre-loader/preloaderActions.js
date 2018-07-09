@@ -106,8 +106,8 @@ export function downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
 
 export function invalidateUserSession(isPreLoader, calledFromAutoLogout, message) {
   return async function (dispatch) { // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "") /* uncomment this code when run sync in logout */
-   try {
-      dispatch(setState(PRE_LOGOUT_START,message))
+    try {
+      dispatch(setState(PRE_LOGOUT_START, message))
       const isPreLoaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       let response = await authenticationService.logout(calledFromAutoLogout, isPreLoaderComplete) // create backup, hit logout api and delete dataBase
       dispatch(setState(PRE_LOGOUT_SUCCESS))
@@ -180,7 +180,7 @@ export function checkForUnsyncBackupFilesAndNavigate(user) {
         navDispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
 
       } else {
-        const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
+        const { company: { customErpPullActivated: ErpCheck } } = user
         if (ErpCheck) {
           keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
           navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
@@ -215,9 +215,9 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
         const userObject = await keyValueDBService.getValueFromStore(USER)
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationService === SERVICE_PENDING || deviceVerificationService == SERVICE_FAILED)) {
-          dispatch(checkAsset(deviceIMEI, deviceSIM, userObject, token))
+          dispatch(checkAsset(deviceIMEI, deviceSIM, userObject ? userObject.value : null, token))
         } else {
-          dispatch(downloadJobMaster(deviceIMEI, deviceSIM, userObject, token))
+          dispatch(downloadJobMaster(deviceIMEI, deviceSIM, userObject ? userObject.value : null, token))
         }
       }
     } catch (error) {
@@ -240,8 +240,7 @@ export function validateAndSaveJobMaster(deviceIMEI, deviceSIM, token, jobMaster
       dispatch(setState(MASTER_SAVING_START))
       await jobMasterService.saveJobMaster(jobMasterResponse)
       dispatch(setState(MASTER_SAVING_SUCCESS))
-      const userObject = await keyValueDBService.getValueFromStore(USER)
-      dispatch(checkAsset(deviceIMEI, deviceSIM, userObject, token))
+      dispatch(checkAsset(deviceIMEI, deviceSIM, jobMasterResponse.user, token))
     } catch (error) {
       dispatch(checkIfAppIsOutdated(error))
     }
@@ -369,7 +368,7 @@ export function checkIfSimValidOnServer(user, token, longCodeConfiguration) {
         dispatch(checkForUnsyncBackupFilesAndNavigate(user))
       } else {
         if (longCodeConfiguration && longCodeConfiguration.value && longCodeConfiguration.value.simVerificationType == 'LongCode' && Platform.OS !== 'ios') {
-          await deviceVerificationService.sendLongSms({ deviceIMEI, deviceSIM, longCodeConfiguration })
+          await deviceVerificationService.sendLongSms(user, { deviceIMEI, deviceSIM, longCodeConfiguration })
           dispatch(setState(PRELOADER_SUCCESS))
           dispatch(checkForUnsyncBackupFilesAndNavigate(user))
         } else {
@@ -417,7 +416,7 @@ export function validateOtp(otpNumber) {
       await deviceVerificationService.verifySim(otpNumber)
       dispatch(setState(OTP_SUCCESS))
       const user = await keyValueDBService.getValueFromStore(USER)
-      dispatch(checkForUnsyncBackupFilesAndNavigate(user))
+      dispatch(checkForUnsyncBackupFilesAndNavigate(user ? user.value : null))
     } catch (error) {
       showToastAndAddUserExceptionLog(1811, error.message, 'danger', 0)
       dispatch(setState(OTP_VALIDATION_FAILURE, error.message))
