@@ -1,6 +1,6 @@
 'use strict';
 import React, { PureComponent } from 'react'
-import {  StyleSheet, View, TouchableOpacity, Image, Platform } from 'react-native'
+import {  StyleSheet, View, TouchableOpacity, Image, Platform,TouchableHighlight } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Right, Icon, Footer, StyleProvider, Toast } from 'native-base'
 import Loader from '../components/Loader'
@@ -129,12 +129,14 @@ class CameraFieldAttribute extends PureComponent {
                         <SafeAreaView style={[styles.absolute, styles.paddingTop10, { top: 0, left: 0, height: 60, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
                             <View style={[styles.paddingVertical10, styles.paddingHorizontal15]}>
                                 <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
+                                <TouchableHighlight onPress = {() => {
+                                            this.props.navigation.goBack()
+                                        }}>
                                     <Icon
                                         name="md-close"
                                         style={[styles.fontXxxl, styles.fontWhite]}
-                                        onPress={() => {
-                                            this.props.navigation.goBack()
-                                        }} />
+                                       />
+                                        </TouchableHighlight>
                                     <Right>
                                         {torchView}
                                     </Right>
@@ -179,12 +181,14 @@ class CameraFieldAttribute extends PureComponent {
                         />
                         <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
                             <View style={[styles.paddingLeft15, styles.paddingRight15]}>
+                            <TouchableHighlight onPress = {() => {
+                                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA,'')
+                                    }}>
                                 <Icon
                                     name="md-close"
                                     style={[styles.fontXxxl, styles.fontWhite]}
-                                    onPress={() => {
-                                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA,'')
-                                    }} />
+                                    />
+                                    </TouchableHighlight>
                             </View>
                         </SafeAreaView>
                     </View>

@@ -114,7 +114,8 @@ class JobTransaction {
      * FieldDataQuery
      */
     getJobTransactionMapAndQuery(jobTransactionList) {
-        let jobQuery = '', jobTransactionQuery = '', fieldDataQuery = '', jobTransactionMap = {},jobIdJobTransactionStatusIdMap = {};
+        let jobQuery = '', jobTransactionQuery = '', fieldDataQuery = '', jobTransactionMap = {}
+        let jobIdJobTransactionStatusIdMap = {};
         for (let index in jobTransactionList) {
             const transaction = jobTransactionList[index];
             const { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual } = transaction;
@@ -186,7 +187,7 @@ class JobTransaction {
         let jobTransactionQuery = runsheetObject.jobTransactionQuery;
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1';
         jobTransactionQuery = queryDTO && queryDTO.jobTransactionQuery && queryDTO.jobTransactionQuery.trim() !== '' ? `${jobTransactionQuery} AND ${queryDTO.jobTransactionQuery}` : jobTransactionQuery;
-        let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [], fieldDataList = [], fieldDataMap = {};
+        let jobTransactionList = [], jobTransactionObject = {}, jobDataList = [], fieldDataList = [];
         jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery);
         if (jobTransactionList.length == 0) {
             return [];
@@ -198,7 +199,7 @@ class JobTransaction {
         let jobMapAndJobDataQuery = jobService.getJobMapAndJobDataQuery(jobsList);
         jobTransactionDTO.jobMap = jobMapAndJobDataQuery.jobMap;
         jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobMapAndJobDataQuery.jobDataQuery);
-        jobTransactionDTO.jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap,jobTransactionObject.jobIdJobTransactionStatusIdMap,jobTransactionCustomizationListParametersMaps.jobAttributeStatusMap);
+        jobTransactionDTO.jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap,jobTransactionCustomizationListParametersMaps.jobAttributeStatusMap,jobTransactionObject.jobIdJobTransactionStatusIdMap);
         fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, jobTransactionObject.fieldDataQuery);
         jobTransactionDTO.fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList);
         let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionDTO, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobTransactionCustomizationListParametersMaps, runsheetObject.runsheetMap);

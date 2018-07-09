@@ -142,17 +142,13 @@ class SignatureAndNps extends PureComponent {
                                 showTitleLabel={false}
                                 viewMode={this.state.isLandscape} />
                         </View>
-                        <SafeAreaView style={[style.feedback]}>
-                            <FooterTab>
-                                <View style={[style.feedback]}>
+                        <View style={[style.feedback]}>
                                     <View style={[{ paddingLeft: 150, paddingRight: 150 }]}>
                                         <NPSFeedback onStarPress={this.onStarRatingPress} showSave={true} />
                                     </View>
                                 </View>
-                                {this.saveSignButton()}
-                            </FooterTab>
-                        </SafeAreaView>
                     </View>
+                    {this.saveSignButton()}
                 </Container>
             </StyleProvider >
 

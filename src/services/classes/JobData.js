@@ -6,9 +6,6 @@ import {
 } from './JobDetails'
 import {
     TABLE_JOB_DATA,
-    TABLE_JOB_TRANSACTION,
-    TABLE_JOB,
-    TABLE_RUNSHEET,
 } from '../../lib/constants'
 
 import {
@@ -20,6 +17,8 @@ import {
     JOB_EXPIRY_TIME,
 
 } from '../../lib/AttributeConstants'
+
+import _ from 'lodash'
 
 class JobData {
 
@@ -41,7 +40,7 @@ class JobData {
      *               }
      * }
      */
-    getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap,jobIdJobTransactionStatusIdMap,jobAttributeStatusMap) {
+    getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap,jobAttributeStatusMap,jobIdJobTransactionStatusIdMap) {
         let jobDataMap = {}, contactMap = {}, addressMap = {},jobExpiryMap = {}
         for (let index in jobDataList) {
             const { jobAttributeMasterId, jobId, parentId, value } = jobDataList[index];
@@ -58,9 +57,10 @@ class JobData {
             } else if (this.checkAddressField(jobAttributeMasterId, value, jobAttributeMasterMap)) {
                 addressMap[jobId] = addressMap[jobId] ? addressMap[jobId] : [];
                 addressMap[jobId].push(jobData);
-            } else if(this.checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId,jobAttributeMasterMap,jobStatusId,jobAttributeStatusMap)){
-                jobExpiryMap[jobId] = jobData;
+            } else if(this.checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId,value,jobAttributeMasterMap,jobAttributeStatusMap,jobStatusId)){
+                jobExpiryMap[jobId] = jobData
             }
+           
         }
         return { jobDataMap, contactMap, addressMap,jobExpiryMap };
     }
@@ -115,18 +115,26 @@ class JobData {
      * @param {*} jobStatusId 
      * @param {*} jobAttributeStatusMap 
      */
-    checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId,jobAttributeMasterMap,jobStatusId,jobAttributeStatusMap){
+    checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId,value,jobAttributeMasterMap,jobAttributeStatusMap,jobStatusId){
         if (!jobAttributeMasterMap[jobAttributeMasterId]) {
             return false
         }
-        //Check if job expiry is mapped to the status in which job transaction is currently prresent
-        if(!jobAttributeStatusMap[jobStatusId]){
+
+
+        if (jobAttributeMasterMap[jobAttributeMasterId].hidden ||
+            value == undefined || value == null || value.trim() === '') {
             return false
         }
-        if (jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId !== JOB_EXPIRY_TIME) {
-            return false
+
+        //Check if job expiry is mapped to the status in which job transaction is currently present or if job attribute is not mapped to any status
+        if (jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == JOB_EXPIRY_TIME) {
+            if(_.isEmpty(jobAttributeStatusMap) || jobAttributeStatusMap[jobStatusId] == jobAttributeMasterId){
+                return true
+            }
+           
         }
-        return true
+       
+        return false
     }
 
     /**

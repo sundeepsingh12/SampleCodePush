@@ -114,7 +114,6 @@ class PostAssignment {
      * scanError : string
      */
     async checkPostJobOnServer(referenceNumber, jobMaster, jobTransactionMap) {
-        let referenceNumberList = [referenceNumber]
         let scanError = null, successListDTO = {}
         let postData = JSON.stringify([{
             jobMasterId: jobMaster.id,
