@@ -18,6 +18,8 @@ import JobListItem from '../components/JobListItem'
 import { SET_SEARCH, SET_LIVE_JOB_TOAST, QrCodeScanner } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { LIVE_TASKS, NO_JOBS_PRESENT, SELECT_ALL, ACCEPT, REJECT, SELECTED, OK } from '../lib/ContainerConstants'
+import { navigate } from '../modules/navigators/NavigationService';
+
 function mapStateToProps(state) {
     return {
         liveJobList: state.liveJobList.liveJobList,
@@ -64,14 +66,12 @@ class LiveJobListing extends PureComponent {
 
     navigateToScene = (item) => {
         if (item.isChecked == 'false' || !item.isChecked && this.props.selectedItems.length == 0) {
-            this.props.actions.navigateToScene('LiveJob',
+            navigate('LiveJob',
                 {
                     job: item,
                     liveJobList: this.props.liveJobList,
                     displayName: this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS
-                },
-                this.props.navigation.navigate
-            )
+                })
         } else {
             this.toggleLiveJobSelection(item.id)
         }

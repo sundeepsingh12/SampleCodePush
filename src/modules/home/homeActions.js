@@ -72,13 +72,14 @@ import {
   SERVER_REACHABLE,
   SERVER_UNREACHABLE,
   Piechart,
+  PATH_COMPANY_LOGO_IMAGE
 } from '../../lib/AttributeConstants'
 import { Toast, ActionSheet, } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import { trackingService } from '../../services/classes/Tracking'
 import { userEventLogService } from '../../services/classes/UserEvent'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog, deleteSessionToken, resetNavigationState } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog, deleteSessionToken } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
 import { Platform } from 'react-native'
@@ -96,11 +97,13 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions'
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
-import FCM, { NotificationActionType, FCMEvent, NotificationType, RemoteNotificationResult, WillPresentNotificationResult } from "react-native-fcm"
+import FCM, { FCMEvent, NotificationType, RemoteNotificationResult, WillPresentNotificationResult } from "react-native-fcm"
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR,FCM_PERMISSION_DENIED,OK } from '../../lib/ContainerConstants'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK } from '../../lib/ContainerConstants'
+import RNFS from 'react-native-fs'
+import { navDispatch, navigate } from '../navigators/NavigationService';
 
 /**
  * Function which updates STATE when component is mounted
@@ -111,10 +114,15 @@ import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION
 export function fetchPagesAndPiechart() {
   return async function (dispatch) {
     try {
-      dispatch(setState(PAGES_LOADING));
-      const user = await keyValueDBService.getValueFromStore(USER);
+      dispatch(setState(PAGES_LOADING, true));
+      let user = await keyValueDBService.getValueFromStore(USER);
       //Fetching list of Pages
-      const pageList = await keyValueDBService.getValueFromStore(PAGES);
+      let pageList = await keyValueDBService.getValueFromStore(PAGES);
+      let file;
+      let fileExits = await RNFS.exists(PATH_COMPANY_LOGO_IMAGE);
+      if (fileExits) {
+        file = await RNFS.readFile(PATH_COMPANY_LOGO_IMAGE, 'base64')
+      }
       let mainMenuAndSubMenuObject = moduleCustomizationService.getPagesMainMenuAndSubMenuObject(pageList ? pageList.value : null, user ? user.value : null);
       let sortedMainMenuAndSubMenuList = moduleCustomizationService.sortMenuAndSubMenuGroupList(mainMenuAndSubMenuObject.mainMenuObject, mainMenuAndSubMenuObject.subMenuObject);
       //Fetching list of Home screen Utilities 
@@ -132,11 +140,12 @@ export function fetchPagesAndPiechart() {
       //Fetching Summary count for Pie-chart
       const pieChartSummaryCount = (Piechart.enabled) ? await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params) : null
       //Finally updating state
-      dispatch(setState(SET_PAGES_UTILITY_N_PIESUMMARY, { sortedMainMenuAndSubMenuList, utilities, pieChartSummaryCount }));
+      dispatch(setState(SET_PAGES_UTILITY_N_PIESUMMARY, { sortedMainMenuAndSubMenuList, utilities, pieChartSummaryCount, logo: file }));
     } catch (error) {
       //TODO : show proper error code message ERROR CODE 600
       //Save the error in exception logs
       showToastAndAddUserExceptionLog(2701, error.message, 'danger', 1)
+      dispatch(setState(PAGES_LOADING, false));
     }
   }
 }
@@ -166,7 +175,7 @@ export function navigateToPage(pageObject, navigationProps) {
     try {
       switch (pageObject.screenTypeId) {
         case PAGE_BACKUP:
-          dispatch(navigateToScene(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' }, navigationProps));
+          navigate(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' })
           break;
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
@@ -176,7 +185,7 @@ export function navigateToPage(pageObject, navigationProps) {
         }
         case PAGE_CUSTOM_WEB_PAGE:
           let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
-          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null },navigationProps)) : dispatch(customAppSelection(customRemarks,navigationProps))
+          !_.size(customRemarks) || customRemarks.length == 1 ? navigate(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null }) : dispatch(customAppSelection(customRemarks, navigationProps))
           break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -185,7 +194,7 @@ export function navigateToPage(pageObject, navigationProps) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          dispatch(navigateToScene(LiveJobs, { pageObject }, navigationProps));
+          navigate(LiveJobs, { pageObject })
           break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -196,10 +205,10 @@ export function navigateToPage(pageObject, navigationProps) {
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
-          dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' }, navigationProps))
+          navigate(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' })
           break;
         case PAGE_OUTSCAN:
-          dispatch(navigateToScene(PostAssignmentScanner, { pageObject }, navigationProps))
+          navigate(PostAssignmentScanner, { pageObject })
 
           break
         case PAGE_PAYNEAR_INITIALIZE:
@@ -207,20 +216,20 @@ export function navigateToPage(pageObject, navigationProps) {
         case PAGE_PICKUP:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PROFILE:
-          dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' }, navigationProps))
+          navigate(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' })
           break;
         case PAGE_SEQUENCING: {
           dispatch(getRunsheetsForSequence(pageObject, navigationProps));
           break;
         }
         case PAGE_SORTING_PRINTING:
-          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' }, navigationProps))
+          navigate(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' })
           break;
         case PAGE_STATISTICS:
-          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' }, navigationProps))
+          navigate(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' })
           break;
         case PAGE_TABS:
-          dispatch(navigateToScene(TabScreen, { pageObject }, navigationProps));
+          navigate(TabScreen, { pageObject })
           break;
         default:
           throw new Error("Unknown page type " + pageObject.screenTypeId + ". Contact support");
@@ -244,7 +253,7 @@ export function customAppSelection(appModule, navigationProps) {
           destructiveButtonIndex: BUTTONS.length - 1
         },
         buttonIndex => {
-          (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? dispatch(navigateToScene(CustomApp, { customUrl: appModule[buttonIndex].customUrl }, navigationProps)) : null
+          (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? navigate(CustomApp, { customUrl: appModule[buttonIndex].customUrl }, navigationProps) : null
         }
       )
     } catch (error) {
@@ -273,7 +282,7 @@ export function checkCustomErpPullActivated() {
   }
 }
 
-export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader, navigate) {
+export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) {
   return async function (dispatch) {
     try {
       if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
@@ -282,9 +291,9 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader, 
         if (message === true) {
           dispatch(setState(syncLoader, false))
           if (!isBulk) {
-            dispatch(redirectToContainer(pageObject, navigate))
+            dispatch(redirectToContainer(pageObject))
           } else {
-            dispatch(navigateToScene(BulkListing, { pageObject }, navigate))
+            navigate(BulkListing, { pageObject })
           }
         } else {
           dispatch(setState(syncLoader, false))
@@ -293,9 +302,9 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader, 
       }
       else {
         if (!isBulk) {
-          dispatch(redirectToContainer(pageObject, navigate))
+          dispatch(redirectToContainer(pageObject))
         } else {
-          dispatch(navigateToScene(BulkListing, { pageObject }, navigate))
+          navigate(BulkListing, { pageObject })
         }
       }
     } catch (error) {
@@ -320,25 +329,25 @@ export function startTracking(trackingServiceStarted) {
 
 export function startFCM() {
   return async function (dispatch) {
-    try{
-    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    if (token && token.value) {
+    try {
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      if (token && token.value) {
 
-      //these callback will be triggered only when app is foreground or background
-      FCM.on(FCMEvent.Notification, notif => {
-        if (notif.Notification == 'Android push notification') {
-          dispatch(performSyncService(true))
-        }
-        else if (notif.Notification == 'Live Job Notification') {
-          keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-          dispatch(performSyncService(true, true))
-        }
-        if (notif.local_notification) {
-          return
-        }
-        if (notif.opened_from_tray) {
-          return
-        }
+        //these callback will be triggered only when app is foreground or background
+        FCM.on(FCMEvent.Notification, notif => {
+          if (notif.Notification == 'Android push notification') {
+            dispatch(performSyncService(true))
+          }
+          else if (notif.Notification == 'Live Job Notification') {
+            keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+            dispatch(performSyncService(true, true))
+          }
+          if (notif.local_notification) {
+            return
+          }
+          if (notif.opened_from_tray) {
+            return
+          }
           if (Platform.OS === 'ios') {
             switch (notif._notificationType) {
               case NotificationType.Remote:
@@ -353,54 +362,54 @@ export function startFCM() {
             }
           }
         })
-        
-      FCM.enableDirectChannel();
-      FCM.on(FCMEvent.DirectChannelConnectionChanged, (data) => {
-      });
-      setTimeout(function() {
-        FCM.isDirectChannelEstablished().then(d =>  {});
-      }, 1000);
 
-      FCM.getInitialNotification().then(notif => {
-      });
-      try {
-        let result = await FCM.requestPermissions({
-          badge: false,
-          sound: true,
-          alert: true
+        FCM.enableDirectChannel();
+        FCM.on(FCMEvent.DirectChannelConnectionChanged, (data) => {
         });
-      } catch (e) {
-        showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED, 'danger', 1)
+        setTimeout(function () {
+          FCM.isDirectChannelEstablished().then(d => { });
+        }, 1000);
+
+        FCM.getInitialNotification().then(notif => {
+        });
+        try {
+          let result = await FCM.requestPermissions({
+            badge: false,
+            sound: true,
+            alert: true
+          });
+        } catch (e) {
+          showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED, 'danger', 1)
+        }
+        const userObject = await keyValueDBService.getValueFromStore(USER)
+        const topic = `FE_${userObject.value.id}`
+
+        FCM.getFCMToken().then(async fcmToken => {
+          await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+          await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+
+        }, (error) => {
+        }).catch(() => showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR, 'danger', 1))
+
+        if (Platform.OS === 'ios') {
+          FCM.getAPNSToken().then(token => {
+          }).catch(() => showToastAndAddUserExceptionLog(2718, APNS_TOKEN_ERROR, 'danger', 1))
+        }
+
+        // fcm token may not be available on first load, catch it here
+        FCM.on(FCMEvent.RefreshToken, async fcmToken => {
+          await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+          await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+        });
+
+        FCM.subscribeToTopic(topic)
       }
-      const userObject = await keyValueDBService.getValueFromStore(USER)
-      const topic = `FE_${userObject.value.id}`
-
-      FCM.getFCMToken().then(async fcmToken => {
-        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
-        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
-
-      }, (error) => {
-      }).catch( () =>  showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR, 'danger', 1))
-      
-          if (Platform.OS === 'ios') {
-            FCM.getAPNSToken().then(token => {
-            }).catch(() =>  showToastAndAddUserExceptionLog(2718, APNS_TOKEN_ERROR, 'danger', 1))
-          }
-
-       // fcm token may not be available on first load, catch it here
-      FCM.on(FCMEvent.RefreshToken, async fcmToken => {
-        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
-        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
-      });
-
-      FCM.subscribeToTopic(topic)
+      else {
+        Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
+      }
+    } catch (error) {
+      showToastAndAddUserExceptionLog(2715, error.message, 'danger', 1)
     }
-    else {
-      Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
-    }
-  }catch(error){
-    showToastAndAddUserExceptionLog(2715, error.message, 'danger', 1)    
-  }
   }
 }
 
@@ -422,7 +431,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       const autoLogoutEnabled = userData ? userData.company ? userData.company.autoLogoutFromDevice : null : null
       const lastLoginTime = userData ? userData.lastLoginTime : null
       if (!calledFromAutoLogout && autoLogoutEnabled && !moment(moment(lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
-        dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
+        navDispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
         return
       }
       let syncCount = 0
@@ -495,8 +504,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       return false;
     } finally {
       if (!erpPull) {
-        const difference = await sync.calculateDifference()
-        dispatch(setState(LAST_SYNC_TIME, difference))
+        dispatch(syncTimer())
       }
       await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, {
         syncRunning: false
@@ -526,6 +534,16 @@ export function syncService() {
   }
 }
 
+export function syncTimer() {
+  return async (dispatch) => {
+    try {
+      const difference = await sync.calculateDifference()
+      dispatch(setState(LAST_SYNC_TIME, difference))      
+    } catch (error) {
+      //Update UI here
+    }
+  }
+}
 export function pieChartCount() {
   return async (dispatch) => {
     try {
@@ -561,7 +579,7 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
         }))
         await logoutService.deleteDataBase()
         dispatch(deleteSessionToken())
-        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: LoginScreen })]))
+        navDispatch(NavigationActions.navigate({ routeName: LoginScreen }));
       } else {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
@@ -634,6 +652,15 @@ export function resetFailCountInStore() {
   return async function (dispatch) {
     try {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
+      const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
+      if (ErpCheck) {
+        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
+        navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
+      }
+      else {
+        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
+        navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+      }
     } catch (error) {
       showToastAndAddUserExceptionLog(2711, error.message, 'danger', 1)
     }
@@ -641,13 +668,13 @@ export function resetFailCountInStore() {
 }
 
 
-export function restoreNewJobDraft(draftStatusInfo, restoreDraft, navigate) {
+export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
   return async function (dispatch) {
     try {
       if (restoreDraft) {
-        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft, null, null, null, navigate))
+        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft))
       } else {
-        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId, navigate))
+        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId))
       }
       dispatch(setState(SET_NEWJOB_DRAFT_INFO, {}))
     } catch (error) {

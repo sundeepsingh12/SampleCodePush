@@ -27,7 +27,7 @@ describe('login reducer without initial state',() => {
         expect(nextState.form.authenticationService).toBe(true)
         expect(nextState.form.displayMessage).toBe('')
         expect(nextState.form.isButtonDisabled).toBe(true)
-        expect(nextState.form.isEditTextDisabled).toBe(true)
+        expect(nextState.form.isEditTextEnabled).toBe(true)
     })
 
     it('should set login success',() => {
@@ -38,7 +38,7 @@ describe('login reducer without initial state',() => {
         expect(nextState.form.authenticationService).toBe(false)
         expect(nextState.form.displayMessage).toBe('')
         expect(nextState.form.isButtonDisabled).toBe(false)
-        expect(nextState.form.isEditTextDisabled).toBe(false)
+        expect(nextState.form.isEditTextEnabled).toBe(false)
     })
     it('should set reset setting on long press',() => {
         const action = {
@@ -59,7 +59,7 @@ describe('login reducer without initial state',() => {
         expect(nextState.form.authenticationService).toBe(false)
         expect(nextState.form.displayMessage).toBe('test error')
         expect(nextState.form.isButtonDisabled).toBe(true)
-        expect(nextState.form.isEditTextDisabled).toBe(false)
+        expect(nextState.form.isEditTextEnabled).toBe(false)
         expect(nextState.form.password).toBe('')
     })
 

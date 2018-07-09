@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity, BackHandler } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
@@ -27,6 +27,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SignatureAndNps extends PureComponent {
+    _didFocusSubscription;
+    _willBlurSubscription;
 
     constructor(props) {
         super(props)
@@ -35,9 +37,25 @@ class SignatureAndNps extends PureComponent {
             isLandscape: 'landscape',
             isSaveDisabled: true
         };
+        this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload =>
+            BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
     componentDidMount() {
         this.props.actions.getRemarksList(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState.formElement)
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
+    }
+
+    componentWillUnmount() {
+        this._didFocusSubscription && this._didFocusSubscription.remove();
+        this._willBlurSubscription && this._willBlurSubscription.remove();
+    }
+
+    onBackButtonPressAndroid = () => {
+        this.setState({ isLandscape: 'portrait' });
+        return false;
     }
 
     onStarRatingPress = (starCount) => {
@@ -57,13 +75,13 @@ class SignatureAndNps extends PureComponent {
     }
 
     static navigationOptions = ({ navigation }) => {
-        return { header: null }
+        return { header: null,gesturesEnabled:false }
     }
     saveSign = () => {
         if (this.state.isSaveDisabled) {
             Toast.show({
                 text: IMPROPER_SIGNATURE,
-                position: "bottom" | "center",
+                position: "bottom",
                 buttonText: OK,
                 duration: 5000
             })

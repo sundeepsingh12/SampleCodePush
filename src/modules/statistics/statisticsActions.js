@@ -10,7 +10,6 @@ import {
 
 /**This action is fire when statistics module is tap,
  * 
- * @param {*} userSummaryList // it return the user_summary which contains all user information 
  * return data for view of statistics list 
  */
 export function getDataForStatisticsList() {

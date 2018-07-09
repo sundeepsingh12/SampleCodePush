@@ -1,11 +1,7 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import {
-    View,
-    Text
-}
-    from 'react-native'
+import { View,Text }from 'react-native'
 import moment from 'moment'
 class CountDownTimer extends PureComponent {
 
@@ -88,5 +84,5 @@ class CountDownTimer extends PureComponent {
     }
 }
 
-module.exports = CountDownTimer
+export default CountDownTimer
 

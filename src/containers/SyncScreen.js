@@ -34,6 +34,16 @@ function mapDispatchToProps(dispatch) {
 
 class SyncScreen extends PureComponent {
 
+  constructor(props) {
+    super(props);
+    this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
+      this.props.actions.syncTimer()
+    );
+  }
+  componentWillUnmount() {
+    this._didFocusSubscription && this._didFocusSubscription.remove();
+  }
+
   getTransactionView() {
     let transactionList = this.props.unsyncedTransactionList
     let transactionView = []

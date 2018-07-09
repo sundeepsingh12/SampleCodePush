@@ -99,7 +99,7 @@ class PostAssignment {
         jobTransactionDTOMap[jobTransaction.id] = transactionDTO
         let jobTransactionTableDTO = {
             tableName: TABLE_JOB_TRANSACTION,
-            value: transactionList,   
+            value: transactionList,
         }
         realm.performBatchSave(jobTransactionTableDTO, runSheet)
         await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionDTOMap)

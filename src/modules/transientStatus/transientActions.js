@@ -1,10 +1,9 @@
 'use strict'
 
-import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import {
     ADD_FORM_LAYOUT_STATE,
     LOADER_IS_RUNNING,
-    FormLayout
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService'
 import _ from 'lodash'
@@ -15,11 +14,11 @@ import _ from 'lodash'
  * @param {*} transientFormLayoutMap //contains form layout state of previous statuses and current status
  * @param {*} currentStatus 
  */
-export function setStateFromNavigationParams(navigationParams, transientFormLayoutMap, navigate) {
+export function setStateFromNavigationParams(navigationParams, transientFormLayoutMap) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_IS_RUNNING, true))
-            let { formLayoutState, currentStatus, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams } = navigationParams
+            let { formLayoutState, currentStatus, jobTransaction, jobMasterId } = navigationParams
             if (!currentStatus || !formLayoutState) {
                 throw new Error('current status missing')
             }

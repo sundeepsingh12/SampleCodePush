@@ -32,12 +32,14 @@ export default function skuListingReducer(state = initialState, action) {
                 .set('skuValidationForImageAndReason', action.payload.skuValidationForImageAndReason)
                 .set('reasonsList', action.payload.reasonsList)
                 .set('isSearchBarVisible', action.payload.skuCodeMap)
+                
         case SKU_CODE_CHANGE:
             return state.set('skuSearchTerm', action.payload)
 
         case UPDATE_SKU_ACTUAL_QUANTITY:
             return state.set('skuListItems', action.payload.skuListItems)
                 .set('skuChildItems', action.payload.skuRootChildElements)
+                .set('searchText', '')
 
         case UPDATE_SKU_LIST_ITEMS:
             return state.set('skuListItems', action.payload)

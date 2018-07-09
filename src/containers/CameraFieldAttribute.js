@@ -85,10 +85,8 @@ class CameraFieldAttribute extends PureComponent {
             takePhotoButtonTitle: 'Take Photo...',
             chooseFromLibraryButtonTitle: 'Choose from Library...',
             quality: 0.5,
-            allowsEditing: true,
             storageOptions: {
                 skipBackup: true,
-                waitUntilSaved: true
             }
         }
         ImagePicker.launchImageLibrary(options, (response) => {
@@ -206,7 +204,7 @@ class CameraFieldAttribute extends PureComponent {
                                     if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
                                         this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData.data, this.props.navigation.state.params.currentElement)
                                     } else {
-                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction, this.props.navigation.goBack)
+                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
                                     }
                                 }}>
                                     <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />

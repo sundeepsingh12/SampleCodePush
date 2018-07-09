@@ -97,7 +97,7 @@ class MosambeeWalletPayment extends PureComponent {
         if (this.props.isModalVisible == 2 || _.isEqual(message, RESEND)) {
             this.props.actions.hitOtpUrlToGetOtp(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, this.props.navigation.state.params)
         } else {
-            this.props.actions.hitPaymentUrlforPayment(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, this.props.otpNumber, this.props.navigation.state.params, this.props.navigation.push, this.props.navigation.goBack, this.props.navigation.state.key)
+            this.props.actions.hitPaymentUrlforPayment(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, this.props.otpNumber, this.props.navigation.state.params)
         }
     }
 

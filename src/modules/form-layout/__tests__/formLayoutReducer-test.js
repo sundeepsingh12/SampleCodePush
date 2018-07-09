@@ -19,9 +19,11 @@ import {
     SET_NO_FIELD_ATTRIBUTE_MAPPED,
     SET_FORM_INVALID_AND_FORM_ELEMENT,
     SET_ARRAY_DATA_STORE_FILTER_MAP,
+    CLEAR_FORM_LAYOUT_WITH_LOADER
 } from '../../../lib/constants'
 
 import InitialState from '../formLayoutInitialState'
+import { fieldAttributeMasterService } from '../../../services/classes/FieldAttributeMaster';
 
 describe('test cases for form layout reducer', () => {
 
@@ -53,6 +55,22 @@ describe('test cases for form layout reducer', () => {
             payload: {
                 formElement: {},
                 isSaveDisabled: true,
+                latestPositionId: 1,
+                modalFieldAttributeMasterId: 1
+            }
+        }
+        let nextState = formLayoutReducer(undefined, action)
+        expect(nextState.formElement).toEqual(action.payload.formElement)
+        expect(nextState.isSaveDisabled).toEqual(action.payload.isSaveDisabled)
+        expect(nextState.latestPositionId).toEqual(action.payload.latestPositionId)
+        expect(nextState.modalFieldAttributeMasterId).toEqual(action.payload.modalFieldAttributeMasterId)
+    })
+    it('test UPDATE_FIELD_DATA_WITH_CHILD_DATA with false isSaveDisabled', () => {
+        const action = {
+            type: UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+            payload: {
+                formElement: {},
+                isSaveDisabled: false,
                 latestPositionId: 1,
                 modalFieldAttributeMasterId: 1
             }
@@ -152,6 +170,38 @@ describe('test cases for form layout reducer', () => {
         }
         let nextState = formLayoutReducer(undefined, action)
         expect(nextState.updateDraft).toEqual(action.payload)
+    })
+    it('test CLEAR_FORM_LAYOUT_WITH_LOADER', () => {
+        const action = {
+            type: CLEAR_FORM_LAYOUT_WITH_LOADER,
+            payload: true
+        }
+        let nextState = formLayoutReducer(undefined, action)
+        expect(nextState.isLoading).toEqual(action.payload)
+    })
+    it('test CLEAR_FORM_LAYOUT', () => {
+        const action = {
+            type: CLEAR_FORM_LAYOUT,
+            payload: false
+        }
+        let nextState = formLayoutReducer(undefined, action)
+        expect(nextState.isLoading).toEqual(action.payload)
+    })
+    it('test RESET_STATE', () => {
+        const action = {
+            type: RESET_STATE,
+            payload: false
+        }
+        let nextState = formLayoutReducer(undefined, action)
+        expect(nextState.isLoading).toEqual(action.payload)
+    })
+    it('test null state', () => {
+        const action = {
+            type: 'NULL',
+            payload: false
+        }
+        let nextState = formLayoutReducer(undefined, action)
+        expect(nextState.isLoading).toEqual(action.payload)
     })
 
     it('test SET_FORM_TO_INVALID', () => {

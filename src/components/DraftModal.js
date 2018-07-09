@@ -1,18 +1,15 @@
 'use strict'
-
 import React, { PureComponent } from 'react'
 import {
     View,
     Text,
     Modal,
-
 } from 'react-native'
 import styles from '../themes/FeStyle'
 
-import {
-    Button
-} from 'native-base';
+import {Button} from 'native-base'
 import { DRAFT_RESTORE_MESSAGE, OK, CANCEL } from '../lib/ContainerConstants'
+
 export default class DraftModal extends PureComponent {
 
     render() {

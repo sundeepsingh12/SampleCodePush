@@ -1,18 +1,17 @@
+'use strict'
+
 import * as realm from '../../repositories/realmdb'
 import {
     TABLE_JOB_TRANSACTION,
     UNSEEN,
-    TABIDMAP,
     TABLE_JOB,
     TABLE_FIELD_DATA,
     TABLE_JOB_DATA,
-    TAB,
     TABLE_RUNSHEET,
     PENDING_SYNC_TRANSACTION_IDS,
-    TABLE_MESSAGE_INTERACTION
 } from '../../lib/constants'
 
-import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, SEQ_SELECTED, JOB_EXPIRY_TIME } from '../../lib/AttributeConstants'
+import { SKU_ARRAY, SEQ_SELECTED, JOB_EXPIRY_TIME } from '../../lib/AttributeConstants'
 import { ATTEMPT, SLOT, START, END, DISTANCE, HALT_DURATION, CALL_COUNT, CALL_DURATION, SMS, TIME_SPENT, SEQUENCE } from '../../lib/ContainerConstants'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
@@ -33,7 +32,6 @@ class JobTransaction {
 
     /**A Generic method for filtering out jobtransactions whose job status ids lie in 'statusids'  
      * 
-     * @param {*} allJobTransactions 
      * @param {*} statusIds 
      */
     getJobTransactionsForStatusIds(statusIds) {
@@ -346,6 +344,7 @@ class JobTransaction {
             jobTransactionCustomization.isNextStatusPresent = jobTransaction.jobStatusId ? jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList && jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList.length > 0 : null;
             jobTransactionCustomization.jobPriority = jobTransactionCustomizationListParametersMaps.jobMasterIdMap[jobMasterId].enableJobPriority ? job.jobPriority : 0;
             jobTransactionCustomization.jobExpiryData = jobTransactionDTO.jobDataDetailsForListing.jobExpiryMap[jobId] ? jobTransactionDTO.jobDataDetailsForListing.jobExpiryMap[jobId] :{}
+            jobTransactionCustomization.isJobUnseen = jobTransactionCustomizationListParametersMaps.jobStatusObject.unseenStatusIdCodeMap[ jobTransaction.jobStatusId] ? true :false
             jobTransactionCustomizationList.push(jobTransactionCustomization);
         }
         return jobTransactionCustomizationList;
@@ -387,7 +386,7 @@ class JobTransaction {
         customizationObject.separator = customizationObject.separator ? customizationObject.separator : ''
         jobAttributeMasterList = jobAttributeMasterList ? jobAttributeMasterList : []
         jobAttributeMasterList.forEach(object => {
-            jobData = jobDataForJobId[object.jobAttributeMasterId]
+            let jobData = jobDataForJobId[object.jobAttributeMasterId]
             if (!jobData || jobData.value == undefined || jobData.value == null) {
                 return
             }
@@ -409,7 +408,7 @@ class JobTransaction {
         customizationObject.separator = customizationObject.separator ? customizationObject.separator : ''
         fieldAttributeMasterList = fieldAttributeMasterList ? fieldAttributeMasterList : []
         fieldAttributeMasterList.forEach(object => {
-            fieldData = fieldDataForJobTransactionId[object.fieldAttributeMasterId]
+            let fieldData = fieldDataForJobTransactionId[object.fieldAttributeMasterId]
             if (!fieldData || fieldData.value == undefined || fieldData.value == null) {
                 return
             }
@@ -469,8 +468,8 @@ class JobTransaction {
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
         let checkId = false
         if (pendingSyncTransactionIds && pendingSyncTransactionIds.value && _.size(pendingSyncTransactionIds.value) > 0) {
-            for (let item of pendingSyncTransactionIds.value) {
-                if (item.id == jobTransactionId) {
+            for (let item in pendingSyncTransactionIds.value) {
+                if (pendingSyncTransactionIds.value[item].id == jobTransactionId) {
                     checkId = true
                     break
                 }
@@ -482,12 +481,9 @@ class JobTransaction {
     /**
      * This function prepares swipable details of job transaction
      * @param {*} jobDataDetailsForListing 
-     * @param {*} jobAttributeMasterMap 
-     * @param {*} jobMasterIdJobAttributeStatusMap 
+     * @param {*} jobTransactionCustomizationListParametersMaps 
      * @param {*} jobTransaction 
      * @param {*} job 
-     * @param {*} customerCareMap 
-     * @param {*} smsTemplateMap 
      * @returns 
      * jobSwipableDetails : {
      *                          addressData : []
@@ -594,8 +590,6 @@ class JobTransaction {
      * @param {*} jobAttributeStatusList 
      * @param {*} fieldAttributeMasterList 
      * @param {*} fieldAttributeStatusList 
-     * @param {*} customerCareList 
-     * @param {*} smsTemplateList 
      * @param {*} statusList
      * @returns 
      * {
@@ -613,7 +607,7 @@ class JobTransaction {
      *                              }
      * } 
      */
-    async prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList, statusList, callingActivity) {
+    async prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, statusList, callingActivity) {
         let jobTransactionQuery = 'id = ' + jobTransactionId
         const jobTransaction = (callingActivity != 'LiveJob') ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery) : realm.getRecordListOnQuery(TABLE_JOB, jobTransactionQuery)
         let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime, runsheetId, hubId, cityId, companyId, actualAmount, moneyTransactionType, startTime, endTime } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
@@ -713,7 +707,7 @@ class JobTransaction {
 
     /**
      * This function fetch unseen job transactions which are assigned to the user
-     * @param {*} jobMaster 
+     * @param {*} jobMasterId 
      * @returns
      * {
      *      jobTransactionMap : {
@@ -743,8 +737,6 @@ class JobTransaction {
     /**
        * This function checks for future runsheet enabled and returns selected date if multipart is not selected
        * @param {*}  customNaming
-       * @param {*}  jobIdGroupIdMap
-       * @param {*}  date
        * @returns
        * {
        *     enableFutureDateRunsheet: boolean,

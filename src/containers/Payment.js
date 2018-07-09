@@ -18,6 +18,7 @@ import {
 import { SET_PAYMENT_CHANGED_PARAMETERS, SET_SPLIT_PAYMENT, SplitPayment } from '../lib/constants'
 import { AMOUNT_TO_BE_COLLECTED, YES, NO, SPLIT_PAYMENT, SELECT_PAYMENT_METHOD, SELECT_PAYMENT_METHOD_TO_SPLIT, ENTER_SPLIT_DETAILS, SAVE } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
+import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
     return {
@@ -93,7 +94,6 @@ class Payment extends PureComponent {
                 <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
                     <Input
                         keyboardType="numeric"
-                        KeyboardTypeIOS="number-pad"
                         returnKeyType='done'
                         value={this.props.transactionNumber}
                         placeholder='Regular Textbox'
@@ -255,7 +255,6 @@ class Payment extends PureComponent {
                         placeholder="Enter Amount"
                         editable={this.props.isAmountEditable}
                         keyboardType="numeric"
-                        KeyboardTypeIOS="decimal-pad"
                         returnKeyType='done'
                         onChangeText={value => this.onTextChange(
                             'SET_ACTUAL_AMOUNT',
@@ -274,7 +273,7 @@ class Payment extends PureComponent {
 
     moveToSplitOrSavePayment() {
         if (this.props.splitPaymentMode == YES) {
-            this.props.actions.navigateToScene(SplitPayment, {
+            navigate(SplitPayment, {
                 selectedPaymentMode: this.props.selectedPaymentMode,
                 actualAmount: this.props.actualAmount,
                 originalAmount: this.props.originalAmount,
@@ -284,8 +283,7 @@ class Payment extends PureComponent {
                 moneyCollectMaster: this.props.moneyCollectMaster,
                 paymentContainerKey: this.props.navigation.state.key,
                 renderPaymentModeId: this.renderPaymentModeId,
-            },
-                this.props.navigation.navigate)
+            })
         } else {
             this.props.actions.saveMoneyCollectObject(
                 this.props.actualAmount,
@@ -299,7 +297,6 @@ class Payment extends PureComponent {
                 null,
                 this.props.jobTransactionIdAmountMap,
                 this.props.navigation.state.params.formLayoutState,
-                this.props.navigation.goBack
             )
         }
     }

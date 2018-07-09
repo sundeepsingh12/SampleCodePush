@@ -1,8 +1,7 @@
 import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
 module.exports = {
-
-    APP_VERSION_NUMBER: '0.3.0',
+    APP_VERSION_NUMBER: '0.4.0',
     /**
      * TODO : Change money collect details object keys to attribute type id
      */
@@ -245,6 +244,8 @@ module.exports = {
     DATA_STORE_ATTR_KEY: "&dataStoreAttributeKey=",
 
     //Location where zip contents are temporarily added and then removed
+    PATH_COMPANY_LOGO_DIR: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/LOGO',
+    PATH_COMPANY_LOGO_IMAGE: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/LOGO/companyLogo.jpg',
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP',
     PATH_CUSTOMER_IMAGES: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/CustomerImages/',
     PATH: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER,
@@ -260,7 +261,8 @@ module.exports = {
     View_Parcel_Summary: 'View Parcel Summary',
     Sign_Off_Summary: 'Sign Off Summary',
     Parcel_Summary: 'Parcel Summary',
-    Yes_Checkout: 'Yes,Checkout',
+    NO:'No',
+    Yes_Checkout: 'Checkout',
     Total: 'Total :',
     Select_Next_Status: 'Select Next Status',
     REGEX_TO_CHECK_PHONE_NUMBER: /^[0-9]{10,25}$/,

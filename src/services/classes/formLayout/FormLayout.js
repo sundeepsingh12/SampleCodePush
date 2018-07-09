@@ -2,7 +2,6 @@ import { keyValueDBService } from '../KeyValueDBService.js'
 import { transientStatusAndSaveActivatedService } from '../TransientStatusAndSaveActivatedService.js'
 import {
     AFTER,
-    BEFORE,
     OBJECT,
     STRING,
     TEXT,
@@ -13,22 +12,13 @@ import {
 } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
 import {
-    HomeTabNavigatorScreen,
     SaveActivated,
     Transient,
     CheckoutDetails,
     TabScreen,
     SHOULD_RELOAD_START,
-    GEO_FENCING,
-    FIELD_ATTRIBUTE,
-    FIELD_ATTRIBUTE_STATUS,
-    FIELD_ATTRIBUTE_VALIDATION,
-    FIELD_ATTRIBUTE_VALIDATION_CONDITION,
     BACKUP_ALREADY_EXIST,
     TABLE_FIELD_DATA,
-    JOB_ATTRIBUTE,
-    USER,
-    HUB
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
@@ -59,7 +49,7 @@ class FormLayout {
         }
         let fieldAttributesMappedToStatus = fieldAttributeStatusList.filter(fieldAttributeStatus => fieldAttributeStatus.statusId == statusId).sort((a, b) => a.sequence - b.sequence)
         // first find list of fieldAttributeStatus mapped to a status using filter, then sort them on their sequence and then get list of fieldAttributeIds using map
-        if (_.isEmpty(fieldAttributesMappedToStatus)) {
+        if (!fieldAttributesMappedToStatus) {
             return []
         }
         let fieldAttributeMap = {}, arrayMainObject = {} //map for root field attributes
@@ -169,9 +159,9 @@ class FormLayout {
 
     /**
      * creates fieldAttributeDto
-     * @param {*fieldAttribute} fieldAttribute 
-     * @param {*validationArray} validationArray 
-     * @param {*positionId} positionId 
+     * @param  fieldAttribute 
+     * @param  validationArray 
+     * @param  positionId 
      */
     getFieldAttributeObject(fieldAttribute, validationArray, positionId) {
         const { label, subLabel, helpText, key, required, hidden, attributeTypeId, dataStoreAttributeId, dataStoreMasterId, externalDataStoreMasterUrl, dataStoreFilterMapping } = fieldAttribute
@@ -230,7 +220,7 @@ class FormLayout {
         }
         else if (currentStatus.transient) {
             routeName = Transient
-            let { jobDetailsScreenKey, pageObjectAdditionalParams } = taskListScreenDetails
+            let {jobDetailsScreenKey, pageObjectAdditionalParams}  = taskListScreenDetails 
             routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams }
         }
         else {
