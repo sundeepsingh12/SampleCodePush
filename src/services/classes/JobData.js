@@ -128,7 +128,7 @@ class JobData {
 
         //Check if job expiry is mapped to the status in which job transaction is currently present or if job attribute is not mapped to any status
         if (jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == JOB_EXPIRY_TIME) {
-            if(_.isEmpty(jobAttributeStatusMap) || jobAttributeStatusMap[jobStatusId] == jobAttributeMasterId){
+            if(_.isEmpty(jobAttributeStatusMap) || !jobAttributeStatusMap[jobStatusId] || (jobAttributeStatusMap[jobStatusId] == jobAttributeMasterId)){
                 return true
             }
            
