@@ -65,6 +65,7 @@ class TaskListScreen extends PureComponent {
     return (
       <JobListItem
         data={item}
+        onChatButtonPressed = {(contact, smsTemplatedata) => {this.props.actions.setSmsTemplateList(contact, smsTemplatedata, item)}}
         showIconsInJobListing={true}
         onPressItem={() => { this.navigateToScene(item) }}
         lastId={lastId}

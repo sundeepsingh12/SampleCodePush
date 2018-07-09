@@ -31,6 +31,25 @@ class FieldData {
         return fieldDataMap
     }
 
+    getFieldData(id) {
+        let fieldDataQuery =  'jobTransactionId = ' + id
+        let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
+        let fieldDataMap = {}
+        fieldDataMap[id] = {}
+        fieldDataList.forEach(fieldDataObj => {
+            const {
+                fieldAttributeMasterId,
+                value
+            } = fieldDataObj
+            let fieldData = {
+                fieldAttributeMasterId,
+                value
+            }
+            fieldDataMap[id][fieldAttributeMasterId] = fieldData
+        })
+        return fieldDataMap
+    }
+
     /**
      * This method fetch data from db and prepares field data object for display
      * @param {*} jobTransactionId 

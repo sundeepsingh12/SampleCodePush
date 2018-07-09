@@ -115,7 +115,7 @@ class JobTransaction {
         let jobQuery = '', jobTransactionQuery = '', fieldDataQuery = '', jobTransactionMap = {};
         for (let index in jobTransactionList) {
             const transaction = jobTransactionList[index];
-            const { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual } = transaction;
+            const { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual, attemptCount, lastTransactionTimeOnMobile, jobEtaTime, jobCreatedAt, lastUpdatedAtServer } = transaction;
             if (index == 0) {
                 jobQuery += 'id = ' + jobId;
                 jobTransactionQuery += 'id = ' + id;
@@ -125,7 +125,7 @@ class JobTransaction {
                 jobTransactionQuery += ' OR id = ' + id;
                 fieldDataQuery += ' OR jobTransactionId = ' + id;
             }
-            jobTransactionMap[id] = { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual };
+            jobTransactionMap[id] = { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual, attemptCount, lastTransactionTimeOnMobile, jobEtaTime, jobCreatedAt, lastUpdatedAtServer };
         }
         return { jobTransactionMap, jobQuery, jobTransactionQuery, fieldDataQuery };
     }
@@ -330,6 +330,11 @@ class JobTransaction {
             jobTransactionCustomization.jobLatitude = job.latitude;
             jobTransactionCustomization.jobLongitude = job.longitude;
             jobTransactionCustomization.jobId = jobTransaction.jobId;
+            jobTransactionCustomization.attemptCount = jobTransaction.attemptCount
+            jobTransactionCustomization.jobCreatedAt = jobTransaction.jobCreatedAt
+            jobTransactionCustomization.lastUpdatedAtServer = jobTransaction.lastUpdatedAtServer
+            jobTransactionCustomization.jobEtaTime = jobTransaction.jobEtaTime
+            jobTransactionCustomization.lastTransactionTimeOnMobile = jobTransaction.lastTransactionTimeOnMobile
             jobTransactionCustomization.identifierColor = jobTransactionCustomizationListParametersMaps.jobMasterIdMap[jobMasterId].identifierColor;
             jobTransactionCustomization.seqActual = jobTransaction.seqActual;
             jobTransactionCustomization.seqAssigned = jobTransaction.seqAssigned;

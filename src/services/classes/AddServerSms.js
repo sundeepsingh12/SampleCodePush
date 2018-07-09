@@ -276,17 +276,21 @@ class AddServerSms {
         return messageBody
     }
 
-    sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData, jobAttributesList, fieldAttributesList, user) {
+    sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData, jobAttributesList, fieldAttributesList, user, jobDataMap, fieldDataMap) {
         if (smsTemplate.body && smsTemplate.body.trim() != '') {
             let fieldDataList, jobDataList;
             let messageBody = smsTemplate.body
             let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAttributesList.value, fieldAttributesList.value)
-
-            if (jobData) {
+            if(jobDataMap){
+                messageBody = this.setSmsBodyJobData(smsTemplate.body, jobDataMap, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap, null, true)
+            }else if (jobData) {
                 jobDataList = jobData.map((dataList) => dataList.data)
                 messageBody = this.setSmsBodyJobData(smsTemplate.body, null, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap, jobDataList, true)
             }
-            if (fieldData) {
+            if(fieldDataMap){
+                messageBody = this.setSMSBodyFieldData(messageBody, null, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap, fieldDataMap, true)
+
+            }else if (fieldData) {
                 fieldDataList = fieldData.map((dataList) => dataList.data)
                 messageBody = this.setSMSBodyFieldData(messageBody, fieldDataList, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap, null, true)
             }
