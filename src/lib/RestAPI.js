@@ -19,7 +19,6 @@ import { keyValueDBService } from '../services/classes/KeyValueDBService.js'
 import { PENDING_SYNC_TRANSACTION_IDS, LAST_SYNC_WITH_SERVER, DOMAIN_URL } from './constants'
 import { sync } from '../services/classes/Sync'
 const fetch = require('react-native-cancelable-fetch');
-import CookieManager from 'react-native-cookies';
 
 class RestAPI {
   /**
@@ -59,7 +58,6 @@ class RestAPI {
     if (opts.method == 'WALLET') opts.method = 'POST'
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
-      CookieManager.clearAll()
     }
     const response = await fetch(url, opts, fetchRequestId)
     const { status, code, headers, _bodyText } = response;
