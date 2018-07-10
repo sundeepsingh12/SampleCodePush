@@ -57,7 +57,6 @@ class Login extends PureComponent {
 
   componentDidMount() {
     this.props.checkRememberMe()
-    this._didFocusSubscription = this.props.navigation.addListener('didFocus',payload => this.props.checkRememberMe());
   }
 
   onChangeUsername = (value) => {

@@ -10,7 +10,6 @@ import {
     NEXT_FOCUS,
     TabScreen,
     Transient,
-    CLEAR_FORM_LAYOUT,
     SET_FORM_LAYOUT_STATE,
     USER,
     AutoLogoutScreen,
@@ -35,7 +34,6 @@ import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobStatusService } from '../../services/classes/JobStatus'
-
 import _ from 'lodash'
 import { performSyncService, pieChartCount } from '../home/homeActions'
 import { draftService } from '../../services/classes/DraftService'
@@ -46,17 +44,17 @@ import { Toast } from 'native-base'
 import { fetchJobs } from '../taskList/taskListActions';
 
 
-export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobTransaction) {
+export function getSortedRootFieldAttributes(statusData, jobTransactionId, jobTransaction) {
     return async function (dispatch) {
         try {
             dispatch(setState(CLEAR_FORM_LAYOUT_WITH_LOADER))
-            let sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
+            let sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusData.statusId, null, jobTransaction,latestPositionId)
             let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
             sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds);
             dispatch(setState(SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT, {
-                statusId,
-                statusName,
+                statusId:statusData.statusId,
+                statusName:statusData.statusName,
                 jobTransactionId,
                 latestPositionId,
                 fieldAttributeMasterParentIdMap,
@@ -212,6 +210,8 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                                 jobTransaction: jobTransaction,
                                 statusId: currentStatus.nextStatusList[0].id,
                                 statusName: currentStatus.nextStatusList[0].name,
+                                saveActivated:currentStatus.nextStatusList[0].saveActivated,
+                                transient:currentStatus.nextStatusList[0].transient,
                                 jobMasterId: jobMasterId,
                                 navigationFormLayoutStates: cloneTransientFormLayoutMap,
                                 latestPositionId: formLayoutState.latestPositionId,
@@ -270,14 +270,14 @@ export function fieldValidations(currentElement, formLayoutState, timeOfExecutio
     }
 }
 
-export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, latestPositionId) {
+export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, jobTransactionId, jobTransaction, latestPositionId,statusData) {
     return async function (dispatch) {
         try {
             if (editableFormLayoutState) {
-                dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
+                dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName:statusData.statusName }))
             }
             else {
-                dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobTransaction))
+                dispatch(getSortedRootFieldAttributes(statusData, jobTransactionId, jobTransaction,latestPositionId))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1011, error.message, 'danger', 1)
@@ -329,6 +329,9 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
             if (!_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore)) {
                 dispatch(setState(ADD_FORM_LAYOUT_STATE, draftRestored.navigationFormLayoutStatesForRestore))
             }
+            //Change this approach when Job Detail is refactored
+            const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+            const nextJobStatus  = jobStatusService.getJobStatusForJobStatusId(statusList.value,draftRestored.formLayoutState.statusId)
             navigate('FormLayout', {
                 contactData,
                 jobTransactionId: jobTransaction.id,
@@ -339,7 +342,9 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                 navigationFormLayoutStates: !_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore) ? draftRestored.navigationFormLayoutStatesForRestore : (navgiationStateForSaveActivated ? navgiationStateForSaveActivated : {}),
                 isDraftRestore: true,
                 pageObjectAdditionalParams,
-                jobDetailsScreenKey
+                jobDetailsScreenKey,
+                transient:nextJobStatus.transient,
+                saveActivated:nextJobStatus.saveActivated
             })
         } catch (error) {
             showToastAndAddUserExceptionLog(1013, error.message, 'danger', 1)

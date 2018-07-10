@@ -5,19 +5,14 @@ import {
     StyleSheet,
     View,
     FlatList,
-    Text,
-    Actio
+    Text
 } from 'react-native'
 import {
-    SELECT_NUMBER_FOR_CALL,
-    OK,
-    CANCEL,
-    CALL_CONFIRM,
     SELECT_TEMPLATE,
     SELECT_NUMBER
   } from '../lib/ContainerConstants'
 import styles from '../themes/FeStyle'
-import { Button, Icon, ActionSheet, FooterTab } from 'native-base'
+import { Button, Icon, ActionSheet } from 'native-base'
 
 export default class MessageButtonItem extends PureComponent {
     chatButtonPressed = () => {

@@ -35,7 +35,7 @@ import {
 
 import CONFIG from '../../lib/config'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions,StackActions } from 'react-navigation'
 import { navDispatch } from '../navigators/NavigationService';
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 
@@ -52,10 +52,10 @@ export function loginSuccess() {
   }
 }
 
-export function loginFailure(error) {
+export function loginFailure(error, code) {
   return {
     type: LOGIN_FAILURE,
-    payload: error
+    payload: {error, code}
   }
 }
 
@@ -129,12 +129,13 @@ export function authenticateUser(username, password, rememberMe) {
       await authenticationService.saveLoginCredentials(username, password, rememberMe)
       dispatch(loginSuccess())
       keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','PreloaderScreen')
-      navDispatch(NavigationActions.navigate({
-        routeName: 'PreloaderScreen'
-      }))
+      navDispatch(StackActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({ routeName: 'PreloaderScreen' })],
+      }));
     } catch (error) {
       showToastAndAddUserExceptionLog(1301, error.message, 'danger', 0)
-      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
+      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, ""), error.code))
     }
   }
 }
@@ -180,7 +181,7 @@ export function forgetPasswordRequest(username) {
       dispatch(loginFailure(response.json.message.replace(/<\/?[^>]+(>|$)/g, "")))
     } catch (error) {
       showToastAndAddUserExceptionLog(1303, error.message, 'danger', 0)
-      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
+      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, ""), error.code))
     }
   }
 }

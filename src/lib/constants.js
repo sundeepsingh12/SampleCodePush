@@ -38,7 +38,7 @@ module.exports = keyMirror({
     LOGOUT_START: null,
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
-    SET_LOGIN_PARAMETERS:null,
+    SET_LOGIN_PARAMETERS: null,
 
     //Preloader Actions
     MASTER_DOWNLOAD_START: null,
@@ -235,6 +235,7 @@ module.exports = keyMirror({
     MDM_POLICIES: null,
     FCM_TOKEN: null,
     APP_THEME: null,
+    LONG_CODE_SIM_VERIFICATION: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,

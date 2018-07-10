@@ -37,9 +37,11 @@ import {
   MDM_POLICIES,
   APP_VERSION,
   APP_THEME,
+  LONG_CODE_SIM_VERIFICATION
 } from '../../lib/constants'
 import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER, PATH_COMPANY_LOGO_DIR, PATH_COMPANY_LOGO_IMAGE } from '../../lib/AttributeConstants'
 import _ from 'lodash'
+import { TIME_ERROR_MESSAGE } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
 class JobMaster {
@@ -102,8 +104,8 @@ class JobMaster {
       if ((!deviceIMEI || !deviceSIM)) {
         deviceIMEI = {}
         deviceSIM = {}
-        currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
-        deviceCompanyId = userObject.value.company.id
+        currentJobMasterVersion = userObject.company.currentJobMasterVersion
+        deviceCompanyId = userObject.company.id
         postData = JSON.stringify({
           deviceIMEI,
           deviceSIM,
@@ -111,8 +113,8 @@ class JobMaster {
           deviceCompanyId
         })
       } else {
-        currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
-        deviceCompanyId = userObject.value.company.id
+        currentJobMasterVersion = userObject.company.currentJobMasterVersion
+        deviceCompanyId = userObject.company.id
         postData = JSON.stringify({
           deviceIMEI: deviceIMEI.value,
           deviceSIM: deviceSIM.value,
@@ -179,6 +181,7 @@ class JobMaster {
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.appTheme, APP_THEME)
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.companyMDM, MDM_POLICIES)
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.hubLatLng, HUB_LAT_LONG)
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.deviceSimVerification, LONG_CODE_SIM_VERIFICATION)
   }
 
 
@@ -285,7 +288,7 @@ class JobMaster {
     const currentTimeInMillis = moment()
     let diffIntime = Math.abs(moment(currentTimeInMillis).diff(serverTimeInMillis, 'minutes'))
     if (diffIntime > 15) {
-      throw new Error("Time mismatch. Please correct time on Device")
+      throw new Error(TIME_ERROR_MESSAGE)
     }
     return true
   }

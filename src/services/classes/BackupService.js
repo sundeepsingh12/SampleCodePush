@@ -248,7 +248,7 @@ class Backup {
     async checkForUnsyncBackup(user) {
         let unsyncBackupFilesList = []
         let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
-        if (!user || !user.value || !domainUrl || !domainUrl.value) return unsyncBackupFilesList
+        if (!user || !domainUrl || !domainUrl.value) return unsyncBackupFilesList
         RNFS.mkdir(PATH_BACKUP);
         let backUpFilesInfo = await RNFS.readDir(PATH_BACKUP)
         for (let backUpFile in backUpFilesInfo) {
@@ -257,7 +257,7 @@ class Backup {
             let fileNameArray = fileName.split('_')
             let fileDomainInfo = fileNameArray[0]
             let employeeCode = fileName.substring(fileName.indexOf(fileNameArray[2]), _.size(fileName) - 4)
-            if (fileDomainInfo.split('-')[0] == domain && employeeCode.split('_')[1] == user.value.company.code) {
+            if (fileDomainInfo.split('-')[0] == domain && employeeCode.split('_')[1] == user.company.code) {
                 if (fileDomainInfo.split('-')[1] == 'UnSyncbackup') {
                     unsyncBackupFilesList.push(backUpFilesInfo[backUpFile])
                 }

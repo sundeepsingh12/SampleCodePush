@@ -84,9 +84,12 @@ class FormLayout extends PureComponent {
   // }
 
   componentDidMount() {
+   
     this.props.navigation.setParams({ backForTransient: this._goBack });
     if (!this.props.navigation.state.params.isDraftRestore) {
-      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId)
+      let {statusId,statusName} = this.props.navigation.state.params
+      const statusData = {statusId,statusName}
+      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,statusData)
       if (this.props.navigation.state.params.jobTransaction.length || this.props.navigation.state.params.editableFormLayoutState || this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
         this.props.actions.setState(SET_UPDATE_DRAFT, false)
       }
@@ -108,7 +111,6 @@ class FormLayout extends PureComponent {
   };
 
   _goBack = () => {
-
     //Set previous status form layout state in case of transient single status
     if (this.props.navigation.state.params.navigationFormLayoutStates && this.props.navigation.state.params.previousStatus) {
       this.props.actions.setState(SET_FORM_LAYOUT_STATE, {
@@ -163,8 +165,6 @@ class FormLayout extends PureComponent {
 
     return null
   }
-
-
 
   saveJobTransaction() {
     let formLayoutState = {
@@ -232,7 +232,7 @@ class FormLayout extends PureComponent {
     return view
   }
 
-  getFooterView() {
+  getFooterView(transient,saveActivated) {
     return (
       <SafeAreaView style={[styles.bgWhite]}>
         <Footer style={[style.footer]}>
@@ -240,7 +240,7 @@ class FormLayout extends PureComponent {
             <Button success full
               onPress={() => this.saveJobTransaction()}
               disabled={this.props.isSaveDisabled}>
-              <Text style={[styles.fontLg, styles.fontWhite]}>{!_.isEmpty(this.props.paymentAtEnd) ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{!_.isEmpty(this.props.paymentAtEnd) ? (this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName) : (saveActivated || transient) ? 'Continue' : this.props.statusName}</Text>
             </Button>
           </FooterTab>
         </Footer>
@@ -269,10 +269,26 @@ class FormLayout extends PureComponent {
     return formData
   }
 
+  renderFormLayoutView(){
+    return (
+      <View style={[styles.flex1, styles.bgWhite]}>
+      <View style={[styles.paddingTop10, styles.paddingBottom10]}>
+        <FlatList
+          data={this._renderFormData()}
+          extraData={this.state}
+          renderItem={(item) => this.renderData(item)} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
+          keyExtractor={this._keyExtractor}>
+        </FlatList>
+      </View>
+    </View>
+    )
+  }
+
   render() {
+    const { saveActivated,transient } = this.props.navigation.state.params
     const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
     let emptyFieldAttributeForStatusView = this.emptyFieldAttributeForStatusView()
-    const footerView = this.getFooterView()
+    const footerView = this.getFooterView(transient,saveActivated)
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
@@ -282,7 +298,7 @@ class FormLayout extends PureComponent {
             <Button success full
               onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
               disabled={this.props.isSaveDisabled}>
-              <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{(this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : (saveActivated || transient) ? 'Continue' : this.props.statusName)}</Text>
             </Button>
           </FooterTab>
         </Footer>
@@ -292,32 +308,14 @@ class FormLayout extends PureComponent {
       formView = <KeyboardAvoidingView style={[{ flex: 1 }, styles.bgWhite]} behavior="padding">
         {invalidFormAlert}
         {emptyFieldAttributeForStatusView}
-        <View style={[styles.flex1, styles.bgWhite]}>
-          <View style={[styles.paddingTop10, styles.paddingBottom10]}>
-            <FlatList
-              data={this._renderFormData()}
-              extraData={this.state}
-              renderItem={(item) => this.renderData(item)} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
-              keyExtractor={this._keyExtractor}>
-            </FlatList>
-          </View>
-        </View>
+       {this.renderFormLayoutView()}
         {footerView}
       </KeyboardAvoidingView >
     } else {
       formView = <Container>
         {invalidFormAlert}
         {emptyFieldAttributeForStatusView}
-        <View style={[styles.flex1, styles.bgWhite]}>
-          <View style={[styles.paddingTop10, styles.paddingBottom10]}>
-            <FlatList
-              data={ this._renderFormData()}
-              extraData={this.state}
-              renderItem={(item) => this.renderData(item)} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
-              keyExtractor={this._keyExtractor}>
-            </FlatList>
-          </View>
-        </View>
+        {this.renderFormLayoutView()}
         {footerView}
       </Container >
     }

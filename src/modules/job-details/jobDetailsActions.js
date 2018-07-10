@@ -189,7 +189,7 @@ export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditiona
 export function checkForLocationMismatch(data, currentStatusCategory) {
     return async function (dispatch) {
         try {
-            const FormLayoutData = { contactData: data.contactData, jobTransactionId: data.jobTransaction.id, jobTransaction: data.jobTransaction, statusId: data.statusList.id, statusName: data.statusList.name, jobMasterId: data.jobTransaction.jobMasterId, pageObjectAdditionalParams: data.pageObjectAdditionalParams, jobDetailsScreenKey: data.jobDetailsScreenKey }
+            const FormLayoutData = { contactData: data.contactData, jobTransactionId: data.jobTransaction.id, jobTransaction: data.jobTransaction, statusId: data.statusList.id, statusName: data.statusList.name, jobMasterId: data.jobTransaction.jobMasterId, pageObjectAdditionalParams: data.pageObjectAdditionalParams, jobDetailsScreenKey: data.jobDetailsScreenKey,transient:data.statusList.transient,saveActivated:data.statusList.saveActivated }
             const nextStatusCategory = data.statusList.statusCategory
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(FormLayoutData.jobMasterId)
             const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)

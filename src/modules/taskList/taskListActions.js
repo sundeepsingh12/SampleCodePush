@@ -3,12 +3,10 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
 import { setState } from '../global/globalActions'
-import { JOB_LISTING_START, JOB_LISTING_END, JOB_STATUS, SET_TABS_LIST, CUSTOM_NAMING, TAB, SHOULD_RELOAD_START, TABS_LOADING, JOB_ATTRIBUTE, USER, FIELD_ATTRIBUTE, FIELD_ATTRIBUTE_STATUS } from '../../lib/constants'
-import moment from 'moment'
+import { JOB_LISTING_START, JOB_LISTING_END, JOB_STATUS, SET_TABS_LIST, CUSTOM_NAMING, TAB, SHOULD_RELOAD_START, TABS_LOADING, JOB_ATTRIBUTE, USER, FIELD_ATTRIBUTE } from '../../lib/constants'
 import _ from 'lodash'
 import { jobStatusService } from '../../services/classes/JobStatus';
 import { fieldDataService } from '../../services/classes/FieldData'
-import { fieldAttributeMasterService } from '../../services/classes/FieldAttributeMaster'
 import { addServerSmsService } from '../../services/classes/AddServerSms'
 import { jobDataService } from '../../services/classes/JobData'
 
