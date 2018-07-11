@@ -43,16 +43,18 @@ class SyncZip {
         let lastSyncTime = syncStoreDTO.lastSyncWithServer
         let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced, lastSyncTime);
         SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
-        SYNC_RESULTS.job = realmDbData.jobList;
-        SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
+        //SYNC_RESULTS.job = realmDbData.jobList;
+        //SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
         SYNC_RESULTS.runSheetSummary = realmDbData.runSheetSummary;
         SYNC_RESULTS.scannedReferenceNumberLog = [];
         SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, syncStoreDTO.lastSyncWithServer);
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
         const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
-        let { communicationLogs, lastCallTime, lastSmsTime } = await communicationLogsService.getCallLogs(syncStoreDTO)
+        let { communicationLogs, lastCallTime, lastSmsTime, transactionsToUpdate, jobsToUpdate } = await communicationLogsService.getCallLogs(syncStoreDTO, realmDbData.transactionList, realmDbData.jobList)
         SYNC_RESULTS.userCommunicationLog = communicationLogs
+        SYNC_RESULTS.jobTransaction = transactionsToUpdate
+        SYNC_RESULTS.job = jobsToUpdate ? jobsToUpdate : []
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.userExceptionLog = userExceptionLogsService.getUserExceptionLog(realmDbData.userExceptionLog, lastSyncTime)
         let jobSummary = jobSummaryService.getJobSummaryListForSync(syncStoreDTO.jobSummaryList, syncStoreDTO.lastSyncWithServer)
@@ -66,7 +68,7 @@ class SyncZip {
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
-        return { lastCallTime, lastSmsTime }
+        return { lastCallTime, lastSmsTime, transactionsToUpdate }
         //Deleting TEMP folder location
         // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }

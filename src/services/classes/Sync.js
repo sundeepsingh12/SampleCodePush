@@ -52,9 +52,9 @@ class Sync {
     if (!token) {
       throw new Error('Token Missing')
     }
-    let { lastCallTime, lastSmsTime } = await syncZipService.createZip(syncStoreDTO)
+    let { lastCallTime, lastSmsTime, transactionsToUpdate } = await syncZipService.createZip(syncStoreDTO)
     const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO)
-    await communicationLogsService.updateLastCallSmsTime(lastCallTime, lastSmsTime)
+    await communicationLogsService.updateLastCallSmsTimeAndTransactions(lastCallTime, lastSmsTime, transactionsToUpdate)
     return responseBody
   }
 
