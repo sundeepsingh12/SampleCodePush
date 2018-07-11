@@ -45,10 +45,10 @@ class PostAssignmentScanner extends PureComponent {
         this.state = {
             showTransactionList: false,
             torchStatus: false,
-            bounceValue: new Animated.Value(240),
+            bounceValue: new Animated.Value(150),
             searchText: ''
         };
-        this.animatedValue = new Animated.Value(120)
+        this.animatedValue = new Animated.Value(75)
     }
 
     onSwipeUp(gestureState) {
@@ -61,7 +61,7 @@ class PostAssignmentScanner extends PureComponent {
     onSwipeDown(gestureState) {
         if (this.state.showTransactionList) {
             this.setState({ showTransactionList: false })
-            this._toggleTransactionView(240)
+            this._toggleTransactionView(150)
         }
     }
 
@@ -77,7 +77,7 @@ class PostAssignmentScanner extends PureComponent {
         Animated.timing(
             this.animatedValue,
             {
-                toValue: 120,
+                toValue: 75,
             }).start()
         this.props.actions.setState(SET_POST_SCAN_SUCCESS, {})
     }
@@ -198,6 +198,7 @@ class PostAssignmentScanner extends PureComponent {
                         placeholderTextColor={'rgba(255,255,255,.6)'}
                         underlineColorAndroid='transparent'
                         style={[styles.headerSearch]}
+                        autoCorrect={false}           
                         onChangeText={value => this.setState({ searchText: value })}
                         onSubmitEditing={event => this.checkJobTransaction(this.state.searchText, true)}
                         value={this.state.searchText} />
@@ -390,7 +391,7 @@ const style = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        height: 345,
+        height: 255,
     },
     imageSync: {
         width: 74,
