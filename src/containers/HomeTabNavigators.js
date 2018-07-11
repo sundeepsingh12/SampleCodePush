@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { Platform, View } from 'react-native'
-import { Icon } from 'native-base'
 import { createBottomTabNavigator,createStackNavigator } from 'react-navigation'
 import SyncScreen from './SyncScreen'
 import ErpSyncScreen from './ErpSyncScreen'
@@ -44,6 +43,7 @@ import SplitPayment from './SplitPayment'
 import CameraFieldAttribute from './CameraFieldAttribute'
 import QrCodeScanner from './QrCodeScanner'
 import MenuStack from '../modules/navigators/MenuStackNavigator'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 MenuStack.navigationOptions = ({ navigation }) => {
     let tabBarVisible = true;
@@ -196,8 +196,8 @@ const Tabs = {
         navigationOptions:{ 
             header:null,
             tabBarIcon: ({ tintColor }) => (
-            <Icon
-                name='ios-home'
+            <MaterialIcons
+                name='home'
                 style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
             />
         ),
@@ -209,8 +209,8 @@ const Tabs = {
             title: 'Sync',
             gesturesEnabled: false,
             tabBarIcon: ({ tintColor }) => (
-                <Icon
-                    name='ios-sync'
+                <MaterialIcons
+                    name='sync'
                     style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
                 />
             ),
@@ -222,8 +222,8 @@ const Tabs = {
             title: 'ERP',
             gesturesEnabled: false,
             tabBarIcon: ({ tintColor }) => (
-                <Icon
-                name="ios-download"
+                <MaterialIcons
+                name="cloud-download"
                 style={[{fontSize:18,color:tintColor}]}
                 />
             ),
@@ -234,8 +234,8 @@ const Tabs = {
         navigationOptions:{ 
             header:null,
             tabBarIcon: ({ tintColor }) => (
-            <Icon
-                name='md-menu'
+            <MaterialIcons
+                name='menu'
                 style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
             />
         ),
