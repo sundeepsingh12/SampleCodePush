@@ -380,7 +380,6 @@ export function checkIfSimValidOnServer(user, token, longCodeConfiguration) {
       const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI);
       const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM);
       let responseIsVerified = await deviceVerificationService.checkAssetApiAndSimVerificationOnServer(token, { deviceIMEI, deviceSIM });
-      responseIsVerified = false;
       if (responseIsVerified) {
         dispatch(setState(PRELOADER_SUCCESS));
         dispatch(checkForUnsyncBackupFilesAndNavigate(user));
@@ -392,7 +391,7 @@ export function checkIfSimValidOnServer(user, token, longCodeConfiguration) {
             await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_OTP_SCREEN, SHOW_LONG_CODE_IOS_SCREEN);
             dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, { showMobileOtpNumberScreen: SHOW_LONG_CODE_IOS_SCREEN, longCodeSMSData }));
           } else {
-            await sendSMSBackGroundService.sendLongCodeSMS(messageBody, recipientPhoneNumber);
+            await sendSMSBackGroundService.sendLongCodeSMS(longCodeSMSData.messageBody, longCodeSMSData.recipientPhoneNumber);
             dispatch(setState(PRELOADER_SUCCESS));
             dispatch(checkForUnsyncBackupFilesAndNavigate(user));
           }
