@@ -10,8 +10,7 @@ import { addServerSmsService } from '../AddServerSms';
 import { fieldValidationService } from '../FieldValidation';
 import { jobStatusService } from '../JobStatus';
 import { keyValueDBService } from '../KeyValueDBService.js';
-
-
+import { communicationLogsService } from '../CommunicationLogs'
 
 export default class FormLayoutEventImpl {
 
@@ -154,7 +153,7 @@ export default class FormLayoutEventImpl {
      * @param {*statusId} statusId 
      * @param {*jobMasterId} jobMasterId
      */
-    async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionList) {
+    async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionList, jobAndFieldAttributesList) {
         let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
         let user = await keyValueDBService.getValueFromStore(USER)
         let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
@@ -171,17 +170,19 @@ export default class FormLayoutEventImpl {
             longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
         }
         let fieldData, jobTransaction, job, dbObjects
+        let { callAndSmsLogs, jobDataMap } = await communicationLogsService.getCallLogsAndJobDataMap(jobTransactionList, jobAndFieldAttributesList, jobMasterId)
+
         if (jobTransactionList && jobTransactionList.length) { //Case of bulk
             fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionList, currentTime)
             dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
-            jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap) // to edit later 
+            jobTransaction = await this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap, callAndSmsLogs, jobDataMap, fieldData.value) // to edit later 
             job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value, fieldData.reAttemptDate)
         }
         else {
             jobTransactionId = await this.changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList)//In case of new job change jobTransactionId
             fieldData = this._saveFieldData(formLayoutObject, jobTransactionId, null, currentTime)
             dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
-            jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap) //to edit later
+            jobTransaction = await this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap, callAndSmsLogs, jobDataMap, fieldData.value) //to edit later
             job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, lastTrackLog)
         }
         //TODO add other dbs which needs updation
@@ -610,7 +611,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue, amountMap) {
+    async _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue, amountMap, callAndSmsLogs, jobDataMap, fieldData) {
         let jobTransactionArray = [], jobTransactionDTOMap = {}, syncTime = moment().format('YYYY-MM-DD HH:mm:ss');
         let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
         jobTransaction.jobType = jobMaster.code
@@ -629,6 +630,7 @@ export default class FormLayoutEventImpl {
         jobTransaction.originalAmount = parseFloat(amountMap.originalAmount) ? parseFloat(amountMap.originalAmount) : 0
         jobTransaction.actualAmount = parseFloat(amountMap.actualAmount) ? parseFloat(amountMap.actualAmount) : 0
         jobTransaction.moneyTransactionType = amountMap.moneyTransactionType
+        await communicationLogsService.setTrackCallCountAndDuration(jobTransaction, callAndSmsLogs, jobDataMap[jobTransaction.jobId], fieldData)
         jobTransactionArray.push(jobTransaction)
         jobTransactionDTOMap[jobTransaction.id] = {
             id: jobTransaction.id,
@@ -643,7 +645,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue, amountMap) {
+    async _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue, amountMap, callAndSmsLogs, jobDataMap, fieldData) {
         let jobTransactionArray = [], jobTransactionDTOMap = {}, syncTime = moment().format('YYYY-MM-DD HH:mm:ss');
         for (let jobTransaction1 in jobTransactionList) {
             let jobTransaction = Object.assign({}, jobTransactionList[jobTransaction1]) // no need to have null checks as it is called from a private method
@@ -663,6 +665,7 @@ export default class FormLayoutEventImpl {
             jobTransaction.originalAmount = amountMap[jobTransaction.id] ? parseFloat(amountMap[jobTransaction.id].originalAmount) : parseFloat(amountMap.originalAmount) ? parseFloat(amountMap.originalAmount) : 0
             jobTransaction.actualAmount = amountMap[jobTransaction.id] ? parseFloat(amountMap[jobTransaction.id].actualAmount) : parseFloat(amountMap.actualAmount) ? parseFloat(amountMap.actualAmount) : 0
             jobTransaction.moneyTransactionType = amountMap.moneyTransactionType
+            await communicationLogsService.setTrackCallCountAndDuration(jobTransaction, callAndSmsLogs, jobDataMap[jobTransaction.jobId], fieldData)
             jobTransactionArray.push(jobTransaction)
             jobTransactionDTOMap[jobTransaction.id] = {
                 id: jobTransaction.id,

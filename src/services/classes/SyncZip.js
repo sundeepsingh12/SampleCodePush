@@ -43,23 +43,20 @@ class SyncZip {
         let lastSyncTime = syncStoreDTO.lastSyncWithServer
         let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced, lastSyncTime);
         SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
-        //SYNC_RESULTS.job = realmDbData.jobList;
-        //SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
+        SYNC_RESULTS.job = realmDbData.jobList;
+        SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
         SYNC_RESULTS.runSheetSummary = realmDbData.runSheetSummary;
         SYNC_RESULTS.scannedReferenceNumberLog = [];
         SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, syncStoreDTO.lastSyncWithServer);
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
         const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
-        let { communicationLogs, lastCallTime, lastSmsTime, transactionsToUpdate, jobsToUpdate } = await communicationLogsService.getCallLogs(syncStoreDTO, realmDbData.transactionList, realmDbData.jobList)
+        let { communicationLogs, lastCallTime, lastSmsTime } = await communicationLogsService.getCallLogs(syncStoreDTO, userSummary)
         SYNC_RESULTS.userCommunicationLog = communicationLogs
-        SYNC_RESULTS.jobTransaction = transactionsToUpdate
-        SYNC_RESULTS.job = jobsToUpdate ? jobsToUpdate : []
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.userExceptionLog = userExceptionLogsService.getUserExceptionLog(realmDbData.userExceptionLog, lastSyncTime)
         let jobSummary = jobSummaryService.getJobSummaryListForSync(syncStoreDTO.jobSummaryList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.jobSummary = jobSummary || {}
-        await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
         //Writing Object to File at TEMP location
@@ -68,7 +65,7 @@ class SyncZip {
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
-        return { lastCallTime, lastSmsTime, transactionsToUpdate }
+        return { lastCallTime, lastSmsTime, userSummary }
         //Deleting TEMP folder location
         // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }

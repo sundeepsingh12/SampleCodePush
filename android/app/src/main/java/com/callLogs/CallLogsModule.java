@@ -40,7 +40,7 @@ public class CallLogsModule extends ReactContextBaseJavaModule {
         String[] dates = {dateTime + ""};
         Cursor cursor;
         if (lastCallLogTime == null) {
-            cursor = this.reactContext.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, CallLog.Calls.DATE + ">?", dates, CallLog.Calls.DATE + " DESC");
+            cursor = this.reactContext.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, CallLog.Calls.DATE + ">=?", dates, CallLog.Calls.DATE + " DESC");
         } else {
             String[] args = {lastCallLogTime};
             cursor = this.reactContext.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, CallLog.Calls.DATE + ">?", args, CallLog.Calls.DATE + " DESC");

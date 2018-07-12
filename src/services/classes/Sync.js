@@ -31,6 +31,7 @@ import {
   LAST_SYNC_WITH_SERVER,
   PAGES,
   TABLE_MESSAGE_INTERACTION,
+  USER_SUMMARY
 } from '../../lib/constants'
 import { FAREYE_UPDATES, PAGE_OUTSCAN, PATH_TEMP } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
@@ -52,9 +53,10 @@ class Sync {
     if (!token) {
       throw new Error('Token Missing')
     }
-    let { lastCallTime, lastSmsTime, transactionsToUpdate } = await syncZipService.createZip(syncStoreDTO)
+    let { lastCallTime, lastSmsTime, userSummary } = await syncZipService.createZip(syncStoreDTO)
     const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO)
-    await communicationLogsService.updateLastCallSmsTimeAndTransactions(lastCallTime, lastSmsTime, transactionsToUpdate)
+    await communicationLogsService.updateLastCallSmsTime(lastCallTime, lastSmsTime)
+    await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
     return responseBody
   }
 
@@ -763,7 +765,7 @@ class Sync {
     let transactionToBeSynced = await keyValueDBService.getValueFromStore(schemaName);
     let originalTransactionsToBeSynced = transactionToBeSynced ? transactionToBeSynced.value : {}
     for (let index in transactionIdsSynced) {
-      if (moment(originalTransactionsToBeSynced[index].syncTime).isBefore(moment(date).format('YYYY-MM-DD HH:mm:ss')) || moment(originalTransactionsToBeSynced[index].syncTime.isSame(moment(date).format('YYYY-MM-DD HH:mm:ss')))) {
+      if (moment(originalTransactionsToBeSynced[index].syncTime).isBefore(moment(date).format('YYYY-MM-DD HH:mm:ss')) || (moment(originalTransactionsToBeSynced[index].syncTime).isSame(moment(date).format('YYYY-MM-DD HH:mm:ss')))) {
         delete originalTransactionsToBeSynced[index]
       }
     }

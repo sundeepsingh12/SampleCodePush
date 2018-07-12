@@ -4,7 +4,8 @@ import {
     TABLE_JOB_TRANSACTION,
     CUSTOMER_CARE,
     LAST_CALL_AND_SMS_TIME,
-    TABLE_JOB
+    TABLE_JOB,
+    JOB_ATTRIBUTE
 } from '../../lib/constants'
 import {
     CONTACT_NUMBER
@@ -24,12 +25,13 @@ import {
     SMS_PERSONAL
 } from '../../lib/ContainerConstants'
 let calls = require('../../wrapper/CALLS')
-
+import {
+    jobDataService
+} from './JobData'
 class CommunicationLogs {
 
 
-    async getCallLogs(syncStoreDTO, transactionList, jobList) {
-        //syncStoreDTO.lastSyncWithServer = '2018-07-01 00:00:00'
+    async getCallLogs(syncStoreDTO, userSummary) {
         let lastSyncWithServerInMillis = moment(syncStoreDTO.lastSyncWithServer).format('x')
         let lastCallSmsTime = await keyValueDBService.getValueFromStore(LAST_CALL_AND_SMS_TIME)
         let lastCallTimeFromStore, lastSmsTimeFromStore
@@ -46,7 +48,7 @@ class CommunicationLogs {
         let callLogsArray = JSON.parse(callLogsFromPhone);
         let smsLogsArray = JSON.parse(smsLogsFromPhone);
         if (_.isEmpty(callLogsArray) && _.isEmpty(smsLogsArray)) {
-            return { communicationLogs: [], lastCallTime: null, lastSmsTime: null, transactionsToUpdate: transactionList, jobsToUpdate: jobList }
+            return { communicationLogs: [], lastCallTime: null, lastSmsTime: null }
         }
         let lastCallTime, lastSmsTime
         if (_.size(callLogsArray) > 0) {
@@ -64,11 +66,11 @@ class CommunicationLogs {
         let customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
         let jobMasterIdToJobMasterMap = _.mapKeys(syncStoreDTO.jobMasterList, 'id')
         let statusIdToStatusMap = _.mapKeys(syncStoreDTO.statusList, 'id')
-        let { communicationLogs, transactionsToUpdate, jobsToUpdate } = await this.setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, transactionList, jobList)
-        return { communicationLogs, lastCallTime, lastSmsTime, transactionsToUpdate, jobsToUpdate }
+        let communicationLogs = await this.setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary)
+        return { communicationLogs, lastCallTime, lastSmsTime }
     }
 
-    async setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, transactionList, jobList) {
+    async setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary) {
         let communicationLogs = [], contactToCallLogMap = {}, jobIdToContactMap = {}, jobTransactionToContactMap = {}
         let callAndSmsLogs = callLogsArray.concat(smsLogsArray);
 
@@ -86,62 +88,38 @@ class CommunicationLogs {
                 let isNumberCUG = await this.checkNumberIfCUG(callLog.phoneNumber, customerCareList)
                 if (isNumberCUG) {
                     communicationLog.communicationType = (communicationLog.duration) ? CALL_CUG : SMS_OFFICIAL
+                    this.incrementCountInUserSummary(communicationLog.transactionType, 'CUG', communicationLog.duration, userSummary)
                 } else {
                     communicationLog.communicationType = (communicationLog.duration) ? CALL_PERSONAL : SMS_PERSONAL
+                    this.incrementCountInUserSummary(communicationLog.transactionType, 'PERSONAL', communicationLog.duration, userSummary)
                 }
                 communicationLogs.push(communicationLog)
             }
         }
 
         if (_.isEmpty(jobIdToContactMap) && _.isEmpty(jobTransactionToContactMap)) {
-            return { communicationLogs, transactionsToUpdate: transactionList }
+            return communicationLogs
         }
 
-        let pendingJobTransactionsMap = _.mapKeys(transactionList, 'id')
-        let pendingJobIdsMap = _.mapKeys(jobList, 'id'), jobQuery = ''
         let jobTransactionArray = this.getJobTransactionFromDb(jobIdToContactMap, jobTransactionToContactMap)
         for (let index in jobTransactionArray) {
-            let id = jobTransactionArray[index].id;
-            let jobTransaction = {}
-            if (pendingJobTransactionsMap[id]) {
-                jobTransaction = pendingJobTransactionsMap[id]
-            } else {
-                jobTransaction = { ...jobTransactionArray[index] }
-            }
+            let jobTransaction = { ...jobTransactionArray[index] }
+
             if (jobIdToContactMap[jobTransaction.jobId]) {
-                let callLogs = this.getOfficialCommunicationLogs(jobIdToContactMap[jobTransaction.jobId].contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap)
+                let callLogs = this.getOfficialCommunicationLogs(jobIdToContactMap[jobTransaction.jobId].contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary)
                 communicationLogs = communicationLogs.concat(callLogs)
-                jobTransaction.trackCallCount += jobIdToContactMap[jobTransaction.jobId].callCount
-                jobTransaction.trackCallDuration += jobIdToContactMap[jobTransaction.jobId].callDuration
+                //jobTransaction.trackCallCount += jobIdToContactMap[jobTransaction.jobId].callCount
+                //jobTransaction.trackCallDuration += jobIdToContactMap[jobTransaction.jobId].callDuration
             }
 
             if (jobTransactionToContactMap[jobTransaction.id]) {
-                let callLogs = this.getOfficialCommunicationLogs(jobTransactionToContactMap[jobTransaction.id].contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap)
+                let callLogs = this.getOfficialCommunicationLogs(jobTransactionToContactMap[jobTransaction.id].contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary)
                 communicationLogs = communicationLogs.concat(callLogs)
-                jobTransaction.trackCallCount += jobTransactionToContactMap[jobTransaction.id].callCount
-                jobTransaction.trackCallDuration += jobTransactionToContactMap[jobTransaction.id].callDuration
-            }
-            pendingJobTransactionsMap[id] = jobTransaction
-            if (!pendingJobIdsMap[jobTransaction.jobId]) {
-                if (jobQuery == '') {
-                    jobQuery += 'id = ' + jobTransaction.jobId
-                } else {
-                    jobQuery += ' OR ' + 'id = ' + jobTransaction.jobId
-                }
+                //jobTransaction.trackCallCount += jobTransactionToContactMap[jobTransaction.id].callCount
+                //jobTransaction.trackCallDuration += jobTransactionToContactMap[jobTransaction.id].callDuration
             }
         }
-        let jobListFromDb
-        if (jobQuery != '') {
-            jobListFromDb = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
-        }
-        for (let index in jobListFromDb) {
-            let job = { ...jobListFromDb[index] }
-            pendingJobIdsMap[job.id] = job
-        }
-
-        let transactionsToUpdate = _.values(pendingJobTransactionsMap)
-        let jobsToUpdate = _.values(pendingJobIdsMap)
-        return { communicationLogs, transactionsToUpdate, jobsToUpdate }
+        return communicationLogs
     }
 
     setCommunicationLogDefaultValues(communicationLog, syncStoreDTO, callLog) {
@@ -160,7 +138,7 @@ class CommunicationLogs {
         communicationLog.transactionType = callLog.callType
     }
 
-    getOfficialCommunicationLogs(contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap) {
+    getOfficialCommunicationLogs(contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary) {
         let contactNumbersList = _.keys(contactsList), communicationLogs = []
         for (let contact of contactNumbersList) {
             if (contactToCallLogMap[contact]) {
@@ -172,6 +150,7 @@ class CommunicationLogs {
                     cloneCommunicationLog.communicationType = (cloneCommunicationLog.duration) ? CALL_OFFICIAL : SMS_OFFICIAL
                     cloneCommunicationLog.jobType = jobMasterIdToJobMasterMap[jobTransaction.jobMasterId].code
                     cloneCommunicationLog.jobStatus = statusIdToStatusMap[jobTransaction.jobStatusId].name
+                    this.incrementCountInUserSummary(cloneCommunicationLog.transactionType, 'OFFICIAL', communicationLog.duration, userSummary)
                     communicationLogs.push(cloneCommunicationLog)
                 }
             }
@@ -202,14 +181,14 @@ class CommunicationLogs {
     setIdToContactMap(jobOrJobTransactionMap, id, callLog) {
         if (jobOrJobTransactionMap[id]) {
             jobOrJobTransactionMap[id].contactsList[callLog.phoneNumber] = callLog.phoneNumber
-            jobOrJobTransactionMap[id].callCount += 1
-            jobOrJobTransactionMap[id].callDuration += parseInt(callLog.callDuration)
+            // jobOrJobTransactionMap[id].callCount += 1
+            // jobOrJobTransactionMap[id].callDuration += parseInt(callLog.callDuration)
         } else {
             jobOrJobTransactionMap[id] = {}
             jobOrJobTransactionMap[id].contactsList = {}
             jobOrJobTransactionMap[id].contactsList[callLog.phoneNumber] = callLog.phoneNumber
-            jobOrJobTransactionMap[id].callCount = 1
-            jobOrJobTransactionMap[id].callDuration = parseInt(callLog.callDuration)
+            // jobOrJobTransactionMap[id].callCount = 1
+            // jobOrJobTransactionMap[id].callDuration = parseInt(callLog.callDuration)
         }
     }
 
@@ -226,7 +205,7 @@ class CommunicationLogs {
         }
     }
 
-    async updateLastCallSmsTimeAndTransactions(lastCallTime, lastSmsTime, transactionsToUpdate) {
+    async updateLastCallSmsTime(lastCallTime, lastSmsTime) {
         let lastCallSmsTime = await keyValueDBService.getValueFromStore(LAST_CALL_AND_SMS_TIME)
         if (lastCallSmsTime && lastCallSmsTime.value) {
             if (lastCallTime) {
@@ -243,9 +222,7 @@ class CommunicationLogs {
             }
             await keyValueDBService.validateAndSaveData(LAST_CALL_AND_SMS_TIME, lastCallSmsTimeObject)
         }
-        if (_.size(transactionsToUpdate) > 0) {
-            realm.saveList(TABLE_JOB_TRANSACTION, transactionsToUpdate)
-        }
+
     }
 
     getJobTransactionFromDb(jobIdToContactMap, jobTransactionToContactMap) {
@@ -257,6 +234,114 @@ class CommunicationLogs {
         }
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, transactionQuery)
         return jobTransactionList
+    }
+
+    async getCallLogsAndJobDataMap(jobTransactionList, jobAndFieldAttributesList, jobMasterId) {
+        let jobDataQuery = '', todayDate = moment().format('YYYY-MM-DD') + ' 00:00:00', jobAttributesQuery = ''
+        let todayDateInMilliSecond = moment(todayDate).format('x')
+        let callLogsFromPhone = await calls.getCallLogs(todayDateInMilliSecond, null)
+        let smsLogsFromPhone = await calls.getSmsLogs(todayDateInMilliSecond, null)
+        let callLogsArray = JSON.parse(callLogsFromPhone);
+        let smsLogsArray = JSON.parse(smsLogsFromPhone);
+        if (_.isEmpty(callLogsArray) && _.isEmpty(smsLogsArray)) {
+            return
+        }
+        if (jobTransactionList.length) {
+            jobDataQuery += jobTransactionList.map(jobTransaction => 'jobId = ' + jobTransaction.jobId).join(' OR ')
+        } else {
+            jobDataQuery += 'jobId = ' + jobTransactionList.jobId
+        }
+        let jobAttributesWithContactType = jobAndFieldAttributesList.jobAttributes.filter(jobAttribute => jobAttribute.attributeTypeId == CONTACT_NUMBER && jobAttribute.jobMasterId == jobMasterId)
+        jobAttributesQuery = jobAttributesWithContactType.map(jobAttribute => 'jobAttributeMasterId = ' + jobAttribute.id).join(' OR ')
+        if (jobAttributesQuery == '') {
+            return
+        }
+        let finalJobDataQuery = `(${jobDataQuery}) AND (${jobAttributesQuery})`
+        let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, finalJobDataQuery)
+        let jobDataMap = jobDataService.getJobDataMapFromList(jobDataList)
+        let callAndSmsLogs = callLogsArray.concat(smsLogsArray)
+        return { callAndSmsLogs, jobDataMap }
+    }
+    async setTrackCallCountAndDuration(jobTransaction, callAndSmsLogs, jobDataList, fieldDataList) {
+        if (!callAndSmsLogs || !jobDataList) {
+            return
+        }
+        let customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
+        let isNumberSame
+        for (let callLog of callAndSmsLogs) {
+            for (let jobData of jobDataList) {
+                isNumberSame = await calls.compareNumbers(callLog.phoneNumber, jobData.value)
+                if (isNumberSame) {
+                    break
+                }
+            }
+            if (!isNumberSame) {
+                for (let fieldData of fieldDataList) {
+                    isNumberSame = await calls.compareNumbers(callLog.phoneNumber, fieldData.value)
+                    if (isNumberSame) {
+                        break
+                    }
+                }
+            }
+            if (!isNumberSame) {
+                isNumberSame = await this.checkNumberIfCUG(callLog.phoneNumber, customerCareList)
+            }
+            if (isNumberSame) {
+                if (callLog.callDuration) {
+                    jobTransaction.trackCallCount += 1
+                    jobTransaction.trackCallDuration += parseInt(callLog.callDuration)
+                } else {
+                    jobTransaction.trackSmsCount += 1
+                }
+            }
+        }
+    }
+
+    incrementCountInUserSummary(transactionType, communicationType, duration, userSummary) {
+        if (duration) { //CALL CASES
+            switch (communicationType) {
+                case 'CUG': {
+                    if (transactionType == 'INCOMING') {
+                        userSummary.cugCallIncomingCount += 1
+                        userSummary.cugCallIncomingDuration += parseInt(duration)
+                    } else if (transactionType == 'OUTGOING') {
+                        userSummary.cugCallOutgoingCount += 1
+                        userSummary.cugCallOutgoingDuration += parseInt(duration)
+                    }
+                    break;
+                }
+                case 'OFFICIAL': {
+                    if (transactionType == 'INCOMING') {
+                        userSummary.officialCallIncomingCount += 1
+                        userSummary.officialCallIncomingDuration += parseInt(duration)
+                    } else if (transactionType == 'OUTGOING') {
+                        userSummary.officialCallOutgoingCount += 1
+                        userSummary.officialCallOutgoingDuration += parseInt(duration)
+                    }
+                    break;
+                }
+                case 'PERSONAL': {
+                    if (transactionType == 'INCOMING') {
+                        userSummary.personalCallIncomingCount += 1
+                        userSummary.personalCallIncomingDuration += parseInt(duration)
+                    } else if (transactionType == 'OUTGOING') {
+                        userSummary.personalCallOutgoingCount += 1
+                        userSummary.personalCallOutgoingDuration += parseInt(duration)
+                    }
+                    break;
+                }
+            }
+        } else {  //SMS CASES
+            switch (communicationType) {
+                case 'CUG':
+                case 'OFFICIAL':
+                    userSummary.officialSmsSentCount += 1
+                    break
+                case 'PERSONAL':
+                    userSummary.personalSmsSentCount += 1
+                    break
+            }
+        }
     }
 }
 
