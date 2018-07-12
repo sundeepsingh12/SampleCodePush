@@ -1,39 +1,26 @@
 'use strict'
 import {
-    JOB_MASTER,
     JOB_STATUS,
     START_FETCHING_BULK_TRANSACTIONS,
     STOP_FETCHING_BULK_TRANSACTIONS,
-    TOGGLE_JOB_TRANSACTION_LIST_ITEM,
     TOGGLE_ALL_JOB_TRANSACTIONS,
-    CUSTOMIZATION_APP_MODULE,
-    SET_BULK_SEARCH_TEXT,
     CUSTOMIZATION_LIST_MAP,
     SET_BULK_ERROR_MESSAGE,
     SET_BULK_TRANSACTION_PARAMETERS,
-    BulkListing
 } from '../../lib/constants'
 import {
     setState,
     showToastAndAddUserExceptionLog
 } from '../global/globalActions'
 import {
-    BULK_ID
-} from '../../lib/AttributeConstants'
-import {
     SELECT_ALL,
     SELECT_NONE,
-    COULD_NOT_SEARCH
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
 import { jobStatusService } from '../../services/classes/JobStatus';
-import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { bulkService } from '../../services/classes/Bulk'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { jobTransactionService } from '../../services/classes/JobTransaction';
-import {
-    Alert
-} from 'react-native'
+
 /**
  * This action sets job transaction,manual selection,selectAll and search on line1 or lin2 parameters
  * @param {*} bulkParams 

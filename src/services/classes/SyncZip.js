@@ -1,4 +1,3 @@
-import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs'
 import { zip } from 'react-native-zip-archive'
 import { keyValueDBService } from './KeyValueDBService'
@@ -16,9 +15,7 @@ import {
     TABLE_RUNSHEET,
     TABLE_TRANSACTION_LOGS,
     LAST_SYNC_WITH_SERVER,
-    FIELD_ATTRIBUTE,
     JOB_STATUS,
-    JOB_MASTER,
     UNSEEN,
     USER_EXCEPTION_LOGS
 } from '../../lib/constants'
@@ -27,10 +24,9 @@ import { trackingService } from './Tracking'
 import { userEventLogService } from './UserEvent'
 import { addServerSmsService } from './AddServerSms'
 import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, SIGNATURE_AND_FEEDBACK, PENDING, PATH, PATH_TEMP } from '../../lib/AttributeConstants'
-import { jobStatusService } from './JobStatus'
-import { jobMasterService } from './JobMaster'
 import { userExceptionLogsService } from './UserException'
 import { communicationLogsService } from './CommunicationLogs'
+import { omit } from 'lodash'
 
 class SyncZip {
 
@@ -56,7 +52,7 @@ class SyncZip {
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.userExceptionLog = userExceptionLogsService.getUserExceptionLog(realmDbData.userExceptionLog, lastSyncTime)
         let jobSummary = jobSummaryService.getJobSummaryListForSync(syncStoreDTO.jobSummaryList, syncStoreDTO.lastSyncWithServer)
-        SYNC_RESULTS.jobSummary = jobSummary || {}
+        SYNC_RESULTS.jobSummary = jobSummary
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
         //Writing Object to File at TEMP location
@@ -81,22 +77,18 @@ class SyncZip {
         return userSummary;
     }
 
-    /**
-    * expects transactionIds whose data is to be synced
-    * and returns the object containing data from realm
-    * @param {*} transactionIds whose data is to be synced
-    */
+
     _getSyncDataFromDb(transactionIdsObject) {
-        let userExceptionLog = _getDataFromRealm([], null, USER_EXCEPTION_LOGS)
-        let runSheetSummary = _getDataFromRealm([], null, TABLE_RUNSHEET)
-        let trackLogs = _getDataFromRealm([], null, TABLE_TRACK_LOGS)
+        let userExceptionLog = this._getDataFromRealm([], null, USER_EXCEPTION_LOGS)
+        let runSheetSummary = this._getDataFromRealm([], null, TABLE_RUNSHEET)
+        let trackLogs = this._getDataFromRealm([], null, TABLE_TRACK_LOGS)
         let transactionList = [],
             fieldDataList = [],
             jobList = [],
             serverSmsLogs = [],
             transactionLogs = []
         if (!transactionIdsObject || !transactionIdsObject.value) {
-            serverSmsLogs = _getDataFromRealm([], null, TABLE_SERVER_SMS_LOG)
+            serverSmsLogs = this._getDataFromRealm([], null, TABLE_SERVER_SMS_LOG)
             return {
                 fieldDataList,
                 transactionList,
@@ -214,7 +206,7 @@ class SyncZip {
                 let fieldData = { ...data[index] }
                 if (moment(fieldData.dateTime).isAfter(lastSyncTime)) {
                     fieldData.id = 0
-                    fieldDataList.push(_.omit(fieldData, ['dateTime']))
+                    fieldDataList.push(omit(fieldData, ['dateTime']))
                 }
             }
             return fieldDataList

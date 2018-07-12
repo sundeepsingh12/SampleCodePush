@@ -9,15 +9,14 @@ import {
 } from './KeyValueDBService'
 
 import moment from 'moment'
-import _ from 'lodash'
 
 class UserEvent {
 
   /**
    * 
    * @param {*} eventID --id of event for ex- login logout etc.
-   * @param {*} desciption -- description of the event at that time.
-   * @returns {*} 
+   * @param {*} description -- description of the event at that time.
+   * 
    */
 
   async addUserEventLog(eventID, description) {

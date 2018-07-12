@@ -13,10 +13,9 @@ import {
     SKU_ACTUAL_QUANTITY,
     SKU_REASON,
     SKU_PHOTO,
-    REASON,
     NA
 } from '../lib/AttributeConstants'
-import { CheckBox, Picker, Content, Icon, Toast } from 'native-base'
+import { CheckBox, Picker, Icon, Toast } from 'native-base'
 import _ from 'lodash'
 import {
     CameraAttribute,
@@ -28,6 +27,7 @@ import {
     ACTUAL_QUANTITY_INPUT_ERROR,
 } from '../lib/ContainerConstants'
 import { Platform } from 'react-native'
+import { navigate } from '../modules/navigators/NavigationService';
 const Item = Picker.Item;
 
 class SkuListItem extends PureComponent {
@@ -57,7 +57,7 @@ class SkuListItem extends PureComponent {
     _getViewOfHeader(rowItem, originalQuantityValue) {
         if (rowItem.attributeTypeId == SKU_PHOTO) {
             return <Icon name="ios-camera" style={[styles.flexBasis50, styles.fontDefault, styles.fontXxl, styles.marginTop15, {color : styles.fontPrimaryColor}]} />
-        } else if (!(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY && originalQuantityValue > 1 && originalQuantityValue <= 1000)) {
+        } else if (!(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY && originalQuantityValue > 1)) {
             return <View style={[styles.flexBasis50, styles.column, styles.justifyCenter, { height: 60 }]}>
                 <Text style={[styles.fontSm]}>
                     {rowItem.label}
@@ -134,7 +134,7 @@ class SkuListItem extends PureComponent {
             return (
                 <View style={[styles.row, styles.flexBasis50, styles.alignCenter, styles.marginTop15]}>
                     <Text style={[styles.fontDefault, styles.padding10, styles.paddingLeft0, {color : styles.fontPrimaryColor}]}
-                        onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) },this.props.navigate) }}>
+                        onPress={() => { navigate('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
                         {OPEN_CAMERA}
                     </Text>
                     {this._getIconForImageAlreadyCaptured(rowItem)}
@@ -148,7 +148,7 @@ class SkuListItem extends PureComponent {
                         <CheckBox color={ styles.bgPrimaryColor } style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value, this.props.title)} />
                     </View>
             }
-            else if (originalQuantityValue > 1 && originalQuantityValue <= 1000) {
+            else if (originalQuantityValue > 1) {
                 quantitySelector = this.renderQuantitySelectorForLargeQuantity(rowItem,originalQuantityValue)
             }
             return (

@@ -3,6 +3,7 @@ package com.fareyereact;
 import android.app.Application;
 import com.emekalites.react.compress.image.ImageCompressPackage;
 import com.facebook.react.ReactApplication;
+import com.rjblopes.opensettings.OpenSettingsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.cnull.apkinstaller.ApkInstallerPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
@@ -26,6 +27,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.imeigetter.RNIMEIPackage;
+import com.smsinbackground.SendSMSPackage;
 import java.util.Arrays;
 import java.util.List;
 import com.callgetter.CallLogsPackage;
@@ -48,27 +50,29 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+          new OpenSettingsPackage(),
           new ImagePickerPackage(),
-            new PickerPackage(),
-           new ImageCompressPackage(), 
+          new PickerPackage(),
+          new ImageCompressPackage(), 
           new ApkInstallerPackage(),
-            new RNCameraPackage(),
-            new FIRMessagingPackage(),
-            new RNBackgroundFetchPackage(),
-            new RealmReactPackage(),
-            new LinearGradientPackage(),
-            new RSSignatureCapturePackage(),
-            new SvgPackage(),
-            new RNBackgroundGeolocation(),
-            new RNZipArchivePackage(),
-            new RNFSPackage(),
-            new RNFetchBlobPackage(),
-            new VectorIconsPackage(),
-            new RNDeviceInfo(),
-            new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
-            new BackgroundTimerPackage() ,
-            new RNIMEIPackage(),
-            new CallLogsPackage()
+          new RNCameraPackage(),
+          new FIRMessagingPackage(),
+          new RNBackgroundFetchPackage(),
+          new RealmReactPackage(),
+          new LinearGradientPackage(),
+          new RSSignatureCapturePackage(),
+          new SvgPackage(),
+          new RNBackgroundGeolocation(),
+          new RNZipArchivePackage(),
+          new RNFSPackage(),
+          new RNFetchBlobPackage(),
+          new VectorIconsPackage(),
+          new RNDeviceInfo(),
+          new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
+          new BackgroundTimerPackage() ,
+          new RNIMEIPackage(),
+          new SendSMSPackage(),
+          new CallLogsPackage()
       );
     }
 

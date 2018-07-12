@@ -33,6 +33,7 @@ var InitialState = Record({
         jobTransactionId: 0,
         statusName: '',
         formElement: {},
+        sequenceWiseFieldAttributeMasterIds: [],
         isLoading: false,
         errorMessage: '',
         paymentAtEnd: {},

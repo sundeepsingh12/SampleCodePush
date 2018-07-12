@@ -26,7 +26,7 @@ export function getDataForSortingAndPrinting(referenceNumber) {
                 throw new Error(TOKEN_MISSING)
             }
             const sortingJson = await sortingService.getSortingData(referenceNumber, token.value)
-            const setSortingValues = sortingService.setSortingData(sortingJson, referenceNumber)
+            const setSortingValues = sortingService.setSortingData(sortingJson)
             dispatch(setState(SORTING_ITEM_DETAILS, setSortingValues))
         } catch (error) {
             dispatch(setState(DEFAULT_ERROR_MESSAGE_IN_SORTING, error.message))

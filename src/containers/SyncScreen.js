@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Loader from '../components/Loader'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, View, Image } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Body, StyleProvider } from 'native-base';
 import { AUTHENTICATING, DOWNLOADING, INTERNAL_ERROR, INTERNAL_SERVER_ERROR, NO_INTERNET, RE_SYNC, RETRY, SYNC_OK_TEXT, UNSYNCED_TASKS, UPLOADING, } from '../lib/ContainerConstants'
@@ -33,6 +33,16 @@ function mapDispatchToProps(dispatch) {
 
 
 class SyncScreen extends PureComponent {
+
+  constructor(props) {
+    super(props);
+    this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
+      this.props.actions.syncTimer()
+    );
+  }
+  componentWillUnmount() {
+    this._didFocusSubscription && this._didFocusSubscription.remove();
+  }
 
   getTransactionView() {
     let transactionList = this.props.unsyncedTransactionList

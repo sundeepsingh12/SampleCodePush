@@ -1,7 +1,6 @@
 'use strict'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { logoutService } from '../../services/classes/Logout'
-import * as realm from '../../repositories/realmdb'
 import {
     TABLE_TRACK_LOGS,
     USER_SUMMARY,
@@ -9,9 +8,7 @@ import {
     TABLE_JOB_TRANSACTION,
     TABLE_JOB,
     TABLE_SERVER_SMS_LOG,
-    TABLE_RUNSHEET,
     TABLE_TRANSACTION_LOGS,
-    FIELD_ATTRIBUTE,
     USER,
     PENDING_SYNC_TRANSACTION_IDS,
     BACKUP_ALREADY_EXIST,
@@ -21,7 +18,6 @@ import {
 import { userEventLogService } from './UserEvent'
 import { jobSummaryService } from './JobSummary'
 import { keyValueDBService } from './KeyValueDBService'
-import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs'
 import moment from 'moment'
 import { zip } from 'react-native-zip-archive'
@@ -252,7 +248,7 @@ class Backup {
     async checkForUnsyncBackup(user) {
         let unsyncBackupFilesList = []
         let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
-        if (!user || !user.value || !domainUrl || !domainUrl.value) return unsyncBackupFilesList
+        if (!user || !domainUrl || !domainUrl.value) return unsyncBackupFilesList
         RNFS.mkdir(PATH_BACKUP);
         let backUpFilesInfo = await RNFS.readDir(PATH_BACKUP)
         for (let backUpFile in backUpFilesInfo) {
@@ -261,7 +257,7 @@ class Backup {
             let fileNameArray = fileName.split('_')
             let fileDomainInfo = fileNameArray[0]
             let employeeCode = fileName.substring(fileName.indexOf(fileNameArray[2]), _.size(fileName) - 4)
-            if (fileDomainInfo.split('-')[0] == domain && employeeCode.split('_')[1] == user.value.company.code) {
+            if (fileDomainInfo.split('-')[0] == domain && employeeCode.split('_')[1] == user.company.code) {
                 if (fileDomainInfo.split('-')[1] == 'UnSyncbackup') {
                     unsyncBackupFilesList.push(backUpFilesInfo[backUpFile])
                 }

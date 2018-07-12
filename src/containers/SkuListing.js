@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
 import Loader from '../components/Loader'
 import SkuListItem from '../components/SkuListItem'
-import { Container, Content, Text, Footer, FooterTab, Button, Input, StyleProvider, Separator } from 'native-base'
+import { Container, Content, Text, Footer,Button, StyleProvider, Separator } from 'native-base'
 import styles from '../themes/FeStyle'
 import _ from 'lodash'
 import getTheme from '../../native-base-theme/components'
@@ -17,6 +17,8 @@ import SearchBarV2 from '../components/SearchBarV2'
 import { SEARCH_PLACE_HOLDER, PROCEED, SKU } from '../lib/ContainerConstants'
 import { SET_SKU_CODE, SKU_CODE_CHANGE } from '../lib/constants'
 import TitleHeader from '../components/TitleHeader'
+import { navigate } from '../modules/navigators/NavigationService'
+
 class SkuListing extends PureComponent {
 
   componentDidMount() {
@@ -24,9 +26,9 @@ class SkuListing extends PureComponent {
     this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement, jobTransactions)
   }
 
-  renderData(item, title) {
+  renderData(items, title) {
     return (
-      <SkuListItem navigate={this.props.navigation.navigate} item={item} title={title} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} skuValidationForImageAndReason={this.props.skuValidationForImageAndReason} />
+      <SkuListItem item = {items}  title={title} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList}  skuValidationForImageAndReason={this.props.skuValidationForImageAndReason} />
     )
   }
 

@@ -84,6 +84,7 @@ class CommunicationLogs {
                 } else {
                     contactToCallLogMap[callLog.phoneNumber] = [communicationLog]
                 }
+                this.incrementCountInUserSummary(communicationLog.transactionType, 'OFFICIAL', communicationLog.duration, userSummary)
             } else {
                 let isNumberCUG = await this.checkNumberIfCUG(callLog.phoneNumber, customerCareList)
                 if (isNumberCUG) {
@@ -150,7 +151,6 @@ class CommunicationLogs {
                     cloneCommunicationLog.communicationType = (cloneCommunicationLog.duration) ? CALL_OFFICIAL : SMS_OFFICIAL
                     cloneCommunicationLog.jobType = jobMasterIdToJobMasterMap[jobTransaction.jobMasterId].code
                     cloneCommunicationLog.jobStatus = statusIdToStatusMap[jobTransaction.jobStatusId].name
-                    this.incrementCountInUserSummary(cloneCommunicationLog.transactionType, 'OFFICIAL', communicationLog.duration, userSummary)
                     communicationLogs.push(cloneCommunicationLog)
                 }
             }

@@ -14,7 +14,7 @@ import styles from '../themes/FeStyle'
 import * as taskListActions from '../modules/taskList/taskListActions'
 import * as globalActions from '../modules/global/globalActions'
 import { FILTER_REF_NO, ALL_TASKS, NO_TAB_PRESENT } from '../lib/ContainerConstants'
-import { IS_CALENDAR_VISIBLE, LISTING_SEARCH_VALUE,  SET_LANDING_TAB, SET_SELECTED_DATE } from '../lib/constants'
+import { IS_CALENDAR_VISIBLE, LISTING_SEARCH_VALUE, SET_LANDING_TAB, SET_SELECTED_DATE } from '../lib/constants'
 import TaskListCalender from '../components/TaskListCalender'
 import TitleHeader from '../components/TitleHeader'
 import SyncLoader from '../components/SyncLoader'
@@ -56,10 +56,13 @@ class TabScreen extends PureComponent {
     this.props.actions.setState(IS_CALENDAR_VISIBLE, isCalendarVisible)
   }
 
-  renderTabs() {
+  renderTabs(tabListForPage) {
     const tabs = this.props.tabsList
     const renderTabList = []
     for (let index in tabs) {
+      if (_.size(tabListForPage) > 0 && !tabListForPage.includes(tabs[index].id)) {
+        continue
+      }
       if (this.props.tabIdStatusIdMap[tabs[index].id]) {
         renderTabList.push(
           <Tab
@@ -75,7 +78,6 @@ class TabScreen extends PureComponent {
               searchText={this.props.searchText}
               pageObject={this.props.navigation.state.params.pageObject}
               isFutureRunsheetEnabled={this.props.isFutureRunsheetEnabled}
-              navigationProps = {this.props.navigation.navigate}
             />
           </Tab>
         )
@@ -109,20 +111,6 @@ class TabScreen extends PureComponent {
     })
   }
 
-  //Renders calender component TaskListCalender
-  renderCalendar = () => {
-    if (!this.props.isFutureRunsheetEnabled) {
-      return null
-    }
-    return (
-      <TaskListCalender
-        isFutureRunsheetEnabled={this.props.isFutureRunsheetEnabled}
-        isCalendarVisible={this.props.isCalendarVisible}
-        setSelectedDate={this.setSelectedDate}
-        setCalendarState={this.setCalendarState} />
-    )
-  }
-
   render() {
     if (this.props.tabsLoading) {
       return (
@@ -139,10 +127,9 @@ class TabScreen extends PureComponent {
         </StyleProvider>
       )
     } else {
-      let scrollableTabView;
+      let tabListForPage = this.props.navigation.state.params.pageObject.additionalParams ? JSON.parse(this.props.navigation.state.params.pageObject.additionalParams).tabids : []
       const searchTextValue = (this.props.searchText) ? this.props.searchText.searchText : '';
-      const viewTabList = this.renderTabs();
-      const calendarView = this.renderCalendar();
+      const viewTabList = this.renderTabs(tabListForPage);
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container>

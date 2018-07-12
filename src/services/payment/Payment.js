@@ -226,7 +226,7 @@ class Payment {
             }
             originalAmount = totalAmount + ''
         } else if (originalAmountMaster && originalAmountMaster.fieldAttributeMasterId) { //If original amount is mapped with field attribute
-            originalAmount = formData.get(originalAmountMaster.fieldAttributeMasterId) ? formData.get(originalAmountMaster.fieldAttributeMasterId).value : null
+            originalAmount = formData[originalAmountMaster.fieldAttributeMasterId] ? formData[originalAmountMaster.fieldAttributeMasterId].value : null
             jobTransactionIdAmountMap = null
         } else if (jobTransaction.length) { // If case of bulk and money collect if not mapped
             throw new Error(INVALID_CONFIGURATION)
@@ -248,15 +248,15 @@ class Payment {
      */
     getTotalActualAmount(moneyCollectMaster, formData) {
         let actualAmount = 0
-        for (let [fieldAttributeMasterId, formElement] of formData) {
+        for (let formElement in formData) {
             // Check if sku present in form element and its sequence is before money collect
-            if (formElement.attributeTypeId == SKU_ARRAY && formElement.positionId < formData.get(moneyCollectMaster.id).positionId) {
-                actualAmount += this.getActualAmount(formElement, SKU_ACTUAL_AMOUNT)
+            if (formData[formElement].attributeTypeId == SKU_ARRAY && formData[formElement].positionId < formData[moneyCollectMaster.id].positionId) {
+                actualAmount += this.getActualAmount(formData[formElement], SKU_ACTUAL_AMOUNT)
             }
 
             // Check if fixed sku present in form element and its sequence is before money collect
-            if (formElement.attributeTypeId == FIXED_SKU && formElement.positionId < formData.get(moneyCollectMaster.id).positionId) {
-                actualAmount += this.getActualAmount(formElement, DECIMAL)
+            if (formData[formElement].attributeTypeId == FIXED_SKU && formData[formElement].positionId < formData[moneyCollectMaster.id].positionId) {
+                actualAmount += this.getActualAmount(formData[formElement], DECIMAL)
             }
         }
         return actualAmount
@@ -302,7 +302,7 @@ class Payment {
 
     /**
      * This function returns actual amount of attribute based on its childList and property
-     * @param {*} childList 
+     * @param {*} formElement 
      * @param {*} property 
      * @returns
      * actualAmount : integer
@@ -612,8 +612,8 @@ class Payment {
 
     addPaymentObjectToDetailsArray(actualAmount, modeType, transactionNumber, receipt, remarks, formLayoutState) {
         let moneyCollectAttributeId = formLayoutState.paymentAtEnd.currentElement.fieldAttributeMasterId
-        if (moneyCollectAttributeId && formLayoutState.formElement.get(moneyCollectAttributeId)) {
-            let moneyCollectChildList = formLayoutState.formElement.get(moneyCollectAttributeId).childDataList
+        if (moneyCollectAttributeId && formLayoutState.formElement[moneyCollectAttributeId]) {
+            let moneyCollectChildList = formLayoutState.formElement[moneyCollectAttributeId].childDataList
             for (let index in moneyCollectChildList) {
                 if (moneyCollectChildList[index].childDataList && moneyCollectChildList[index].childDataList[0].childDataList) {
                     let detailsList = moneyCollectChildList[index].childDataList[0].childDataList

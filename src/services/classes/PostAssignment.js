@@ -19,7 +19,6 @@ import { keyValueDBService } from './KeyValueDBService'
 import { formLayoutEventsInterface } from '../classes/formLayout/FormLayoutEventInterface'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
-import _ from 'lodash'
 import moment from 'moment'
 
 class PostAssignment {
@@ -81,7 +80,8 @@ class PostAssignment {
         let transactionDTO = {
             id: jobTransaction.id,
             referenceNumber: jobTransaction.referenceNumber,
-            jobId: jobTransaction.jobId
+            jobId: jobTransaction.jobId,
+            syncTime: moment().format('YYYY-MM-DD HH:mm:ss')
         }
         const runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction.jobStatusId, pendingStatus.statusCategory, [jobTransaction])
         await formLayoutEventsInterface._updateJobSummary(jobTransaction, pendingStatus.id)
@@ -100,7 +100,6 @@ class PostAssignment {
         let jobTransactionTableDTO = {
             tableName: TABLE_JOB_TRANSACTION,
             value: transactionList,
-            syncTime: moment().format('YYYY-MM-DD HH:mm:ss')
         }
         realm.performBatchSave(jobTransactionTableDTO, runSheet)
         await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionDTOMap)
@@ -115,7 +114,6 @@ class PostAssignment {
      * scanError : string
      */
     async checkPostJobOnServer(referenceNumber, jobMaster, jobTransactionMap) {
-        let referenceNumberList = [referenceNumber]
         let scanError = null, successListDTO = {}
         let postData = JSON.stringify([{
             jobMasterId: jobMaster.id,

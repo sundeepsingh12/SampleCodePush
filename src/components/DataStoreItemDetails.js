@@ -21,10 +21,10 @@ export default class DataStoreItemDetails extends PureComponent {
         let attributeArray = []
         let id = 0
         for (let attribute in dataStoreAttributeValueMap) {
-            if (attribute != _id && dataStoreAttributeValueMap[attribute]) {
+            if (attribute != _id) {
                 let attributeObject = {
                     id: id++,
-                    key: attribute,
+                    key: (this.props.keyLabelAttributeMap && this.props.keyLabelAttributeMap[attribute]) ? this.props.keyLabelAttributeMap[attribute] : attribute,
                     value: dataStoreAttributeValueMap[attribute]
                 }
                 attributeArray.push(attributeObject)
@@ -49,7 +49,7 @@ export default class DataStoreItemDetails extends PureComponent {
                                         style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{CONFIRM}</Text>
                                     <View />
                                 </View>
-                                <View style={[styles.row,]}>
+                                <View style={[styles.row]}>
                                     <View
                                         style={[styles.row, styles.flex1, styles.justifySpaceBetween, styles.relative]}>
                                     </View>
@@ -58,7 +58,7 @@ export default class DataStoreItemDetails extends PureComponent {
                         </Header>
                     </SafeAreaView>
                     <Content style={[styles.margin5]}>
-                        < FlatList
+                        <FlatList
                             data={this.createDetails(this.props.selectedElement.dataStoreAttributeValueMap)}
                             renderItem={({ item }) => this.renderData(item)}
                             keyExtractor={item => String(item.id)}
@@ -66,7 +66,7 @@ export default class DataStoreItemDetails extends PureComponent {
                     </Content>
                     <SafeAreaView style={[styles.bgWhite]}>
                         <Footer style={{ backgroundColor: 'white' }}>
-                            <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
+                            <FooterTab style={StyleSheet.flatten([ styles.bgWhite])}>
                                 <Button success full style={{ backgroundColor: styles.bgPrimaryColor }}
                                     onPress={() => {
                                         this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.uniqueKey])

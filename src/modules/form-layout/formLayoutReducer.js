@@ -1,7 +1,6 @@
 'use strict'
 
 import InitialState from './formLayoutInitialState.js'
-import _ from 'lodash'
 
 import {
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
@@ -71,6 +70,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('isSaveDisabled', action.payload.isSaveDisabled)
                 .set('isLoading', action.payload.isLoading)
                 .set('jobAndFieldAttributesList', action.payload.jobAndFieldAttributesList)
+                .set('sequenceWiseFieldAttributeMasterIds',action.payload.sequenceWiseFieldAttributeMasterIds)
         }
 
         /**
@@ -120,6 +120,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('arrayReverseDataStoreFilterMap', action.payload.editableFormLayoutState.arrayReverseDataStoreFilterMap)
                 .set('jobAndFieldAttributesList', action.payload.editableFormLayoutState.jobAndFieldAttributesList)
                 .set('noFieldAttributeMappedWithStatus', action.payload.editableFormLayoutState.noFieldAttributeMappedWithStatus)
+                .set('sequenceWiseFieldAttributeMasterIds',action.payload.editableFormLayoutState.sequenceWiseFieldAttributeMasterIds)
         }
 
         case SET_UPDATE_DRAFT: {

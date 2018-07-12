@@ -19,7 +19,8 @@ import {
   MINUTES_AGO,
   SECONDS_AGO,
   RESYNC_IN,
-  ERP_SYNC
+  ERP_SYNC,
+  OK
 } from '../lib/ContainerConstants'
 import { ERP_SYNC_STATUS } from '../lib/constants'
 import ErpSyncIcon from '../svg_components/icons/ErpSyncIcon'
@@ -168,7 +169,7 @@ class ErpSyncScreen extends PureComponent {
         animationType="fade"
         transparent={true}
         onRequestClose={() => {
-          this.props.actions.setState(ERP_SYNC_STATUS, { syncStatus: 'OK', lastErpSyncTime: this.props.lastErpSyncTime })
+          this.props.actions.setState(ERP_SYNC_STATUS, { syncStatus: OK, lastErpSyncTime: this.props.lastErpSyncTime })
         }}
       >
         <View style={[styles.flex1, styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
@@ -181,7 +182,7 @@ class ErpSyncScreen extends PureComponent {
               {ERP_SYNC_OK_TEXT}
             </Text>
             <View style={[styles.marginTop30]}>
-              <Button transparent onPress={() => { this.props.actions.setState(ERP_SYNC_STATUS, { syncStatus: 'OK', lastErpSyncTime: this.props.lastErpSyncTime }) }} >
+              <Button transparent onPress={() => { this.props.actions.setState(ERP_SYNC_STATUS, { syncStatus: OK, lastErpSyncTime: this.props.lastErpSyncTime }) }} >
                 <Text style={{ color: styles.fontPrimaryColor }}> {CLOSE} </Text>
               </Button>
             </View>

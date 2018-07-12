@@ -12,7 +12,7 @@ export default class SummaryDetails extends PureComponent {
         return (
             <FlatList
                 style={[styles.marginBottom10, styles.marginLeft10, styles.marginRight10, styles.bgWhite, styles.padding5, styles.shadow, styles.borderRadius3]}
-                data={item.fieldDataArray}
+                data={this._getData(item.fieldDataArray)}
                 extraData={this.state}
                 renderItem={(item) => this.renderParcelItem(item.item)}
                 keyExtractor={this._keyExtractor}>
@@ -20,7 +20,6 @@ export default class SummaryDetails extends PureComponent {
     }
 
     renderParcelItem = (item) => {
-        if (item.value) {
             return (
                 <View style={[styles.row, styles.paddingRight5, styles.paddingLeft5]}>
                     <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
@@ -31,7 +30,17 @@ export default class SummaryDetails extends PureComponent {
                     </View>
                 </View>
             )
+    }
+    _getData(fieldDataArray){
+        let data = []
+        if(fieldDataArray.length){
+            for(let item in fieldDataArray){
+                if(fieldDataArray[item].value && !fieldDataArray[item].hidden){
+                    data.push(fieldDataArray[item])
+                }
+            }
         }
+        return data
     }
 
     _keyExtractor = (item, index) => String(item.id);

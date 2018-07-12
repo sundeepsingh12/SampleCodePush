@@ -11,6 +11,7 @@ import { fieldValidationService } from '../FieldValidation';
 import { jobStatusService } from '../JobStatus';
 import { keyValueDBService } from '../KeyValueDBService.js';
 import { communicationLogsService } from '../CommunicationLogs'
+import { runSheetService } from '../RunSheet';
 
 export default class FormLayoutEventImpl {
 
@@ -24,22 +25,17 @@ export default class FormLayoutEventImpl {
      * @param {*isSaveDisabled} isSaveDisabled 
      * @param {*fieldAttribute value} value 
      */
-    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
+    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds) {
         let isAllAttributeHidden = true //this is a check if there are all hidden attribute or not
-        if (attributeMasterId && formLayoutObject.get(attributeMasterId)) {
+        if (attributeMasterId && formLayoutObject[attributeMasterId]) {
             this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
         }
         isSaveDisabled = false
-
-        for (var [key, value] of formLayoutObject) {
-
-            if (key != attributeMasterId || event == NEXT_FOCUS) {
+        for (var ids in sequenceWiseSortedFieldAttributesMasterIds) {
+            value = formLayoutObject[sequenceWiseSortedFieldAttributesMasterIds[ids]]
+            if (sequenceWiseSortedFieldAttributesMasterIds[ids] != attributeMasterId || event == NEXT_FOCUS) {
                 value.focus = false
             }
-            // if (!value.value && value.value !== 0 && value.required) {
-            //     isSaveDisabled = true
-            // }
-
             if (value.displayValue || value.displayValue === 0) {
                 continue
             }
@@ -55,8 +51,8 @@ export default class FormLayoutEventImpl {
                 }
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
-                let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
-                let valueAfterValidation = formLayoutObject.get(value.fieldAttributeMasterId).value
+                fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+                let valueAfterValidation = formLayoutObject[value.fieldAttributeMasterId].value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
                     if (value.required) {
                         isSaveDisabled = true
@@ -66,7 +62,7 @@ export default class FormLayoutEventImpl {
                         continue
                     }
                 }
-                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject[value.fieldAttributeMasterId], formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 if (!afterValidationResult && value.required) {
                     break
                 } else {
@@ -79,8 +75,8 @@ export default class FormLayoutEventImpl {
             }
         }
         if (!isSaveDisabled) {
-            if (formLayoutObject.get(attributeMasterId)) {
-                formLayoutObject.get(attributeMasterId).focus = true
+            if (formLayoutObject[attributeMasterId]) {
+                formLayoutObject[attributeMasterId].focus = true
             }
         }
         return { formLayoutObject, isSaveDisabled, isAllAttributeHidden }
@@ -96,8 +92,8 @@ export default class FormLayoutEventImpl {
      */
     disableSave(attributeMasterId, isSaveDisabled, formLayoutObject, value) {
         this.updateFieldInfo(attributeMasterId, value, formLayoutObject);
-        if (formLayoutObject.get(attributeMasterId) && formLayoutObject.get(attributeMasterId).required) {
-            formLayoutObject.get(attributeMasterId).showCheckMark = false;
+        if (formLayoutObject[attributeMasterId] && formLayoutObject[attributeMasterId].required) {
+            formLayoutObject[attributeMasterId].showCheckMark = false;
             return true;
         }
         return isSaveDisabled
@@ -113,11 +109,11 @@ export default class FormLayoutEventImpl {
      * @param {*} calledFrom 
      */
     updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom, fieldDataList) {
-        formLayoutObject.get(attributeMasterId).displayValue = (value != null && value != undefined && calledFrom == NEXT_FOCUS && value.length != 0 && value.length < 64 &&
-            formLayoutObject.get(attributeMasterId).attributeTypeId == 61) ? sha256(value) : value;
-        formLayoutObject.get(attributeMasterId).childDataList = fieldDataList ? fieldDataList : formLayoutObject.get(attributeMasterId).childDataList
+        formLayoutObject[attributeMasterId].displayValue = (value != null && value != undefined && calledFrom == NEXT_FOCUS && value.length != 0 && value.length < 64 &&
+            formLayoutObject[attributeMasterId].attributeTypeId == 61) ? sha256(value) : value;
+        formLayoutObject[attributeMasterId].childDataList = fieldDataList ? fieldDataList : formLayoutObject[attributeMasterId].childDataList
         if (!calledFrom) {
-            formLayoutObject.get(attributeMasterId).alertMessage = null
+            formLayoutObject[attributeMasterId].alertMessage = null
         }
         return formLayoutObject;
     }
@@ -126,8 +122,6 @@ export default class FormLayoutEventImpl {
      * It hits api to get sequence attr data from server.
      * 
      * @param {Number} sequenceMasterId 
-     * 
-     * @returns {float}  -> data
      */
 
     async getSequenceAttrData(sequenceMasterId) {
@@ -148,10 +142,6 @@ export default class FormLayoutEventImpl {
     /**
      * called on saving button and saves Data in db or store
      * currently saving fieldData, jobTransaction and job
-     * @param {*formLayoutMap} formLayoutObject 
-     * @param {*transactionId} jobTransactionId 
-     * @param {*statusId} statusId 
-     * @param {*jobMasterId} jobMasterId
      */
     async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionList, jobAndFieldAttributesList) {
         let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -192,7 +182,7 @@ export default class FormLayoutEventImpl {
         }
         const prevStatusId = (jobTransactionList && jobTransactionList.length) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
         const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, lastTrackLog)
-        const runSheet = (jobTransactionId >= 0 || (jobTransactionList && jobTransactionList.length && jobTransactionList[0].jobTransactionId > 0)) ? await this._updateRunsheetSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value) : []
+        const runSheet = await this._updateRunsheetSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value);
         await this._updateUserSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value, userSummary.value, dbObjects.status[0].id)
         await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionList)
         let serverSmsLogs = await addServerSmsService.addServerSms(statusId, jobMasterId, fieldData, jobTransaction.value)
@@ -250,7 +240,7 @@ export default class FormLayoutEventImpl {
     _prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user, dateTime, lastTrackLog) {
         let transactionLogs = []
         for (let job in jobTransaction) {
-            transactionLog = {
+            let transactionLog = {
                 userId: user.id,
                 transactionId: jobTransaction[job].id,
                 jobMasterId: jobMasterId,
@@ -306,7 +296,7 @@ export default class FormLayoutEventImpl {
      * update jobSummaryDb count after completing transactions.
      * 
      * @param {object} jobTransaction 
-     * @param {Array} jobTransactionIdList // case of bulk
+     * @param {Array} jobTransactionList // case of bulk
      * @param {Number} statusId // new transaction status Id
      * 
      */
@@ -317,12 +307,13 @@ export default class FormLayoutEventImpl {
         const count = (jobTransactionList && jobTransactionList.length) ? jobTransactionList.length : 1
         let jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
         jobSummaryList.value.forEach(item => {
-            item.updatedTime = currentDate
             if (item.jobStatusId == prevStatusId) { // check for previous statusID
                 item.count = (item.count - count >= 0) ? item.count - count : 0
+                item.updatedTime = currentDate
             }
             if (item.jobStatusId == statusId) { // check for next statusID
                 item.count += count
+                item.updatedTime = currentDate
             }
         })
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
@@ -333,14 +324,19 @@ export default class FormLayoutEventImpl {
       *   and returns an object containing tablename and runSheetArray
       * 
       * @param {Number} prevStatusId 
-      * @param {Array} jobTransactionList 
+      * @param {Array} dbJobTransactionList 
       * @param {Number} statusCategory // next status category
       * 
       * @returns {Object}  -> { tablename : TABLE, value : []}
       */
 
-    async _updateRunsheetSummary(prevStatusId, statusCategory, jobTransactionList) {
+    async _updateRunsheetSummary(prevStatusId, statusCategory, dbJobTransactionList) {
         let runSheetList = []
+        let transactionWithRunsheetObject = runSheetService.filterTransactionOnRunsheetIdPresentAndPrepareTransactionQuery(dbJobTransactionList);
+        if (_.size(transactionWithRunsheetObject.jobTransactionListWithRunsheetId) == 0) {
+            return [];
+        }
+        let jobTransactionList = transactionWithRunsheetObject.jobTransactionListWithRunsheetId;
         const status = ['pendingCount', 'failCount', 'successCount']
         const moneyTypeCollectionTypeMap = { 'Collection-Cash': 'cashCollected', 'Collection-SOD': 'cashCollectedByCard', 'Refund': 'cashPayment' }
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId) // get previous status category
@@ -349,15 +345,18 @@ export default class FormLayoutEventImpl {
             total[current.id] = Object.assign({}, current);
             return total;
         }, {}); // build map of runsheetId and runsheet
-        let prevJobTransactionValue = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION) // in case of mapping of moneycollect to more than 1 status, we have to get actual amount in previous status
+        let prevJobTransactionValue = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, transactionWithRunsheetObject.jobTransactionListWithRunsheetIdQuery) // in case of mapping of moneycollect to more than 1 status, we have to get actual amount in previous status
         let prevJobTransactionMap = _.keyBy(prevJobTransactionValue, 'id')
         for (let id in jobTransactionList) {
+            if (!runsheetMap[jobTransactionList[id].runsheetId]) {
+                continue;
+            }
             if (prevStatusCategory && runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] > 0) { // check for previousStatus category undefined and runSheetMap conut is greater than 0 
                 runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] -= 1
             }
             runsheetMap[jobTransactionList[id].runsheetId][status[statusCategory - 1]] += 1;
             if (jobTransactionList[id].moneyTransactionType && jobTransactionList[id].actualAmount > 0) { // check for moneyTransactionType and  actualAmount
-                if (prevJobTransactionMap[jobTransactionList[id].id].moneyTransactionType == jobTransactionList[id].moneyTransactionType && prevJobTransactionMap[jobTransactionList[id].id].actualAmount > 0) {
+                if (prevJobTransactionMap[jobTransactionList[id].id] && prevJobTransactionMap[jobTransactionList[id].id].moneyTransactionType == jobTransactionList[id].moneyTransactionType && prevJobTransactionMap[jobTransactionList[id].id].actualAmount > 0) {
                     runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount - prevJobTransactionMap[jobTransactionList[id].id].actualAmount
                 } else {
                     runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount
@@ -373,8 +372,6 @@ export default class FormLayoutEventImpl {
      * creates fieldData db structure for current transaction
      * and returns an object containing fieldDataArrayinue
      * 
-     * @param {*formLayoutMap} formLayoutObject 
-     * @param {*jobTransactionId} jobTransactionId 
      */
     _saveFieldData(formLayoutObject, jobTransactionId, isBulk, currentTime) {
         let currentFieldDataObject = {} // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
@@ -382,13 +379,15 @@ export default class FormLayoutEventImpl {
         let fieldDataArray = []
         let npsFeedbackValue = null
         let reAttemptDate = null
-        let moneyCollectObject = skuArrayObject = null
+        let moneyCollectObject = null
+        let skuArrayObject = null
         let amountMap = {
             originalAmount: null,
             actualAmount: null,
             moneyTransactionType: null
         }
-        for (var [key, value] of formLayoutObject) {
+        for (var data in formLayoutObject) {
+            let value = formLayoutObject[data]
             if (value.attributeTypeId == 61) {
                 continue
             } else if (value.attributeTypeId == NPS_FEEDBACK) {
@@ -681,12 +680,6 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    /**
-     * updates jobStatus on the basis of action on status
-     * 
-     * @param {*statusObject} status 
-     * @param {*jobId} jobId 
-     */
     _setJobDbValues(status, jobId, jobMasterId, user, hub, referenceNumber, currentTime, reAttemptDate, lastTrackLog) {
         let jobArray = []
         let realmJobObject = null
@@ -752,7 +745,7 @@ export default class FormLayoutEventImpl {
      * @param {*} id 
      */
     _getDefaultValuesForJob(jobMasterId, id, user, hub, referenceNumber, currentTime) {
-        return job = {
+        return {
             id,
             referenceNo: referenceNumber,
             hubId: (hub) ? hub.id : null,
@@ -775,7 +768,7 @@ export default class FormLayoutEventImpl {
 
     _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei, currentTime, referenceNumber) {
         //TODO some values like lat/lng and battery are not valid values, update them as their library is added
-        return jobTransaction = {
+        return {
             id,
             runsheetNo: "AUTO-GEN",
             syncErp: false,

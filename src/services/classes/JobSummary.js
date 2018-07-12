@@ -1,7 +1,5 @@
 import {
   JOB_SUMMARY,
-  LAST_SYNC_WITH_SERVER,
-  TABLE_JOB_TRANSACTION
 } from '../../lib/constants'
 
 import {
@@ -10,10 +8,8 @@ import {
 
 import moment from 'moment'
 import _ from 'lodash'
-import * as realm from '../../repositories/realmdb'
 import {
   UNABLE_TO_UPDATE_JOB_SUMMARY,
-  VALUE_OF_JOBSUMMARY_IS_MISSING,
 } from '../../lib/ContainerConstants'
 
 class JobSummary {
@@ -32,7 +28,7 @@ class JobSummary {
     if (!jobSummariesInStore || !jobSummariesInStore.value) {
       throw new Error(UNABLE_TO_UPDATE_JOB_SUMMARY)
     }
-    const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+    const currentDate = moment().format('YYYY-MM-DD HH:mm:ss')
     jobSummariesInStore.value.forEach(jobSummaryObject => {
       jobSummaryObject.updatedTime = currentDate
       if (statusCountMap[jobSummaryObject.jobStatusId]) { // check for jobStatusId in statusCount map

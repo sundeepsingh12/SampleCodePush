@@ -8,34 +8,21 @@ import {
     UPDATE_SKU_LIST_ITEMS,
     SkuListing,
     NEXT_FOCUS,
+    SET_SKU_CODE
 } from '../../lib/constants'
-
-import {
-    skuListing
-} from '../../services/classes/SkuListing'
-import {
-    fieldAttributeValidation
-} from '../../services/classes/FieldAttributeValidation'
+import { skuListing } from '../../services/classes/SkuListing'
+import { fieldAttributeValidation } from '../../services/classes/FieldAttributeValidation'
 import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
-
-import {
-    ARRAY_SAROJ_FAREYE,
-    SKU_PHOTO,
-    SKU_REASON,
-    NA,
-    SKUVALIDATION
-} from '../../lib/AttributeConstants'
+import { ARRAY_SAROJ_FAREYE, SKU_PHOTO, SKU_REASON, NA, SKUVALIDATION } from '../../lib/AttributeConstants'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
-import {
-    setState, navigateToScene, showToastAndAddUserExceptionLog
-} from '../global/globalActions'
-import {
-    Toast
-} from 'native-base'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import { Toast } from 'native-base'
 import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
 import { SKIP_SKU_MESSAGE, OK } from '../../lib/ContainerConstants'
+import _ from 'lodash'
+import { navigate } from '../navigators/NavigationService';
 
 export function prepareSkuList(fieldAttributeMaster, jobId) {
     return async function (dispatch) {
@@ -68,6 +55,7 @@ export function scanSkuItem(functionParams) {
         try {
             let { errorMessage, cloneSKUListItems, cloneSkuChildItems } = await skuListing.scanSKUCode(functionParams)
             if (errorMessage) {
+                dispatch(setState(SET_SKU_CODE, ''))
                 Toast.show({
                     text: errorMessage,
                     position: 'bottom',
@@ -84,14 +72,10 @@ export function scanSkuItem(functionParams) {
 
 /**
  * 
- * @param {*} value 
- * @param {*} parentId 
- * @param {*} skuListItems 
- * 
  *This method updates SkuActualQuantity of a particular list item and TotalActualQuantity,
  * TotalOriginalQuantity & SkuActualAmount as well,Called when actualQuantity is changed by user
  */
-export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId,navigation) {
+export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId, navigation) {
     return async function (dispatch) {
         try {
             if (rowItem.attributeTypeId == SKU_PHOTO || rowItem.attributeTypeId == SKU_REASON) {
@@ -123,7 +107,7 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionList, parentObject, formLayoutState, skuValidationForImageAndReason, skuObjectAttributeKey,navigate) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionList, parentObject, formLayoutState, skuValidationForImageAndReason, skuObjectAttributeKey) {
     return async function (dispatch) {
         try {
             let jobTransaction = _.isArray(jobTransactionList) ? jobTransactionList : [jobTransactionList]
@@ -153,7 +137,7 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                     })
                 } else {
                     fieldDataListWithLatestPositionId.latestPositionId = positionId
-                    dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransactionList,null,null,navigate))
+                    dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransactionList))
                 }
             }
             else {
@@ -184,7 +168,7 @@ export function changeSkuCode(skuCode) {
  * else open SkuListing
  * @param {*} routeParams 
  */
-export function checkForNewJob(routeParams,navigate) {
+export function checkForNewJob(routeParams) {
     return async function (dispatch) {
         try {
             let { currentElement, jobTransaction } = routeParams
@@ -197,7 +181,7 @@ export function checkForNewJob(routeParams,navigate) {
                 })
                 dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, routeParams.formLayoutState, NA, NEXT_FOCUS, jobTransaction))// save NA as value
             } else {
-                dispatch(navigateToScene(SkuListing, routeParams,navigate))//navigate to SkuListing
+                navigate(SkuListing, routeParams)//navigate to SkuListing
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(2205, error.message, 'danger', 1)

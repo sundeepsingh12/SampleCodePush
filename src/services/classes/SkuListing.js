@@ -1,7 +1,6 @@
 'use strict'
 import {
     FIELD_ATTRIBUTE,
-    FIELD_ATTRIBUTE_STATUS,
     TABLE_JOB_DATA,
     FIELD_ATTRIBUTE_VALUE,
 } from '../../lib/constants'

@@ -5,21 +5,21 @@ import { addServerSmsService } from '../../services/classes/AddServerSms'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { jobDetailsService } from '../../services/classes/JobDetails'
-import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '..//global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '..//global/globalActions'
 import { performSyncService, pieChartCount } from '../home/homeActions'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { MosambeeWalletPaymentServices } from '../../services/payment/MosambeeWalletPayment'
 import _ from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions'
 import { paymentService } from '../../services/payment/Payment'
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,OK,TRANSACTION_SUCCESSFUL } from '../../lib/ContainerConstants'
 import { saveJobTransaction } from '../form-layout/formLayoutActions'
 import { Toast } from 'native-base'
-
 import {
     JOB_EXPIRY_TIME,
 } from '../../lib/AttributeConstants'
-import { TRANSACTION_SUCCESSFUL } from '../../lib/ContainerConstants'
+import { StackActions } from 'react-navigation'
+import { navDispatch, navigate } from '../navigators/NavigationService'
 import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
@@ -63,13 +63,13 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
     }
 }
 
-export function getJobDetails(params, key, navigate, goBack) {
+export function getJobDetails(params, key) {
     return async function (dispatch) {
         try {
             dispatch(startFetchingJobDetails())
             const jobTransactionId = params.jobTransaction.id
             const { statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, fieldAttributeStatusList, jobAttributeStatusList } = await jobDetailsService.getJobDetailsParameters()
-            const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
+            const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, statusList.value)
             if (details.checkForSeenStatus) dispatch(performSyncService())
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(details.jobTransactionDisplay.jobMasterId)
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery,
@@ -80,17 +80,17 @@ export function getJobDetails(params, key, navigate, goBack) {
             const draftStatusInfo = draftService.getDraftForState(details.jobTransactionDisplay, null)
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
             if (draftStatusInfo) {
-                await dispatch(checkForPaymentAtEnd(draftStatusInfo, details.jobTransactionDisplay, params, key, SET_CHECK_TRANSACTION_STATUS, null, null, goBack))
+                await dispatch(checkForPaymentAtEnd(draftStatusInfo, details.jobTransactionDisplay, params, key, SET_CHECK_TRANSACTION_STATUS))
             }
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, (statusCategory == 1), jobExpiryTime, draftStatusInfo && jobMaster[0].enableLiveJobMaster, details.messageList))
-            if (draftStatusInfo && jobMaster[0].enableLiveJobMaster) dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(null, jobMaster, navigate))
+            if (draftStatusInfo && jobMaster[0].enableLiveJobMaster) dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(null, jobMaster))
         } catch (error) {
             showToastAndAddUserExceptionLog(1101, error.message, 'danger', 0)
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
         }
     }
 }
-export function checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, key, checkTransactionState, loaderState, navigate, goBack) {
+export function checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, key, checkTransactionState, loaderState) {
     return async function (dispatch) {
         try {
             let { formLayoutState, navigationFormLayoutStatesForRestore } = draftService.getFormLayoutStateFromDraft(draftStatusInfo)
@@ -105,10 +105,10 @@ export function checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, ke
                     paymentService.addPaymentObjectToDetailsArray(walletParameters.actualAmount, 14, responseMessage.transId, walletParameters.selectedWalletDetails.code, responseMessage, formLayoutState)
                     setTimeout(() => { dispatch(setState(checkTransactionState, TRANSACTION_SUCCESSFUL)) }, 1000);
                     if (!jobTransaction) {
-                        Toast.show({ text: TRANSACTION_SUCCESSFUL, position: 'bottom', buttonText: "OK", type: 'success', duration: 5000 })
+                        Toast.show({ text: TRANSACTION_SUCCESSFUL, position: 'bottom', buttonText: OK, type: 'success', duration: 5000 })
                         jobTransaction = { id: formLayoutState.jobTransactionId, jobMasterId: draftStatusInfo.jobMasterId, jobId: formLayoutState.jobTransactionId, referenceNumber: draftStatusInfo.referenceNumber }
                     }
-                    await dispatch(saveJobTransaction(formLayoutState, draftStatusInfo.jobMasterId, walletParameters.contactData, jobTransaction, navigationFormLayoutStatesForRestore, null, null, taskListScreenDetails, navigate, goBack))
+                    await dispatch(saveJobTransaction(formLayoutState, draftStatusInfo.jobMasterId, walletParameters.contactData, jobTransaction, navigationFormLayoutStatesForRestore, null, taskListScreenDetails))
                     return true
                 } else {
                     dispatch(setState(checkTransactionState, null))
@@ -122,11 +122,11 @@ export function checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, ke
         }
     }
 }
-export function deleteDraftAndNavigateToFormLayout(formLayoutData, navigate) {
+export function deleteDraftAndNavigateToFormLayout(formLayoutData) {
     return async function (dispatch) {
         try {
             draftService.deleteDraftFromDb(formLayoutData.jobTransaction, formLayoutData.jobMasterId)
-            dispatch(navigateToScene('FormLayout', formLayoutData, navigate))
+            navigate('FormLayout', formLayoutData)
         } catch (error) {
             showToastAndAddUserExceptionLog(1108, error.message, 'danger', 1)
         }
@@ -158,23 +158,18 @@ export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, j
  *
  */
 
-export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditionalParams, goBack) {
+export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditionalParams) {
     return async function (dispatch) {
         try {
             dispatch(startFetchingJobDetails());
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             await jobDetailsService.setAllDataForRevertStatus(statusList, jobTransaction, statusTo)
             let landingTabId = JSON.parse(pageObjectAdditionalParams).landingTabAfterJobCompletion ? jobStatusService.getTabIdOnStatusId(statusList.value, statusTo[0]) : null
-            //let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, statusTo[0]) : false
-            //if (landingId) {
-            //    await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
             dispatch(setState(SET_LANDING_TAB, { landingTabId }))
             dispatch(performSyncService())
             dispatch(pieChartCount())
             dispatch(fetchJobs())
-            // dispatch(NavigationActions.back())
-            goBack()
-            //} else { dispatch(navigation.goBack()) }
+            navDispatch(StackActions.pop())
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
         } catch (error) {
             showToastAndAddUserExceptionLog(1103, error.message, 'danger', 0)
@@ -191,17 +186,17 @@ export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditiona
  * It check that user location and job location are far than 100m or less 
  *
  */
-export function checkForLocationMismatch(data, currentStatusCategory, navigate) {
+export function checkForLocationMismatch(data, currentStatusCategory) {
     return async function (dispatch) {
         try {
-            const FormLayoutData = { contactData: data.contactData, jobTransactionId: data.jobTransaction.id, jobTransaction: data.jobTransaction, statusId: data.statusList.id, statusName: data.statusList.name, jobMasterId: data.jobTransaction.jobMasterId, pageObjectAdditionalParams: data.pageObjectAdditionalParams, jobDetailsScreenKey: data.jobDetailsScreenKey }
+            const FormLayoutData = { contactData: data.contactData, jobTransactionId: data.jobTransaction.id, jobTransaction: data.jobTransaction, statusId: data.statusList.id, statusName: data.statusList.name, jobMasterId: data.jobTransaction.jobMasterId, pageObjectAdditionalParams: data.pageObjectAdditionalParams, jobDetailsScreenKey: data.jobDetailsScreenKey,transient:data.statusList.transient,saveActivated:data.statusList.saveActivated }
             const nextStatusCategory = data.statusList.statusCategory
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(FormLayoutData.jobMasterId)
             const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
             if ((jobMaster[0].enableLocationMismatch) && currentStatusCategory == 1 && (nextStatusCategory == 2 || nextStatusCategory == 3) && jobDetailsService.checkLatLong(data.jobTransaction.jobId, userSummary.value.lastLat, userSummary.value.lastLng)) {
                 dispatch(setState(IS_MISMATCHING_LOCATION, { id: data.statusList.id, name: data.statusList.name }))
             } else {
-                dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutData, jobMaster, navigate))
+                dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutData, jobMaster))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1104, error.message, 'danger', 1)
@@ -209,7 +204,7 @@ export function checkForLocationMismatch(data, currentStatusCategory, navigate) 
     }
 }
 
-export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutData, jobMaster, navigate) {
+export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutData, jobMaster) {
     return async function (dispatch) {
         try {
             const jobMasterValue = (!jobMaster) ? await jobMasterService.getJobMasterFromJobMasterList(FormLayoutData.jobMasterId) : jobMaster
@@ -218,14 +213,14 @@ export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutDa
                 let message = await dispatch(performSyncService())
                 if (message === true) {
                     dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))
-                    if (!_.isEmpty(FormLayoutData)) dispatch(navigateToScene('FormLayout', FormLayoutData, navigate))
+                    if (!_.isEmpty(FormLayoutData)) navigate('FormLayout', FormLayoutData)
                 } else {
                     dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT, false))
                     alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
                 }
             }
             else if (!_.isEmpty(FormLayoutData)) {
-                dispatch(navigateToScene('FormLayout', FormLayoutData, navigate))
+                navigate('FormLayout', FormLayoutData)
             }
         } catch (error) {
             dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))

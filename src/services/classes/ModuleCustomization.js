@@ -1,5 +1,4 @@
 'use strict'
-import React from 'react'
 import {
     BACKUP_ID,
     BLUETOOTH_ID,
@@ -23,22 +22,6 @@ import {
     Start
 } from '../../lib/AttributeConstants'
 import {
-    BACKUP,
-    BLUETOOTH,
-    BULK,
-    EZETAP,
-    LIVE,
-    MSWIPE,
-    OFFLINEDATASTORE,
-    PIECHART,
-    PROFILE,
-    STATISTIC,
-    START,
-    SEQUENCEMODULE,
-    SUMMARY,
-    SORTING,
-    CUSTOMAPP,
-    JOB_ASSIGNMENT,
     MAIN_MENU
 } from '../../lib/constants'
 import _ from 'lodash'

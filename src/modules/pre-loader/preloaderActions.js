@@ -47,8 +47,6 @@ import {
   CUSTOMIZATION_LIST_MAP,
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
-  HomeTabNavigatorScreen,
-  LoginScreen,
   OTP_SUCCESS,
   PENDING_SYNC_TRANSACTION_IDS,
   SET_UNSYNC_TRANSACTION_PRESENT,
@@ -61,17 +59,19 @@ import {
   SET_APP_UPDATE_BY_CODEPUSH,
   SET_APP_UPDATE_STATUS,
   IS_SHOW_MOBILE_OTP_SCREEN,
-  IS_LOGGING_OUT
+  IS_LOGGING_OUT,
+  LONG_CODE_SIM_VERIFICATION
 } from '../../lib/constants'
 import { MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, setState, showToastAndAddUserExceptionLog, resetNavigationState, resetApp } from '../global/globalActions'
+import { deleteSessionToken, setState, showToastAndAddUserExceptionLog, resetApp } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions, StackActions } from 'react-navigation'
+import { navDispatch } from '../navigators/NavigationService';
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
@@ -102,18 +102,16 @@ export function downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
 }
 
 /**This method logs out the user and deletes session token from store
- * @param {*} createBackup if it is called from backup class 
- * @return {Function}
  */
 
-export function invalidateUserSession(isPreLoader, calledFromAutoLogout) {
+export function invalidateUserSession(isPreLoader, calledFromAutoLogout, message) {
   return async function (dispatch) { // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "") /* uncomment this code when run sync in logout */
-   try {
-      dispatch(setState(PRE_LOGOUT_START))
+    try {
+      dispatch(setState(PRE_LOGOUT_START, message))
       const isPreLoaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       let response = await authenticationService.logout(calledFromAutoLogout, isPreLoaderComplete) // create backup, hit logout api and delete dataBase
       dispatch(setState(PRE_LOGOUT_SUCCESS))
-      dispatch(resetNavigationState(0,[NavigationActions.navigate({routeName: LoginScreen})]))
+      navDispatch(NavigationActions.navigate({ routeName: 'LoginScreen' }))
       dispatch(deleteSessionToken())
     } catch (error) {
       showToastAndAddUserExceptionLog(1803, error.message, 'danger', 1)
@@ -142,7 +140,7 @@ export function autoLogout(userData) {
         let timeLimit = moment('23:59:59', "HH:mm:ss").diff(moment(new Date(), "HH:mm:ss"), 'seconds') + 5
         const timeOutId = BackgroundTimer.setTimeout(async () => {
           if (!moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
-            dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
+            navDispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
             BackgroundTimer.clearTimeout(timeOutId);
           }
         }, timeLimit * 1000)
@@ -161,7 +159,12 @@ export function startLoginScreenWithoutLogout() {
       dispatch(setState(PRE_LOGOUT_SUCCESS))
       await logoutService.deleteDataBase()
       dispatch(deleteSessionToken())
-      dispatch(resetNavigationState(0,[NavigationActions.navigate({routeName: LoginScreen})]))
+      // navDispatch(StackActions.reset({
+      //   index: 0,
+      //   key: 'StackRouterRoot',
+      //   actions: [NavigationActions.navigate({ routeName: 'LoginScreen' })],
+      // }));
+      navDispatch(NavigationActions.navigate({ routeName: 'LoginScreen' }));
     } catch (error) {
       showToastAndAddUserExceptionLog(1805, error.message, 'danger', 1)
     }
@@ -173,10 +176,19 @@ export function checkForUnsyncBackupFilesAndNavigate(user) {
     try {
       let unsyncBackupFilesList = await backupService.checkForUnsyncBackup(user)
       if (unsyncBackupFilesList.length > 0) {
-        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: UnsyncBackupUpload })]))
-        
+        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'UnsyncBackupUpload')
+        navDispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
+
       } else {
-        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
+        const { company: { customErpPullActivated: ErpCheck } } = user
+        if (ErpCheck) {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
+        }
+        else {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+        }
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(1814, error.message, 'danger', 1)
@@ -203,9 +215,9 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
         const userObject = await keyValueDBService.getValueFromStore(USER)
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationService === SERVICE_PENDING || deviceVerificationService == SERVICE_FAILED)) {
-          dispatch(checkAsset(deviceIMEI, deviceSIM, userObject, token))
+          dispatch(checkAsset(deviceIMEI, deviceSIM, userObject ? userObject.value : null, token))
         } else {
-          dispatch(downloadJobMaster(deviceIMEI, deviceSIM, userObject, token))
+          dispatch(downloadJobMaster(deviceIMEI, deviceSIM, userObject ? userObject.value : null, token))
         }
       }
     } catch (error) {
@@ -228,8 +240,7 @@ export function validateAndSaveJobMaster(deviceIMEI, deviceSIM, token, jobMaster
       dispatch(setState(MASTER_SAVING_START))
       await jobMasterService.saveJobMaster(jobMasterResponse)
       dispatch(setState(MASTER_SAVING_SUCCESS))
-      const userObject = await keyValueDBService.getValueFromStore(USER)
-      dispatch(checkAsset(deviceIMEI, deviceSIM, userObject, token))
+      dispatch(checkAsset(deviceIMEI, deviceSIM, jobMasterResponse.user, token))
     } catch (error) {
       dispatch(checkIfAppIsOutdated(error))
     }
@@ -323,13 +334,15 @@ export function checkIfAppIsOutdated(error) {
 export function checkAsset(deviceIMEI, deviceSIM, user, token) {
   return async function (dispatch) {
     try {
+      let longCodeConfiguration = await keyValueDBService.getValueFromStore(LONG_CODE_SIM_VERIFICATION);
       dispatch(setState(CHECK_ASSET_START))
-      const isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
+      let isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
+      isVerified = longCodeConfiguration && longCodeConfiguration.value && longCodeConfiguration.value.simVerificationType == 'LongCode' ? false : isVerified;
       if (isVerified) {
         dispatch(setState(PRELOADER_SUCCESS))
         dispatch(checkForUnsyncBackupFilesAndNavigate(user))
       } else {
-        dispatch(checkIfSimValidOnServer(user, token));
+        dispatch(checkIfSimValidOnServer(user, token, longCodeConfiguration));
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(1808, error.message, 'danger', 0)
@@ -344,15 +357,23 @@ export function checkAsset(deviceIMEI, deviceSIM, user, token) {
  */
 
 
-export function checkIfSimValidOnServer(user, token) {
+export function checkIfSimValidOnServer(user, token, longCodeConfiguration) {
   return async function (dispatch) {
     try {
-      const responseIsVerified = await deviceVerificationService.checkAssetApiAndSimVerificationOnServer(token)
+      const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+      const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+      let responseIsVerified = await deviceVerificationService.checkAssetApiAndSimVerificationOnServer(token, { deviceIMEI, deviceSIM })
       if (responseIsVerified) {
         dispatch(setState(PRELOADER_SUCCESS))
         dispatch(checkForUnsyncBackupFilesAndNavigate(user))
       } else {
-        dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, SHOW_MOBILE_SCREEN))
+        if (longCodeConfiguration && longCodeConfiguration.value && longCodeConfiguration.value.simVerificationType == 'LongCode' && Platform.OS !== 'ios') {
+          await deviceVerificationService.sendLongSms(user, { deviceIMEI, deviceSIM, longCodeConfiguration })
+          dispatch(setState(PRELOADER_SUCCESS))
+          dispatch(checkForUnsyncBackupFilesAndNavigate(user))
+        } else {
+          dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, SHOW_MOBILE_SCREEN))
+        }
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(1809, error.message, 'danger', 0)
@@ -395,7 +416,7 @@ export function validateOtp(otpNumber) {
       await deviceVerificationService.verifySim(otpNumber)
       dispatch(setState(OTP_SUCCESS))
       const user = await keyValueDBService.getValueFromStore(USER)
-      dispatch(checkForUnsyncBackupFilesAndNavigate(user))
+      dispatch(checkForUnsyncBackupFilesAndNavigate(user ? user.value : null))
     } catch (error) {
       showToastAndAddUserExceptionLog(1811, error.message, 'danger', 0)
       dispatch(setState(OTP_VALIDATION_FAILURE, error.message))
@@ -408,11 +429,11 @@ export function checkForUnsyncTransactionAndLogout(calledFromAutoLogout) {
   return async function (dispatch) {
     try {
       dispatch(setState(IS_LOGGING_OUT, true))
-      let message = await dispatch(performSyncService(true, null,null, calledFromAutoLogout))
+      let message = await dispatch(performSyncService(true, null, null, calledFromAutoLogout))
       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       let isUnsyncTransactionsPresent = logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
       if (isUnsyncTransactionsPresent && !calledFromAutoLogout) {
-        dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, {isUnsyncTransactionOnLogout : true, isLoggingOut : false}))
+        dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, { isUnsyncTransactionOnLogout: true, isLoggingOut: false }))
       } else {
         dispatch(invalidateUserSession(false, calledFromAutoLogout))
       }
@@ -422,7 +443,3 @@ export function checkForUnsyncTransactionAndLogout(calledFromAutoLogout) {
     }
   }
 }
-
-
-
-

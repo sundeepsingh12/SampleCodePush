@@ -42,5 +42,5 @@ class CustomAlert extends PureComponent {
     }
 }
 
-module.exports = CustomAlert
+export default CustomAlert
 

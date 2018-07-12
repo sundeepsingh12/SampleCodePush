@@ -11,7 +11,8 @@ import {
     CLEAR_ATTR_MAP_AND_SET_LOADER,
     DISABLE_AUTO_START_SCANNER,
     SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP,
-    SEARCH_DATA_STORE_RESULT
+    SEARCH_DATA_STORE_RESULT,
+    SET_DS_KEYLABEL_MAP
 } from '../../lib/constants'
 const initialState = new InitialState()
 
@@ -63,12 +64,16 @@ export default function dataStoreReducer(state = initialState, action) {
                 .set('isAllowFromFieldInExternalDS', action.payload.validation.isAllowFromFieldInExternalDS)
                 .set('searchText', action.payload.searchText)
                 .set('isDataStoreEditable', action.payload.isDataStoreEditable)
+                .set('keyLabelAttributeMap', action.payload.keyLabelAttributeMap)
 
         case SEARCH_DATA_STORE_RESULT:
             return state.set('dataStoreAttrValueMap', action.payload.dataStoreAttrValueMap)
                 .set('cloneDataStoreAttrValueMap', action.payload.cloneDataStoreAttrValueMap)
                 .set('searchText', action.payload.searchText)
                 .set('loaderRunning', false)
+
+        case SET_DS_KEYLABEL_MAP:
+            return state.set('keyLabelAttributeMap', action.payload)
     }
     return state
 }

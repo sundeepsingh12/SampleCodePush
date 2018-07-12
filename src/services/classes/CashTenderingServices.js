@@ -48,9 +48,9 @@ class CashTenderingServices {
     checkForCashInMoneyCollect(formElement, currentElement) {
         let cash = 0
         if (formElement != null) {
-            for (let [key, fieldDataObject] of formElement.entries()) {
-                if (fieldDataObject.attributeTypeId == MONEY_COLLECT && fieldDataObject.childDataList && currentElement.positionId > fieldDataObject.positionId) {
-                    let cashDetailsArray = fieldDataObject.childDataList
+            for (let fieldDataObject in formElement) {
+                if (formElement[fieldDataObject].attributeTypeId == MONEY_COLLECT && formElement[fieldDataObject].childDataList && currentElement.positionId > formElement[fieldDataObject].positionId) {
+                    let cashDetailsArray = formElement[fieldDataObject].childDataList
                         .filter(item => item.attributeTypeId == ARRAY)[0].childDataList
                         .filter(item_1 => item_1.attributeTypeId == OBJECT)[0].childDataList
                     if (cashDetailsArray.filter(item_2 => item_2.value == CASH.modeType).length) {
@@ -117,10 +117,10 @@ class CashTenderingServices {
     }
 
     checkForCashTenderingAndResetValue(formElement, currentElement) {
-        for (let [key, fieldDataObject] of formElement.entries()) {
-            if (fieldDataObject.attributeTypeId == CASH_TENDERING && fieldDataObject.childDataList && fieldDataObject.value && currentElement.positionId < fieldDataObject.positionId) {
-                fieldDataObject.value = fieldDataObject.displayValue = null
-                fieldDataObject.childDataList = null
+        for (let fieldDataObject in formElement) {
+            if (formElement[fieldDataObject].attributeTypeId == CASH_TENDERING && formElement[fieldDataObject].childDataList && formElement[fieldDataObject].value && currentElement.positionId < formElement[fieldDataObject].positionId) {
+                formElement[fieldDataObject].value = formElement[fieldDataObject].displayValue = null
+                formElement[fieldDataObject].childDataList = null
             }
         }
         return formElement

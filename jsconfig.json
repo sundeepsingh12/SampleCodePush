@@ -1,7 +1,13 @@
 {
     "compilerOptions": {
         "allowJs": true,
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        "checkJs": true,
+        "target":"es2017",
+        "lib": [
+            "es2017"
+        ],
+        "jsx": "preserve"
     },
     "exclude": [
         "node_modules"

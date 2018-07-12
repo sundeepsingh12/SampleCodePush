@@ -20,7 +20,6 @@ import {
   SELECT_NUMBER_FOR_CALL,
   CONFIRMATION,
   CALL_CONFIRM,
-  DRAFT_RESTORE_MESSAGE,
   YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE,
   SELECT_ADDRESS_NAVIGATION,
   REVERT_STATUS,
@@ -32,7 +31,7 @@ import {
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert, Image } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, StyleProvider, List, ListItem, Footer, FooterTab, Card, ActionSheet, Toast } from 'native-base'
+import { Container, Content, Header, Button, Text, Right, Icon, StyleProvider, ListItem, Footer, FooterTab, ActionSheet, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import Loader from '../components/Loader'
@@ -42,7 +41,6 @@ import {
   DataStoreDetails,
   ImageDetailsView,
   RESET_STATE_FOR_JOBDETAIL,
-  BulkListing,
   SHOW_DROPDOWN,
   SET_JOBDETAILS_DRAFT_INFO,
   SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
@@ -64,6 +62,7 @@ import Line1Line2View from '../components/Line1Line2View'
 import SyncLoader from '../components/SyncLoader'
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
   return {
@@ -101,7 +100,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key, this.props.navigation.navigate, this.props.navigation.goBack)
+    this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key)
   }
 
   componentWillUnmount() {
@@ -118,10 +117,11 @@ class JobDetailsV2 extends PureComponent {
   }
 
   navigateToDataStoreDetails = (navigationParam) => {
-    this.props.actions.navigateToScene(DataStoreDetails, navigationParam, this.props.navigation.navigate)
+    navigate(DataStoreDetails, navigationParam)
   }
+  
   navigateToCameraDetails = (navigationParam) => {
-    this.props.actions.navigateToScene(ImageDetailsView, navigationParam, this.props.navigation.navigate)
+    navigate(ImageDetailsView, navigationParam)
   }
 
   statusDataItem(statusList, index, minIndexDropDown) {
@@ -212,9 +212,7 @@ class JobDetailsV2 extends PureComponent {
       jobMasterId: this.props.jobTransaction.jobMasterId,
       pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
       jobDetailsScreenKey: this.props.navigation.state.key
-    },
-      null,
-      this.props.navigation.navigate)
+    })
     this._onCancel()
   }
 
@@ -240,7 +238,7 @@ class JobDetailsV2 extends PureComponent {
         pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
         jobDetailsScreenKey: this.props.navigation.state.key
       }
-      this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory, this.props.navigation.navigate)
+      this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
     }
   }
 
@@ -426,10 +424,10 @@ class JobDetailsV2 extends PureComponent {
 
   selectStatusToRevert = () => {
     if (this.props.statusRevertList[0] == 1) {
-      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
+      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom', buttonText: OK, type: 'danger', duration: 5000 }) }
     }
     else if (this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType) {
-      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
+      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom', buttonText: OK, type: 'danger', duration: 5000 }) }
     }
     else {
       this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
@@ -437,7 +435,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _onGoToPreviousStatus = (statusData) => {
-    this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation.state.params.pageObjectAdditionalParams, this.props.navigation.goBack)
+    this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation.state.params.pageObjectAdditionalParams)
   }
 
   statusRevertSelection(statusList) {
@@ -455,9 +453,7 @@ class JobDetailsV2 extends PureComponent {
       }
     )
   }
-  _onCancelDraft = () => {
-    this.props.actions.setState(SET_DRAFT_INFO_JOBDETAILS, {})
-  }
+ 
   showDraftAlert() {
     return <DraftModal draftStatusInfo={this.props.draftStatusInfo} onOkPress={() => this._goToFormLayoutWithDraft()} onCancelPress={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} onRequestClose={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} />
   }
@@ -691,7 +687,7 @@ class JobDetailsV2 extends PureComponent {
           </Text>
           <View>
             <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 50, width: 200 }, styles.alignCenter, styles.justifyCenter, { marginTop: 183 }]}
-              onPress={() => { this.props.actions.checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, key, SET_CHECK_TRANSACTION_STATUS, JOB_DETAILS_FETCHING_START, null, this.props.navigation.goBack) }}
+              onPress={() => { this.props.actions.checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, key, SET_CHECK_TRANSACTION_STATUS, JOB_DETAILS_FETCHING_START) }}
               onLongPress={() => { this._goToFormLayoutWithoutDraft() }} >
               <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontRegular]}> {'Check Transaction'}</Text>
             </Button>
@@ -711,9 +707,7 @@ class JobDetailsV2 extends PureComponent {
       jobMasterId: this.props.jobTransaction.jobMasterId,
       pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
       jobDetailsScreenKey: this.props.navigation.state.key
-    },
-      this.props.navigation.navigate
-    )
+    })
     this.props.actions.setState(RESET_CHECK_TRANSACTION_AND_DRAFT)
   }
 
@@ -724,8 +718,7 @@ class JobDetailsV2 extends PureComponent {
       this.props.draftStatusInfo,
       null,
       this.props.navigation.state.params.pageObjectAdditionalParams,
-      this.props.navigation.state.key,
-      this.props.navigation.navigate
+      this.props.navigation.state.key
     )
     this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
   }

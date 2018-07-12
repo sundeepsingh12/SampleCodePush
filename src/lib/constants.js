@@ -38,6 +38,7 @@ module.exports = keyMirror({
     LOGOUT_START: null,
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
+    SET_LOGIN_PARAMETERS: null,
 
     //Preloader Actions
     MASTER_DOWNLOAD_START: null,
@@ -235,6 +236,7 @@ module.exports = keyMirror({
     FCM_TOKEN: null,
     APP_THEME: null,
     LAST_CALL_AND_SMS_TIME: null,
+    LONG_CODE_SIM_VERIFICATION: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -384,6 +386,7 @@ module.exports = keyMirror({
     DISABLE_AUTO_START_SCANNER: null,
     SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP: null,
     SEARCH_DATA_STORE_RESULT: null,
+    SET_DS_KEYLABEL_MAP: null,
 
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,

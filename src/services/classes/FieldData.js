@@ -6,7 +6,6 @@ import * as realm from '../../repositories/realmdb'
 import {
     TABLE_FIELD_DATA
 } from '../../lib/constants'
-import moment from 'moment';
 class FieldData {
 
     /**

@@ -1,39 +1,28 @@
 'use strict'
-import {
-    NEXT_FOCUS,
-    VIEW_IMAGE_DATA,
-    SET_CAMERA_LOADER,
-    SET_SHOW_IMAGE_AND_DATA,
-    SET_SHOW_IMAGE_AND_VALIDATION,
-    SET_CAMERA_LOADER_INITIAL_SET_UP,
-} from '../../lib/constants'
+import { NEXT_FOCUS, VIEW_IMAGE_DATA, SET_CAMERA_LOADER, SET_SHOW_IMAGE_AND_DATA, SET_SHOW_IMAGE_AND_VALIDATION, SET_CAMERA_LOADER_INITIAL_SET_UP } from '../../lib/constants'
 import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions';
 import CompressImage from 'react-native-compress-image';
-
-import {
-    ImageStore,
-    Platform
-} from 'react-native';
-
+import { ImageStore, Platform } from 'react-native';
 import { PATH_CUSTOMER_IMAGES } from '../../lib/AttributeConstants'
 import { OPEN_CAMERA } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import ImageCropPicker from 'react-native-image-crop-picker';
+import _ from 'lodash'
 
 var PATH_COMPRESS_IMAGE = '/compressImages';
 
-export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack) {
+export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_CAMERA_LOADER, true))
             if (Platform.OS == 'android') {
                 CompressImage.createCompressedImage(result.uri, PATH_COMPRESS_IMAGE).then((resizedImage) => {
                     ImageStore.getBase64ForTag(resizedImage.uri, (base64Data) => {
-                        dispatch(saveImageInFormLayout(base64Data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack))
+                        dispatch(saveImageInFormLayout(base64Data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction))
                         RNFS.unlink(resizedImage.path)
                     }, (reason) => {
                         dispatch(setState(SET_CAMERA_LOADER, false))
@@ -44,7 +33,7 @@ export function saveImage(result, fieldAttributeMasterId, formLayoutState, calle
                     showToastAndAddUserExceptionLog(311, error.message, 'danger', 1)
                 });
             } else {
-                dispatch(saveImageInFormLayout(result.data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack))
+                dispatch(saveImageInFormLayout(result.data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction))
             }
         } catch (error) {
             dispatch(setState(SET_CAMERA_LOADER, false))
@@ -66,25 +55,29 @@ export function getImageData(value) {
 export function takePicture(ref) {
     return async function (dispatch) {
         try {
-            const options = { quality: 0.2, base64: true, fixOrientation: true };
+            let options = { quality: 0.2, base64: true, fixOrientation: true };
+            if (Platform.OS === "ios") {
+                options.orientation = 'portrait'
+            }
             ref.takePictureAsync(options).then((capturedImg) => {
                 const { uri, base64 } = capturedImg;
                 dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64, uri }))
-                })
+            })
         } catch (error) {
             dispatch(setState(SET_CAMERA_LOADER, false))
-            showToastAndAddUserExceptionLog(316, error.message, 'danger', 1)        }
+            showToastAndAddUserExceptionLog(316, error.message, 'danger', 1)
+        }
     }
 }
 
-export function saveImageInFormLayout(data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction, goBack) {
+export function saveImageInFormLayout(data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction) {
     return async function (dispatch) {
         try {
             const value = await signatureService.saveFile(data, moment(), true)
             if (calledFromArray) {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState, goBack))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState))
             } else {
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction, null, null, goBack))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(312, error.message, 'danger', 1)
@@ -96,7 +89,7 @@ export function setCameraInitialView(item) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_CAMERA_LOADER_INITIAL_SET_UP))
-            const validation = null, data = null
+            let validation = null, data = null
             if (!_.isEmpty(item.validation)) {
                 validation = await signatureService.getValidations(item.validation)
             }

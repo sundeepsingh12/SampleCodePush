@@ -1,6 +1,5 @@
 'use strict'
-import { Container, StyleProvider, Card, Input, Footer, Item, Content } from 'native-base';
-import { PureComponent } from 'react';
+import { Container, StyleProvider, Footer, Item, Content } from 'native-base';
 import { FlatList, View, Text, StyleSheet, TextInput } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -23,6 +22,8 @@ import {
 } from '../lib/constants'
 import MessageSendIcon from '../svg_components/icons/MessageSendIcon'
 import MessageReceiveIcon from '../svg_components/icons/MessageReceiveIcon'
+import _ from 'lodash'
+import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
     return {
@@ -80,13 +81,11 @@ class MessageBox extends Component {
 
     }
     navigateToScene = (item) => {
-        this.props.actions.navigateToScene(JobDetailsV2,
+        navigate(JobDetailsV2,
             {
                 jobSwipableDetails: item.jobSwipableDetails,
                 jobTransaction: item,
-            },
-            this.props.navigation.navigate
-        )
+            })
     }
 
     renderData = (item, transactionIdToCustomisationMap) => {

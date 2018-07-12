@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import * as homeActions from '../modules/home/homeActions'
-import { StyleSheet, View, Image, Text } from 'react-native'
+import { StyleSheet, View, Image, Text, BackHandler } from 'react-native'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
@@ -32,15 +32,23 @@ function mapStateToProps(state) {
     }
 };
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch) { 
     return {
         actions: bindActionCreators({ ...globalActions, ...homeActions }, dispatch)
     }
 }
 
 class UnsyncBackupUpload extends Component {
+    _didFocusSubscription;
+    _willBlurSubscription;
+
     constructor(props) {
         super(props);
+        BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid);
+        this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload =>{
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+            BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        });
     }
     componentDidMount() {
         if (this.props.navigation.state.params && this.props.navigation.state.params > 0) {
@@ -48,10 +56,26 @@ class UnsyncBackupUpload extends Component {
         } else {
             this.props.actions.readAndUploadFiles()
         }
+
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
+
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        this._didFocusSubscription && this._didFocusSubscription.remove();
+        this._willBlurSubscription && this._willBlurSubscription.remove();
+    }
+
+    onBackButtonPressAndroid = () => {
+       BackHandler.exitApp();
+        return true;
+    };
 
     uploadSuccessView() {
         if (this.props.backupUploadView == 2) {
@@ -95,10 +119,8 @@ class UnsyncBackupUpload extends Component {
                     </View>
                     <View style={[styles.marginTop30, styles.alignCenter]}>
                         <Button transparent style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}
-                            onPress={() => {
-                                this.props.actions.navigateToScene('HomeTabNavigatorScreen',null,this.props.navigation.navigate)
-                                this.props.actions.resetFailCountInStore()
-                            }}  >
+                            onPress={this.props.actions.resetFailCountInStore}
+                            >
                             <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>{CONTINUE}</Text>
                         </Button>
                     </View>
@@ -154,14 +176,15 @@ class UnsyncBackupUpload extends Component {
         let uploadSuccessView = this.uploadSuccessView()
         let logoutView = this.getLogoutView()
         return (
-            <StyleProvider style={getTheme(platform)}>
+            <StyleProvider style={getTheme(platform)} >
                 <Container>
                     {uploadingView}
                     {failureView}
                     {uploadSuccessView}
                     {logoutView}
                 </Container>
-            </StyleProvider >)
+            </StyleProvider >
+        );
     }
 }
 

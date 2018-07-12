@@ -3,14 +3,13 @@ import renderIf from '../lib/renderIf'
 import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Edit } from '../lib/constants'
-import { Container, Content, Header, Text, Left, Body, Right, Icon, List, StyleProvider, Footer, } from 'native-base';
+import { Container, Content, Header, Text, Body, Icon, StyleProvider } from 'native-base';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 export default class ReviewSaveActivatedDetails extends PureComponent {
 
     renderData = (item) => {
-        if (item.value) {
             return (
                 <View style={[styles.row, styles.paddingLeft10, styles.paddingRight10]}>
                     <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
@@ -22,13 +21,23 @@ export default class ReviewSaveActivatedDetails extends PureComponent {
                 </View>
             )
         }
+
+    getData(){
+        let data = []
+        if(this.props.commonData && this.props.commonData.length){
+            this.props.commonData.forEach((item) => {
+                if(item.value && !item.hidden){
+                    data.push(item)
+                }
+            })
+        }
+        return data
     }
 
-    _keyExtractor = (item, index) => String(item.id);
+    _keyExtractor = (item, index) => String(item.id)
 
     render() {
         return (
-
             <Modal
                 animationType="slide"
                 onRequestClose={() => this.props.reviewCommonData(false, {})}>
@@ -59,8 +68,7 @@ export default class ReviewSaveActivatedDetails extends PureComponent {
 
                         <Content style={[styles.flex1, styles.bgWhite]}>
                             <FlatList
-                                data={this.props.commonData}
-                                extraData={this.state}
+                                data={this.getData()}
                                 renderItem={(item) => this.renderData(item.item)}
                                 keyExtractor={this._keyExtractor}>
                             </FlatList>

@@ -3,7 +3,9 @@ import {
     StyleSheet,
     View,
     Text,
-    Image
+    Image,
+    Linking,
+    Platform
 } from 'react-native'
 import { StyleProvider, Container, Content, Button, List, ListItem, Left, Right } from 'native-base'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
@@ -14,15 +16,16 @@ import platform from '../../native-base-theme/variables/platform'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
+import TimeMismatchSetting from '../components/TimeMismatchSetting'
 import {
     SETTING_UP,
     DOWNLOAD_SETTINGS,
     APPLYING_SETTINGS,
     VERIFY_HANDSET,
     CANCEL,
-    RETRY
+    RETRY,
+    TIME_ERROR_MESSAGE
 } from '../lib/ContainerConstants'
-
 function mapStateToProps(state) {
     return {
         configDownloadService: state.preloader.configDownloadService,
@@ -40,8 +43,8 @@ function mapDispatchToProps(dispatch) {
 
 class InitialSetup extends PureComponent {
 
-    invalidateSession = () => {
-        this.props.actions.invalidateUserSession(true)
+    invalidateSession = (message) => {
+        this.props.actions.invalidateUserSession(true, false, message)
     }
 
     retry = () => {
@@ -109,6 +112,9 @@ class InitialSetup extends PureComponent {
     }
 
     render() {
+        if(this.props.error == TIME_ERROR_MESSAGE || this.props.error == 'mismatchLoading'){
+            return <TimeMismatchSetting retry = {this.retry} invalidateSession={this.invalidateSession} error = {this.props.error}/>
+        }else{
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
@@ -129,7 +135,7 @@ class InitialSetup extends PureComponent {
             </StyleProvider>
         )
     }
-
+    }
     _renderErrorMessage() {
         if (!_.isEmpty(this.props.error)) {
             return (

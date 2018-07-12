@@ -6,7 +6,7 @@ import * as bulkActions from '../modules/bulk/bulkActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, FlatList, TouchableOpacity, BackHandler, TextInput } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, TextInput } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Header, Button, Text, Body, Icon, Footer, StyleProvider, ActionSheet, Toast } from 'native-base'
 import getTheme from '../../native-base-theme/components'
@@ -17,6 +17,8 @@ import _ from 'lodash'
 import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED,  NO_JOBS_PRESENT, TOTAL_COUNT } from '../lib/ContainerConstants'
 import { FormLayout, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import moment from 'moment'
+import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
   return {
@@ -49,11 +51,14 @@ class BulkListing extends PureComponent {
   }
 
   renderData = (item) => {
-    return (
-      <JobListItem data={item}
-        onPressItem={() => this.onClickRowItem(item)}
-      />
-    )
+    if(_.isEmpty(item.jobExpiryData.value) ||  moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(item.jobExpiryData.value)){
+      return (
+        <JobListItem data={item}
+          onPressItem={() => this.onClickRowItem(item)}
+        />
+      )
+    }
+    
   }
 
   componentDidUpdate() {
@@ -129,6 +134,7 @@ class BulkListing extends PureComponent {
       jobTransactionArray = Object.values(this.props.bulkTransactionList)
     }
     else {
+      
       let searchText = this.props.searchText
       // Function for filtering on basis of reference number, runsheet number, line1, line2, circleline1, circleline2
       _.forEach(this.props.bulkTransactionList, function (value) {
@@ -177,11 +183,16 @@ class BulkListing extends PureComponent {
     let nextStatusNames = []
     this.props.nextStatusList.forEach(object => {
       let statusObject =
-        { text: object.name, icon: "md-arrow-dropright", iconColor: "#000000" }
-      nextStatusNames.push(statusObject)
-    })
+        nextStatusNames.push({
+          text: object.name,
+          icon: "md-arrow-dropright",
+          iconColor: "#000000",
+          transient:object.transient,
+          saveActivated:object.saveActivated,
+          id:object.id
+        })
+        })
     nextStatusNames.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
-    const nextStatusIds = this.props.nextStatusList.map(nextStatus => nextStatus.id)
 
     return (
       <StyleProvider style={getTheme(platform)}>
@@ -229,9 +240,9 @@ class BulkListing extends PureComponent {
                     title: NEXT_POSSIBLE_STATUS
                   }, buttonIndex => {
                     if (buttonIndex >= 0 && buttonIndex != nextStatusNames.length - 1) {
-                      this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex].text)
+                      this.goToFormLayout( nextStatusNames[buttonIndex].id, nextStatusNames[buttonIndex].text,nextStatusNames[buttonIndex].transient,nextStatusNames[buttonIndex].saveActivated)
                     }
-                  }) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0].text)
+                  }) : this.goToFormLayout(nextStatusNames[0].id, nextStatusNames[0].text,nextStatusNames[0].transient,nextStatusNames[0].saveActivated)
                 }}
                 success full
                 disabled={_.isEmpty(this.props.selectedItems) || (this.props.navigation.state.params.pageObject.groupId && !_.isEqual(_.size(this.props.bulkTransactionList), _.size(this.props.selectedItems)))}
@@ -263,15 +274,15 @@ class BulkListing extends PureComponent {
     }
   }
 
-  goToFormLayout(statusId, statusName) {
-    this.props.actions.navigateToScene(FormLayout, {
+  goToFormLayout(statusId, statusName,transient,saveActivated) {
+    navigate(FormLayout, {
       statusId,
       statusName,
+      transient,
+      saveActivated,
       jobMasterId: JSON.parse(this.props.navigation.state.params.pageObject.jobMasterIds)[0],
       jobTransaction: Object.values(this.props.selectedItems),
-    },
-    this.props.navigation.navigate
-    )
+    })
   }
 }
 

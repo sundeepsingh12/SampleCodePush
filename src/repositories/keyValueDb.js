@@ -94,6 +94,9 @@ export class keyValueDb {
       case 'MDM_POLICIES':
         schemaInstance = require('../repositories/schema/mdmPolicies');
         break;
+      case 'LONG_CODE_SIM_VERIFICATION':
+        schemaInstance = require('../repositories/schema/longCodeSimVerification');
+        break;
       default:
         checkCondition = true;
     }

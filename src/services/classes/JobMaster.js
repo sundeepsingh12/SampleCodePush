@@ -23,11 +23,9 @@ import {
   FIELD_ATTRIBUTE_STATUS,
   FIELD_ATTRIBUTE_VALIDATION,
   FIELD_ATTRIBUTE_VALIDATION_CONDITION,
-  JOB_LIST_CUSTOMIZATION,
   CUSTOMIZATION_APP_MODULE,
   USER,
   CUSTOMIZATION_LIST_MAP,
-  TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   CUSTOM_NAMING,
   TRANSACTION_TIME_SPENT,
@@ -39,13 +37,13 @@ import {
   MDM_POLICIES,
   APP_VERSION,
   APP_THEME,
+  LONG_CODE_SIM_VERIFICATION
 } from '../../lib/constants'
-import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER } from '../../lib/AttributeConstants'
-import { DOWNLOAD_LATEST_APP_VERSION } from '../../lib/ContainerConstants'
+import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER, PATH_COMPANY_LOGO_DIR, PATH_COMPANY_LOGO_IMAGE } from '../../lib/AttributeConstants'
 import _ from 'lodash'
-import package_json from '../../../package.json'
-
-
+import { TIME_ERROR_MESSAGE } from '../../lib/ContainerConstants'
+import RNFS from 'react-native-fs'
+import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
 class JobMaster {
   /**
    *## This will Download Job Master from server
@@ -60,8 +58,8 @@ class JobMaster {
    *
    * @param deviceIMEI
    * @param deviceSIM
-   * @param currentJobMasterVersion
-   * @param deviceCompanyId
+   * @param userObject
+   * @param token
    *
    *
    * * @return
@@ -106,8 +104,8 @@ class JobMaster {
       if ((!deviceIMEI || !deviceSIM)) {
         deviceIMEI = {}
         deviceSIM = {}
-        currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
-        deviceCompanyId = userObject.value.company.id
+        currentJobMasterVersion = userObject.company.currentJobMasterVersion
+        deviceCompanyId = userObject.company.id
         postData = JSON.stringify({
           deviceIMEI,
           deviceSIM,
@@ -115,8 +113,8 @@ class JobMaster {
           deviceCompanyId
         })
       } else {
-        currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
-        deviceCompanyId = userObject.value.company.id
+        currentJobMasterVersion = userObject.company.currentJobMasterVersion
+        deviceCompanyId = userObject.company.id
         postData = JSON.stringify({
           deviceIMEI: deviceIMEI.value,
           deviceSIM: deviceSIM.value,
@@ -141,15 +139,16 @@ class JobMaster {
       throw ({ errorCode: MAJOR_VERSION_OUTDATED, downloadUrl: json.androidDownloadUrl })
     }
     const minorPatchVersion = json.minorPatchVersion
+    await this.downloadCompanyLogoAndSaveToDevice(json.companyLogo)
 
-     //Check if minor or patch version from server is greater than current minor/patch version installed in phone
+    //Check if minor or patch version from server is greater than current minor/patch version installed in phone
     if (parseInt(json.applicationVersion) == packageJsonMajorVersion && minorPatchVersion) {
       const [minorVersionFromServer, patchVersionFromServer] = minorPatchVersion.split('.')
       const [appMajorVersion, appMinorVersion, appPatchVersion] = APP_VERSION_NUMBER.split('.')
       if (parseInt(minorVersionFromServer) > parseInt(appMinorVersion) || parseInt(patchVersionFromServer) > parseInt(appPatchVersion)) {
         throw ({ errorCode: MINOR_PATCH_OUTDATED, androidDeploymentKey: json.androidDeployementKey, iosDeploymentKey: json.iosDeployementKey })
+      }
     }
-  }
 
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);
@@ -182,6 +181,7 @@ class JobMaster {
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.appTheme, APP_THEME)
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.companyMDM, MDM_POLICIES)
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.hubLatLng, HUB_LAT_LONG)
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.deviceSimVerification, LONG_CODE_SIM_VERIFICATION)
   }
 
 
@@ -288,7 +288,7 @@ class JobMaster {
     const currentTimeInMillis = moment()
     let diffIntime = Math.abs(moment(currentTimeInMillis).diff(serverTimeInMillis, 'minutes'))
     if (diffIntime > 15) {
-      throw new Error("Time mismatch. Please correct time on Device")
+      throw new Error(TIME_ERROR_MESSAGE)
     }
     return true
   }
@@ -333,6 +333,31 @@ class JobMaster {
       }
     }
     return jobMasterWithAssignOrderToHubEnabled
+  }
+
+  /**
+   * This function download logo of company from url and stores in the internal store of device
+   * @param {*} url 
+   */
+  async downloadCompanyLogoAndSaveToDevice(url) {
+    try {
+      if (url) {
+        RNFS.mkdir(PATH_COMPANY_LOGO_DIR);
+        let download = RNFS.downloadFile({
+          fromUrl: url,
+          toFile: PATH_COMPANY_LOGO_IMAGE,
+        });
+        //To wait for download
+        let result = await download.promise
+      } else {
+        let fileExists = RNFS.exists(PATH_COMPANY_LOGO_IMAGE);
+        if (fileExists) {
+          RNFS.unlink(PATH_COMPANY_LOGO_IMAGE)
+        }
+      }
+    } catch (error) {
+      showToastAndAddUserExceptionLog(1304, error.message, 'danger', 0)
+    }
   }
 
 }

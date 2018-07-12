@@ -1,18 +1,11 @@
 'use strict'
 
-import {
-    jobAttributeMasterService
-} from './JobAttributeMaster'
 import * as realm from '../../repositories/realmdb'
 import {
     jobDetailsService
 } from './JobDetails'
 import {
     TABLE_JOB_DATA,
-    TABLE_JOB_TRANSACTION,
-    TABLE_JOB,
-    TABLE_RUNSHEET,
-    TABLE_FIELD_DATA,
 } from '../../lib/constants'
 
 import {
@@ -20,8 +13,12 @@ import {
     ADDRESS_LINE_2,
     CONTACT_NUMBER,
     LANDMARK,
-    PINCODE
+    PINCODE,
+    JOB_EXPIRY_TIME,
+
 } from '../../lib/AttributeConstants'
+
+import _ from 'lodash'
 
 class JobData {
 
@@ -43,10 +40,11 @@ class JobData {
      *               }
      * }
      */
-    getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap) {
-        let jobDataDetailsForListing = {}, jobDataMap = {}, contactMap = {}, addressMap = {}
+    getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap,jobAttributeStatusMap,jobIdJobTransactionStatusIdMap) {
+        let jobDataMap = {}, contactMap = {}, addressMap = {},jobExpiryMap = {}
         for (let index in jobDataList) {
             const { jobAttributeMasterId, jobId, parentId, value } = jobDataList[index];
+            const jobStatusId = jobIdJobTransactionStatusIdMap[jobId]
             let jobData = { jobId, jobAttributeMasterId, value };
             if (parentId !== 0) {
                 continue;
@@ -59,9 +57,12 @@ class JobData {
             } else if (this.checkAddressField(jobAttributeMasterId, value, jobAttributeMasterMap)) {
                 addressMap[jobId] = addressMap[jobId] ? addressMap[jobId] : [];
                 addressMap[jobId].push(jobData);
+            } else if(this.checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId,value,jobAttributeMasterMap,jobAttributeStatusMap,jobStatusId)){
+                jobExpiryMap[jobId] = jobData
             }
+           
         }
-        return { jobDataMap, contactMap, addressMap };
+        return { jobDataMap, contactMap, addressMap,jobExpiryMap };
     }
 
     /**
@@ -85,7 +86,7 @@ class JobData {
     }
 
     /**
-     * This method checks if job attrinute is of address type
+     * This method checks if job attribute is of address type
      * @param {*} jobAttributeMasterId 
      * @param {*} value 
      * @param {*} jobAttributeMasterMap 
@@ -104,6 +105,35 @@ class JobData {
             jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == PINCODE) {
             return true
         }
+        return false
+    }
+
+    /**This method checks if job expiry attribute is present
+     * 
+     * @param {*} jobAttributeMasterId 
+     * @param {*} jobAttributeMasterMap 
+     * @param {*} jobStatusId 
+     * @param {*} jobAttributeStatusMap 
+     */
+    checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId,value,jobAttributeMasterMap,jobAttributeStatusMap,jobStatusId){
+        if (!jobAttributeMasterMap[jobAttributeMasterId]) {
+            return false
+        }
+
+
+        if (jobAttributeMasterMap[jobAttributeMasterId].hidden ||
+            value == undefined || value == null || value.trim() === '') {
+            return false
+        }
+
+        //Check if job expiry is mapped to the status in which job transaction is currently present or if job attribute is not mapped to any status
+        if (jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == JOB_EXPIRY_TIME) {
+            if(_.isEmpty(jobAttributeStatusMap) || !jobAttributeStatusMap[jobStatusId] || (jobAttributeStatusMap[jobStatusId] == jobAttributeMasterId)){
+                return true
+            }
+           
+        }
+       
         return false
     }
 

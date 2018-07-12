@@ -2,7 +2,6 @@
 
 import * as realm from '../../repositories/realmdb'
 
-import { jobDataService } from './JobData'
 import { jobTransactionService } from './JobTransaction'
 import { jobStatusService } from './JobStatus'
 import {
@@ -141,7 +140,7 @@ class JobDetails {
     async getParentStatusList(statusList, currentStatus, jobTransactionId) {
         let parentStatusList = []
         for (let status of statusList) {
-            if (status.code === UNSEEN || _.isEqual(_.toLower(status.code), 'seen'))
+            if (status.code === UNSEEN || _.isEqual(_.toLower(status.code), 'seen') || status.transient)
                 continue
             for (let nextStatus of status.nextStatusList) {
                 if (currentStatus.id === nextStatus.id) { // check for currentStatus Id in  nextStatusList

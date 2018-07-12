@@ -1,6 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { Alert, StyleSheet, View, Text, Platform, TouchableHighlight, Image, TouchableOpacity, TextInput } from 'react-native'
+import { Alert, StyleSheet, View, Text, Image, TouchableOpacity, TextInput } from 'react-native'
 import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg, ActionSheet } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -11,7 +11,6 @@ import * as authActions from '../modules/login/loginActions'
 import { QrCodeScanner } from '../lib/constants'
 import CONFIG from '../lib/config'
 import { OK, CANCEL, CONFIRM_RESET, RESET_ACCOUNT_SETTINGS, REMEMBER_ME } from '../lib/ContainerConstants'
-
 
 var style = StyleSheet.create({
   container: {
@@ -54,6 +53,7 @@ function mapStateToProps(state) {
 }
 
 class Login extends PureComponent {
+  _didFocusSubscription;
 
   componentDidMount() {
     this.props.checkRememberMe()
@@ -116,14 +116,23 @@ class Login extends PureComponent {
     if (this.props.auth.form.authenticationService || this.props.auth.form.isLongPress) {
       return <Spinner />
     }
+    let sourceOptions;
+    if (this.props.auth.form.logo) {
+      sourceOptions = {
+        isStatic: true,
+        uri: 'data:image/jpeg;base64,' + this.props.auth.form.logo
+      }
+    } else {
+      sourceOptions = require('../../images/fareye-logo.png')
+    }
     if (!this.props.auth.form.authenticationService) {
       return (
-        <TouchableOpacity onLongPress={this.onLongPress}>
+        <TouchableOpacity style={[styles.width100, { height: 'auto' }]} onLongPress={this.onLongPress}>
           <Image
-            style={styles.logoStyle}
-            source={require('../../images/fareye-logo.png')}
+            source={sourceOptions}
+            style={[{ height: 100, width: 100, resizeMode: Image.resizeMode.contain }]}
           />
-        </TouchableOpacity >
+        </TouchableOpacity>
       )
     }
   }
@@ -156,7 +165,7 @@ class Login extends PureComponent {
           placeholder='Username'
           underlineColorAndroid='transparent'
           onChangeText={this.onChangeUsername}
-          disabled={this.props.auth.form.isEditTextDisabled}
+          editable={this.props.auth.form.isEditTextEnabled}
           style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, styles.width100, { height: 40 }]}
         />
       </Item>
@@ -173,7 +182,7 @@ class Login extends PureComponent {
           secureTextEntry={true}
           onChangeText={this.onChangePassword}
           onSubmitEditing={this.loginButtonPress}
-          disabled={this.props.auth.form.isEditTextDisabled}
+          editable={this.props.auth.form.isEditTextEnabled}
           style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, styles.width100, { height: 40 }]}
         />
         {this.showForgetPasswordView()}
@@ -202,18 +211,6 @@ class Login extends PureComponent {
         style={[styles.marginTop15]}
       >
         <Text style={[styles.fontWhite]}>Log In</Text>
-      </Button>
-    )
-  }
-
-  showCodePush() {
-    return (
-      <Button
-        full rounded success
-        onPress={this.codepushSync}
-        style={[styles.marginTop15]}
-      >
-        <Text style={[styles.fontWhite]}>Code Push</Text>
       </Button>
     )
   }

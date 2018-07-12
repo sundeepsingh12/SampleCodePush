@@ -144,6 +144,7 @@ repositories {
 }
 
 dependencies {
+    compile project(':react-native-device-settings')
     implementation project(':react-native-image-crop-picker')
     implementation project(':react-native-compress-image') 
     implementation project(':react-native-apk-installer')
