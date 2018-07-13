@@ -91,10 +91,4 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
     SoLoader.init(this, /* native exopackage */ false);
   }
 
-  //   @Override
-  // protected void attachBaseContext(Context base) {
-  //    super.attachBaseContext(base);
-  //    MultiDex.install(this);
-  // }
-
 }
