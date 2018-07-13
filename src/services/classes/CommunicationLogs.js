@@ -4,8 +4,7 @@ import {
     TABLE_JOB_TRANSACTION,
     CUSTOMER_CARE,
     LAST_CALL_AND_SMS_TIME,
-    TABLE_JOB,
-    JOB_ATTRIBUTE
+    LONG_CODE_SIM_VERIFICATION
 } from '../../lib/constants'
 import {
     CONTACT_NUMBER
@@ -64,13 +63,14 @@ class CommunicationLogs {
         let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
         let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery)
         let customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
+        let longCodeVerification = await keyValueDBService.getValueFromStore(LONG_CODE_SIM_VERIFICATION)
         let jobMasterIdToJobMasterMap = _.mapKeys(syncStoreDTO.jobMasterList, 'id')
         let statusIdToStatusMap = _.mapKeys(syncStoreDTO.statusList, 'id')
-        let communicationLogs = await this.setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary)
+        let communicationLogs = await this.setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary, longCodeVerification)
         return { communicationLogs, lastCallTime, lastSmsTime }
     }
 
-    async setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary) {
+    async setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary, longCodeVerification) {
         let communicationLogs = [], contactToCallLogMap = {}, jobIdToContactMap = {}, jobTransactionToContactMap = {}
         let callAndSmsLogs = callLogsArray.concat(smsLogsArray);
 
@@ -86,7 +86,7 @@ class CommunicationLogs {
                 }
                 this.incrementCountInUserSummary(communicationLog.transactionType, 'OFFICIAL', communicationLog.duration, userSummary)
             } else {
-                let isNumberCUG = await this.checkNumberIfCUG(callLog.phoneNumber, customerCareList)
+                let isNumberCUG = await this.checkNumberIfCUG(callLog, customerCareList, longCodeVerification)
                 if (isNumberCUG) {
                     communicationLog.communicationType = (communicationLog.duration) ? CALL_CUG : SMS_OFFICIAL
                     this.incrementCountInUserSummary(communicationLog.transactionType, 'CUG', communicationLog.duration, userSummary)
@@ -192,13 +192,16 @@ class CommunicationLogs {
         }
     }
 
-    async checkNumberIfCUG(phoneNumber, customerCareList) {
-        if (!phoneNumber || !customerCareList || !customerCareList.value) {
+    async checkNumberIfCUG(callLog, customerCareList, longCodeConfiguration) {
+        if (!callLog || !customerCareList || !customerCareList.value) {
             return
+        }
+        if (!callLog.duration && longCodeConfiguration && longCodeConfiguration.value && longCodeConfiguration.value.longCodeNumber) {
+            customerCareList.value.push({ mobileNumber: longCodeConfiguration.value.longCodeNumber })
         }
 
         for (let customerCareNumber of customerCareList.value) {
-            let isNumberSame = await calls.compareNumbers(phoneNumber, customerCareNumber.mobileNumber)
+            let isNumberSame = await calls.compareNumbers(callLog.phoneNumber, customerCareNumber.mobileNumber)
             if (isNumberSame) {
                 return true
             }
@@ -284,7 +287,7 @@ class CommunicationLogs {
                 }
             }
             if (!isNumberSame) {
-                isNumberSame = await this.checkNumberIfCUG(callLog.phoneNumber, customerCareList)
+                isNumberSame = await this.checkNumberIfCUG(callLog, customerCareList)
             }
             if (isNumberSame) {
                 if (callLog.callDuration) {
