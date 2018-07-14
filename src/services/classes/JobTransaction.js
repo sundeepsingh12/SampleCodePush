@@ -199,7 +199,7 @@ class JobTransaction {
         jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobMapAndJobDataQuery.jobDataQuery);
         jobTransactionDTO.jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap,jobTransactionCustomizationListParametersMaps.jobAttributeStatusMap,jobTransactionObject.jobIdJobTransactionStatusIdMap);
         fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, jobTransactionObject.fieldDataQuery);
-        jobTransactionDTO.fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList);
+        jobTransactionDTO.fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList, true);
         let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionDTO, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobTransactionCustomizationListParametersMaps, runsheetObject.runsheetMap);
         return jobTransactionCustomizationList;
     }

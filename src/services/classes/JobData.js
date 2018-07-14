@@ -192,6 +192,18 @@ class JobData {
         return parentIdJobDataListMap
     }
 
+    buildMasterIdDataMapFormList(dataList, dataMap, key){
+        if(_.isEmpty(dataList)) return 
+        for(let data in dataList){
+            let dataSet = (dataList[data] && dataList[data].data) ? dataList[data].data : null
+            if(dataSet){
+                dataMap[dataSet[key]] = {value : dataSet.value}
+            }
+           if(dataList[data].childDataList){
+               this.buildMasterIdDataMapFormList(dataList[data].childDataList, dataMap, key)
+           }
+        }
+    }
     /**Returns job data map for transaction list
      * 
      * @param {*} jobTransactionList 

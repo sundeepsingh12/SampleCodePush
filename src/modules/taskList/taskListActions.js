@@ -3,12 +3,13 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
 import { setState } from '../global/globalActions'
-import { JOB_LISTING_START, JOB_LISTING_END, JOB_STATUS, SET_TABS_LIST, CUSTOM_NAMING, TAB, SHOULD_RELOAD_START, TABS_LOADING, JOB_ATTRIBUTE, USER, FIELD_ATTRIBUTE } from '../../lib/constants'
+import { JOB_LISTING_START, JOB_LISTING_END, JOB_STATUS, SET_TABS_LIST, CUSTOM_NAMING, TAB, SHOULD_RELOAD_START, TABS_LOADING, JOB_ATTRIBUTE, USER, FIELD_ATTRIBUTE, TABLE_FIELD_DATA } from '../../lib/constants'
 import _ from 'lodash'
 import { jobStatusService } from '../../services/classes/JobStatus';
 import { fieldDataService } from '../../services/classes/FieldData'
 import { addServerSmsService } from '../../services/classes/AddServerSms'
 import { jobDataService } from '../../services/classes/JobData'
+import * as realm from '../../repositories/realmdb'
 
 /**
  * This function fetches tabs list and set in state
@@ -73,12 +74,12 @@ export function shouldFetchJobsOrNot(jobTransactionCustomizationList, pageObject
 export function setSmsTemplateList(contact, smsTemplatedata, item) {
   return async function (dispatch) {
     try {
-      const jobAttributesList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
-      const fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
       const user = await keyValueDBService.getValueFromStore(USER);
-      const fieldDataMap = fieldDataService.getFieldData(item.id)
+      let fieldDataQuery =  'jobTransactionId = ' + item.id
+      let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
+      const fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList, false)
       const jobDataMap =  jobDataService.getJobData([item])
-      await addServerSmsService.sendFieldMessage(contact, smsTemplatedata, item, null, null, jobAttributesList, fieldAttributesList, user, jobDataMap[item.jobId], fieldDataMap[item.id])
+      await addServerSmsService.sendFieldMessage(contact, smsTemplatedata, item, user, fieldDataMap[item.id], jobDataMap[item.jobId])
     } catch (error) {
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList: [] }))
     }
