@@ -397,6 +397,7 @@ module.exports = {
     //TaskListCalender
     ALL: 'All',
     TODAY: 'Today',
+    NO_RESULT_FOUND: 'No result found for your search',
 
     //TaskListScreen
     NO_NEXT_STATUS: 'No NextStatus Available',
