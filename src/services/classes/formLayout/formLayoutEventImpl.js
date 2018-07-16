@@ -50,7 +50,7 @@ export default class FormLayoutEventImpl {
                 }
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
-             fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+                fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                 let valueAfterValidation = formLayoutObject[value.fieldAttributeMasterId].value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
                     if (value.required) {
@@ -155,8 +155,8 @@ export default class FormLayoutEventImpl {
         let gpsKms = (!userSummary.value.gpsKms) ? "0" : userSummary.value.gpsKms
         await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, gpsKms)
         let lastTrackLog = {
-            latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
-            longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
+            latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : null,
+            longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : null
         }
         let fieldData, jobTransaction, job, dbObjects
         if (jobTransactionList && jobTransactionList.length) { //Case of bulk
@@ -383,7 +383,7 @@ export default class FormLayoutEventImpl {
             actualAmount: null,
             moneyTransactionType: null
         }
-        for (var  data in formLayoutObject) {
+        for (var data in formLayoutObject) {
             let value = formLayoutObject[data]
             if (value.attributeTypeId == 61) {
                 continue
@@ -740,7 +740,7 @@ export default class FormLayoutEventImpl {
      * @param {*} id 
      */
     _getDefaultValuesForJob(jobMasterId, id, user, hub, referenceNumber, currentTime) {
-        return  {
+        return {
             id,
             referenceNo: referenceNumber,
             hubId: (hub) ? hub.id : null,
@@ -763,7 +763,7 @@ export default class FormLayoutEventImpl {
 
     _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei, currentTime, referenceNumber) {
         //TODO some values like lat/lng and battery are not valid values, update them as their library is added
-        return  {
+        return {
             id,
             runsheetNo: "AUTO-GEN",
             syncErp: false,

@@ -26,6 +26,7 @@ import FCM from "react-native-fcm"
 class Tracking {
 
     init() {
+        console.log('Tracking init')
         // 1.  Wire up event-listeners
 
         // This handler fires whenever bgGeo receives a location update.
@@ -97,6 +98,7 @@ class Tracking {
 
     destroy() {
         // Remove BackgroundGeolocation listeners
+        console.log('Tracking destroy')
         BackgroundGeolocation.un('location', this.onLocation)
         BackgroundGeolocation.un('error', this.onError)
         BackgroundGeolocation.un('motionchange', this.onMotionChange)
@@ -137,6 +139,7 @@ class Tracking {
     }
 
     async onLocation(location) {
+        console.log('Tracking onLocation', location)
         let user = await keyValueDBService.getValueFromStore(USER) || {}
         let track_record = {
             'battery': location.battery.level * 100,
