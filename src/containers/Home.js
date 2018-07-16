@@ -54,7 +54,6 @@ function mapDispatchToProps(dispatch) {
 class Home extends PureComponent {
 
   componentDidMount() {
-    console.log('componentDidMount home', this.props);
     this.props.actions.fetchPagesAndPiechart();
     this.props.actions.performSyncService(this.props.customErpPullActivated == 'notActivated');
     this.props.actions.startTracking(this.props.trackingServiceStarted);
