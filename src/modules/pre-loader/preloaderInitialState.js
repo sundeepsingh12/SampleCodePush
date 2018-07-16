@@ -15,15 +15,16 @@ var InitialState = Record({
   deviceVerificationService: SERVICE_PENDING, //Possible values => Constants.SERVICE_PENDING/ RUNNING/ SUCCESS/ FAILED
   error: '',
   errorMessage_403_400_Logout: '',
-  showMobileOtpNumberScreen:false,
-  mobileNumber:'',
-  otpNumber:'',
+  showMobileOtpNumberScreen: false,
+  mobileNumber: '',
+  otpNumber: '',
   mobileOtpDisplayMessage: true, //message which will be displayed in mobile no screen
   downloadLatestAppMessage: null,
   downloadUrl: null,
   isAppUpdatedThroughCodePush: false,
   codePushUpdateStatus: '',
-  iosDownloadScreen: null
+  iosDownloadScreen: null,
+  longCodeSMSData: null
 })
 
 export default InitialState
