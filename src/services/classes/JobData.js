@@ -219,25 +219,5 @@ class JobData {
         return jobDataMap
     }
 
-    getJobDataMapFromList(jobDataList) {
-        let jobDataMap = {}
-        jobDataList.forEach(jobDataObj => {
-            const {
-                jobAttributeMasterId,
-                jobId,
-                parentId,
-                value
-            } = jobDataObj
-            let jobData = {
-                jobId,
-                jobAttributeMasterId,
-                value
-            }
-            jobDataMap[jobId] = jobDataMap[jobId] ? jobDataMap[jobId] : []
-
-            jobDataMap[jobId].push(jobData)
-        })
-        return jobDataMap
-    }
 }
 export let jobDataService = new JobData()

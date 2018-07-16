@@ -37,6 +37,7 @@ public class CallLogsModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getCallLogs(String dateTime, String lastCallLogTime, Promise promise) {
+        try{
         String[] dates = {dateTime + ""};
         Cursor cursor;
         if (lastCallLogTime == null) {
@@ -74,18 +75,18 @@ public class CallLogsModule extends ReactContextBaseJavaModule {
                     break;
             }
             JSONObject callObj = new JSONObject();
-            try {
                 callObj.put("phoneNumber", phNumber);
                 callObj.put("callType", dir);
                 callObj.put("callDate", callDate);
                 callObj.put("callDuration", callDuration);
                 callArray.put(callObj);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+            } 
+        
         cursor.close();
         promise.resolve(callArray.toString());
+       } catch (Exception e) {
+            promise.reject(e.getMessage());
+            }
     }
 
     @ReactMethod
@@ -95,6 +96,7 @@ public class CallLogsModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getSmsLogs(String dateTime, String lastCallLogTime, Promise promise) {
+        try{
         JSONArray callArray = new JSONArray();
         Uri uri = Uri.parse("content://sms");
         String filter;
@@ -109,63 +111,34 @@ public class CallLogsModule extends ReactContextBaseJavaModule {
             return;
         }
          while (cursor.moveToNext()){
-
-                String dateTimeInMillis;
-                String contact;
-                try {
-                    contact = cursor.getString(cursor.getColumnIndexOrThrow("address")) + "";
-                } catch (Exception e) {
-                    contact = "";
-                }
-
-                try {
-                    dateTimeInMillis = cursor.getString(cursor.getColumnIndexOrThrow("date")) + "";
-                } catch (Exception e) {
-                    dateTimeInMillis = "";
-                }
-
-                String smsBody;
-                try {
-                    smsBody = cursor.getString(cursor.getColumnIndexOrThrow("body")) + "";
-                } catch (Exception e) {
-                    smsBody = "";
-                    e.printStackTrace();
-                }
-                String type;
-                try {
-                    type = cursor.getString(cursor.getColumnIndexOrThrow("type")) + "";
-                      switch (Integer.parseInt(type)) {
-                                case 1:
-                                    type="INBOX";
+                
+                String contact = cursor.getString(cursor.getColumnIndexOrThrow("address")) + "";
+                String dateTimeInMillis = cursor.getString(cursor.getColumnIndexOrThrow("date")) + "";
+                String smsBody= cursor.getString(cursor.getColumnIndexOrThrow("body")) + "";
+                String type = cursor.getString(cursor.getColumnIndexOrThrow("type")) + "";
+                    switch (Integer.parseInt(type)) {
+                            case 1:
+                                type="INBOX";
                                     break;
-                                case 2:
+                            case 2:
                               type="SENT";
-
                                     break;
-                                case 3:
-                            type="DRAFT";
-
+                            case 3:
+                              type="DRAFT";
                                     break;
                             }
-                } catch (Exception e) {
-                    type = "";
-                    e.printStackTrace();
-                }
-
-
+               
                 JSONObject callObj = new JSONObject();
-                try {
                     callObj.put("phoneNumber", contact);
                     callObj.put("callType", type);
                     callObj.put("callDate", dateTimeInMillis);
                     callObj.put("smsBody", smsBody);
                     callArray.put(callObj);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
             } 
-           cursor.close();
-            promise.resolve(callArray.toString());
-
+        cursor.close();
+        promise.resolve(callArray.toString());
+    }catch(Exception e){
+            promise.reject(e.getMessage());
+        }
     }
 }
