@@ -31,6 +31,8 @@ import com.smsinbackground.SendSMSPackage;
 import java.util.Arrays;
 import java.util.List;
 import android.support.multidex.MultiDexApplication;
+import com.opendatetimesettings.OpenDateTimeSettingsPackage;
+
 public class MainApplication extends MultiDexApplication implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
@@ -70,7 +72,8 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
           new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
           new BackgroundTimerPackage() ,
           new RNIMEIPackage(),
-          new SendSMSPackage()
+          new SendSMSPackage(),
+          new OpenDateTimeSettingsPackage()
       );
     }
 
