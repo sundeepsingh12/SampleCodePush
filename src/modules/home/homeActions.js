@@ -462,9 +462,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
           await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO)
         }
         if (isJobsPresent) {
-          if (Piechart.enabled) {
-            dispatch(pieChartCount())
-          }
+          dispatch(pieChartCount())
           dispatch(fetchJobs())
         }
 
@@ -551,9 +549,11 @@ export function syncTimer() {
 export function pieChartCount() {
   return async (dispatch) => {
     try {
-      dispatch(setState(CHART_LOADING, { loading: true }))
-      const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params)
-      dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
+      if(Piechart.enabled){
+        dispatch(setState(CHART_LOADING, { loading: true }))
+        const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params)
+        dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
+      }
     } catch (error) {
       showToastAndAddUserExceptionLog(2707, error.message, 'danger', 1)
       dispatch(setState(CHART_LOADING, { loading: false, count: null }))
