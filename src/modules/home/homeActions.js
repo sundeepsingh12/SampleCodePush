@@ -317,6 +317,10 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) 
 export function startTracking(trackingServiceStarted) {
   return async function (dispatch) {
     try {
+      let mdmSettings = await keyValueDBService.getValueFromStore(MDM_POLICIES);
+      if (mdmSettings && mdmSettings.value && mdmSettings.value.basicSetting && !mdmSettings.value.gpsTracking) {
+        return;
+      }
       if (!trackingServiceStarted) {
         trackingService.init()
         dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
@@ -538,7 +542,7 @@ export function syncTimer() {
   return async (dispatch) => {
     try {
       const difference = await sync.calculateDifference()
-      dispatch(setState(LAST_SYNC_TIME, difference))      
+      dispatch(setState(LAST_SYNC_TIME, difference))
     } catch (error) {
       //Update UI here
     }
