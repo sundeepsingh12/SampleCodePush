@@ -1,6 +1,6 @@
 'use strict';
 import React, { PureComponent } from 'react'
-import {  StyleSheet, View, TouchableOpacity, Image, Platform,TouchableHighlight } from 'react-native'
+import {  StyleSheet, View, TouchableOpacity, Image, Platform,TouchableHighlight, ImageStore } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Right, Icon, Footer, StyleProvider, Toast } from 'native-base'
 import Loader from '../components/Loader'
@@ -94,7 +94,8 @@ class CameraFieldAttribute extends PureComponent {
                 this._setToastForError(response.error)
             }
             else if (response.data) {
-                this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data : response.data, uri: response.uri}) 
+                this.setImage(response.uri)
+                //this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data : response.data, uri: response.uri}) 
             }
         })
     }
@@ -109,6 +110,26 @@ class CameraFieldAttribute extends PureComponent {
                 <Icon name="ios-flash" style={[styles.fontWhite, styles.fontXxxl]} onPress={() => this._setTorchOff()} />
         }
         return view
+    }
+
+    setImage = (uri) => {
+        if(uri == null) {
+            ImageStore.removeImageForTag(this.state.imageData.uri);
+            this.setState({imageData: null});
+        }
+        else {
+            this.setState({imageData: { uri }})
+        }
+    }
+
+    submitImage = () => {
+        const { uri } = this.state.imageData;
+        ImageStore.getBase64ForTag(uri, (base64Data) => {
+            this.props.setState(SET_SHOW_IMAGE_AND_DATA, { data: base64Data, uri });
+        }, (error) => {
+            this.props.setState(SET_CAMERA_LOADER, false);
+            this.props.showToastAndAddUserExceptionLog(314, error.message, 'danger', 1)
+        });
     }
 
     imageCaptureView(getValidationObject, quality) {
@@ -265,8 +286,7 @@ class CameraFieldAttribute extends PureComponent {
                                                     this.props.navigation.goBack()
                                                 }
                                                 else {
-                                                    this.setState({imageData: null})
-
+                                                    this.setImage(null);
                                                 }
                                             }}>
                                                 <Icon
@@ -284,7 +304,7 @@ class CameraFieldAttribute extends PureComponent {
 
                         {(getValidationObject && getValidationObject.cropImageValidation && Platform.OS==='android' && this.state.imageData != null) ?
                             <View style={[styles.justifyCenter, styles.alignCenter]}>
-                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.state.imageData.uri)}>
+                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.state.imageData.uri, this.setImage)}>
                                     <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
                                 </TouchableOpacity>
                             </View>
@@ -337,7 +357,7 @@ class CameraFieldAttribute extends PureComponent {
                 this.camera.takePictureAsync(options).then((capturedImg) => {
                     //console.logs("hipeee")
                     const { uri, base64 } = capturedImg;
-                    this.setState({imageData: {data: base64, uri}})
+                    this.setImage(uri)
                 })
                 //this.camera.pausePreview();
             } catch (error) {
