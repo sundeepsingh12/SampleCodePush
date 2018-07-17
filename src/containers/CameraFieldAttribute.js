@@ -143,7 +143,7 @@ class CameraFieldAttribute extends PureComponent {
                         </SafeAreaView>
                     </RNCamera>
                 </View>
-                <SafeAreaView style={[style.cameraFooter]}>
+                <SafeAreaView style={[style.footer]}>
                     <View style={{ height: 100, flexDirection: 'row', alignItems: 'center' }}>
                         <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
                             {(getValidationObject && getValidationObject.imageUploadFromDevice) ? <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} /> : null}
@@ -258,9 +258,7 @@ class CameraFieldAttribute extends PureComponent {
                             style={[styles.flex1]}
                         />
                         }
-                        <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
-                            <View style={[styles.paddingLeft15, styles.paddingRight15]}>
-                                <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
+                        <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%'},styles.paddingLeft15, styles.paddingRight15, styles.row, styles.justifySpaceBetween, styles.alignCenter ]}>
                                             <TouchableHighlight 
                                             onPress = {() => {
                                                 if(this.state.imageData == null){
@@ -280,28 +278,29 @@ class CameraFieldAttribute extends PureComponent {
                                                 {this.renderTorch()}
                                             </Right>
                                             }
-                                </View>
-                            </View>
                         </SafeAreaView>
                     </View>
-                    <SafeAreaView style={[style.cameraFooter]}>
-                    <View style={{ height: 100, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>
+                    <SafeAreaView style={[style.footer]}>
 
                         {(getValidationObject && getValidationObject.cropImageValidation && Platform.OS==='android' && this.state.imageData != null) ?
-                            <View style={[styles.justifyCenter, styles.alignCenter, { marginRight: 46 }]}>
+                            <View style={[styles.justifyCenter, styles.alignCenter]}>
                                 <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.state.imageData.uri)}>
                                     <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
                                 </TouchableOpacity>
                             </View>
                             : null}
 
-                             {this.state.imageData == null ?<View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
-                            {(getValidationObject && getValidationObject.imageUploadFromDevice && this.state.imageData == null) ? <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} /> : null}
-                        </View>
-                            : null
+                            {
+                                this.state.imageData == null 
+                            ?
+                                <View style={[ styles.alignCenter, styles.justifyCenter]}>
+                                    {(getValidationObject && getValidationObject.imageUploadFromDevice && this.state.imageData == null) ? <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} /> : null}
+                                </View>
+                            : 
+                                null
                             }
                         
-                            <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
+                            <View style={[ styles.alignCenter, styles.justifyCenter]}>
                                 
                                    { 
                                     this.state.imageData == null
@@ -317,12 +316,11 @@ class CameraFieldAttribute extends PureComponent {
                                     }
                             
                             </View>
-                            {this.state.imageData == null ?<View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
+                            {this.state.imageData == null ?<View style={[ styles.alignCenter, styles.justifyCenter]}>
                                 {(getValidationObject && getValidationObject.isFrontCameraEnabled && this.state.imageData == null) ? <MaterialIcons name={'switch-camera'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.toggleCameraType()} /> : null}
                             </View>
                             : null
                             }
-                    </View>
                     </SafeAreaView>
                 </Container>
             </StyleProvider>
@@ -366,14 +364,15 @@ const style = StyleSheet.create({
         color: '#000',
         padding: 10,
     },
-    cameraFooter: {
+    footer: {
         width: '100%',
         position: 'absolute',
         bottom: 0,
         height: 100,
         backgroundColor: 'rgba(0,0,0,.4)',
         borderLeftWidth: 0,
-        justifyContent: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
         alignItems: 'center',
         flex: 1
     }
