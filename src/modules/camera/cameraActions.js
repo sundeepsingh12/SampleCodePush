@@ -119,7 +119,7 @@ export function setInitialState() {
     }
 }
 
-export function cropImage(uri) {
+export function cropImage(uri, setImage) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_CAMERA_LOADER, true))
@@ -129,13 +129,10 @@ export function cropImage(uri) {
                 height: 300,
                 freeStyleCropEnabled: true,
             }).then((image) => {
+                console.logs(image)
                 if (image.path) {
-                    ImageStore.getBase64ForTag(image.path, (base64Data) => {
-                        dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64Data, uri: image.path }))
-                    }, (error) => {
-                        dispatch(setState(SET_CAMERA_LOADER, false))
-                        showToastAndAddUserExceptionLog(314, error.message, 'danger', 1)
-                    })
+                    setImage(image.path);
+                    dispatch(setState(SET_CAMERA_LOADER, false))
                 }
             }).catch(e => {
                 dispatch(setState(SET_CAMERA_LOADER, false))
