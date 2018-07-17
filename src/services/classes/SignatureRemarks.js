@@ -102,8 +102,9 @@ class SignatureRemarks {
         return value
     }
 
-    getValidations(validationArray) {
-        let validationObject = {}, validationCountForImage = 0, remarkValidationCount = 0
+    getValidations(validationArray, attributeTypeId) {
+        let validationObject = {}, validationCountForImage = 0
+        let remarkValidationCount = (attributeTypeId == 42 || attributeTypeId == 55) ? 0 : 1
         for (let validation of validationArray) {
             if (validation.timeOfExecution) {
                 switch (validation.timeOfExecution) {
