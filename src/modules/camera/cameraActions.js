@@ -52,26 +52,26 @@ export function getImageData(value) {
     }
 }
 
-export function takePicture(ref) {
-    return async function (dispatch) {
-        // try {
-        //     let options = { quality: 0.2, base64: true, fixOrientation: true };
-        //     if (Platform.OS === "ios") {
-        //         options.orientation = 'portrait'
-        //     }
-        //     ref.takePictureAsync(options).then((capturedImg) => {
-        //         const { uri, base64 } = capturedImg;
-        //     })
-        //     dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64, uri }))
+// export function takePicture(ref) {
+//     return async function (dispatch) {
+//         // try {
+//         //     let options = { quality: 0.2, base64: true, fixOrientation: true };
+//         //     if (Platform.OS === "ios") {
+//         //         options.orientation = 'portrait'
+//         //     }
+//         //     ref.takePictureAsync(options).then((capturedImg) => {
+//         //         const { uri, base64 } = capturedImg;
+//         //     })
+//         //     dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64, uri }))
 
-        // } catch (error) {
-        //     dispatch(setState(SET_CAMERA_LOADER, false))
-        //     showToastAndAddUserExceptionLog(316, error.message, 'danger', 1)
-        // }
-        //console.logs('taking picture')
-        dispatch(setState(SET_SHOW_IMAGE_AND_DATA, ref))
-    }
-}
+//         // } catch (error) {
+//         //     dispatch(setState(SET_CAMERA_LOADER, false))
+//         //     showToastAndAddUserExceptionLog(316, error.message, 'danger', 1)
+//         // }
+//         //console.logs('taking picture')
+//         dispatch(setState(SET_SHOW_IMAGE_AND_DATA, ref))
+//     }
+// }
 
 export function saveImageInFormLayout(data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction) {
     return async function (dispatch) {

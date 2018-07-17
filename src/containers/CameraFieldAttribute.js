@@ -125,10 +125,9 @@ class CameraFieldAttribute extends PureComponent {
     submitImage = () => {
         const { uri } = this.state.imageData;
         ImageStore.getBase64ForTag(uri, (base64Data) => {
-            this.props.setState(SET_SHOW_IMAGE_AND_DATA, { data: base64Data, uri });
+            this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data: base64Data, uri });
         }, (error) => {
-            this.props.setState(SET_CAMERA_LOADER, false);
-            this.props.showToastAndAddUserExceptionLog(314, error.message, 'danger', 1)
+            this.props.actions.showToastAndAddUserExceptionLog(314, error.message, 'danger', 1)
         });
     }
 
@@ -324,16 +323,19 @@ class CameraFieldAttribute extends PureComponent {
                                 
                                    { 
                                     this.state.imageData == null
-                                    ?  
-                                    <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
-                                        <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={() => this.takePicture()} />
-                                    </View>
-                                    :<TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
-                                        this.takePicture()
-                                    }}>
+                                    ? (  
+                                        <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
+                                            <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={this.takePicture} />
+                                        </View>
+                                    ): (
+                                    <TouchableOpacity 
+                                        style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} 
+                                        onPress={this.submitImage}
+                                        >
                                         <Icon name="md-checkmark"  style={[styles.fontWhite, styles.fontXxxl]} /> 
                                      </TouchableOpacity>
-                                    }
+                                     )
+                                   }
                             
                             </View>
                             {this.state.imageData == null ?<View style={[ styles.alignCenter, styles.justifyCenter]}>
