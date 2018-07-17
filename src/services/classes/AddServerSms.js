@@ -209,11 +209,13 @@ class AddServerSms {
         let jobAttributesList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE);
         let fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
         let keyToJobAttributeMap = {}, keyToFieldAttributeMap = {}
-        if (jobAttributesList && jobAttributesList.value && fieldAttributesList && fieldAttributesList.value) {
+        if (jobAttributesList && jobAttributesList.value) {
             jobAttributesList.value.forEach(jobAttribute => {
                 keyToJobAttributeMap[jobAttribute.jobMasterId] = (keyToJobAttributeMap[jobAttribute.jobMasterId]) ? keyToJobAttributeMap[jobAttribute.jobMasterId] : {}
                 keyToJobAttributeMap[jobAttribute.jobMasterId][jobAttribute.key] = jobAttribute
             })
+        }
+        if(fieldAttributesList && fieldAttributesList.value){
             fieldAttributesList.value.forEach(fieldAttribute => {
                 keyToFieldAttributeMap[fieldAttribute.jobMasterId] = (keyToFieldAttributeMap[fieldAttribute.jobMasterId]) ? keyToFieldAttributeMap[fieldAttribute.jobMasterId] : {}
                 keyToFieldAttributeMap[fieldAttribute.jobMasterId][fieldAttribute.key] = fieldAttribute
