@@ -117,7 +117,7 @@ class SignatureRemarks {
                         }
                         break
                     case REMARKS:
-                        if (remarkValidationCount == 1) {
+                        if (true) {
                             validationObject.isFrontCameraEnabled = (validation.condition == 'true')
                         } else {
                             remarkValidationCount++

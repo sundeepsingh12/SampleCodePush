@@ -26,7 +26,7 @@ console.tron = Reactotron
 if(__DEV__){
 Reactotron //To be added dev under dev flag
     .configure({
-        host: '192.168.0.108',
+    //    host: '192.168.0.108',
         name: "Fareye App"
     }) // Middlewares Now
     .use(reactotronRedux({

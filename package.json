@@ -23,7 +23,7 @@
     "react-native-background-fetch": "2.4.3",
     "react-native-background-geolocation": "2.12.2",
     "react-native-background-timer": "2.0.1",
-    "react-native-camera": "git+https://git@github.com/react-native-community/react-native-camera",
+    "react-native-camera": "git+http://git@github.com/react-native-community/react-native-camera",
     "react-native-cancelable-fetch": "0.1.1",
     "react-native-code-push": "5.3.5",
     "react-native-communications": "2.2.1",
