@@ -80,7 +80,7 @@ class DeviceVerification {
       await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
       if (user.hubId != deviceIMEI.value.hubId) {
         deviceIMEI.value.hubId = user.hubId;
-        await keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI)
+        await keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI.value)
       }
     }
     return true
