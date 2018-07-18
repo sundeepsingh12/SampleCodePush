@@ -12,12 +12,13 @@ import { MosambeeWalletPaymentServices } from '../../services/payment/MosambeeWa
 import _ from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions'
 import { paymentService } from '../../services/payment/Payment'
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,OK,TRANSACTION_SUCCESSFUL } from '../../lib/ContainerConstants'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,OK,TRANSACTION_SUCCESSFUL, ERROR } from '../../lib/ContainerConstants'
 import { saveJobTransaction } from '../form-layout/formLayoutActions'
 import { Toast } from 'native-base'
 import {
     JOB_EXPIRY_TIME,
 } from '../../lib/AttributeConstants'
+import { Alert } from 'react-native'
 import { StackActions } from 'react-navigation'
 import { navDispatch, navigate } from '../navigators/NavigationService'
 import {
@@ -216,7 +217,8 @@ export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutDa
                     if (!_.isEmpty(FormLayoutData)) navigate('FormLayout', FormLayoutData)
                 } else {
                     dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT, false))
-                    alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
+                    Alert.alert( ERROR,UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,[{ text: OK}])
+
                 }
             }
             else if (!_.isEmpty(FormLayoutData)) {

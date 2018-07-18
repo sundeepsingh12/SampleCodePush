@@ -82,7 +82,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { setState, showToastAndAddUserExceptionLog, deleteSessionToken } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
-import { Platform } from 'react-native'
+import { Platform, Alert } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -101,9 +101,10 @@ import FCM, { FCMEvent, NotificationType, RemoteNotificationResult, WillPresentN
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK } from '../../lib/ContainerConstants'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK, ERROR } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import { navDispatch, navigate } from '../navigators/NavigationService';
+import {each,size, isNull } from 'lodash'
 
 /**
  * Function which updates STATE when component is mounted
@@ -129,7 +130,7 @@ export function fetchPagesAndPiechart() {
       const utilityList = await keyValueDBService.getValueFromStore(PAGES_ADDITIONAL_UTILITY);
       //Looping over Utility list to check if Piechart and Messaging are enabled
       let utilities = {}
-      _.each(utilityList.value, function (utility) {
+      each(utilityList.value, function (utility) {
         if (utility.utilityID == PAGE_SUMMARY_PIECHART) {
           Piechart.enabled = utilities.pieChartEnabled = utility.enabled
           Piechart.params = JSON.parse(utility.additionalParams).jobMasterIds
@@ -185,7 +186,7 @@ export function navigateToPage(pageObject, navigationProps) {
         }
         case PAGE_CUSTOM_WEB_PAGE:
           let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
-          !_.size(customRemarks) || customRemarks.length == 1 ? navigate(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null }) : dispatch(customAppSelection(customRemarks, navigationProps))
+          !size(customRemarks) || customRemarks.length == 1 ? navigate(CustomApp, { customUrl: (size(customRemarks)) ? customRemarks[0].customUrl : null }) : dispatch(customAppSelection(customRemarks, navigationProps))
           break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -297,7 +298,7 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) 
           }
         } else {
           dispatch(setState(syncLoader, false))
-          alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
+          Alert.alert( ERROR,UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,[{ text: OK}])
         }
       }
       else {
@@ -476,7 +477,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       //Now schedule sync service which will run regularly after 2 mins
       await dispatch(syncService())
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-      if (_.isNull(serverReachable) || serverReachable.value == 2) {
+      if (isNull(serverReachable) || serverReachable.value == 2) {
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
         await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
       }
@@ -495,7 +496,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       }
       //Update Javadoc
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-      if (_.isNull(serverReachable) || serverReachable.value == 1) {
+      if (isNull(serverReachable) || serverReachable.value == 1) {
         await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
         await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
       }
@@ -590,7 +591,7 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
           syncStatus: 'ERROR'
         }))
         let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-        if (_.isNull(serverReachable) || serverReachable.value == 1) {
+        if (isNull(serverReachable) || serverReachable.value == 1) {
           await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
           await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
         }
