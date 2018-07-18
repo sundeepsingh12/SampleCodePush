@@ -148,23 +148,25 @@ export default class FormLayoutEventImpl {
         let user = await keyValueDBService.getValueFromStore(USER)
         let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
 
-        let fieldData, jobTransaction, job, dbObjects, transactionTrackValuesObject = {}
+        let fieldData, jobTransaction, job, dbObjects, transactionTrackValuesObject = {}, jobIdToJobTransactionMap = {}
         await this.getJobTransactionTrackValues(userSummary, transactionTrackValuesObject)
         let { callAndSmsLogs, jobDataList } = await communicationLogsService.getCallLogsAndJobDataList(jobTransactionList, jobAndFieldAttributesList, jobMasterId)
 
         if (jobTransactionList && jobTransactionList.length) { //Case of bulk
             fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionList, currentTime)
             dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
-            let jobIdAndTransactionIdCallCountMap = await communicationLogsService.getTrackCallCount(callAndSmsLogs, jobDataList, fieldData.value)
-            jobTransaction = this._setBulkJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, fieldData.npsFeedbackValue, fieldData.amountMap, jobIdAndTransactionIdCallCountMap) // to edit later 
+            jobIdToJobTransactionMap = _.mapKeys(dbObjects.jobTransaction, 'jobId')
+            let jobTransactionIdToCallCountMap = await communicationLogsService.getTrackCallCount(callAndSmsLogs, jobDataList, fieldData.value, jobIdToJobTransactionMap)
+            jobTransaction = this._setBulkJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, fieldData.npsFeedbackValue, fieldData.amountMap, jobTransactionIdToCallCountMap) // to edit later 
             job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value, fieldData.reAttemptDate)
         }
         else {
             jobTransactionId = await this.changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList)//In case of new job change jobTransactionId
             fieldData = this._saveFieldData(formLayoutObject, jobTransactionId, null, currentTime)
             dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
-            let jobIdAndTransactionIdCallCountMap = await communicationLogsService.getTrackCallCount(callAndSmsLogs, jobDataList, fieldData.value)
-            jobTransaction = this._setJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, fieldData.npsFeedbackValue, fieldData.amountMap, jobIdAndTransactionIdCallCountMap) //to edit later
+            jobIdToJobTransactionMap[jobTransactionList.jobId] = jobTransactionList
+            let jobTransactionIdToCallCountMap = await communicationLogsService.getTrackCallCount(callAndSmsLogs, jobDataList, fieldData.value, jobIdToJobTransactionMap)
+            jobTransaction = this._setJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, fieldData.npsFeedbackValue, fieldData.amountMap, jobTransactionIdToCallCountMap) //to edit later
             job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, transactionTrackValuesObject.lastTrackLog)
         }
         //TODO add other dbs which needs updation
@@ -618,7 +620,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _setJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, npsFeedbackValue, amountMap, jobIdAndTransactionIdCallCountMap) {
+    _setJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, npsFeedbackValue, amountMap, jobTransactionIdToCallCountMap) {
         let jobTransactionArray = [], jobTransactionDTOMap = {}, syncTime = moment().format('YYYY-MM-DD HH:mm:ss'), status = dbObjects.status[0], jobMaster = dbObjects.jobMaster[0]
         let jobTransaction = Object.assign({}, dbObjects.jobTransaction) // no need to have null checks as it is called from a private method
         jobTransaction.jobType = jobMaster.code
@@ -637,8 +639,9 @@ export default class FormLayoutEventImpl {
         jobTransaction.originalAmount = parseFloat(amountMap.originalAmount) ? parseFloat(amountMap.originalAmount) : 0
         jobTransaction.actualAmount = parseFloat(amountMap.actualAmount) ? parseFloat(amountMap.actualAmount) : 0
         jobTransaction.moneyTransactionType = amountMap.moneyTransactionType
-        this.getTrackCallCountFromJobId(jobTransaction, jobIdAndTransactionIdCallCountMap.jobIdToCallCountMap, jobIdAndTransactionIdCallCountMap.jobTransactionIdToCallCountMap)
-        jobTransaction.trackCallCount = (jobIdAndTransactionIdCallCountMap.jobIdToCallCountMap[jobTransaction.jobId] && jobIdAndTransactionIdCallCountMap.jobIdToCallCountMap[jobTransaction.jobId].callCount)
+        jobTransaction.trackCallCount = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].callCount) ? jobTransactionIdToCallCountMap[jobTransaction.id].callCount : 0
+        jobTransaction.trackCallDuration = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].callDuration) ? jobTransactionIdToCallCountMap[jobTransaction.id].callDuration : 0
+        jobTransaction.trackSmsCount = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].smsCount) ? jobTransactionIdToCallCountMap[jobTransaction.id].smsCount : 0
         jobTransactionArray.push(jobTransaction)
         jobTransactionDTOMap[jobTransaction.id] = {
             id: jobTransaction.id,
@@ -652,28 +655,7 @@ export default class FormLayoutEventImpl {
             jobTransactionDTOMap
         }
     }
-    getTrackCallCountFromJobId(jobTransaction, jobIdToCallCountMap, jobTransactionIdToCallCountMap) {
-        let trackCallCount = 0, trackCallDuration = 0, trackSmsCount = 0
-        if (jobIdToCallCountMap[jobTransaction.jobId]) {
-            if (jobIdToCallCountMap[jobTransaction.jobId].callCount) {
-                trackCallCount += jobIdToCallCountMap[jobTransaction.jobId].callCount
-                trackCallDuration += jobIdToCallCountMap[jobTransaction.jobId].callDuration
-            } else if (jobIdToCallCountMap[jobTransaction.jobId].smsCount) {
-                trackSmsCount += jobIdToCallCountMap[jobTransaction.jobId].smsCount
-            }
-        }
-
-        if (!_.isEmpty(jobTransactionIdToCallCountMap)) {
-            let value = _.values(jobTransactionIdToCallCountMap)
-            trackCallCount = (value[0].callCount) ? trackCallCount + value[0].callCount : trackCallCount
-            trackCallDuration = (value[0].callDuration) ? trackCallDuration + value[0].callDuration : trackCallDuration
-            trackSmsCount = (value[0].smsCount) ? trackSmsCount + value[0].smsCount : trackSmsCount
-        }
-        jobTransaction.trackCallCount += trackCallCount
-        jobTransaction.trackCallDuration += trackCallDuration
-        jobTransaction.trackSmsCount += trackSmsCount
-    }
-    _setBulkJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, npsFeedbackValue, amountMap, jobIdAndTransactionIdCallCountMap) {
+    _setBulkJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, npsFeedbackValue, amountMap, jobTransactionIdToCallCountMap) {
         let jobTransactionArray = [], jobTransactionDTOMap = {}, syncTime = moment().format('YYYY-MM-DD HH:mm:ss'), status = dbObjects.status[0], jobMaster = dbObjects.jobMaster[0]
         for (let jobTransaction1 in dbObjects.jobTransaction) {
             let jobTransaction = Object.assign({}, dbObjects.jobTransaction[jobTransaction1]) // no need to have null checks as it is called from a private method
@@ -693,7 +675,9 @@ export default class FormLayoutEventImpl {
             jobTransaction.originalAmount = amountMap[jobTransaction.id] ? parseFloat(amountMap[jobTransaction.id].originalAmount) : parseFloat(amountMap.originalAmount) ? parseFloat(amountMap.originalAmount) : 0
             jobTransaction.actualAmount = amountMap[jobTransaction.id] ? parseFloat(amountMap[jobTransaction.id].actualAmount) : parseFloat(amountMap.actualAmount) ? parseFloat(amountMap.actualAmount) : 0
             jobTransaction.moneyTransactionType = amountMap.moneyTransactionType
-            this.getTrackCallCountFromJobId(jobTransaction, jobIdAndTransactionIdCallCountMap.jobIdToCallCountMap, jobIdAndTransactionIdCallCountMap.jobTransactionIdToCallCountMap)
+            jobTransaction.trackCallCount = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].callCount) ? jobTransactionIdToCallCountMap[jobTransaction.id].callCount : 0
+            jobTransaction.trackCallDuration = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].callDuration) ? jobTransactionIdToCallCountMap[jobTransaction.id].callDuration : 0
+            jobTransaction.trackSmsCount = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].smsCount) ? jobTransactionIdToCallCountMap[jobTransaction.id].smsCount : 0
             jobTransactionArray.push(jobTransaction)
             jobTransactionDTOMap[jobTransaction.id] = {
                 id: jobTransaction.id,

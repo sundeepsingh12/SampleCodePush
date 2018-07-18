@@ -40,8 +40,6 @@ class CommunicationLogs {
         if (lastCallSmsTime && lastCallSmsTime.value && lastCallSmsTime.value.lastSmsTime) {
             lastSmsTimeFromStore = lastCallSmsTime.value.lastSmsTime
         }
-        //lastCallTimeFromStore = lastSyncWithServerInMillis // remove only for testing
-        //lastSmsTimeFromStore = lastSyncWithServerInMillis
         let callLogsFromPhone = await calls.getCallLogs(lastSyncWithServerInMillis, lastCallTimeFromStore)
         let smsLogsFromPhone = await calls.getSmsLogs(lastSyncWithServerInMillis, lastSmsTimeFromStore)
         let callLogsArray = JSON.parse(callLogsFromPhone);
@@ -56,10 +54,7 @@ class CommunicationLogs {
         if (_.size(smsLogsArray) > 0) {
             lastSmsTime = smsLogsArray[0].callDate
         }
-        let jobAttributesWithContactType = syncStoreDTO.jobAttributesList.filter(jobAttribute => jobAttribute.attributeTypeId == CONTACT_NUMBER)
-        let jobDataQuery = jobAttributesWithContactType.map(jobAttribute => 'jobAttributeMasterId = ' + jobAttribute.id).join(' OR ')
-        let fieldAttributesWithContactType = syncStoreDTO.fieldAttributesList.filter(fieldAttribute => fieldAttribute.attributeTypeId == CONTACT_NUMBER)
-        let fieldDataQuery = fieldAttributesWithContactType.map(fieldAttribute => 'fieldAttributeMasterId = ' + fieldAttribute.id).join(' OR ')
+        let { jobDataQuery, fieldDataQuery } = this.getJobAndFieldDataQuery(syncStoreDTO.jobAttributesList, syncStoreDTO.fieldAttributesList)
         let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
         let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery)
         let customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
@@ -69,6 +64,15 @@ class CommunicationLogs {
         let communicationLogs = await this.setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary, longCodeVerification)
         return { communicationLogs, lastCallTime, lastSmsTime }
     }
+
+    getJobAndFieldDataQuery(jobAttributesList, fieldAttributesList) {
+        let jobAttributesWithContactType = jobAttributesList.filter(jobAttribute => jobAttribute.attributeTypeId == CONTACT_NUMBER)
+        let jobDataQuery = jobAttributesWithContactType.map(jobAttribute => 'jobAttributeMasterId = ' + jobAttribute.id).join(' OR ')
+        let fieldAttributesWithContactType = fieldAttributesList.filter(fieldAttribute => fieldAttribute.attributeTypeId == CONTACT_NUMBER)
+        let fieldDataQuery = fieldAttributesWithContactType.map(fieldAttribute => 'fieldAttributeMasterId = ' + fieldAttribute.id).join(' OR ')
+        return { jobDataQuery, fieldDataQuery }
+    }
+
 
     async setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary, longCodeVerification) {
         let communicationLogs = [], contactToCallLogMap = {}, jobIdToContactMap = {}, jobTransactionToContactMap = {}
@@ -243,7 +247,7 @@ class CommunicationLogs {
     }
 
     async getCallLogsAndJobDataList(jobTransactionList, jobAndFieldAttributesList, jobMasterId) {
-        let jobDataQuery = '', todayDate = moment().format('YYYY-MM-DD') + ' 00:00:00', jobAttributesQuery = ''
+        let jobQuery = '', todayDate = moment().format('YYYY-MM-DD') + ' 00:00:00', jobAttributesQuery = ''
         let todayDateInMilliSecond = moment(todayDate).format('x')
         let callLogsFromPhone = await calls.getCallLogs(todayDateInMilliSecond, null)
         let smsLogsFromPhone = await calls.getSmsLogs(todayDateInMilliSecond, null)
@@ -253,45 +257,43 @@ class CommunicationLogs {
             return {}
         }
         if (jobTransactionList.length) {
-            jobDataQuery += jobTransactionList.map(jobTransaction => 'jobId = ' + jobTransaction.jobId).join(' OR ')
+            jobQuery += jobTransactionList.map(jobTransaction => 'jobId = ' + jobTransaction.jobId).join(' OR ')
         } else {
-            jobDataQuery += 'jobId = ' + jobTransactionList.jobId
+            jobQuery += 'jobId = ' + jobTransactionList.jobId
         }
-        let jobAttributesWithContactType = jobAndFieldAttributesList.jobAttributes.filter(jobAttribute => jobAttribute.attributeTypeId == CONTACT_NUMBER && jobAttribute.jobMasterId == jobMasterId)
-        jobAttributesQuery = jobAttributesWithContactType.map(jobAttribute => 'jobAttributeMasterId = ' + jobAttribute.id).join(' OR ')
-        if (jobAttributesQuery == '') {
+        let { jobDataQuery, fieldDataQuery } = this.getJobAndFieldDataQuery(jobAndFieldAttributesList.jobAttributes, jobAndFieldAttributesList.fieldAttributes)
+        if (jobDataQuery == '') {
             return {}
         }
-        let finalJobDataQuery = `(${jobDataQuery}) AND (${jobAttributesQuery})`
+        let finalJobDataQuery = `(${jobQuery}) AND (${jobDataQuery})`
         let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, finalJobDataQuery)
         let callAndSmsLogs = callLogsArray.concat(smsLogsArray)
         return { callAndSmsLogs, jobDataList }
     }
-    async getTrackCallCount(callAndSmsLogs, jobDataList, fieldDataList) {
-        let jobIdToCallCountMap = {}, jobTransactionIdToCallCountMap = {}
-        if (!callAndSmsLogs || !jobDataList) {
-            return { jobIdToCallCountMap, jobTransactionIdToCallCountMap }
-        }
-        let isNumberSame
+
+    async getTrackCallCount(callAndSmsLogs, jobDataList, fieldDataList, jobIdToJobTransactionMap) {
+        let jobTransactionIdToCallCountMap = {}
         for (let callLog of callAndSmsLogs) {
-            for (let jobData of jobDataList) {
-                isNumberSame = await calls.compareNumbers(callLog.phoneNumber, jobData.value)
+            let tempMapForJobIdsMatchingWithLogs = {}
+            for (let fieldData of fieldDataList) {
+                let isNumberSame = await calls.compareNumbers(callLog.phoneNumber, fieldData.value)
                 if (isNumberSame) {
-                    this.setCallCountInMap(jobIdToCallCountMap, jobData.jobId, callLog)
+                    for (let index in jobIdToJobTransactionMap) {
+                        tempMapForJobIdsMatchingWithLogs[index] = index
+                        this.setCallCountInMap(jobTransactionIdToCallCountMap, jobIdToJobTransactionMap[index].id, callLog)
+                    }
                     break
                 }
             }
-            if (!isNumberSame) {
-                for (let fieldData of fieldDataList) {
-                    isNumberSame = await calls.compareNumbers(callLog.phoneNumber, fieldData.value)
-                    if (isNumberSame) {
-                        this.setCallCountInMap(jobTransactionIdToCallCountMap, fieldData.jobTransactionId, callLog)
-                        break
-                    }
+            for (let jobData of jobDataList) {
+                let isNumberSame = await calls.compareNumbers(callLog.phoneNumber, jobData.value)
+                if (isNumberSame && !tempMapForJobIdsMatchingWithLogs[jobData.jobId]) {
+                    tempMapForJobIdsMatchingWithLogs[jobData.jobId] = jobData.jobId
+                    this.setCallCountInMap(jobTransactionIdToCallCountMap, jobIdToJobTransactionMap[jobData.jobId].id, callLog)
                 }
             }
         }
-        return { jobIdToCallCountMap, jobTransactionIdToCallCountMap }
+        return jobTransactionIdToCallCountMap
     }
 
     setCallCountInMap(idMap, id, callLog) {
