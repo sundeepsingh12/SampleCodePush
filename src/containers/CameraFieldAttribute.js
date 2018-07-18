@@ -39,6 +39,7 @@ class CameraFieldAttribute extends PureComponent {
         this.state = {
             torchOff: '',
             cameraType: 'back',
+            imageData: null,
         }
     }
 
@@ -46,6 +47,23 @@ class CameraFieldAttribute extends PureComponent {
         return { header: null }
     }
 
+    static getDerivedStateFromProps(props, state){
+        if(_.isEmpty(props.imageData))
+            return null;
+        // const { data } = props.imageData;
+        // if(data==null)
+        // return null;
+        console.logs(props)
+        console.logs(state)
+        // if(){
+        //     return {...state , imageData: {...props.imageData}};
+
+        // }
+        if(state.imageData === null ||( props.imageData.data != state.imageData.data && props.imageData.uri != state.imageData.uri){
+            return {...state , imageData: {...props.imageData}};
+        }
+        return null;
+    }
     componentDidMount() {
         this.props.actions.setCameraInitialView(this.props.navigation.state.params.currentElement)
     }
@@ -123,12 +141,11 @@ class CameraFieldAttribute extends PureComponent {
     }
 
     submitImage = () => {
-        const { uri } = this.state.imageData;
-        ImageStore.getBase64ForTag(uri, (base64Data) => {
-            this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data: base64Data, uri });
-        }, (error) => {
-            this.props.actions.showToastAndAddUserExceptionLog(314, error.message, 'danger', 1)
-        });
+        if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
+            this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData.data, this.props.navigation.state.params.currentElement)
+        } else {
+            this.props.actions.saveImage(this.state.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
+        }
     }
 
     imageCaptureView(getValidationObject, quality) {
@@ -273,7 +290,7 @@ class CameraFieldAttribute extends PureComponent {
                         <Image
                             resizeMethod={'resize'}
                             source={{
-                                uri: this.state.imageData.uri,
+                                uri: this.state.imageData != null && this.state.imageData.uri != null ? this.state.imageData.uri : 'data:image/jpeg;base64,' + this.state.imageData.data,
                             }}
                             style={[styles.flex1]}
                         />
