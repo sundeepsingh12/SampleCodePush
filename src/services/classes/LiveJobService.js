@@ -25,7 +25,7 @@ class LiveJobService {
         let jobsList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery);
         let jobMapAndJobDataQuery = jobService.getJobMapAndJobDataQuery(jobsList);
         let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobMapAndJobDataQuery.jobDataQuery);
-        let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap, {}, {});
+        let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap);
         let jobTransactionDTO = { jobTransactionMap: jobMapAndJobDataQuery.jobMap, jobMap: jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap: {} }
         let jobTransactionCustomizationList = jobTransactionService.prepareJobCustomizationList(jobTransactionDTO, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobTransactionCustomizationListParametersMaps, {})
         return jobTransactionCustomizationList
