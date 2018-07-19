@@ -20,7 +20,6 @@ export default function postAssignmentReducer(state = initialState, action) {
                 .set('pendingCount', action.payload.pendingCount)
                 .set('scanSuccess', false)
                 .set('error', null)
-                .set('scanError', action.payload.scanError)
                 .set('jobMaster',action.payload.jobMaster)
 
         case SET_POST_ASSIGNMENT_ERROR:
@@ -32,7 +31,6 @@ export default function postAssignmentReducer(state = initialState, action) {
             return state.set('scanSuccess', action.payload.scanSuccess)
                 .set('loading', false)
                 .set('error', null)
-                .set('scanError',action.payload.scanError)
 
     }
 
