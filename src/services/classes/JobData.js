@@ -40,8 +40,8 @@ class JobData {
      *               }
      * }
      */
-    getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap,jobAttributeStatusMap,jobIdJobTransactionStatusIdMap) {
-        let jobDataMap = {}, contactMap = {}, addressMap = {},jobExpiryMap = {}
+    getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap, jobAttributeStatusMap, jobIdJobTransactionStatusIdMap) {
+        let jobDataMap = {}, contactMap = {}, addressMap = {}, jobExpiryMap = {}
         for (let index in jobDataList) {
             const { jobAttributeMasterId, jobId, parentId, value } = jobDataList[index];
             const jobStatusId = jobIdJobTransactionStatusIdMap[jobId]
@@ -57,12 +57,12 @@ class JobData {
             } else if (this.checkAddressField(jobAttributeMasterId, value, jobAttributeMasterMap)) {
                 addressMap[jobId] = addressMap[jobId] ? addressMap[jobId] : [];
                 addressMap[jobId].push(jobData);
-            } else if(this.checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId,value,jobAttributeMasterMap,jobAttributeStatusMap,jobStatusId)){
+            } else if (this.checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId, value, jobAttributeMasterMap, jobAttributeStatusMap, jobStatusId)) {
                 jobExpiryMap[jobId] = jobData
             }
-           
+
         }
-        return { jobDataMap, contactMap, addressMap,jobExpiryMap };
+        return { jobDataMap, contactMap, addressMap, jobExpiryMap };
     }
 
     /**
@@ -115,7 +115,7 @@ class JobData {
      * @param {*} jobStatusId 
      * @param {*} jobAttributeStatusMap 
      */
-    checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId,value,jobAttributeMasterMap,jobAttributeStatusMap,jobStatusId){
+    checkJobExpiryAttributeForParticularStatus(jobAttributeMasterId, value, jobAttributeMasterMap, jobAttributeStatusMap, jobStatusId) {
         if (!jobAttributeMasterMap[jobAttributeMasterId]) {
             return false
         }
@@ -128,12 +128,12 @@ class JobData {
 
         //Check if job expiry is mapped to the status in which job transaction is currently present or if job attribute is not mapped to any status
         if (jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == JOB_EXPIRY_TIME) {
-            if(_.isEmpty(jobAttributeStatusMap) || !jobAttributeStatusMap[jobStatusId] || (jobAttributeStatusMap[jobStatusId] == jobAttributeMasterId)){
+            if (_.isEmpty(jobAttributeStatusMap) || !jobAttributeStatusMap[jobStatusId] || (jobAttributeStatusMap[jobStatusId] == jobAttributeMasterId)) {
                 return true
             }
-           
+
         }
-       
+
         return false
     }
 
@@ -181,9 +181,9 @@ class JobData {
      * 
      * @param {*} jobDatas 
      */
-    getParentIdJobDataListMap(jobDatas,jobTransactionList) {
+    getParentIdJobDataListMap(jobDatas, jobTransactionList) {
         let parentIdJobDataListMap = {}
-        jobTransactionList.map((jobTransaction) => {parentIdJobDataListMap[jobTransaction.jobId] = {}})
+        jobTransactionList.map((jobTransaction) => { parentIdJobDataListMap[jobTransaction.jobId] = {} })
         jobDatas.forEach(jobData => {
             let jobDataList = (parentIdJobDataListMap[jobData.jobId][jobData.parentId]) ? parentIdJobDataListMap[jobData.jobId][jobData.parentId] : []
             jobDataList.push(jobData)
@@ -192,6 +192,18 @@ class JobData {
         return parentIdJobDataListMap
     }
 
+    buildMasterIdDataMapFormList(dataList, dataMap, key) {
+        if (_.isEmpty(dataList)) return
+        for (let data in dataList) {
+            let dataSet = (dataList[data] && dataList[data].data) ? dataList[data].data : null
+            if (dataSet) {
+                dataMap[dataSet[key]] = { value: dataSet.value }
+            }
+            if (dataList[data].childDataList) {
+                this.buildMasterIdDataMapFormList(dataList[data].childDataList, dataMap, key)
+            }
+        }
+    }
     /**Returns job data map for transaction list
      * 
      * @param {*} jobTransactionList 
