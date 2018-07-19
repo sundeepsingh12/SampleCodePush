@@ -272,7 +272,11 @@ class CommunicationLogs {
     }
 
     async getTrackCallCount(callAndSmsLogs, jobDataList, fieldDataList, jobIdToJobTransactionMap) {
+    
         let jobTransactionIdToCallCountMap = {}
+        if(!callAndSmsLogs || !jobDataList){
+            return jobTransactionIdToCallCountMap
+        }
         for (let callLog of callAndSmsLogs) {
             let tempMapForJobIdsMatchingWithLogs = {}
             for (let fieldData of fieldDataList) {

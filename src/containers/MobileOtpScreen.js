@@ -1,11 +1,5 @@
 import React, { PureComponent } from 'react'
-import {
-    View,
-    Text,
-    TextInput,
-    Platform,
-    TouchableOpacity,
-} from 'react-native'
+import { View, Text, TextInput, Platform, TouchableOpacity, Image } from 'react-native'
 import { Content, Button, StyleProvider, Item, Icon, Spinner } from 'native-base';
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -14,30 +8,17 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { setState } from '../modules/global/globalActions'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import {
-    ENTER_MOBILE,
-    SEND_OTP,
-    ENTER_OTP,
-    OTP_CODE_SENT,
-    PROCEED,
-    EDIT,
-    RESEND_OTP_NO,
-    DID_NOT_RECEIVE_OTP,
-    ONE_TIME_PASSOWRD_WILL_BE_SENT_TO_MOBILE_NO,
-    SHOW_MOBILE_SCREEN,
-} from '../lib/ContainerConstants'
-
-import {
-    ON_MOBILE_NO_CHANGE,
-    ON_OTP_CHANGE,
-    SHOW_MOBILE_NUMBER_SCREEN
-} from '../lib/constants'
+import { ENTER_MOBILE, SEND_OTP, ENTER_OTP, OTP_CODE_SENT, PROCEED, EDIT, RESEND_OTP_NO, DID_NOT_RECEIVE_OTP, ONE_TIME_PASSOWRD_WILL_BE_SENT_TO_MOBILE_NO, SHOW_MOBILE_SCREEN, SHOW_OTP, SIM_VERIFICATION, SIM_VERIFICATION_MESSAGE, GO_TO_MESSAGES, SIM_VERIFIED_SUCCESSFULLY, GO_TO_HOME } from '../lib/ContainerConstants'
+import { ON_MOBILE_NO_CHANGE, ON_OTP_CHANGE, SHOW_MOBILE_NUMBER_SCREEN } from '../lib/constants'
+import { SHOW_LONG_CODE_COMPLETE_SCREEN } from '../lib/AttributeConstants'
+import SimVerify from '../svg_components/icons/SimVerifyIcon'
 
 function mapStateToProps(state) {
     return {
         mobileOtpDisplayMessage: state.preloader.mobileOtpDisplayMessage,
         mobileNumber: state.preloader.mobileNumber,
-        otpNumber: state.preloader.otpNumber
+        otpNumber: state.preloader.otpNumber,
+        longCodeSMSData: state.preloader.longCodeSMSData
     }
 };
 
@@ -53,7 +34,7 @@ class MobileOtpScreen extends PureComponent {
         this.props.actions.generateOtp(this.props.mobileNumber)
     }
     onShowMobileNoScreen = () => {
-        this.props.actions.setState(SHOW_MOBILE_NUMBER_SCREEN, SHOW_MOBILE_SCREEN)
+        this.props.actions.setState(SHOW_MOBILE_NUMBER_SCREEN, { showMobileOtpNumberScreen: SHOW_MOBILE_SCREEN })
     }
     onChangeMobileNo = (value) => {
         this.props.actions.setState(ON_MOBILE_NO_CHANGE, value)
@@ -93,7 +74,7 @@ class MobileOtpScreen extends PureComponent {
     mobileButtonView() {
         const checkForGetOtpButton = (_.size(this.props.mobileNumber) == 0 || (this.props.mobileOtpDisplayMessage === false))
         return (
-            <View style = {[styles.alignCenter, styles.justifyCenter]}>
+            <View style={[styles.alignCenter, styles.justifyCenter]}>
                 {this.errorLoaderView()}
                 <View>
                     <Button onPress={this.getOtp} full
@@ -149,7 +130,7 @@ class MobileOtpScreen extends PureComponent {
     otpButtonView() {
         let checkForProceed = _.size(this.props.otpNumber) == 0 || ((this.props.mobileOtpDisplayMessage === false))
         return (
-            <View style = {[styles.alignCenter, styles.justifyCenter,]}>
+            <View style={[styles.alignCenter, styles.justifyCenter,]}>
                 {this.errorLoaderView()}
                 <View>
                     <Button onPress={this.validateOtp} full
@@ -182,9 +163,7 @@ class MobileOtpScreen extends PureComponent {
         return (
             <View style={[{ left: 10, height: 60 }, Platform.OS === 'ios' ? styles.marginTop30 : styles.marginTop10]}>
                 <TouchableOpacity style={[styles.padding10]} onPress={this.props.invalidateUserSession} disabled={(this.props.mobileOtpDisplayMessage === false)}>
-                    <Icon
-                        name="md-close"
-                        style={[styles.fontXl]} />
+                    <Icon name="md-close" style={[styles.fontXl]} />
                 </TouchableOpacity>
             </View>
         )
@@ -205,8 +184,39 @@ class MobileOtpScreen extends PureComponent {
         )
     }
 
+    sendLongCodeSMSIOS = () => {
+        if (this.props.isMobileScreen == SHOW_LONG_CODE_COMPLETE_SCREEN) {
+            this.props.actions.completeLongCodeVerification();
+        } else {
+            this.props.actions.sendSMSForLongCodeVerification(this.props.longCodeSMSData);
+        }
+    }
+
+    showIOSLongCodeSMSScreen() {
+        return (
+            <View style={[styles.paddingTop0, styles.paddingLeft5, styles.flex1]}>
+                {this.showCloseButton()}
+                <View style={[styles.flex1, styles.column, styles.alignCenter, styles.paddingTop30]}>
+                    {this.props.isMobileScreen == SHOW_LONG_CODE_COMPLETE_SCREEN ? <Image
+                        style={{ width: 116, height: 116, resizeMode: 'contain' }}
+                        source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
+                    /> : <SimVerify />}
+                    <View style={[styles.alignCenter, styles.column, styles.justifyCenter, styles.marginTop30, styles.paddingTop20, { width: 280 }]}>
+                        <Text style={[styles.fontWeight600, styles.fontLg, styles.fontBlack, styles.lineHeight25]}>{this.props.isMobileScreen == SHOW_LONG_CODE_COMPLETE_SCREEN ? SIM_VERIFIED_SUCCESSFULLY : SIM_VERIFICATION}</Text>
+                        {this.props.isMobileScreen == SHOW_LONG_CODE_COMPLETE_SCREEN ? null : <Text style={[styles.marginTop10, styles.fontCenter, styles.fontDefault, styles.fontMediumGray, styles.lineHeight20]}>{SIM_VERIFICATION_MESSAGE}</Text>}
+                    </View>
+                    <View style={[{ marginTop: 'auto', marginBottom: 100 }]}>
+                        <Button onPress={this.sendLongCodeSMSIOS} full style={[{ width: 150 }, styles.justifyCenter, styles.alignCenter, styles.marginTop5]}>
+                            <Text style={[styles.fontWhite, styles.fontWeight500]}>{this.props.isMobileScreen == SHOW_LONG_CODE_COMPLETE_SCREEN ? GO_TO_HOME : GO_TO_MESSAGES}</Text>
+                        </Button>
+                    </View>
+                </View>
+            </View>
+        )
+    }
+
     render() {
-        let showContent = this.props.isMobileScreen == SHOW_MOBILE_SCREEN ? this.showMobileContent() : this.showOtpContent()
+        let showContent = this.props.isMobileScreen == SHOW_MOBILE_SCREEN ? this.showMobileContent() : this.props.isMobileScreen == SHOW_OTP ? this.showOtpContent() : this.showIOSLongCodeSMSScreen()
         return (
             <StyleProvider style={getTheme(platform)}>
                 {showContent}

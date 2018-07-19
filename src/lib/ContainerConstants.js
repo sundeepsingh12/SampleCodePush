@@ -369,10 +369,13 @@ module.exports = {
     TIME_MISMATCH_ERROR: 'The time on your phone does not match with the server, please set it according to your region.',
     GO_TO_SETTINGS: 'Go to settings',
     TIME_MISMATCH: 'Time Mismatch',
-    TIMEMISMATCH:'Time_Mismatch',
+    TIMEMISMATCH: 'Time_Mismatch',
     TIME_ERROR_MESSAGE: 'Time mismatch. Please correct time on Device',
-
-
+    SIM_VERIFICATION: 'Sim Verification',
+    SIM_VERIFICATION_MESSAGE: 'An SMS will be sent from your device. Please go to the messenger app and send the SMS to complete the verification.',
+    GO_TO_MESSAGES: 'Go to Messages',
+    SIM_VERIFIED_SUCCESSFULLY: 'Sim Verified Successsfully',
+    GO_TO_HOME: 'Go to Home',
 
     //Mosambee Wallet
     FAILED: 'Failed',
@@ -397,6 +400,7 @@ module.exports = {
     //TaskListCalender
     ALL: 'All',
     TODAY: 'Today',
+    NO_RESULT_FOUND: 'No result found for your search',
 
     //TaskListScreen
     NO_NEXT_STATUS: 'No NextStatus Available',

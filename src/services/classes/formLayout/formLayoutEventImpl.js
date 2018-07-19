@@ -197,8 +197,8 @@ export default class FormLayoutEventImpl {
         transactionTrackValuesObject.gpsKms = (!userSummary.value.gpsKms) ? "0" : userSummary.value.gpsKms
         await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, transactionTrackValuesObject.gpsKms)
         transactionTrackValuesObject.lastTrackLog = {
-            latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
-            longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
+            latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : null,
+            longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : null
         }
     }
 

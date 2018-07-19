@@ -84,9 +84,10 @@ export default function preloaderReducer(state = initialState, action) {
 
     case SHOW_MOBILE_NUMBER_SCREEN:
     case SHOW_OTP_SCREEN:
-      return state.set('showMobileOtpNumberScreen', action.payload)
+      return state.set('showMobileOtpNumberScreen', action.payload.showMobileOtpNumberScreen)
         .set('mobileOtpDisplayMessage', '')
         .set('otpNumber', '')
+        .set('longCodeSMSData', action.payload.longCodeSMSData)
 
     case PRE_LOGOUT_START:
       return state.set('error', action.payload == TIMEMISMATCH ? 'mismatchLoading' : 'Logging out')
@@ -101,8 +102,8 @@ export default function preloaderReducer(state = initialState, action) {
         .set('otpNumber', '')
         .set('error', '')
         .set('errorMessage_403_400_Logout', '')
-        .set('isAppUpdatedThroughCodePush',false)
-        .set('iosDownloadScreen',null)
+        .set('isAppUpdatedThroughCodePush', false)
+        .set('iosDownloadScreen', null)
 
     case ERROR_400_403_LOGOUT:
       return state.set('errorMessage_403_400_Logout', action.payload)

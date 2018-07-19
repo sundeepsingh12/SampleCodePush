@@ -11,7 +11,7 @@ import Loader from '../components/Loader';
 import styles from '../themes/FeStyle';
 import {  LISTING_SEARCH_VALUE, BulkListing, JobDetailsV2} from '../lib/constants'
 import JobListItem from '../components/JobListItem';
-import { NO_NEXT_STATUS, OK, ALL } from '../lib/ContainerConstants';
+import { NO_NEXT_STATUS, OK, ALL, NO_RESULT_FOUND } from '../lib/ContainerConstants';
 import moment from 'moment';
 import { navigate } from '../modules/navigators/NavigationService';
 
@@ -65,6 +65,7 @@ class TaskListScreen extends PureComponent {
     return (
       <JobListItem
         data={item}
+        onChatButtonPressed = {(contact, smsTemplatedata) => {this.props.actions.setSmsTemplateList(contact, smsTemplatedata, item)}}
         showIconsInJobListing={true}
         onPressItem={() => { this.navigateToScene(item) }}
         lastId={lastId}
@@ -126,6 +127,17 @@ class TaskListScreen extends PureComponent {
         this.prepareJobTrasactionListStructureForViewForFutureRunsheetDate(tabJobTransactionList, jobTransactionList[index]);
       } else if (this.props.selectedDate && this.props.selectedDate != ALL && moment(jobTransactionList[index].runsheetDate).isSame(this.props.selectedDate, 'day')) {
         this.prepareJobTrasactionListStructureForViewForNormalCase(tabJobTransactionList, jobTransactionList[index]);
+      }
+    }
+    if (this.props.searchText && this.props.searchText.scanner) {
+      this.props.actions.setState(LISTING_SEARCH_VALUE, { searchText: this.props.searchText.searchText, scanner: false })
+      if (_.isEmpty(tabJobTransactionList) && searchEqualTransactionList.length != 1) {
+        Toast.show({
+          text: NO_RESULT_FOUND,
+          position: 'bottom',
+          buttonText: OK,
+          duration: 5000
+        })
       }
     }
     if (searchEqualTransactionList.length == 1) {

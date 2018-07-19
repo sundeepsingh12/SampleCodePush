@@ -30,9 +30,9 @@ import com.imeigetter.RNIMEIPackage;
 import com.smsinbackground.SendSMSPackage;
 import java.util.Arrays;
 import java.util.List;
+import android.support.multidex.MultiDexApplication;
 import com.callgetter.CallLogsPackage;
-
-public class MainApplication extends Application implements ReactApplication {
+public class MainApplication extends MultiDexApplication implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
 
@@ -92,4 +92,5 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
   }
+
 }

@@ -17,17 +17,36 @@ class FieldData {
      *                                     }
      *                }
      */
-    getFieldDataMap(fieldDataList) {
+    getFieldDataMap(fieldDataList, checkForParentId) {
         let fieldDataMap = {};
         for (let index in fieldDataList) {
             const { fieldAttributeMasterId, jobTransactionId, parentId, value } = fieldDataList[index];
             let fieldData = { jobTransactionId, fieldAttributeMasterId, value };
-            if (parentId !== 0) {
+            if (parentId !== 0 && checkForParentId) {
                 continue;
             }
             fieldDataMap[jobTransactionId] = fieldDataMap[jobTransactionId] ? fieldDataMap[jobTransactionId] : {};
             fieldDataMap[jobTransactionId][fieldAttributeMasterId] = fieldData;
         }
+        return fieldDataMap
+    }
+
+    getFieldData(id) {
+        let fieldDataQuery =  'jobTransactionId = ' + id
+        let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
+        let fieldDataMap = {}
+        fieldDataMap[id] = {}
+        fieldDataList.forEach(fieldDataObj => {
+            const {
+                fieldAttributeMasterId,
+                value
+            } = fieldDataObj
+            let fieldData = {
+                fieldAttributeMasterId,
+                value
+            }
+            fieldDataMap[id][fieldAttributeMasterId] = fieldData
+        })
         return fieldDataMap
     }
 
