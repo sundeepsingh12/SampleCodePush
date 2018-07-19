@@ -50,18 +50,38 @@ class CameraFieldAttribute extends PureComponent {
 
     static getDerivedStateFromProps(props, state){
         const imageData = props.imageData;
-        if(_.isEmpty(imageData)){
-            return null;
+        let newstate = null;
+        //console.logs({imageData},{state})
+        if(_.isEmpty(imageData)) {
+            //console.logs("mypenz")
+            newstate = {...state, reduxData: imageData};
+        } else {
+            //console.logs("pingy")
+            newstate = {...state, reduxData: {...imageData}};
         }
-        else if(state.reduxData == null) {
-            return {...state, reduxData:{...imageData}}
+        
+        if(_.isEmpty(imageData) ){
+            if(!_.isEmpty(state.reduxData)){
+                return {...newstate, imageData: null};
+            }
+            else{
+                return null;
+            }
         }
-        if(imageData.data == state.reduxData.data) { //Assuming base64 string changes on  change in image
-            return null;
+        else if(_.isEmpty(state.reduxData)){//Optional chaining is not available
+            //console.logs('him and i')
+
+            return {...newstate, imageData: {...imageData}}
         }
-        // console.logs(props)
-        // console.logs(state)
-        return {...state , reduxData: {...imageData}, imageData:{... imageData}};
+        
+        if(imageData.data === state.reduxData.data) { //Assuming base64 string changes on  change in image
+            //console.logs('him and i')
+            return {...newstate};
+        }
+        // //console.logs(props)
+        // //console.logs(state)
+        // //console.logs('changed value of imageData and reducer')
+        return {...newstate, imageData:{... imageData}};
     }
     componentDidMount() {
         this.props.actions.setCameraInitialView(this.props.navigation.state.params.currentElement)
@@ -253,66 +273,60 @@ class CameraFieldAttribute extends PureComponent {
         )
     }
 
+    showCameraOrImage() {
+        if( this.state.imageData == null){
+            return (
+                <RNCamera
+                    ref={(cam) => {
+                        this.camera = cam;
+                    }}
+                    style={style.preview}
+                    flashMode={this.state.torchOff}
+                    type={this.state.cameraType}
+                />
+            );
+        } else {
+            return (
+                <Image
+                    resizeMethod={'resize'}
+                    source={{
+                        uri: this.state.imageData != null && this.state.imageData.uri != null ? this.state.imageData.uri : 'data:image/jpeg;base64,' + this.state.imageData.data,
+                    }}
+                    style={[styles.flex1]}
+                />
+            );
+        }                
+    }
     render() {
         let item = this.props.navigation.state.params.currentElement
-        const quality = { 20 : 'low', 42: 'high', 43: 'medium', 55: 'high' }
         const getValidationObject = this.props.validation
-        //console.logs(getValidationObject)
-        //if(this.state.imageData != null) return this.showImageView();
-        //return (this.imageCaptureView(getValidationObject))
-        //console.logs(this.state.imageData)
-        // if (this.props.cameraLoader)
-        //     return <Loader />
-        // if (this.state.imageData) {
-        //     //console.logs('intermediate step')
-        //     return this.showImageView(this.props.validation)
-        // } else {
-        //     //console.logs('final step')
-        //     return this.imageCaptureView(this.props.validation, quality[item.attributeTypeId])
-        // }
         if (this.props.cameraLoader)
             return <Loader />
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <View style={{ flex: 1 }}>
-                    {this.state.imageData == null
-                        ? <RNCamera
-                                ref={(cam) => {
-                                    this.camera = cam;
-                                }}
-                                style={style.preview}
-                                flashMode={this.state.torchOff}
-                                type={this.state.cameraType}
-                                />
-                        :
-                        <Image
-                            resizeMethod={'resize'}
-                            source={{
-                                uri: this.state.imageData != null && this.state.imageData.uri != null ? this.state.imageData.uri : 'data:image/jpeg;base64,' + this.state.imageData.data,
-                            }}
-                            style={[styles.flex1]}
-                        />
-                        }
+                    {this.showCameraOrImage()}
                         <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%'},styles.paddingLeft15, styles.paddingRight15, styles.row, styles.justifySpaceBetween, styles.alignCenter ]}>
-                                            <TouchableHighlight 
-                                            onPress = {() => {
-                                                if(this.state.imageData == null){
-                                                    this.props.navigation.goBack()
-                                                }
-                                                else {
-                                                    this.setImage(null);
-                                                }
-                                            }}>
-                                                <Icon
-                                                    name="md-close"
-                                                    style={[styles.fontXxxl, styles.fontWhite]}
-                                                />
-                                            </TouchableHighlight>
-                                            {this.state.imageData == null &&<Right>
-                                                {this.renderTorch()}
-                                            </Right>
-                                            }
+                            <TouchableHighlight 
+                                onPress = {() => {
+                                    if(this.state.imageData == null){
+                                        this.props.navigation.goBack()
+                                    }
+                                    else {
+                                        this.setImage(null);
+                                    }
+                                }}
+                            >
+                                <Icon
+                                    name="md-close"
+                                    style={[styles.fontXxxl, styles.fontWhite]}
+                                />
+                            </TouchableHighlight>
+                            {this.state.imageData == null && <Right>
+                                {this.renderTorch()}
+                            </Right>
+                            }
                         </SafeAreaView>
                     </View>
                     <SafeAreaView style={[style.footer]}>
@@ -373,8 +387,7 @@ class CameraFieldAttribute extends PureComponent {
                     options.orientation = 'portrait'
                 }
                 this.camera.takePictureAsync(options).then((capturedImg) => {
-                    //console.logs("hipeee")
-                    const { uri, base64 } = capturedImg;
+                    const { uri } = capturedImg;
                     this.setImage(uri)
                 })
                 //this.camera.pausePreview();
