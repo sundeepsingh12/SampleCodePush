@@ -158,6 +158,14 @@ class CameraFieldAttribute extends PureComponent {
             this.setState({imageData: { uri }})
         }
     }
+    onCrossPress = () => {
+        if(this.state.imageData == null){
+            this.props.navigation.goBack()
+        }
+        else {
+            this.setImage(null);
+        }
+    }
 
     submitImage = () => {
         if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
@@ -166,6 +174,7 @@ class CameraFieldAttribute extends PureComponent {
             this.props.actions.saveImage(this.state.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
         }
     }
+    
 
     // imageCaptureView(getValidationObject, quality) {
     //     let torchView = this.renderTorch()
@@ -298,22 +307,17 @@ class CameraFieldAttribute extends PureComponent {
         }                
     }
     showSwitchCamera(getValidationObject) {
-        console.logs('coming herer',getValidationObject)
         if(this.state.imageData == null){
             return (
-                <View style={[ styles.alignCenter, styles.justifyCenter]}>
-                    {
-                            (getValidationObject && getValidationObject.isFrontCameraEnabled) 
-                        ? 
-                            <MaterialIcons 
-                                name={'switch-camera'} 
-                                style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} 
-                                onPress={() => this.toggleCameraType()} 
-                            /> 
-                        : 
-                            null
-                    }
-                </View>
+                    (getValidationObject && getValidationObject.isFrontCameraEnabled) 
+                ? 
+                    <MaterialIcons 
+                        name={'switch-camera'} 
+                        style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} 
+                        onPress={() => this.toggleCameraType()} 
+                    /> 
+                :
+                    null
             );
         }
         else {
@@ -323,19 +327,15 @@ class CameraFieldAttribute extends PureComponent {
     showGalleryPicker(getValidationObject) {
         if(this.state.imageData == null){
             return(
-                <View style={[ styles.alignCenter, styles.justifyCenter]}>
-                    {
-                            (getValidationObject && getValidationObject.imageUploadFromDevice && this.state.imageData == null) 
-                        ? 
-                            <MaterialIcons 
-                                name={'photo'} 
-                                style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} 
-                                onPress={() => this.getImageGallery()} 
-                            />
-                        : 
-                            null
-                    }
-                </View>
+                    (getValidationObject && getValidationObject.imageUploadFromDevice && this.state.imageData == null) 
+                ? 
+                    <MaterialIcons 
+                        name={'photo'} 
+                        style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} 
+                        onPress={() => this.getImageGallery()} 
+                    />
+                : 
+                    null
             );
         } else {
             return null;
@@ -379,14 +379,7 @@ class CameraFieldAttribute extends PureComponent {
                         {this.showCameraOrImage()}
                         <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%'},styles.paddingLeft15, styles.paddingRight15, styles.row, styles.justifySpaceBetween, styles.alignCenter ]}>
                             <TouchableHighlight 
-                                onPress = {() => {
-                                    if(this.state.imageData == null){
-                                        this.props.navigation.goBack()
-                                    }
-                                    else {
-                                        this.setImage(null);
-                                    }
-                                }}
+                                onPress = {this.onCrossPress}
                             >
                                 <Icon
                                     name="md-close"
@@ -406,8 +399,8 @@ class CameraFieldAttribute extends PureComponent {
                         {
                                 (getValidationObject && getValidationObject.cropImageValidation && Platform.OS==='android' && this.state.imageData != null) 
                             ?
-                                <View style={[styles.justifyCenter, styles.alignCenter]}>
-                                    <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.state.imageData.uri, this.setImage)}>
+                                <View>
+                                    <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35, marginRight: 45 }]} onPress={() => this.props.actions.cropImage(this.state.imageData.uri, this.setImage)}>
                                         <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
                                     </TouchableOpacity>
                                 </View>
@@ -415,9 +408,7 @@ class CameraFieldAttribute extends PureComponent {
                                 null
                         }
                         {this.showGalleryPicker(getValidationObject)}
-                        <View style={[ styles.alignCenter, styles.justifyCenter]}>
                         { this.showCenterButton()}
-                        </View>
                         {this.showSwitchCamera(getValidationObject)}
                     </SafeAreaView>
                 </Container>
