@@ -80,7 +80,7 @@ class ErpSyncScreen extends PureComponent {
             {INTERNAL_SERVER_ERROR}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(true, null, true) }}>
+            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(true, true) }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -98,7 +98,7 @@ class ErpSyncScreen extends PureComponent {
             {NO_INTERNET}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(true, null, true) }}>
+            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(true, true) }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -115,7 +115,7 @@ class ErpSyncScreen extends PureComponent {
             {INTERNAL_ERROR}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(true, null, true) }}>
+            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(true, true) }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -128,7 +128,7 @@ class ErpSyncScreen extends PureComponent {
           <View style={[styles.marginTop30]}>
             <Button
               style={!isErpDisable ? { backgroundColor: styles.bgPrimaryColor } : null}
-              onPress={() => { this.props.actions.performSyncService(true, null, true) }}
+              onPress={() => { this.props.actions.performSyncService(true, true) }}
               disabled={isErpDisable}>
               <Text> {isErpDisable ? this.state.erpSyncTimer : SYNC} </Text>
             </Button>

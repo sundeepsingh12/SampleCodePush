@@ -9,12 +9,14 @@ import { setState, showToastAndAddUserExceptionLog } from '..//global/globalActi
 import { performSyncService, pieChartCount } from '../home/homeActions'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { MosambeeWalletPaymentServices } from '../../services/payment/MosambeeWalletPayment'
-import _ from 'lodash'
+import {mapKeys} from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions'
 import { paymentService } from '../../services/payment/Payment'
 import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,OK,TRANSACTION_SUCCESSFUL } from '../../lib/ContainerConstants'
 import { saveJobTransaction } from '../form-layout/formLayoutActions'
 import { Toast } from 'native-base'
+import { jobDataService } from '../../services/classes/JobData'
+import { fieldDataService } from '../../services/classes/FieldData'
 import {
     JOB_EXPIRY_TIME,
 } from '../../lib/AttributeConstants'
@@ -136,10 +138,11 @@ export function deleteDraftAndNavigateToFormLayout(formLayoutData) {
 export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, jobData, fieldData) {
     return async function (dispatch) {
         try {
-            let jobAttributesList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE);
-            let fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
             let user = await keyValueDBService.getValueFromStore(USER);
-            await addServerSmsService.sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData, jobAttributesList, fieldAttributesList, user)
+            let jobDataMap = {}, fieldDataMap = {}
+            jobDataService.buildMasterIdDataMapFormList(jobData, jobDataMap, 'jobAttributeMasterId')
+            jobDataService.buildMasterIdDataMapFormList(fieldData, fieldDataMap, 'fieldAttributeMasterId')
+            await addServerSmsService.sendFieldMessage(contact, smsTemplate, jobTransaction, user, fieldDataMap, jobDataMap)
         } catch (error) {
             showToastAndAddUserExceptionLog(1102, error.message, 'danger', 1)
         }

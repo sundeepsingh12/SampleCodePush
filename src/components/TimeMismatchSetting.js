@@ -14,10 +14,9 @@ import {
 } from 'react-native'
 
 import styles from '../themes/FeStyle'
-import { StyleProvider, Content, Button, Container, Header, Icon, Left, Spinner } from 'native-base'
+import { StyleProvider, Content, Button, Container, Icon, Spinner } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
-import DeviceSettings from 'react-native-device-settings';
 import {
     TIME_MISMATCH_ERROR,
     GO_TO_SETTINGS,
@@ -25,18 +24,18 @@ import {
     TIMEMISMATCH,
     RETRY
 } from '../lib/ContainerConstants'
-import Loader from '../components/Loader'
+let openDateTimeSettings = require('../wrapper/OpenSettings');
 
 
 
 export default class TimeMismatchSetting extends PureComponent {
     goToSettings() {
         if (Platform.OS == 'android') {
-            DeviceSettings.open("ACTION_DATE_SETTINGS)");
+            openDateTimeSettings.dateTimeSettings();
         } else {
             Linking.canOpenURL("App-Prefs:root=General&path=DATE_AND_TIME").then(supported => {
                 if (!supported) {
-                    console.log('Can\'t handle url: ' + url);
+                    console.log('Can\'t handle url: ');
                 } else {
                     return Linking.openURL("App-Prefs:root=General&path=DATE_AND_TIME");
                 }
@@ -44,27 +43,27 @@ export default class TimeMismatchSetting extends PureComponent {
             // Linking.openURL("App-Prefs:root=General&path=DATE_AND_TIME");
         }
     }
-    _renderButtons(){
-        return(
+    _renderButtons() {
+        return (
             <View>
-            <View >
-            <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 45, width: 155 }, styles.alignCenter, styles.justifyCenter, { marginTop: 55 }]}
-                onPress={() => { this.goToSettings() }} >
-                <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight600, styles.fontRegular]}> {GO_TO_SETTINGS} </Text>
-            </Button>
-        </View>
-        <View style={[styles.justifyCenter, styles.alignCenter]}>
-            <Text style={[{ color: '#007AFF', lineHeight: 19, height: 19 }, styles.fontWeight500, styles.fontLg, { marginTop: 36 }]}
-                onPress={() => this.props.retry()} >
-                {RETRY}
-            </Text>
-        </View>
-        </View>
+                <View >
+                    <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 45, width: 155 }, styles.alignCenter, styles.justifyCenter, { marginTop: 55 }]}
+                        onPress={() => { this.goToSettings() }} >
+                        <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight600, styles.fontRegular]}> {GO_TO_SETTINGS} </Text>
+                    </Button>
+                </View>
+                <View style={[styles.justifyCenter, styles.alignCenter]}>
+                    <Text style={[{ color: '#007AFF', lineHeight: 19, height: 19 }, styles.fontWeight500, styles.fontLg, { marginTop: 36 }]}
+                        onPress={() => this.props.retry()} >
+                        {RETRY}
+                    </Text>
+                </View>
+            </View>
         )
     }
     _renderView() {
         return (
-            <View style={[styles.justifyCenter, styles.alignCenter, {marginTop : 40}]}>
+            <View style={[styles.justifyCenter, styles.alignCenter, { marginTop: 40 }]}>
                 <View>
                     <Image
                         style={[style.imageSync]}

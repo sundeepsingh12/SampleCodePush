@@ -3,10 +3,13 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
 import { setState } from '../global/globalActions'
-import { JOB_LISTING_START, JOB_LISTING_END, JOB_STATUS, SET_TABS_LIST, CUSTOM_NAMING, TAB, SHOULD_RELOAD_START, TABS_LOADING } from '../../lib/constants'
-import moment from 'moment'
+import { JOB_LISTING_START, JOB_LISTING_END, JOB_STATUS, SET_TABS_LIST, CUSTOM_NAMING, TAB, SHOULD_RELOAD_START, TABS_LOADING, JOB_ATTRIBUTE, USER, FIELD_ATTRIBUTE, TABLE_FIELD_DATA } from '../../lib/constants'
 import _ from 'lodash'
 import { jobStatusService } from '../../services/classes/JobStatus';
+import { fieldDataService } from '../../services/classes/FieldData'
+import { addServerSmsService } from '../../services/classes/AddServerSms'
+import { jobDataService } from '../../services/classes/JobData'
+import * as realm from '../../repositories/realmdb'
 
 /**
  * This function fetches tabs list and set in state
@@ -62,6 +65,21 @@ export function shouldFetchJobsOrNot(jobTransactionCustomizationList, pageObject
       }
       // Sets SHOULD_RELOAD_START to false so jobs are not fetched unnecessesarily 
       await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(false))
+    } catch (error) {
+      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList: [] }))
+    }
+  }
+}
+
+export function setSmsTemplateList(contact, smsTemplatedata, item) {
+  return async function (dispatch) {
+    try {
+      const user = await keyValueDBService.getValueFromStore(USER);
+      let fieldDataQuery =  'jobTransactionId = ' + item.id
+      let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
+      const fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList, false)
+      const jobDataMap =  jobDataService.getJobData([item])
+      await addServerSmsService.sendFieldMessage(contact, smsTemplatedata, item, user, fieldDataMap[item.id], jobDataMap[item.jobId])
     } catch (error) {
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList: [] }))
     }

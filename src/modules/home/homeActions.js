@@ -344,7 +344,7 @@ export function startFCM() {
           }
           else if (notif.Notification == 'Live Job Notification') {
             keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-            dispatch(performSyncService(true, true))
+            dispatch(performSyncService(true))
           }
           if (notif.local_notification) {
             return
@@ -417,7 +417,7 @@ export function startFCM() {
   }
 }
 
-export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledFromAutoLogout) {
+export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogout) {
   return async function (dispatch) {
     let syncStoreDTO
     try {
