@@ -167,111 +167,111 @@ class CameraFieldAttribute extends PureComponent {
         }
     }
 
-    imageCaptureView(getValidationObject, quality) {
-        let torchView = this.renderTorch()
-        return <StyleProvider style={getTheme(platform)}>
-            <Container>
-                <View style={{ flex: 1 }}>
-                    <RNCamera
-                        ref={(cam) => {
-                            this.camera = cam;
-                        }}
-                        captureQuality={quality}
-                        style={style.preview}
-                        flashMode={this.state.torchOff}
-                        type={this.state.cameraType}>
-                        <SafeAreaView style={[styles.absolute, styles.paddingTop10, { top: 0, left: 0, height: 60, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
-                            <View style={[styles.paddingVertical10, styles.paddingHorizontal15]}>
-                                <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
-                                <TouchableHighlight onPress = {() => {
-                                            this.props.navigation.goBack()
-                                        }}>
-                                    <Icon
-                                        name="md-close"
-                                        style={[styles.fontXxxl, styles.fontWhite]}
-                                       />
-                                        </TouchableHighlight>
-                                    <Right>
-                                        {torchView}
-                                    </Right>
-                                </View>
-                            </View>
-                        </SafeAreaView>
-                    </RNCamera>
-                </View>
-                <SafeAreaView style={[style.footer]}>
-                    <View style={{ height: 100, flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
-                            {(getValidationObject && getValidationObject.imageUploadFromDevice) ? <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} /> : null}
-                        </View>
-                        <View style={[styles.flexBasis33_3, styles.alignCenter, styles.marginTop10]}>
-                            <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
-                                <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }}>
-                                    <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={() => this.takePicture()} />
-                                </View>
-                            </View>
-                        </View>
-                        <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
-                            {(getValidationObject && getValidationObject.isFrontCameraEnabled) ? <MaterialIcons name={'switch-camera'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.toggleCameraType()} /> : null}
-                        </View>
-                    </View>
-                </SafeAreaView>
-            </Container>
-        </StyleProvider>
-    }
+    // imageCaptureView(getValidationObject, quality) {
+    //     let torchView = this.renderTorch()
+    //     return <StyleProvider style={getTheme(platform)}>
+    //         <Container>
+    //             <View style={{ flex: 1 }}>
+    //                 <RNCamera
+    //                     ref={(cam) => {
+    //                         this.camera = cam;
+    //                     }}
+    //                     captureQuality={quality}
+    //                     style={style.preview}
+    //                     flashMode={this.state.torchOff}
+    //                     type={this.state.cameraType}>
+    //                     <SafeAreaView style={[styles.absolute, styles.paddingTop10, { top: 0, left: 0, height: 60, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
+    //                         <View style={[styles.paddingVertical10, styles.paddingHorizontal15]}>
+    //                             <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
+    //                             <TouchableHighlight onPress = {() => {
+    //                                         this.props.navigation.goBack()
+    //                                     }}>
+    //                                 <Icon
+    //                                     name="md-close"
+    //                                     style={[styles.fontXxxl, styles.fontWhite]}
+    //                                    />
+    //                                     </TouchableHighlight>
+    //                                 <Right>
+    //                                     {torchView}
+    //                                 </Right>
+    //                             </View>
+    //                         </View>
+    //                     </SafeAreaView>
+    //                 </RNCamera>
+    //             </View>
+    //             <SafeAreaView style={[style.footer]}>
+    //                 <View style={{ height: 100, flexDirection: 'row', alignItems: 'center' }}>
+    //                     <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
+    //                         {(getValidationObject && getValidationObject.imageUploadFromDevice) ? <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} /> : null}
+    //                     </View>
+    //                     <View style={[styles.flexBasis33_3, styles.alignCenter, styles.marginTop10]}>
+    //                         <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
+    //                             <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }}>
+    //                                 <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={() => this.takePicture()} />
+    //                             </View>
+    //                         </View>
+    //                     </View>
+    //                     <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
+    //                         {(getValidationObject && getValidationObject.isFrontCameraEnabled) ? <MaterialIcons name={'switch-camera'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.toggleCameraType()} /> : null}
+    //                     </View>
+    //                 </View>
+    //             </SafeAreaView>
+    //         </Container>
+    //     </StyleProvider>
+    // }
 
-    showImageView(getValidationObject) {
-        return (
-            <StyleProvider style={getTheme(platform)}>
-                <Container>
-                    <View style={{ flex: 1 }}>
-                        <Image
-                            resizeMethod={'resize'}
-                            source={{
-                                isStatic: true,
-                                uri: this.state.imageData.uri,
-                            }}
-                            style={[styles.flex1]}
-                        />
-                        <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
-                            <View style={[styles.paddingLeft15, styles.paddingRight15]}>
-                            <TouchableHighlight onPress = {() => {
-                                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA,'')
-                                    }}>
-                                <Icon
-                                    name="md-close"
-                                    style={[styles.fontXxxl, styles.fontWhite]}
-                                    />
-                                    </TouchableHighlight>
-                            </View>
-                        </SafeAreaView>
-                    </View>
-                    <SafeAreaView style={[styles.width100, styles.absolute, styles.row, styles.heightAuto, styles.justifyCenter, styles.alignCenter, styles.padding10, { bottom: 0 }]}>
-                        {(getValidationObject && getValidationObject.cropImageValidation && Platform.OS==='android') ?
-                            <View style={[styles.justifyCenter, styles.alignCenter, { marginRight: 46 }]}>
-                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.state.imageData.uri)}>
-                                    <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
-                                </TouchableOpacity>
-                            </View>
-                            : null}
-                        <View>
-                            <View style={[styles.justifyCenter, styles.alignCenter]}>
-                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
-                                    if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
-                                        this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData.data, this.props.navigation.state.params.currentElement)
-                                    } else {
-                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
-                                    }
-                                }}>
-                                    <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </SafeAreaView>
-                </Container>
-            </StyleProvider>
-        )
-    }
+    // showImageView(getValidationObject) {
+    //     return (
+    //         <StyleProvider style={getTheme(platform)}>
+    //             <Container>
+    //                 <View style={{ flex: 1 }}>
+    //                     <Image
+    //                         resizeMethod={'resize'}
+    //                         source={{
+    //                             isStatic: true,
+    //                             uri: this.state.imageData.uri,
+    //                         }}
+    //                         style={[styles.flex1]}
+    //                     />
+    //                     <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
+    //                         <View style={[styles.paddingLeft15, styles.paddingRight15]}>
+    //                         <TouchableHighlight onPress = {() => {
+    //                                     this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA,'')
+    //                                 }}>
+    //                             <Icon
+    //                                 name="md-close"
+    //                                 style={[styles.fontXxxl, styles.fontWhite]}
+    //                                 />
+    //                                 </TouchableHighlight>
+    //                         </View>
+    //                     </SafeAreaView>
+    //                 </View>
+    //                 <SafeAreaView style={[styles.width100, styles.absolute, styles.row, styles.heightAuto, styles.justifyCenter, styles.alignCenter, styles.padding10, { bottom: 0 }]}>
+    //                     {(getValidationObject && getValidationObject.cropImageValidation && Platform.OS==='android') ?
+    //                         <View style={[styles.justifyCenter, styles.alignCenter, { marginRight: 46 }]}>
+    //                             <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.state.imageData.uri)}>
+    //                                 <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
+    //                             </TouchableOpacity>
+    //                         </View>
+    //                         : null}
+    //                     <View>
+    //                         <View style={[styles.justifyCenter, styles.alignCenter]}>
+    //                             <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
+    //                                 if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
+    //                                     this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData.data, this.props.navigation.state.params.currentElement)
+    //                                 } else {
+    //                                     this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
+    //                                 }
+    //                             }}>
+    //                                 <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
+    //                             </TouchableOpacity>
+    //                         </View>
+    //                     </View>
+    //                 </SafeAreaView>
+    //             </Container>
+    //         </StyleProvider>
+    //     )
+    // }
 
     showCameraOrImage() {
         if( this.state.imageData == null){
@@ -297,16 +297,85 @@ class CameraFieldAttribute extends PureComponent {
             );
         }                
     }
+    showSwitchCamera(getValidationObject) {
+        if(this.state.imageData == null){
+            return (
+                <View style={[ styles.alignCenter, styles.justifyCenter]}>
+                    {
+                            (getValidationObject && getValidationObject.isFrontCameraEnabled && this.state.imageData == null) 
+                        ? 
+                            <MaterialIcons 
+                                name={'switch-camera'} 
+                                style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} 
+                                onPress={() => this.toggleCameraType()} 
+                            /> 
+                        : 
+                            null
+                    }
+                </View>
+            );
+        }
+        else {
+            return null;
+        }
+    }
+    showGalleryPicker(getValidationObject) {
+        if(this.state.imageData == null){
+            return(
+                <View style={[ styles.alignCenter, styles.justifyCenter]}>
+                    {
+                            (getValidationObject && getValidationObject.imageUploadFromDevice && this.state.imageData == null) 
+                        ? 
+                            <MaterialIcons 
+                                name={'photo'} 
+                                style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} 
+                                onPress={() => this.getImageGallery()} 
+                            />
+                        : 
+                            null
+                    }
+                </View>
+            );
+        } else {
+            return null;
+        }
+    }
+    showCenterButton() {
+        if (this.state.imageData == null) {
+            return(
+                <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
+                    <TouchableOpacity 
+                        style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} 
+                        onPress={this.takePicture} 
+                    />
+                </View>
+            );
+        } else {
+            return(
+                <TouchableOpacity 
+                    style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} 
+                    onPress={this.submitImage}
+                >
+                    <Icon 
+                        name="md-checkmark"  
+                        style={[styles.fontWhite, styles.fontXxxl]} 
+                    /> 
+                </TouchableOpacity>
+            );
+        }
+    }
     render() {
         let item = this.props.navigation.state.params.currentElement
         const getValidationObject = this.props.validation
+        
         if (this.props.cameraLoader)
             return <Loader />
+
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <View style={{ flex: 1 }}>
-                    {this.showCameraOrImage()}
+                        {this.showCameraOrImage()}
                         <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%'},styles.paddingLeft15, styles.paddingRight15, styles.row, styles.justifySpaceBetween, styles.alignCenter ]}>
                             <TouchableHighlight 
                                 onPress = {() => {
@@ -323,77 +392,51 @@ class CameraFieldAttribute extends PureComponent {
                                     style={[styles.fontXxxl, styles.fontWhite]}
                                 />
                             </TouchableHighlight>
-                            {this.state.imageData == null && <Right>
-                                {this.renderTorch()}
-                            </Right>
+                            {
+                                this.state.imageData == null 
+                                && 
+                                <Right>
+                                    {this.renderTorch()}
+                                </Right>
                             }
                         </SafeAreaView>
                     </View>
-                    <SafeAreaView style={[style.footer]}>
-
-                        {(getValidationObject && getValidationObject.cropImageValidation && Platform.OS==='android' && this.state.imageData != null) ?
-                            <View style={[styles.justifyCenter, styles.alignCenter]}>
-                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.state.imageData.uri, this.setImage)}>
-                                    <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
-                                </TouchableOpacity>
-                            </View>
-                            : null}
-
-                            {
-                                this.state.imageData == null 
+                    <SafeAreaView style={[style.footer]} >
+                        {
+                                (getValidationObject && getValidationObject.cropImageValidation && Platform.OS==='android' && this.state.imageData != null) 
                             ?
-                                <View style={[ styles.alignCenter, styles.justifyCenter]}>
-                                    {(getValidationObject && getValidationObject.imageUploadFromDevice && this.state.imageData == null) ? <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} /> : null}
+                                <View style={[styles.justifyCenter, styles.alignCenter]}>
+                                    <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.state.imageData.uri, this.setImage)}>
+                                        <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
+                                    </TouchableOpacity>
                                 </View>
                             : 
                                 null
-                            }
-                        
-                            <View style={[ styles.alignCenter, styles.justifyCenter]}>
-                                
-                                   { 
-                                    this.state.imageData == null
-                                    ? (  
-                                        <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
-                                            <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={this.takePicture} />
-                                        </View>
-                                    ): (
-                                    <TouchableOpacity 
-                                        style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} 
-                                        onPress={this.submitImage}
-                                        >
-                                        <Icon name="md-checkmark"  style={[styles.fontWhite, styles.fontXxxl]} /> 
-                                     </TouchableOpacity>
-                                     )
-                                   }
-                            
-                            </View>
-                            {this.state.imageData == null ?<View style={[ styles.alignCenter, styles.justifyCenter]}>
-                                {(getValidationObject && getValidationObject.isFrontCameraEnabled && this.state.imageData == null) ? <MaterialIcons name={'switch-camera'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.toggleCameraType()} /> : null}
-                            </View>
-                            : null
-                            }
+                        }
+                        {this.showGalleryPicker(getValidationObject)}
+                        <View style={[ styles.alignCenter, styles.justifyCenter]}>
+                        { this.showCenterButton()}
+                        </View>
+                        {this.showSwitchCamera(getValidationObject)}
                     </SafeAreaView>
                 </Container>
             </StyleProvider>
         )
     }
 
-    takePicture =  () => {
+    takePicture = async () => {
         if (this.camera) {
             try {
                 let options = { quality: 0.2, base64: true, fixOrientation: true, skipProcessing: true };
                 if (Platform.OS === "ios") {
                     options.orientation = 'portrait'
                 }
-                this.camera.takePictureAsync(options).then((capturedImg) => {
-                    const { uri } = capturedImg;
+                const { uri } = await this.camera.takePictureAsync(options);
                     this.setImage(uri)
-                })
-                //this.camera.pausePreview();
+                
             } catch (error) {
-                this.props.setState(SET_CAMERA_LOADER, false)
-                this.props.showToastAndAddUserExceptionLog(316, error.message, 'danger', 1)
+                this.props.actions.setState(SET_CAMERA_LOADER, false)
+                this.props.actions.showToastAndAddUserExceptionLog(316, error.message, 'danger', 1)
             }
         }
     };
