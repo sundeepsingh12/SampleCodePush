@@ -453,7 +453,7 @@ export function checkForUnsyncTransactionAndLogout(calledFromAutoLogout) {
   return async function (dispatch) {
     try {
       dispatch(setState(IS_LOGGING_OUT, true))
-      let message = await dispatch(performSyncService(true, null, null, calledFromAutoLogout))
+      let message = await dispatch(performSyncService(true, null, calledFromAutoLogout))
       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       let isUnsyncTransactionsPresent = logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
       if (isUnsyncTransactionsPresent && !calledFromAutoLogout) {
