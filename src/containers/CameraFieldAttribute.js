@@ -40,6 +40,7 @@ class CameraFieldAttribute extends PureComponent {
             torchOff: '',
             cameraType: 'back',
             imageData: null,
+            reduxData: null,
         }
     }
 
@@ -48,21 +49,19 @@ class CameraFieldAttribute extends PureComponent {
     }
 
     static getDerivedStateFromProps(props, state){
-        if(_.isEmpty(props.imageData))
+        const imageData = props.imageData;
+        if(_.isEmpty(imageData)){
             return null;
-        // const { data } = props.imageData;
-        // if(data==null)
-        // return null;
-        console.logs(props)
-        console.logs(state)
-        // if(){
-        //     return {...state , imageData: {...props.imageData}};
-
-        // }
-        if(state.imageData === null ||( props.imageData.data != state.imageData.data && props.imageData.uri != state.imageData.uri){
-            return {...state , imageData: {...props.imageData}};
         }
-        return null;
+        else if(state.reduxData == null) {
+            return {...state, reduxData:{...imageData}}
+        }
+        if(imageData.data == state.reduxData.data) { //Assuming base64 string changes on  change in image
+            return null;
+        }
+        // console.logs(props)
+        // console.logs(state)
+        return {...state , reduxData: {...imageData}, imageData:{... imageData}};
     }
     componentDidMount() {
         this.props.actions.setCameraInitialView(this.props.navigation.state.params.currentElement)
