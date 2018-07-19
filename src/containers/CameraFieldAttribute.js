@@ -298,11 +298,12 @@ class CameraFieldAttribute extends PureComponent {
         }                
     }
     showSwitchCamera(getValidationObject) {
+        console.logs('coming herer',getValidationObject)
         if(this.state.imageData == null){
             return (
                 <View style={[ styles.alignCenter, styles.justifyCenter]}>
                     {
-                            (getValidationObject && getValidationObject.isFrontCameraEnabled && this.state.imageData == null) 
+                            (getValidationObject && getValidationObject.isFrontCameraEnabled) 
                         ? 
                             <MaterialIcons 
                                 name={'switch-camera'} 
