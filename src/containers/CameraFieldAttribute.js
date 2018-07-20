@@ -51,12 +51,14 @@ class CameraFieldAttribute extends PureComponent {
     static getDerivedStateFromProps(props, state){
         const imageData = props.imageData;
         let newState = null;
+        //copy newprops
         if(_.isEmpty(imageData)) {
             newState = {...state, reduxData: imageData};
         } else {
             newState = {...state, reduxData: {...imageData}};
         }
         
+        //Checks to change local state
         if(_.isEmpty(imageData) ){
             if(!_.isEmpty(state.reduxData)){
                 return {...newState, imageData: null};
@@ -149,6 +151,7 @@ class CameraFieldAttribute extends PureComponent {
             this.setState({imageData: { uri }})
         }
     }
+
     onCrossPress = () => {
         if(this.state.imageData == null){
             this.props.navigation.goBack()
@@ -190,6 +193,7 @@ class CameraFieldAttribute extends PureComponent {
             );
         }                
     }
+
     showSwitchCamera(getValidationObject) {
         if(this.state.imageData == null){
             return (
@@ -201,7 +205,7 @@ class CameraFieldAttribute extends PureComponent {
                         onPress={() => this.toggleCameraType()} 
                     /> 
                 :
-                    <View style={[ styles.justifySpaceBetween, styles.alignCenter]}/>
+                    <View style={{width: 28}}/>
 
             );
         }
@@ -209,6 +213,7 @@ class CameraFieldAttribute extends PureComponent {
             return null;
         }
     }
+
     showGalleryPicker(getValidationObject) {
         if(this.state.imageData == null){
             return(
@@ -220,12 +225,13 @@ class CameraFieldAttribute extends PureComponent {
                         onPress={() => this.getImageGallery()} 
                     />
                 : 
-                    <View style={[ styles.justifySpaceBetween, styles.alignCenter]}/>
+                    <View style={{width: 28}}/>
             );
         } else {
             return null;
         }
     }
+
     showCenterButton() {
         if (this.state.imageData == null) {
             return(
@@ -250,13 +256,9 @@ class CameraFieldAttribute extends PureComponent {
             );
         }
     }
+
     render() {
-        //let item = this.props.navigation.state.params.currentElement
         const getValidationObject =  this.props.validation
-        // console.logs(getValidationObject)
-        // getValidationObject.isFrontCameraEnabled = false
-        // getValidationObject.imageUploadFromDevice = false
-        // getValidationObject.cropImageValidation = true
         
         if (this.props.cameraLoader)
             return <Loader />
