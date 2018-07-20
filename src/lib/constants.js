@@ -253,7 +253,7 @@ module.exports = keyMirror({
     TABLE_DRAFT: null,
     SEND_EMAIL_OR_SMS: null,
     TABLE_MESSAGE_INTERACTION: null,
-
+    TABLE_NEGATIVE_COMMUNICATION_LOG: null,
     //Home Actions
     IS_LAST_PAGE: null,
 

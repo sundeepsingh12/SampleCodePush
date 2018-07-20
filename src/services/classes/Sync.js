@@ -47,9 +47,9 @@ class Sync {
     if (!token) {
       throw new Error('Token Missing')
     }
-    let { lastCallTime, lastSmsTime, userSummary } = await syncZipService.createZip(syncStoreDTO)
+    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds } = await syncZipService.createZip(syncStoreDTO)
     const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO)
-    await communicationLogsService.updateLastCallSmsTime(lastCallTime, lastSmsTime)
+    await communicationLogsService.updateLastCallSmsTimeAndNegativeCommunicationLogsDb(lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
     return responseBody
   }
@@ -255,7 +255,7 @@ class Sync {
 
   }
 
- 
+
   async saveDataFromServerInDB(contentQuery, isLiveJob) {
     const jobIds = contentQuery.job.map(jobObject => jobObject.id)
     const existingJobDatas = {
@@ -363,7 +363,7 @@ class Sync {
 
   async insertOrUpdateDataInDb(contentQuery) {
     const jobIds = contentQuery.job.map(jobObject => jobObject.id)
-    let { jobTransactionsIds, newJobTransactionsIds } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions)
+    let { jobTransactionsIds, newJobTransactionsIds, negativeJobTransactions } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions)
     let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
     const jobDatas = {
       tableName: TABLE_JOB_DATA,
@@ -393,6 +393,7 @@ class Sync {
     } else {
       realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs)
     }
+    communicationLogsService.updateNegativeCommunicationLogs(negativeJobTransactions)
     //check update to _.empty
     contentQuery.jobTransactions = (jobTransactionsIds.length > 0) ? this.getTransactionForUpdateQuery(contentQuery.jobTransactions, jobTransactionsIds) : []
     contentQuery.job = (jobIds.length > 0) ? this.getJobForUpdateQuery(contentQuery.job, jobIds) : []
@@ -663,7 +664,7 @@ class Sync {
       show_in_foreground: true
     });
   }
-  
+
   async calculateDifference() {
     const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
     const differenceInDays = moment().diff(lastSyncTime.value, 'days')
@@ -684,16 +685,18 @@ class Sync {
   }
 
   getJobTransactionAndNewJobTransactionIds(jobTransactionList) {
-    let jobTransactionsIds = [], newJobTransactionsIds = []
+    let jobTransactionsIds = [], newJobTransactionsIds = [], negativeJobTransactions = []
     for (let jobTransaction in jobTransactionList) {
       jobTransactionsIds.push(jobTransactionList[jobTransaction].id)
       if (jobTransactionList[jobTransaction].negativeJobTransactionId < 0) {
         newJobTransactionsIds.push(jobTransactionList[jobTransaction].negativeJobTransactionId)
+        negativeJobTransactions.push(jobTransactionList[jobTransaction])
       }
     }
     return {
       jobTransactionsIds,
-      newJobTransactionsIds
+      newJobTransactionsIds,
+      negativeJobTransactions
     }
   }
 

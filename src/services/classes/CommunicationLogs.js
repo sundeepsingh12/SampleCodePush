@@ -4,7 +4,8 @@ import {
     TABLE_JOB_TRANSACTION,
     CUSTOMER_CARE,
     LAST_CALL_AND_SMS_TIME,
-    LONG_CODE_SIM_VERIFICATION
+    LONG_CODE_SIM_VERIFICATION,
+    TABLE_NEGATIVE_COMMUNICATION_LOG
 } from '../../lib/constants'
 import {
     CONTACT_NUMBER
@@ -31,6 +32,7 @@ class CommunicationLogs {
 
 
     async getCallLogs(syncStoreDTO, userSummary) {
+        let lastCallTime, lastSmsTime
         let lastSyncWithServerInMillis = moment(syncStoreDTO.lastSyncWithServer).format('x')
         let lastCallSmsTime = await keyValueDBService.getValueFromStore(LAST_CALL_AND_SMS_TIME)
         let lastCallTimeFromStore, lastSmsTimeFromStore
@@ -47,7 +49,6 @@ class CommunicationLogs {
         if (_.isEmpty(callLogsArray) && _.isEmpty(smsLogsArray)) {
             return { communicationLogs: [], lastCallTime: null, lastSmsTime: null }
         }
-        let lastCallTime, lastSmsTime
         if (_.size(callLogsArray) > 0) {
             lastCallTime = callLogsArray[0].callDate
         }
@@ -61,8 +62,8 @@ class CommunicationLogs {
         let longCodeVerification = await keyValueDBService.getValueFromStore(LONG_CODE_SIM_VERIFICATION)
         let jobMasterIdToJobMasterMap = _.mapKeys(syncStoreDTO.jobMasterList, 'id')
         let statusIdToStatusMap = _.mapKeys(syncStoreDTO.statusList, 'id')
-        let communicationLogs = await this.setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary, longCodeVerification)
-        return { communicationLogs, lastCallTime, lastSmsTime }
+        let { communicationLogs, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds } = await this.setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary, longCodeVerification)
+        return { communicationLogs, lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds }
     }
 
     getJobAndFieldDataQuery(jobAttributesList, fieldAttributesList) {
@@ -75,9 +76,9 @@ class CommunicationLogs {
 
 
     async setCommunicationLogsDto(callLogsArray, smsLogsArray, jobDataList, fieldDataList, syncStoreDTO, customerCareList, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary, longCodeVerification) {
-        let communicationLogs = [], contactToCallLogMap = {}, jobIdToContactMap = {}, jobTransactionToContactMap = {}
+        let communicationLogs = [], contactToCallLogMap = {}, jobIdToContactMap = {}, jobTransactionToContactMap = {}, negativeCommunicationLogs = [], previousNegativeCommunicationLogsTransactionIds = []
         let callAndSmsLogs = callLogsArray.concat(smsLogsArray);
-
+        
         for (let callLog of callAndSmsLogs) {
             let communicationLog = {}
             this.setCommunicationLogDefaultValues(communicationLog, syncStoreDTO, callLog)
@@ -102,8 +103,13 @@ class CommunicationLogs {
             }
         }
 
+        let previousNegativeCommunicationLogs = this.getPreviousNegativeCommunicationLogs(previousNegativeCommunicationLogsTransactionIds)
+        if (previousNegativeCommunicationLogs.length > 0) {
+            communicationLogs = communicationLogs.concat(previousNegativeCommunicationLogs)
+        }
+
         if (_.isEmpty(jobIdToContactMap) && _.isEmpty(jobTransactionToContactMap)) {
-            return communicationLogs
+            return { communicationLogs, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds }
         }
 
         let jobTransactionArray = this.getJobTransactionFromDb(jobIdToContactMap, jobTransactionToContactMap)
@@ -111,22 +117,33 @@ class CommunicationLogs {
             let jobTransaction = { ...jobTransactionArray[index] }
 
             if (jobIdToContactMap[jobTransaction.jobId]) {
-                let callLogs = this.getOfficialCommunicationLogs(jobIdToContactMap[jobTransaction.jobId].contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary)
+                let callLogs = this.getOfficialCommunicationLogs(jobIdToContactMap[jobTransaction.jobId].contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap)
                 communicationLogs = communicationLogs.concat(callLogs)
-                //jobTransaction.trackCallCount += jobIdToContactMap[jobTransaction.jobId].callCount
-                //jobTransaction.trackCallDuration += jobIdToContactMap[jobTransaction.jobId].callDuration
             }
 
             if (jobTransactionToContactMap[jobTransaction.id]) {
-                let callLogs = this.getOfficialCommunicationLogs(jobTransactionToContactMap[jobTransaction.id].contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary)
-                communicationLogs = communicationLogs.concat(callLogs)
-                //jobTransaction.trackCallCount += jobTransactionToContactMap[jobTransaction.id].callCount
-                //jobTransaction.trackCallDuration += jobTransactionToContactMap[jobTransaction.id].callDuration
+                let callLogs = this.getOfficialCommunicationLogs(jobTransactionToContactMap[jobTransaction.id].contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap)
+                if (jobTransaction.id < 0) {
+                    negativeCommunicationLogs = negativeCommunicationLogs.concat(callLogs)
+                } else {
+                    communicationLogs = communicationLogs.concat(callLogs)
+                }
             }
         }
-        return communicationLogs
+        return { communicationLogs, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds }
     }
-
+    getPreviousNegativeCommunicationLogs(previousNegativeCommunicationLogsTransactionIds) {
+        let previousNegativeCommunicationLogs = []
+        let query = 'jobTransactionId > 0'
+        let negativeCommunicationLogsFromDb = realm.getRecordListOnQuery(TABLE_NEGATIVE_COMMUNICATION_LOG, query)
+        for (let index in negativeCommunicationLogsFromDb) {
+            let negativeCommunicationLog = { ...negativeCommunicationLogsFromDb[index] }
+            negativeCommunicationLog = _.omit(negativeCommunicationLog, ['uniqueId'])
+            previousNegativeCommunicationLogs.push(negativeCommunicationLog)
+            previousNegativeCommunicationLogsTransactionIds.push(negativeCommunicationLog.jobTransactionId)
+        }
+        return previousNegativeCommunicationLogs
+    }
     setCommunicationLogDefaultValues(communicationLog, syncStoreDTO, callLog) {
         communicationLog.id = 0
         communicationLog.contact = callLog.phoneNumber
@@ -143,7 +160,7 @@ class CommunicationLogs {
         communicationLog.transactionType = callLog.callType
     }
 
-    getOfficialCommunicationLogs(contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap, userSummary) {
+    getOfficialCommunicationLogs(contactsList, jobTransaction, contactToCallLogMap, jobMasterIdToJobMasterMap, statusIdToStatusMap) {
         let contactNumbersList = _.keys(contactsList), communicationLogs = []
         for (let contact of contactNumbersList) {
             if (contactToCallLogMap[contact]) {
@@ -212,7 +229,7 @@ class CommunicationLogs {
         }
     }
 
-    async updateLastCallSmsTime(lastCallTime, lastSmsTime) {
+    async updateLastCallSmsTimeAndNegativeCommunicationLogsDb(lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds) {
         if (!lastCallTime && !lastSmsTime) {
             return
         }
@@ -232,7 +249,19 @@ class CommunicationLogs {
             }
             await keyValueDBService.validateAndSaveData(LAST_CALL_AND_SMS_TIME, lastCallSmsTimeObject)
         }
-
+        if (!negativeCommunicationLogs || !previousNegativeCommunicationLogsTransactionIds) {
+            return
+        }
+        if (negativeCommunicationLogs.length > 0) {
+            let lastUniqueId = realm.getRecordListOnQuery(TABLE_NEGATIVE_COMMUNICATION_LOG).length
+            for (let negativeCommunicationLog of negativeCommunicationLogs) {
+                negativeCommunicationLog.uniqueId = ++lastUniqueId
+            }
+            realm.saveList(TABLE_NEGATIVE_COMMUNICATION_LOG, negativeCommunicationLogs)
+        }
+        if (previousNegativeCommunicationLogsTransactionIds.length > 0) {
+            realm.deleteRecordList(TABLE_NEGATIVE_COMMUNICATION_LOG, previousNegativeCommunicationLogsTransactionIds, 'jobTransactionId')
+        }
     }
 
     getJobTransactionFromDb(jobIdToContactMap, jobTransactionToContactMap) {
@@ -240,7 +269,10 @@ class CommunicationLogs {
         let jobTransactionIdsList = _.keys(jobTransactionToContactMap)
         let transactionQuery = jobIdsList.map(job => 'jobId = ' + job).join(' OR ')
         if (jobTransactionIdsList.length > 0) {
-            transactionQuery += ' OR ' + jobTransactionIdsList.map(jobTransaction => 'id = ' + jobTransaction).join(' OR ')
+            if (transactionQuery != '') {
+                transactionQuery += ' OR '
+            }
+            transactionQuery += jobTransactionIdsList.map(jobTransaction => 'id = ' + jobTransaction).join(' OR ')
         }
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, transactionQuery)
         return jobTransactionList
@@ -272,9 +304,9 @@ class CommunicationLogs {
     }
 
     async getTrackCallCount(callAndSmsLogs, jobDataList, fieldDataList, jobIdToJobTransactionMap) {
-    
+
         let jobTransactionIdToCallCountMap = {}
-        if(!callAndSmsLogs || !jobDataList){
+        if (!callAndSmsLogs) {
             return jobTransactionIdToCallCountMap
         }
         for (let callLog of callAndSmsLogs) {
@@ -357,6 +389,30 @@ class CommunicationLogs {
                     break
             }
         }
+    }
+
+    updateNegativeCommunicationLogs(negativeJobTransactions) {
+        if (!negativeJobTransactions || negativeJobTransactions.length == 0) {
+            return
+        }
+        let negativeJobTransactionIdToJobTransactionMap = _.mapKeys(negativeJobTransactions, 'negativeJobTransactionId')
+        let updateCommunicationLogs = []
+        let negativeCallLogsQuery = negativeJobTransactions.map(negativeJobTransaction => 'jobTransactionId = ' + negativeJobTransaction.negativeJobTransactionId).join(' OR ')
+        let negativeCommunicationLogs = realm.getRecordListOnQuery(TABLE_NEGATIVE_COMMUNICATION_LOG, negativeCallLogsQuery)
+        if (!negativeCommunicationLogs || negativeCommunicationLogs.length == 0) {
+            return
+        }
+        //if (negativeCommunicationLogs.length > 0) {
+        for (let index in negativeCommunicationLogs) {
+            let negativeCommunicationLog = { ...negativeCommunicationLogs[index] }
+            let communicationLog = JSON.parse(JSON.stringify(negativeCommunicationLog))
+            communicationLog.jobTransactionId = negativeJobTransactionIdToJobTransactionMap[negativeCommunicationLog.jobTransactionId].id
+            communicationLog.referenceNumber = negativeJobTransactionIdToJobTransactionMap[negativeCommunicationLog.jobTransactionId].referenceNumber
+            communicationLog.runsheetNumber = negativeJobTransactionIdToJobTransactionMap[negativeCommunicationLog.jobTransactionId].runsheetNo
+            updateCommunicationLogs.push(communicationLog)
+        }
+        realm.saveList(TABLE_NEGATIVE_COMMUNICATION_LOG, updateCommunicationLogs)
+        //}
     }
 }
 
