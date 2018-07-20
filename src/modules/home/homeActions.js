@@ -181,7 +181,7 @@ export function navigateToPage(pageObject, navigationProps) {
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
-          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING, navigationProps))
+          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_CUSTOM_WEB_PAGE:
@@ -202,7 +202,7 @@ export function navigateToPage(pageObject, navigationProps) {
         case PAGE_MSWIPE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_NEW_JOB: {
-          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING, navigationProps))
+          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
@@ -297,8 +297,7 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) 
             navigate(BulkListing, { pageObject })
           }
         } else {
-          dispatch(setState(syncLoader, false))
-          Alert.alert( ERROR,UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,[{ text: OK}])
+          dispatch(setState(syncLoader, 'error'))
         }
       }
       else {

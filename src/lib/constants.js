@@ -115,6 +115,7 @@ module.exports = keyMirror({
     TABS_LOADING: null,
     SET_SELECTED_DATE: null,
     LOADER_FOR_SYNCING: null,
+    TASKLIST_LOADER_FOR_SYNC: null,
 
     //Pages
     PAGES_LOADING: null,
@@ -134,7 +135,6 @@ module.exports = keyMirror({
     //Listing Actions
     JOB_LISTING_START: null,
     JOB_LISTING_END: null,
-    TASKLIST_LOADER_FOR_SYNC: null,
 
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
