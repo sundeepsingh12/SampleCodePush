@@ -40,7 +40,7 @@ class JobData {
      *               }
      * }
      */
-    getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap, jobAttributeStatusMap, jobIdJobTransactionStatusIdMap) {
+    getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap, jobAttributeStatusMap = {}, jobIdJobTransactionStatusIdMap = {}) {
         let jobDataMap = {}, contactMap = {}, addressMap = {}, jobExpiryMap = {}
         for (let index in jobDataList) {
             const { jobAttributeMasterId, jobId, parentId, value } = jobDataList[index];

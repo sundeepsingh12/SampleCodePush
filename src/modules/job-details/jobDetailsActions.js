@@ -12,7 +12,7 @@ import { MosambeeWalletPaymentServices } from '../../services/payment/MosambeeWa
 import {mapKeys} from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions'
 import { paymentService } from '../../services/payment/Payment'
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,OK,TRANSACTION_SUCCESSFUL } from '../../lib/ContainerConstants'
+import { OK,TRANSACTION_SUCCESSFUL, ERROR } from '../../lib/ContainerConstants'
 import { saveJobTransaction } from '../form-layout/formLayoutActions'
 import { Toast } from 'native-base'
 import { jobDataService } from '../../services/classes/JobData'
@@ -34,8 +34,8 @@ import {
     RESET_STATE_FOR_JOBDETAIL,
     SET_LANDING_TAB,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
-    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT,
-    SET_CHECK_TRANSACTION_STATUS
+    SET_CHECK_TRANSACTION_STATUS,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService';
 
@@ -218,8 +218,7 @@ export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutDa
                     dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))
                     if (!_.isEmpty(FormLayoutData)) navigate('FormLayout', FormLayoutData)
                 } else {
-                    dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT, false))
-                    alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
+                    dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT, 'error'))
                 }
             }
             else if (!_.isEmpty(FormLayoutData)) {

@@ -3,7 +3,6 @@ package com.fareyereact;
 import android.app.Application;
 import com.emekalites.react.compress.image.ImageCompressPackage;
 import com.facebook.react.ReactApplication;
-import com.rjblopes.opensettings.OpenSettingsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.cnull.apkinstaller.ApkInstallerPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
@@ -32,6 +31,8 @@ import java.util.Arrays;
 import java.util.List;
 import android.support.multidex.MultiDexApplication;
 import com.callgetter.CallLogsPackage;
+import com.opendatetimesettings.OpenDateTimeSettingsPackage;
+
 public class MainApplication extends MultiDexApplication implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
@@ -50,7 +51,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-          new OpenSettingsPackage(),
           new ImagePickerPackage(),
           new PickerPackage(),
           new ImageCompressPackage(), 
@@ -72,7 +72,8 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
           new BackgroundTimerPackage() ,
           new RNIMEIPackage(),
           new SendSMSPackage(),
-          new CallLogsPackage()
+          new CallLogsPackage(),
+          new OpenDateTimeSettingsPackage()
       );
     }
 
