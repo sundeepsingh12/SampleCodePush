@@ -32,7 +32,8 @@ import {
     RESET_STATE_FOR_JOBDETAIL,
     SET_LANDING_TAB,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
-    SET_CHECK_TRANSACTION_STATUS
+    SET_CHECK_TRANSACTION_STATUS,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService';
 
@@ -214,7 +215,7 @@ export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutDa
                     dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))
                     if (!_.isEmpty(FormLayoutData)) navigate('FormLayout', FormLayoutData)
                 } else {
-                    dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, 'error'))
+                    dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT, 'error'))
                 }
             }
             else if (!_.isEmpty(FormLayoutData)) {

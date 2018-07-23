@@ -13,7 +13,8 @@ import {
     SET_JOBDETAILS_DRAFT_INFO,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
     SET_CHECK_TRANSACTION_STATUS,
-    RESET_CHECK_TRANSACTION_AND_DRAFT
+    RESET_CHECK_TRANSACTION_AND_DRAFT,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT
 } from '../../lib/constants'
 
 
@@ -66,6 +67,10 @@ export default function jobDetailsReducer(state = initialState, action) {
 
         case SET_JOBDETAILS_DRAFT_INFO:
             return state.set('draftStatusInfo', action.payload)
+
+        case SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT:
+            return state.set('draftStatusInfo', null)
+                .set('syncLoading', action.payload)
 
     }
     return state
