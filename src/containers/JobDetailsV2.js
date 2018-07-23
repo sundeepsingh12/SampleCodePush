@@ -46,7 +46,7 @@ import {
   SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
   SET_CHECK_TRANSACTION_STATUS,
   JOB_DETAILS_FETCHING_START,
-  RESET_CHECK_TRANSACTION_AND_DRAFT
+  RESET_CHECK_TRANSACTION_AND_DRAFT,
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -63,6 +63,7 @@ import SyncLoader from '../components/SyncLoader'
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { navigate } from '../modules/navigators/NavigationService';
+import MessageButtonItem from '../components/MessageButtonItem'
 
 function mapStateToProps(state) {
   return {
@@ -242,54 +243,6 @@ class JobDetailsV2 extends PureComponent {
     }
   }
 
-  chatButtonPressed = () => {
-    if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
-      return
-    if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
-      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
-      contactData.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
-      ActionSheet.show(
-        {
-          options: contactData,
-          cancelButtonIndex: contactData.length - 1,
-          title: SELECT_NUMBER
-        },
-        buttonIndex => {
-          if (buttonIndex != contactData.length - 1 && buttonIndex >= 0) {
-            this.showSmsTemplateList(this.props.navigation.state.params.jobSwipableDetails.contactData[buttonIndex])
-          }
-        }
-      )
-    }
-    else {
-      this.showSmsTemplateList(this.props.navigation.state.params.jobSwipableDetails.contactData[0])
-    }
-  }
-
-  showSmsTemplateList = (contact) => {
-    setTimeout(() => {
-      if (this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 1) {
-        let msgTitles = this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.map(sms => ({ text: sms.title, icon: "md-arrow-dropright", iconColor: "#000000" }))
-        msgTitles.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
-        ActionSheet.show(
-          {
-            options: msgTitles,
-            cancelButtonIndex: msgTitles.length - 1,
-            title: SELECT_TEMPLATE
-          },
-          buttonIndex => {
-            if (buttonIndex != msgTitles.length - 1 && buttonIndex >= 0) {
-              this.sendMessageToContact(contact, this.props.navigation.state.params.jobSwipableDetails.smsTemplateData[buttonIndex])
-            }
-          }
-        )
-      }
-      else {
-        this.sendMessageToContact(contact, this.props.navigation.state.params.jobSwipableDetails.smsTemplateData[0])
-      }
-    }, 500)
-  }
-
   sendMessageToContact = (contact, smsTemplate) => {
     this.props.actions.setSmsBodyAndSendMessage(contact, smsTemplate, this.props.jobTransaction, this.props.jobDataList, this.props.fieldDataList)
   }
@@ -419,7 +372,7 @@ class JobDetailsV2 extends PureComponent {
       jobMasterIds: JSON.stringify([this.props.jobTransaction.jobMasterId]),
       additionalParams: JSON.stringify({ statusId: this.props.currentStatus.id }),
       groupId: groupId
-    }, true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL, this.props.navigation)
+    }, true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
   }
 
   selectStatusToRevert = () => {
@@ -630,9 +583,7 @@ class JobDetailsV2 extends PureComponent {
         <Footer style={[style.footer]}>
           {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0 && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
             <FooterTab>
-              <Button full style={[styles.bgWhite]} onPress={this.chatButtonPressed}>
-                <Icon name="md-text" style={[styles.fontLg, styles.fontBlack]} />
-              </Button>
+            <MessageButtonItem sendMessageToContact = {this.sendMessageToContact} jobSwipableDetails = {this.props.navigation.state.params.jobSwipableDetails}/>
             </FooterTab>
           )}
           {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
@@ -736,6 +687,9 @@ class JobDetailsV2 extends PureComponent {
       }
     }
   }
+  onCancelPress = () => {
+    this.props.actions.setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false)
+  }
 
   detailsContainerView() {
     const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
@@ -743,7 +697,7 @@ class JobDetailsV2 extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgLightGray]}>
-          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} /> : null}
+          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal = {this.onCancelPress}/> : null}
           {draftAlert}
           {mismatchAlert}
           {this.showHeaderView()}

@@ -533,10 +533,7 @@ class FieldValidation {
         }
         let jobDataMap = jobDataService.getJobData(singleJobTransactionArray)[singleJobTransactionArray[0].jobId]
         let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAndFieldAttributesList, singleJobTransactionArray[0].jobMasterId)
-        alertMessage = addServerSmsService.setSmsBodyJobData(alertMessage, jobDataMap, singleJobTransactionArray[0], fieldAndJobAttrMap.keyToJobAttributeMap)
-        alertMessage = addServerSmsService.setSmsBodyFixedAttribute(alertMessage, singleJobTransactionArray[0], { value: jobAndFieldAttributesList.user })
-        alertMessage = addServerSmsService.setSMSBodyFieldData(alertMessage, null, singleJobTransactionArray[0], fieldAndJobAttrMap.keyToFieldAttributeMap, formElement)
-        alertMessage = addServerSmsService.checkForRecursiveData(alertMessage, '', jobDataMap, null, jobTransaction, fieldAndJobAttrMap, { value: jobAndFieldAttributesList.user }, formElement)
+        alertMessage = addServerSmsService.checkForRecursiveData(alertMessage, '', jobDataMap, formElement, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap, fieldAndJobAttrMap.keyToJobAttributeMap, {value: jobAndFieldAttributesList.user})
         return alertMessage
     }
 

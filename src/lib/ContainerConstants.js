@@ -18,7 +18,7 @@ module.exports = {
     TOTAL_COUNT: 'Total Count : ',
     PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB: 'Please enable internet connection to update this job!!!',
     UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET: 'unable to sync with server, Please check your internet connection',
-
+    ERROR: 'Error',
     //Common Error Strings
     JOB_STATUS_MISSING: 'Job status missing in store',
 
@@ -369,10 +369,13 @@ module.exports = {
     TIME_MISMATCH_ERROR: 'The time on your phone does not match with the server, please set it according to your region.',
     GO_TO_SETTINGS: 'Go to settings',
     TIME_MISMATCH: 'Time Mismatch',
-    TIMEMISMATCH:'Time_Mismatch',
+    TIMEMISMATCH: 'Time_Mismatch',
     TIME_ERROR_MESSAGE: 'Time mismatch. Please correct time on Device',
-
-
+    SIM_VERIFICATION: 'Sim Verification',
+    SIM_VERIFICATION_MESSAGE: 'An SMS will be sent from your device. Please go to the messenger app and send the SMS to complete the verification.',
+    GO_TO_MESSAGES: 'Go to Messages',
+    SIM_VERIFIED_SUCCESSFULLY: 'Sim Verified Successsfully',
+    GO_TO_HOME: 'Go to Home',
 
     //Mosambee Wallet
     FAILED: 'Failed',
@@ -397,6 +400,7 @@ module.exports = {
     //TaskListCalender
     ALL: 'All',
     TODAY: 'Today',
+    NO_RESULT_FOUND: 'No result found for your search',
 
     //TaskListScreen
     NO_NEXT_STATUS: 'No NextStatus Available',
@@ -454,5 +458,12 @@ module.exports = {
     FCM_PERMISSION_DENIED: 'FCM Request Access Denied',
 
     MANAGER_INTERACTION: 'MANAGERINTERACTION',
-    FIELDEXECUTIVE_INTERACTION: 'FIELDEXECUTIVEINTERACTION'
+    FIELDEXECUTIVE_INTERACTION: 'FIELDEXECUTIVEINTERACTION',
+
+    //Communication Logs
+    CALL_OFFICIAL: 'CALL_OFFICIAL',
+    CALL_CUG: 'CALL_CUG',
+    CALL_PERSONAL: 'CALL_PERSONAL',
+    SMS_OFFICIAL: 'SMS_OFFICIAL',
+    SMS_PERSONAL: 'SMS_PERSONAL'
 }

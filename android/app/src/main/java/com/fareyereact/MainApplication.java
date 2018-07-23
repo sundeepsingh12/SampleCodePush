@@ -3,8 +3,6 @@ package com.fareyereact;
 import android.app.Application;
 import com.emekalites.react.compress.image.ImageCompressPackage;
 import com.facebook.react.ReactApplication;
-import com.rjblopes.opensettings.OpenSettingsPackage;
-import com.psykar.cookiemanager.CookieManagerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.cnull.apkinstaller.ApkInstallerPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
@@ -31,8 +29,11 @@ import com.imeigetter.RNIMEIPackage;
 import com.smsinbackground.SendSMSPackage;
 import java.util.Arrays;
 import java.util.List;
+import android.support.multidex.MultiDexApplication;
+import com.callgetter.CallLogsPackage;
+import com.opendatetimesettings.OpenDateTimeSettingsPackage;
 
-public class MainApplication extends Application implements ReactApplication {
+public class MainApplication extends MultiDexApplication implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
 
@@ -50,8 +51,6 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-          new OpenSettingsPackage(),
-          new CookieManagerPackage(),
           new ImagePickerPackage(),
           new PickerPackage(),
           new ImageCompressPackage(), 
@@ -72,7 +71,9 @@ public class MainApplication extends Application implements ReactApplication {
           new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
           new BackgroundTimerPackage() ,
           new RNIMEIPackage(),
-          new SendSMSPackage()
+          new SendSMSPackage(),
+          new CallLogsPackage(),
+          new OpenDateTimeSettingsPackage()
       );
     }
 
@@ -92,4 +93,5 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
   }
+
 }

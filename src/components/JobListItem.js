@@ -26,6 +26,7 @@ import Communications from 'react-native-communications'
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
+import MessageButtonItem from './MessageButtonItem'
 
 export default class JobListItem extends PureComponent {
 
@@ -250,10 +251,12 @@ export default class JobListItem extends PureComponent {
   showActionButtonSection() {
     return (
       <View style={[styles.row, { marginLeft: -10 }]}>
-
+        {renderIf(this.props.data.jobSwipableDetails.contactData && this.props.data.jobSwipableDetails.contactData.length > 0 && this.props.data.jobSwipableDetails.smsTemplateData && this.props.data.jobSwipableDetails.smsTemplateData.length > 0,
+          <MessageButtonItem sendMessageToContact = {this.props.onChatButtonPressed} jobSwipableDetails = {this.props.data.jobSwipableDetails}/>
+        )}
         {renderIf(this.props.data.jobSwipableDetails.contactData && this.props.data.jobSwipableDetails.contactData.length > 0 && this.props.showIconsInJobListing,
           <Button transparent onPress={this.callButtonPressed}>
-            <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+            <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]}/>
           </Button>
         )}
 

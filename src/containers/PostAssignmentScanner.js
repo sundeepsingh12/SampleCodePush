@@ -15,7 +15,6 @@ import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import { SET_POST_ASSIGNMENT_ERROR, SET_POST_SCAN_SUCCESS, } from '../lib/constants'
 import { FORCE_ASSIGNED, POST_SEARCH_PLACEHOLDER, OK, DISMISS } from '../lib/ContainerConstants'
-import { Piechart } from '../lib/AttributeConstants'
 import * as homeActions from '../modules/home/homeActions'
 import * as taskListActions from '../modules/taskList/taskListActions'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -167,9 +166,7 @@ class PostAssignmentScanner extends PureComponent {
     }
 
     componentWillUnmount() {
-        if (Piechart.enabled) {
-            this.props.actions.pieChartCount()
-        }
+        this.props.actions.pieChartCount()
         this.props.actions.fetchJobs()
         this.keyboardDidHideListener.remove();
         this.keyboardDidShowListener.remove();
