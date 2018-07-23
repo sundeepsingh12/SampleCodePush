@@ -703,7 +703,6 @@ export function registerCallReceiver(){
       }
 
       new CallDetectorManager(async (event,number)=> {
-        console.log('event',event)
         let dataObject = {} 
          if (event === 'Incoming') {
            const callerIdentityDisplayList = JSON.parse(mdmSettings.value.callerIdentityDisplayList)
@@ -717,7 +716,6 @@ export function registerCallReceiver(){
            const allJobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
            const callerJobAttributeData = jobAttributeMasterService.getCallerIdJobAttributeMapAndQuery(allJobAttributes, callerJobMasterIdList, callerJobAttributeIdList)
            dataObject = await jobDataService.getCallerIdListAndJobId(number, callerJobAttributeData.idJobAttributeMap, callerJobAttributeData.query)
-          console.log('dataObject',dataObject)
            if (dataObject.isNumberPresentInJobData) {
             const job = jobService.getJobForJobId(dataObject.jobId)
              dispatch(setState(SET_CALLER_ID_POPUP, {

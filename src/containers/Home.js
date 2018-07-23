@@ -131,25 +131,6 @@ class Home extends PureComponent {
     this.props.actions.setState(LOADER_FOR_SYNCING, false)
   }
 
-  showCloseIcon() {
-    return (
-      <TouchableOpacity onPress={() => this.props.navigation.goBack(null)} >
-        <View
-          style={{
-            width: 40,
-            alignSelf: 'flex-start',
-            alignItems: 'center',
-            paddingTop: 10,
-            flex: 1
-          }}>
-          <Icon
-            name="md-close"
-            style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
-        </View>
-      </TouchableOpacity>
-    )
-  }
-
   renderCallerDisplayData(item){
     return (
        <View style = {[styles.row]}>
