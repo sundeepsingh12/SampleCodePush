@@ -23,8 +23,11 @@ import moment from 'moment'
 import { trackingService } from './Tracking'
 import { userEventLogService } from './UserEvent'
 import { addServerSmsService } from './AddServerSms'
-import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, SIGNATURE_AND_FEEDBACK, PENDING, PATH, PATH_TEMP } from '../../lib/AttributeConstants'
+import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, PENDING, PATH, PATH_TEMP } from '../../lib/AttributeConstants'
 import { userExceptionLogsService } from './UserException'
+import { communicationLogsService } from './CommunicationLogs'
+import { omit } from 'lodash'
+import { Platform } from 'react-native'
 
 class SyncZip {
 
@@ -44,13 +47,13 @@ class SyncZip {
         SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, syncStoreDTO.lastSyncWithServer);
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
-        SYNC_RESULTS.userCommunicationLog = [];
+        const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
+        let { communicationLogs, lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogs(syncStoreDTO, userSummary) : { communicationLogs: [], lastCallTime: null, lastSmsTime: null }
+        SYNC_RESULTS.userCommunicationLog = communicationLogs ? communicationLogs : []
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.userExceptionLog = userExceptionLogsService.getUserExceptionLog(realmDbData.userExceptionLog, lastSyncTime)
         let jobSummary = jobSummaryService.getJobSummaryListForSync(syncStoreDTO.jobSummaryList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.jobSummary = jobSummary
-        const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
-        await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
         //Writing Object to File at TEMP location
@@ -59,6 +62,7 @@ class SyncZip {
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
+        return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds }
         //Deleting TEMP folder location
         // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }
@@ -74,7 +78,7 @@ class SyncZip {
         return userSummary;
     }
 
-    
+
     _getSyncDataFromDb(transactionIdsObject) {
         let userExceptionLog = this._getDataFromRealm([], null, USER_EXCEPTION_LOGS)
         let runSheetSummary = this._getDataFromRealm([], null, TABLE_RUNSHEET)
@@ -203,7 +207,7 @@ class SyncZip {
                 let fieldData = { ...data[index] }
                 if (moment(fieldData.dateTime).isAfter(lastSyncTime)) {
                     fieldData.id = 0
-                    fieldDataList.push(_.omit(fieldData, ['dateTime']))
+                    fieldDataList.push(omit(fieldData, ['dateTime']))
                 }
             }
             return fieldDataList

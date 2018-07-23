@@ -2,10 +2,10 @@
 import React, { PureComponent } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, TouchableHighlight, Animated, Alert } from 'react-native'
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, TouchableHighlight, Animated, Alert, Keyboard } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { RNCamera } from 'react-native-camera'
-import { Container, Header, Body, Icon, StyleProvider, Button, Content } from 'native-base'
+import { Container, Header, Body, Icon, StyleProvider, Button, Content, Toast } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -14,8 +14,7 @@ import * as postAssignmentActions from '../modules/postAssignment/postAssignment
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import { SET_POST_ASSIGNMENT_ERROR, SET_POST_SCAN_SUCCESS, } from '../lib/constants'
-import { FORCE_ASSIGNED, POST_SEARCH_PLACEHOLDER,OK } from '../lib/ContainerConstants'
-import { Piechart } from '../lib/AttributeConstants'
+import { FORCE_ASSIGNED, POST_SEARCH_PLACEHOLDER, OK, DISMISS } from '../lib/ContainerConstants'
 import * as homeActions from '../modules/home/homeActions'
 import * as taskListActions from '../modules/taskList/taskListActions'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -27,7 +26,6 @@ function mapStateToProps(state) {
         pendingCount: state.postAssignment.pendingCount,
         error: state.postAssignment.error,
         scanSuccess: state.postAssignment.scanSuccess,
-        scanError: state.postAssignment.scanError,
         jobMaster: state.postAssignment.jobMaster
     }
 }
@@ -46,9 +44,9 @@ class PostAssignmentScanner extends PureComponent {
             showTransactionList: false,
             torchStatus: false,
             bounceValue: new Animated.Value(240),
+            show: true,
             searchText: ''
         };
-        this.animatedValue = new Animated.Value(120)
     }
 
     onSwipeUp(gestureState) {
@@ -58,30 +56,15 @@ class PostAssignmentScanner extends PureComponent {
         }
     }
 
+    _keyboardDidShow = () => { this.setState({ show: false }) }
+    _keyboardDidHide = () => { this.setState({ show: true }) }
+
     onSwipeDown(gestureState) {
         if (this.state.showTransactionList) {
             this.setState({ showTransactionList: false })
             this._toggleTransactionView(240)
         }
     }
-
-    callToast() {
-        Animated.timing(
-            this.animatedValue,
-            {
-                toValue: 0,
-            }).start()
-    }
-
-    closeToast() {
-        Animated.timing(
-            this.animatedValue,
-            {
-                toValue: 120,
-            }).start()
-        this.props.actions.setState(SET_POST_SCAN_SUCCESS, {})
-    }
-
 
     _toggleTransactionView(toValue) {
         Animated.spring(
@@ -101,6 +84,8 @@ class PostAssignmentScanner extends PureComponent {
 
     componentDidMount() {
         this.props.actions.fetchUnseenJobs(JSON.parse(this.props.navigation.state.params.pageObject.jobMasterIds)[0])
+        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
+        this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
     }
 
     _onBarcodeRead(barcodeResult) {
@@ -130,9 +115,7 @@ class PostAssignmentScanner extends PureComponent {
             <View style={[styles.row]}>
                 <TouchableHighlight
                     onPress={() => {
-                        this.props.actions.setState(SET_POST_SCAN_SUCCESS, {
-                            scanError: jobTransaction.status
-                        })
+                        Toast.show({ text: jobTransaction.status, buttonText: DISMISS, duration: 10000, buttonTextStyle: { color: "#FFE200" } });
                     }}
                     style={[style.helpIcon]}>
                     <Icon name="md-help" style={[styles.fontDefault]} />
@@ -183,10 +166,10 @@ class PostAssignmentScanner extends PureComponent {
     }
 
     componentWillUnmount() {
-        if (Piechart.enabled) {
-            this.props.actions.pieChartCount()
-        }
+        this.props.actions.pieChartCount()
         this.props.actions.fetchJobs()
+        this.keyboardDidHideListener.remove();
+        this.keyboardDidShowListener.remove();
     }
 
     getSearchPlaceHolder() {
@@ -196,7 +179,9 @@ class PostAssignmentScanner extends PureComponent {
                     <TextInput
                         placeholder={POST_SEARCH_PLACEHOLDER}
                         placeholderTextColor={'rgba(255,255,255,.6)'}
+                        selectionColor={'rgba(224, 224, 224,.5)'}
                         underlineColorAndroid='transparent'
+                        autoCorrect={false}
                         style={[styles.headerSearch]}
                         onChangeText={value => this.setState({ searchText: value })}
                         onSubmitEditing={event => this.checkJobTransaction(this.state.searchText, true)}
@@ -282,11 +267,6 @@ class PostAssignmentScanner extends PureComponent {
     }
 
     render() {
-        if (this.props.scanError && this.props.scanError !== '') {
-            this.callToast()
-        } else {
-            this.closeToast()
-        }
         const alertView = this.getAlertView()
         if (this.props.loading) {
             return <Loader />
@@ -297,8 +277,7 @@ class PostAssignmentScanner extends PureComponent {
                     {this.getHeader()}
 
                     {this.getCameraAndGestureRecognizer()}
-
-                    <Animated.View
+                    {this.state.show && <Animated.View
                         style={[style.subView,
                         { transform: [{ translateY: this.state.bounceValue }] }]}
                     >
@@ -344,13 +323,7 @@ class PostAssignmentScanner extends PureComponent {
                                 </Content>
                             </View>
                         </View>
-                    </Animated.View>
-                    <Animated.View style={{ transform: [{ translateY: this.animatedValue }], flexDirection: 'row', height: 60, backgroundColor: '#000000', position: 'absolute', left: 0, bottom: 0, right: 0, justifyContent: 'space-between', alignItems: 'center', zIndex: 10, paddingHorizontal: 10 }}>
-                        <Text style={[styles.fontLg, styles.fontWhite]}>
-                            {this.props.scanError}
-                        </Text>
-                        <Text onPress={() => this.closeToast()} style={[styles.fontLg, styles.padding10, { color: '#FFE200' }]}>DISMISS</Text>
-                    </Animated.View>
+                    </Animated.View>}
                 </Container>
             </StyleProvider>
         );
@@ -362,28 +335,6 @@ const style = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         paddingTop: 100
-    },
-    capture: {
-        flex: 0,
-        backgroundColor: '#fff',
-        borderRadius: 5,
-        color: '#000',
-        padding: 10,
-        margin: 40
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF',
-        marginTop: 66
-    },
-    button: {
-        padding: 8,
-    },
-    directionIcon: {
-        fontSize: 17,
-        color: "#007AFF"
     },
     subView: {
         position: "absolute",
