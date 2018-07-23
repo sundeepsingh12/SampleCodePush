@@ -62,12 +62,18 @@ class QrCodeScanner extends PureComponent {
                                 </Body>
                             </Header>
                         </SafeAreaView>
-                        <View style={style.rectangleContainer}>
+                        <View style={{flex: 1}}>
                             <RNCamera style={style.camera}
                                 type={RNCamera.Constants.Type.back}
                                 onBarCodeRead={this._handleQrCodeRead.bind(this)}>
                                 <View style={style.rectangleContainer}>
-                                    <View style={style.rectangle} />
+                                    <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
+                                    <View style={{flexDirection: 'row',justifyContent: 'center', height: 248}}>
+                                        <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
+                                        <View style={style.rectangle} />
+                                        <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
+                                    </View>
+                                    <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
                                 </View>
                             </RNCamera>
                         </View>
@@ -82,25 +88,16 @@ class QrCodeScanner extends PureComponent {
 
 const style = StyleSheet.create({
     camera: {
-        flex: 0,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'transparent',
-        height: Dimensions.get('window').width,
-        width: Dimensions.get('window').width,
+        flex: 1,
     },
     rectangleContainer: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
         backgroundColor: 'transparent',
     },
 
     rectangle: {
         height: 250,
         width: 250,
-        borderWidth: 2,
-        borderColor: '#00FF00',
         backgroundColor: 'transparent',
     },
     header: {
