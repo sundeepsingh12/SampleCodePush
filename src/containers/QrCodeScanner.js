@@ -30,10 +30,19 @@ class QrCodeScanner extends PureComponent {
 
     componentDidMount() {
         this.props.actions.setState(SCANNING, true);
-        Animated.timing(this.value, {
-            toValue: 1,
-            duration: 5000,
-        }).start();
+        Animated.loop(
+            Animated.sequence(
+                [Animated.timing(this.value, {
+                    toValue: 1,
+                    duration: 5000,
+                }),
+                Animated.timing(this.value, {
+                    toValue: 0,
+                    duration: 5000,
+                })]
+            )
+        ).start();
+       ;
     }
 
     _handleQrCodeRead(e) {
