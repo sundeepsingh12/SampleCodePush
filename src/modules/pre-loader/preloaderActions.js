@@ -80,6 +80,7 @@ import { SHOW_MOBILE_SCREEN, SHOW_OTP, CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DO
 import codePush from "react-native-code-push"
 import { Platform } from 'react-native'
 import { performSyncService } from '../home/homeActions';
+import feStyle from '../../themes/FeStyle'
 let sendSMSBackGroundService = require('../../wrapper/SendSMSBackGround');
 import Communications from 'react-native-communications';
 
@@ -254,6 +255,13 @@ export function validateAndSaveJobMaster(deviceIMEI, deviceSIM, token, jobMaster
       await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
       dispatch(setState(MASTER_SAVING_START))
       await jobMasterService.saveJobMaster(jobMasterResponse)
+      if (jobMasterResponse.appTheme) {
+        feStyle.primaryColor = jobMasterResponse.appTheme
+        feStyle.bgPrimaryColor = jobMasterResponse.appTheme
+        feStyle.fontPrimaryColor = jobMasterResponse.appTheme
+        feStyle.shadeColor = jobMasterResponse.appTheme + '98'
+        feStyle.borderLeft4Color = jobMasterResponse.appTheme
+      }
       dispatch(setState(MASTER_SAVING_SUCCESS))
       dispatch(checkAsset(deviceIMEI, deviceSIM, jobMasterResponse.user, token))
     } catch (error) {
