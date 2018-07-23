@@ -1,6 +1,6 @@
 'use strict';
 import React, { PureComponent } from 'react';
-import { Dimensions, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native';
 import { SafeAreaView } from 'react-navigation'
 import { Container, Header,Body, Icon,StyleProvider } from 'native-base';
 import { RNCamera } from 'react-native-camera'
@@ -26,9 +26,14 @@ function mapDispatchToProps(dispatch) {
 }
 
 class QrCodeScanner extends PureComponent {
+    value  = new Animated.Value(0);
 
     componentDidMount() {
-        this.props.actions.setState(SCANNING, true)
+        this.props.actions.setState(SCANNING, true);
+        Animated.timing(this.value, {
+            toValue: 1,
+            duration: 5000,
+        }).start();
     }
 
     _handleQrCodeRead(e) {
@@ -70,7 +75,21 @@ class QrCodeScanner extends PureComponent {
                                     <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
                                     <View style={{flexDirection: 'row',justifyContent: 'center', height: 248}}>
                                         <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
-                                        <View style={style.rectangle} />
+                                            <View style={style.rectangle}>
+                                                <Animated.View 
+                                                    style={[
+                                                        style.barStyle,
+                                                       { transform: [
+                                                            {
+                                                                translateY: this.value.interpolate({
+                                                                    inputRange: [0,1],
+                                                                    outputRange:[0,250],
+                                                                }),
+                                                            },
+                                                        ]},
+                                                    ]}
+                                                />    
+                                            </View>
                                         <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
                                     </View>
                                     <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
@@ -123,6 +142,13 @@ const style = StyleSheet.create({
         width: '15%',
         padding: 15
     },
+    barStyle: {
+        width: '100%',
+        height: '1%',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        backgroundColor: 'green',
+    }
 });
 
 
