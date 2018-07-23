@@ -230,5 +230,27 @@ class JobData {
         })
         return jobDataMap
     }
+
+    
+    getCallerIdListAndJobId(incomingNumber,idJobAttributeMap,query){
+        const allJobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA,query)
+        let isNumberPresentInJobData = false,callerIdDisplayList = [],id=0,jobId
+        allJobDataList.forEach(jobData=>{
+
+            //Check whether number from which call is made is present in jobdata db and also get job id from that job data
+            if(!isNumberPresentInJobData && idJobAttributeMap[jobData.jobAttributeMasterId].attributeTypeId == CONTACT_NUMBER && (incomingNumber==jobData.value)){
+                isNumberPresentInJobData = true
+                jobId = jobData.jobId
+            }
+
+            //Prepare callerIdDisplayList,This will be used for displaying info whenever call is made
+            if(idJobAttributeMap[jobData.jobAttributeMasterId]  && idJobAttributeMap[jobData.jobAttributeMasterId].attributeTypeId != CONTACT_NUMBER ){
+                callerIdDisplayList.push({id:id++,jobAttributeLabel:idJobAttributeMap[jobData.jobAttributeMasterId].label,value:jobData.value})
+            }
+
+        })
+        return {isNumberPresentInJobData,callerIdDisplayList,jobId}
+      
+    }
 }
 export let jobDataService = new JobData()

@@ -3,26 +3,27 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, SectionList } from 'react-native'
+import { StyleSheet, View, Image, Platform, ActivityIndicator, SectionList,Modal,TouchableOpacity,FlatList,TouchableHighlight } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import Loader from '../components/Loader'
 import PieChart from '../components/PieChart'
 import * as globalActions from '../modules/global/globalActions'
 import * as homeActions from '../modules/home/homeActions'
 import { checkForPaymentAtEnd } from '../modules/job-details/jobDetailsActions'
-import { Container, Content, Header, Button, Text, List, ListItem, Body, Right, Icon, StyleProvider } from 'native-base'
+import { Container, Content, Header, Text, List, ListItem, Body, Right, Icon, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { UNTITLED, TRANSACTION_SUCCESSFUL, DELETE_DRAFT } from '../lib/ContainerConstants'
-import { Summary, PAGES_LOADING, CHECK_TRANSACTION_STATUS_NEW_JOB, SET_NEWJOB_DRAFT_INFO, SET_CHECK_TRANSACTION_AND_DRAFT } from '../lib/constants'
+import { Summary, PAGES_LOADING, CHECK_TRANSACTION_STATUS_NEW_JOB, SET_NEWJOB_DRAFT_INFO, SET_CHECK_TRANSACTION_AND_DRAFT,SET_CALLER_ID_POPUP} from '../lib/constants'
 import DraftModal from '../components/DraftModal'
 import TransactionAlert from '../components/TransactionAlert'
 import SyncLoader from '../components/SyncLoader'
 import { redirectToFormLayout } from '../modules/newJob/newJobActions'
-import { navigate } from '../modules/navigators/NavigationService';
+import { navigate } from '../modules/navigators/NavigationService'
+import _ from 'lodash'
 
 
 function mapStateToProps(state) {
@@ -41,7 +42,8 @@ function mapStateToProps(state) {
     trackingServiceStarted: state.home.trackingServiceStarted,
     checkNewJobTransactionStatus: state.home.checkNewJobTransactionStatus,
     customErpPullActivated: state.home.customErpPullActivated,
-    logo: state.home.logo
+    logo: state.home.logo,
+    callerIdDisplayData:state.home.callerIdDisplayData
   }
 }
 
@@ -53,7 +55,9 @@ function mapDispatchToProps(dispatch) {
 
 class Home extends PureComponent {
 
-  componentDidMount() {
+
+ componentDidMount() {
+    (Platform.OS==='android')?this.props.actions.registerCallReceiver():null
     this.props.actions.fetchPagesAndPiechart();
     this.props.actions.performSyncService(this.props.customErpPullActivated == 'notActivated');
     this.props.actions.startTracking(this.props.trackingServiceStarted);
@@ -124,6 +128,88 @@ class Home extends PureComponent {
     return null
   }
 
+  showCloseIcon() {
+    return (
+      <TouchableOpacity onPress={() => this.props.navigation.goBack(null)} >
+        <View
+          style={{
+            width: 40,
+            alignSelf: 'flex-start',
+            alignItems: 'center',
+            paddingTop: 10,
+            flex: 1
+          }}>
+          <Icon
+            name="md-close"
+            style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
+  renderCallerDisplayData(item){
+    return (
+       <View style = {[styles.row]}>
+                  <Text style = {[styles.paddingHorizontal10, styles.paddingVertical5, styles.fontDefault, {width: '40%'}]}>
+                    {item.jobAttributeLabel}
+                  </Text>
+                  <Text style={[styles.paddingHorizontal10, styles.paddingVertical5, styles.fontDefault, {width: '60%'}]}>
+                    {item.value}
+                  </Text>
+                </View> 
+    )
+  }
+
+  showCallerPopupWindow(){
+    return (
+      <StyleProvider style={getTheme(platform)}>
+      <Modal animationType={"fade"}
+        transparent={true}
+        visible={true}
+        presentationStyle={"overFullScreen"}
+        onRequestClose={()=>{}}
+        >
+        <View style={[styles.flex1, styles.row, styles.justifyCenter, styles.alignCenter, {backgroundColor: 'rgba(225,225,225,.8)'}]}>
+          
+            <View style={[{backgroundColor: 'white', borderRadius: 6}]}>
+              <View style = {{height: 10, borderTopLeftRadius: 6,  borderTopRightRadius: 6, backgroundColor: '#1478f6'}}></View>
+              <View style={[styles.bgPrimary, styles.width100, styles.row, {backgroundColor: '#1478f6'}]}>
+                <View style={[styles.paddingHorizontal10, styles.flexBasis80, styles.paddingVertical5, styles.paddingBottom10]}>
+                  <Text style={[styles.fontWhite]}>{this.props.callerIdDisplayData.referenceNumber}</Text>
+                  <View style={[styles.row, styles.alignCenter]}>
+                    <Icon name="md-call" style={[styles.fontWhite, styles.fontDefault]}  />
+                    <Text style={[styles.fontWhite, styles.marginLeft5]}>{this.props.callerIdDisplayData.incomingNumber}</Text>
+                  </View>
+                  
+                </View>
+                <TouchableHighlight onPress = {this.dismissCallerPopup} style={[styles.flexBasis20, styles.justifyStart, styles.alignEnd]}>
+                  <Icon name="md-close" style={[styles.fontWhite, styles.padding25, styles.paddingTop5, styles.fontDefault]}  />
+                </TouchableHighlight>
+
+              </View>
+
+              <View style={[styles.paddingTop5]}>
+                  <FlatList
+                                data={this.props.callerIdDisplayData.callerIdDisplayList}
+                                renderItem={({ item }) => this.renderCallerDisplayData(item)}
+                                keyExtractor={item => String(item.id)}
+                            />
+                <View style = {{height: 10, borderBottomLeftRadius: 6,  borderBottomRightRadius: 6}}></View>
+              </View>
+            </View>
+        </View>
+    </Modal>
+  </StyleProvider>
+
+    )
+  }
+
+  dismissCallerPopup = () => {
+    this.props.actions.setState(SET_CALLER_ID_POPUP,{
+      showCallerIdPopup:false,
+    })
+  }
+
   render() {
     const pieChartView = this.pieChartView()
     if (this.props.pagesLoading) {
@@ -157,11 +243,13 @@ class Home extends PureComponent {
             {pieChartView}
             {(this.props.checkNewJobTransactionStatus && this.props.checkNewJobTransactionStatus != TRANSACTION_SUCCESSFUL && this.props.checkNewJobTransactionStatus != DELETE_DRAFT) ? this.showCheckTransactionAlert() : this.getNewJobDraftModal()}
             <List>{this.getPageListItemsView()}</List>
+            {(this.props.callerIdDisplayData.showCallerIdPopup) ? this.showCallerPopupWindow():null}
           </Content>
         </Container>
       </StyleProvider>
     )
   }
+
 }
 
 const style = StyleSheet.create({
@@ -178,7 +266,28 @@ const style = StyleSheet.create({
     width: 116,
     height: 116,
     resizeMode: 'contain'
-  }
+  },
+  headerRight: {
+    width: '35%',
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  headerBody: {
+    width: '50%',
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  modalBackground: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    backgroundColor: '#00000040'
+  },
 });
 
 

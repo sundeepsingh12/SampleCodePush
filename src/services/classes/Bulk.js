@@ -1,7 +1,6 @@
 'use strict'
 import { jobTransactionService } from './JobTransaction'
 import { transactionCustomizationService } from './TransactionCustomization'
-import {  JOB_STATUS, CUSTOMIZATION_LIST_MAP, JOB_ATTRIBUTE, JOB_ATTRIBUTE_STATUS, CUSTOMER_CARE, SMS_TEMPLATE, JOB_MASTER, HUB, TABLE_JOB_TRANSACTION } from '../../lib/constants'
 import _ from 'lodash'
 import { INVALID_SCAN, SELECT_ALL, SELECT_NONE } from '../../lib/ContainerConstants'
 

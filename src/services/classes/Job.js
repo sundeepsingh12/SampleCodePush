@@ -1,3 +1,9 @@
+'use strict'
+
+import * as realm from '../../repositories/realmdb'
+import {
+    TABLE_JOB,
+} from '../../lib/constants'
 
 class Job {
 
@@ -18,6 +24,16 @@ class Job {
             jobMap[id] = { attemptCount, id, jobEndTime, jobMasterId, jobStartTime, latitude, longitude, slot, referenceNo, groupId, jobPriority, jobId: id }
         }
         return { jobMap, jobDataQuery }
+    }
+
+    /**
+     * 
+     * @param {*} jobId 
+     */
+    getJobForJobId(jobId){
+        const jobQuery = `id = ${jobId}`
+        const job = realm.getRecordListOnQuery(TABLE_JOB,jobQuery)
+        return job
     }
 }
 

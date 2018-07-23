@@ -182,7 +182,6 @@ class BulkListing extends PureComponent {
   getBulkTransactionView() {
     let nextStatusNames = []
     this.props.nextStatusList.forEach(object => {
-      let statusObject =
         nextStatusNames.push({
           text: object.name,
           icon: "md-arrow-dropright",
