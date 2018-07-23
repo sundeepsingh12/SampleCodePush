@@ -12,6 +12,7 @@ import { jobStatusService } from '../JobStatus';
 import { keyValueDBService } from '../KeyValueDBService.js';
 import { communicationLogsService } from '../CommunicationLogs'
 import { runSheetService } from '../RunSheet';
+import { Platform } from 'react-native'
 
 export default class FormLayoutEventImpl {
 
@@ -150,7 +151,7 @@ export default class FormLayoutEventImpl {
 
         let fieldData, jobTransaction, job, dbObjects, transactionTrackValuesObject = {}, jobIdToJobTransactionMap = {}
         await this.getJobTransactionTrackValues(userSummary, transactionTrackValuesObject)
-        let { callAndSmsLogs, jobDataList } = await communicationLogsService.getCallLogsAndJobDataList(jobTransactionList, jobAndFieldAttributesList, jobMasterId)
+        let { callAndSmsLogs, jobDataList } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogsAndJobDataList(jobTransactionList, jobAndFieldAttributesList, jobMasterId) : { callAndSmsLogs: null, jobDataList: [] }
 
         if (jobTransactionList && jobTransactionList.length) { //Case of bulk
             fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionList, currentTime)

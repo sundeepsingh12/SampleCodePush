@@ -48,7 +48,7 @@ class SyncZip {
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
         const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
-        let { communicationLogs, lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogs(syncStoreDTO, userSummary) : null
+        let { communicationLogs, lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogs(syncStoreDTO, userSummary) : { communicationLogs: [], lastCallTime: null, lastSmsTime: null }
         SYNC_RESULTS.userCommunicationLog = communicationLogs ? communicationLogs : []
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.userExceptionLog = userExceptionLogsService.getUserExceptionLog(realmDbData.userExceptionLog, lastSyncTime)
