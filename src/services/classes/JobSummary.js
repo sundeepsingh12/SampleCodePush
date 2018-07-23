@@ -7,7 +7,6 @@ import {
 } from './KeyValueDBService'
 
 import moment from 'moment'
-import _ from 'lodash'
 import {
   UNABLE_TO_UPDATE_JOB_SUMMARY,
 } from '../../lib/ContainerConstants'

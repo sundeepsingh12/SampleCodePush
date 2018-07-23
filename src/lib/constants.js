@@ -115,6 +115,7 @@ module.exports = keyMirror({
     TABS_LOADING: null,
     SET_SELECTED_DATE: null,
     LOADER_FOR_SYNCING: null,
+    SET_CALLER_ID_POPUP:null,
     TASKLIST_LOADER_FOR_SYNC: null,
 
     //Pages

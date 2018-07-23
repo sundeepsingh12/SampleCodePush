@@ -38,8 +38,6 @@ import {
     PASSWORD,
     CASH_TENDERING,
     ARRAY,
-    OBJECT,
-    CASH,
     OPTION_RADIO_FOR_MASTER,
     OPTION_RADIO_VALUE,
     QR_SCAN,

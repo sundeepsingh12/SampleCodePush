@@ -9,22 +9,18 @@ import { setState, showToastAndAddUserExceptionLog } from '..//global/globalActi
 import { performSyncService, pieChartCount } from '../home/homeActions'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { MosambeeWalletPaymentServices } from '../../services/payment/MosambeeWalletPayment'
-import {mapKeys} from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions'
 import { paymentService } from '../../services/payment/Payment'
 import { OK,TRANSACTION_SUCCESSFUL, ERROR } from '../../lib/ContainerConstants'
 import { saveJobTransaction } from '../form-layout/formLayoutActions'
 import { Toast } from 'native-base'
 import { jobDataService } from '../../services/classes/JobData'
-import { fieldDataService } from '../../services/classes/FieldData'
 import {
     JOB_EXPIRY_TIME,
 } from '../../lib/AttributeConstants'
 import { StackActions } from 'react-navigation'
 import { navDispatch, navigate } from '../navigators/NavigationService'
 import {
-    JOB_ATTRIBUTE,
-    FIELD_ATTRIBUTE,
     JOB_STATUS,
     JOB_DETAILS_FETCHING_START,
     JOB_DETAILS_FETCHING_END,
@@ -38,6 +34,7 @@ import {
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService';
+import _ from 'lodash'
 
 export function startFetchingJobDetails() {
     return {

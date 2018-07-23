@@ -13,10 +13,8 @@ import {
   DEVICE_SIM,
   IS_PRELOADER_COMPLETE,
   IS_SHOW_MOBILE_OTP_SCREEN,
-  USER,
-  DOMAIN_URL
 } from '../../lib/constants'
-import { LOGIN_SUCCESSFUL, SHOW_LONG_CODE_IOS_SCREEN } from '../../lib/AttributeConstants'
+import { LOGIN_SUCCESSFUL} from '../../lib/AttributeConstants'
 import { SHOW_MOBILE_SCREEN } from '../../lib/ContainerConstants'
 
 class DeviceVerification {
