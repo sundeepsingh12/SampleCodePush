@@ -230,7 +230,7 @@ class FormLayout {
             if (navigationFormLayoutStates) {
                 formLayoutObject = this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
-            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction)
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction, formLayoutState.jobAndFieldAttributesList)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
             //if (!jobTransaction.length) { //Delete draft only if not bulk
             draftService.deleteDraftFromDb(jobTransaction, jobMasterId)

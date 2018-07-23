@@ -235,6 +235,7 @@ module.exports = keyMirror({
     MDM_POLICIES: null,
     FCM_TOKEN: null,
     APP_THEME: null,
+    LAST_CALL_AND_SMS_TIME: null,
     LONG_CODE_SIM_VERIFICATION: null,
 
     //Realm Tables
@@ -252,7 +253,7 @@ module.exports = keyMirror({
     TABLE_DRAFT: null,
     SEND_EMAIL_OR_SMS: null,
     TABLE_MESSAGE_INTERACTION: null,
-
+    TABLE_NEGATIVE_COMMUNICATION_LOG: null,
     //Home Actions
     IS_LAST_PAGE: null,
 

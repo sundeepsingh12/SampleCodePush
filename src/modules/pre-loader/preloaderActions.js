@@ -247,8 +247,6 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
  * otherwise job master failure action is dispatched
  *
  * @param jobMasterResponse
- * @param dispatch
- * @return {Promise.<void>}
  */
 export function validateAndSaveJobMaster(deviceIMEI, deviceSIM, token, jobMasterResponse) {
   return async function (dispatch) {
@@ -345,8 +343,6 @@ export function checkIfAppIsOutdated(error) {
 
 /**Checks if sim is locally verified or not,if not then check if it's valid on server or not
  *
- * @param dispatch
- * @return {Promise.<void>}
  */
 export function checkAsset(deviceIMEI, deviceSIM, user, token) {
   return async function (dispatch) {
@@ -370,7 +366,7 @@ export function checkAsset(deviceIMEI, deviceSIM, user, token) {
 
 /**Checks if sim is valid on server,called only if sim is not valid locally
  *
- * @return {Promise.<void>}
+ *
  */
 
 

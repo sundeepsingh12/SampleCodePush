@@ -230,5 +230,6 @@ class JobData {
         })
         return jobDataMap
     }
+
 }
 export let jobDataService = new JobData()
