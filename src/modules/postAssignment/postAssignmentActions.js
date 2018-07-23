@@ -40,7 +40,7 @@ export function fetchUnseenJobs(jobMasterId) {
 export function checkScannedJob(referenceNumber, jobTransactionMap, jobMaster, isForceAssignmentAllowed, pendingCount, calledFromScan) {
     return async function (dispatch) {
         try {
-            dispatch(setState(SET_POST_ASSIGNMENT_TRANSACTION_LIST, { jobTransactionMap, loading: true, pendingCount, scanError: null, jobMaster }));
+            dispatch(setState(SET_POST_ASSIGNMENT_TRANSACTION_LIST, { jobTransactionMap, loading: true, pendingCount, scanError: null, jobMaster, scanSuccess: false }));
             let pendingStatus = await jobStatusService.getStatusForJobMasterIdAndCode(jobMaster.id, PENDING);
             let jobTransactionMapClone = _.cloneDeep(jobTransactionMap);
             let transactionObject = await postAssignmentService.checkScanResult(referenceNumber, jobTransactionMapClone, pendingStatus, jobMaster, isForceAssignmentAllowed, pendingCount);
@@ -48,11 +48,11 @@ export function checkScannedJob(referenceNumber, jobTransactionMap, jobMaster, i
                 Toast.show({ text: transactionObject.scanError, buttonText: DISMISS, duration: 10000, buttonTextStyle: { color: "#FFE200" }, });
             }
             if (!calledFromScan || (transactionObject.scanError && transactionObject.scanError !== '')) {
-                dispatch(setState(SET_POST_ASSIGNMENT_TRANSACTION_LIST, { jobTransactionMap: transactionObject.jobTransactionMap, loading: false, pendingCount: transactionObject.pendingCount, jobMaster }));
+                dispatch(setState(SET_POST_ASSIGNMENT_TRANSACTION_LIST, { jobTransactionMap: transactionObject.jobTransactionMap, loading: false, pendingCount: transactionObject.pendingCount, jobMaster, scanSuccess: false }));
             } else {
-                dispatch(setState(SET_POST_SCAN_SUCCESS, { scanSuccess: transactionObject.scanError ? false : true, }));
+                dispatch(setState(SET_POST_ASSIGNMENT_TRANSACTION_LIST, { jobTransactionMap: transactionObject.jobTransactionMap, loading: false, pendingCount: transactionObject.pendingCount, jobMaster, scanSuccess: transactionObject.scanError ? false : true, }));
                 setTimeout(() => {
-                    dispatch(setState(SET_POST_ASSIGNMENT_TRANSACTION_LIST, { jobTransactionMap: transactionObject.jobTransactionMap, loading: false, pendingCount: transactionObject.pendingCount, jobMaster }));
+                    dispatch(setState(SET_POST_SCAN_SUCCESS, { scanSuccess: false }));
                 }, 3000);
             }
         } catch (error) {

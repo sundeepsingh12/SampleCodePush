@@ -18,9 +18,9 @@ export default function postAssignmentReducer(state = initialState, action) {
             return state.set('jobTransactionMap', action.payload.jobTransactionMap)
                 .set('loading', action.payload.loading)
                 .set('pendingCount', action.payload.pendingCount)
-                .set('scanSuccess', false)
+                .set('scanSuccess', action.payload.scanSuccess)
                 .set('error', null)
-                .set('jobMaster',action.payload.jobMaster)
+                .set('jobMaster', action.payload.jobMaster)
 
         case SET_POST_ASSIGNMENT_ERROR:
             return state.set('error', action.payload.error)
