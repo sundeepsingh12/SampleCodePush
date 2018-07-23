@@ -17,7 +17,7 @@ import styles from '../themes/FeStyle'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { UNTITLED, TRANSACTION_SUCCESSFUL, DELETE_DRAFT } from '../lib/ContainerConstants'
-import { Summary, PAGES_LOADING, CHECK_TRANSACTION_STATUS_NEW_JOB, SET_NEWJOB_DRAFT_INFO, SET_CHECK_TRANSACTION_AND_DRAFT,SET_CALLER_ID_POPUP} from '../lib/constants'
+import { Summary, PAGES_LOADING, CHECK_TRANSACTION_STATUS_NEW_JOB, SET_NEWJOB_DRAFT_INFO, SET_CHECK_TRANSACTION_AND_DRAFT, LOADER_FOR_SYNCING, SET_CALLER_ID_POPUP} from '../lib/constants'
 import DraftModal from '../components/DraftModal'
 import TransactionAlert from '../components/TransactionAlert'
 import SyncLoader from '../components/SyncLoader'
@@ -126,6 +126,9 @@ class Home extends PureComponent {
       return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
     }
     return null
+  }
+  onCancelPress = () => {
+    this.props.actions.setState(LOADER_FOR_SYNCING, false)
   }
 
   showCloseIcon() {
@@ -239,7 +242,7 @@ class Home extends PureComponent {
             </Header>
           </SafeAreaView>
           <Content>
-            {(this.props.moduleLoading) ? <SyncLoader moduleLoading={this.props.moduleLoading} /> : null}
+            {(this.props.moduleLoading) ? <SyncLoader moduleLoading={this.props.moduleLoading} cancelModal = {this.onCancelPress}/> : null}
             {pieChartView}
             {(this.props.checkNewJobTransactionStatus && this.props.checkNewJobTransactionStatus != TRANSACTION_SUCCESSFUL && this.props.checkNewJobTransactionStatus != DELETE_DRAFT) ? this.showCheckTransactionAlert() : this.getNewJobDraftModal()}
             <List>{this.getPageListItemsView()}</List>

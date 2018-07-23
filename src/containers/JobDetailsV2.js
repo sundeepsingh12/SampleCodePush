@@ -44,7 +44,7 @@ import {
   SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
   SET_CHECK_TRANSACTION_STATUS,
   JOB_DETAILS_FETCHING_START,
-  RESET_CHECK_TRANSACTION_AND_DRAFT
+  RESET_CHECK_TRANSACTION_AND_DRAFT,
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -370,7 +370,7 @@ class JobDetailsV2 extends PureComponent {
       jobMasterIds: JSON.stringify([this.props.jobTransaction.jobMasterId]),
       additionalParams: JSON.stringify({ statusId: this.props.currentStatus.id }),
       groupId: groupId
-    }, true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL, this.props.navigation)
+    }, true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
   }
 
   selectStatusToRevert = () => {
@@ -685,6 +685,9 @@ class JobDetailsV2 extends PureComponent {
       }
     }
   }
+  onCancelPress = () => {
+    this.props.actions.setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false)
+  }
 
   detailsContainerView() {
     const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
@@ -692,7 +695,7 @@ class JobDetailsV2 extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgLightGray]}>
-          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} /> : null}
+          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal = {this.onCancelPress}/> : null}
           {draftAlert}
           {mismatchAlert}
           {this.showHeaderView()}

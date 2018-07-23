@@ -1,7 +1,6 @@
 import {
     OPTION_RADIO_KEY,
     OPTION_RADIO_VALUE,
-    OPTION_RADIO_FOR_MASTER
 } from '../../lib/AttributeConstants'
 import {
     TABLE_JOB_DATA

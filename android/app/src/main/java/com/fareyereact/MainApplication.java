@@ -31,6 +31,7 @@ import com.smsinbackground.SendSMSPackage;
 import java.util.Arrays;
 import java.util.List;
 import android.support.multidex.MultiDexApplication;
+import com.callgetter.CallLogsPackage;
 import com.opendatetimesettings.OpenDateTimeSettingsPackage;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
@@ -73,6 +74,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
           new BackgroundTimerPackage() ,
           new RNIMEIPackage(),
           new SendSMSPackage(),
+          new CallLogsPackage(),
           new OpenDateTimeSettingsPackage()
       );
     }
