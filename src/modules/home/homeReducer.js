@@ -23,7 +23,8 @@ import {
   LOADER_FOR_SYNCING,
   IS_LOGGING_OUT,
   CHECK_TRANSACTION_STATUS_NEW_JOB,
-  SET_CHECK_TRANSACTION_AND_DRAFT
+  SET_CHECK_TRANSACTION_AND_DRAFT,
+  SET_CALLER_ID_POPUP
 } from '../../lib/constants'
 
 import { TRANSACTION_SUCCESSFUL, DELETE_DRAFT } from '../../lib/ContainerConstants'
@@ -112,6 +113,10 @@ export default function homeReducer(state = initialState, action) {
         .set('checkNewJobTransactionStatus', null)
     case SET_TRANSACTION_SERVICE_STARTED:
       return state.set('trackingServiceStarted', action.payload)
+
+    case SET_CALLER_ID_POPUP:
+      return state.set('callerIdDisplayData',action.payload)
+                  
   }
   return state;
 }

@@ -1,5 +1,11 @@
 'use strict'
 
+import {
+    CONTACT_NUMBER,
+
+} from '../../lib/AttributeConstants'
+
+
 class JobAttributeMaster {
 
     /**
@@ -40,6 +46,27 @@ class JobAttributeMaster {
         })
 
         return jobAttributeStatusMap
+    }
+
+    /**
+     * 
+     * @param {*} allJobAttributes 
+     * @param {*} jobMasterIdList 
+     * @param {*} jobAttributeIdList 
+     */
+   getCallerIdJobAttributeMapAndQuery(allJobAttributes,jobMasterIdList,jobAttributeIdList){
+        let idJobAttributeMap = {},query='',index = 0
+        allJobAttributes.value.forEach(jobAttribute => {
+            //Get all job attributes belonging to those job masters which are mapped in MDM Enable Caller Idenity Settings and also contact type attributes of those job master
+            if (jobAttributeIdList.includes(jobAttribute.id) || (jobMasterIdList.includes(jobAttribute.jobMasterId)) && (jobAttribute.attributeTypeId == CONTACT_NUMBER)) {
+                idJobAttributeMap[jobAttribute.id] = jobAttribute
+                query = (index++ == 0) ? `jobAttributeMasterId = ${jobAttribute.id}` : `${query} OR jobAttributeMasterId = ${jobAttribute.id} `
+            }
+        })
+        return {
+            idJobAttributeMap,
+            query
+        }
     }
 
 }

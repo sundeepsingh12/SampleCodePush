@@ -39,7 +39,9 @@ import {
   FCM_TOKEN,
   LOADER_FOR_SYNCING,
   MDM_POLICIES,
-  APP_THEME
+  APP_THEME,
+  JOB_ATTRIBUTE,
+  SET_CALLER_ID_POPUP
 } from '../../lib/constants'
 
 import {
@@ -72,7 +74,7 @@ import {
   SERVER_REACHABLE,
   SERVER_UNREACHABLE,
   Piechart,
-  PATH_COMPANY_LOGO_IMAGE
+  PATH_COMPANY_LOGO_IMAGE,
 } from '../../lib/AttributeConstants'
 import { Toast, ActionSheet, } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -82,7 +84,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { setState, showToastAndAddUserExceptionLog, deleteSessionToken } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
-import { Platform, Alert } from 'react-native'
+import { Platform} from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -101,9 +103,13 @@ import FCM, { FCMEvent, NotificationType, RemoteNotificationResult, WillPresentN
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK, ERROR } from '../../lib/ContainerConstants'
+import { FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK, ERROR } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import { navDispatch, navigate } from '../navigators/NavigationService';
+import CallDetectorManager from 'react-native-call-detection'
+import { jobAttributeMasterService } from '../../services/classes/JobAttributeMaster'
+import { jobDataService } from '../../services/classes/JobData'
+import { jobService } from '../../services/classes/Job'
 import {each,size, isNull } from 'lodash'
 
 /**
@@ -317,7 +323,7 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) 
 export function startTracking(trackingServiceStarted) {
   return async function (dispatch) {
     try {
-      let mdmSettings = await keyValueDBService.getValueFromStore(MDM_POLICIES);
+      const mdmSettings = await keyValueDBService.getValueFromStore(MDM_POLICIES);
       if (mdmSettings && mdmSettings.value && mdmSettings.value.basicSetting && !mdmSettings.value.gpsTracking) {
         return;
       }
@@ -602,7 +608,7 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
 export function uploadUnsyncFiles(backupFilesList) {
   return async function (dispatch) {
     try {
-      const failCount = 0, successCount = 0
+      let failCount = 0, successCount = 0
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       if (!token) {
         throw new Error('Token Missing')
@@ -685,4 +691,57 @@ export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
       showToastAndAddUserExceptionLog(2712, error.message, 'danger', 1)
     }
   }
+}
+
+export function registerCallReceiver(){
+  return async function(dispatch){
+    try{
+
+      const mdmSettings = await keyValueDBService.getValueFromStore(MDM_POLICIES);
+      if(!mdmSettings || !mdmSettings.value || !mdmSettings.value.basicSetting || !mdmSettings.value.enableCallerIdentity || !mdmSettings.value.callerIdentityDisplayList ){
+        return
+      }
+
+      new CallDetectorManager(async (event,number)=> {
+        let dataObject = {} 
+         if (event === 'Incoming') {
+           const callerIdentityDisplayList = JSON.parse(mdmSettings.value.callerIdentityDisplayList)
+           let callerJobMasterIdList = [],
+             callerJobAttributeIdList = []
+           callerIdentityDisplayList.forEach(callerIdentityObject => {
+             callerJobMasterIdList.push(callerIdentityObject.jobMasterId)
+             callerJobAttributeIdList.push(...callerIdentityObject.jobAttributeIdList)
+           })
+
+           const allJobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+           const callerJobAttributeData = jobAttributeMasterService.getCallerIdJobAttributeMapAndQuery(allJobAttributes, callerJobMasterIdList, callerJobAttributeIdList)
+           dataObject = await jobDataService.getCallerIdListAndJobId(number, callerJobAttributeData.idJobAttributeMap, callerJobAttributeData.query)
+           if (dataObject.isNumberPresentInJobData) {
+            const job = jobService.getJobForJobId(dataObject.jobId)
+             dispatch(setState(SET_CALLER_ID_POPUP, {
+               callerIdDisplayList: dataObject.callerIdDisplayList,
+               incomingNumber: number,
+               referenceNumber:job[0].referenceNo,
+               showCallerIdPopup: true,
+             }))
+           }
+          }
+          else if(event === 'Missed'){
+            dispatch(setState(SET_CALLER_ID_POPUP,{
+              showCallerIdPopup:false,
+            }))
+          }
+          },
+      true, // if you want to read the phone number of the incoming call [ANDROID], otherwise false
+      ()=>{}, // callback if your permission got denied [ANDROID] [only if you want to read incoming number] default: console.error
+      {
+      title: 'Phone State Permission',
+      message: 'This app needs access to your phone state in order to react and/or to adapt to incoming calls.'
+      } // a custom permission request message to explain to your user, why you need the permission [recommended] - this is the default one
+      )
+    }catch(error){
+      console.log('error>>>',error)
+    }
+  }
+ 
 }

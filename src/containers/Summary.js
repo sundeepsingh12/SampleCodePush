@@ -10,7 +10,7 @@ import styles from '../themes/FeStyle'
 import LinearGradient from 'react-native-linear-gradient'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
-import { Container, Content, List, ListItem, Header, Button, Text, Body, Icon, StyleProvider } from 'native-base';
+import { Container, Content, Header,Text, Body, Icon, StyleProvider } from 'native-base';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { RESET_SUMMARY_STATE } from '../lib/constants'
 

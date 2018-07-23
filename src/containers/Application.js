@@ -8,7 +8,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { APP_VERSION_NUMBER } from '../lib/AttributeConstants'
 
-console.disableYellowBox = true;
+console.disableYellowBox = false;
 
 import * as authActions from '../modules/login/loginActions'
 import * as initialLoadActions from '../modules/intialLoad/initialLoadActions'

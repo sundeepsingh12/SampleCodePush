@@ -25,9 +25,7 @@ import {
     SMS_PERSONAL
 } from '../../lib/ContainerConstants'
 let calls = require('../../wrapper/CALLS')
-import {
-    jobDataService
-} from './JobData'
+
 class CommunicationLogs {
 
 
