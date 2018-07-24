@@ -466,6 +466,7 @@ module.exports = keyMirror({
     SET_MESSAGE: null,
     SET_LIVE_JOB_TOAST: null,
     SET_LIVE_JOB_LOADER: null,
+    CLEAR_LIVE_JOB_STATE: null,
 
     //Summary
     SET_SUMMARY_FOR_JOBMASTER: null,
