@@ -19,7 +19,7 @@ import AesCtr from '../services/classes/AesCtr'
 import userExceptionLogs from './schema/userExceptionLogsDB'
 import messageInteracion from './schema/MessageInteractionSchema'
 
-const schemaVersion = 49;
+const schemaVersion = 50;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs, messageInteracion];
 
 let realm = new Realm({

@@ -29,7 +29,9 @@ function mapDispatchToProps(dispatch) {
 
 class QrCodeScanner extends PureComponent {
     value  = new Animated.Value(0);
-
+    state = {
+        'flow': false
+    };
     componentDidMount() {
         this.props.actions.setState(SCANNING, true);
         Animated.loop(
@@ -66,7 +68,46 @@ class QrCodeScanner extends PureComponent {
         }
     }
 
+    barOpac() {
+        if(this.state.flow){
+            return(
+            <View style={{flex: 1}}>
+                <View style={[style.barStyle, {opacity: 1}]}/>
+                <View style={[style.barStyle, {opacity: 0.875}]}/>
+                <View style={[style.barStyle, {opacity: 0.75}]}/>
+                <View style={[style.barStyle, {opacity: 0.625}]}/>
+                <View style={[style.barStyle, {opacity: 0.5}]}/>
+                <View style={[style.barStyle, {opacity: 0.375}]}/>
+                <View style={[style.barStyle, {opacity: 0.25}]}/> 
+                <View style={[style.barStyle, {opacity: 0.125 }]}/>
+            </View>)
+
+
+        } else {
+            return (
+            <View style={{flex: 1}}>
+            <View style={[style.barStyle, {opacity: 0.125 }]}/>
+            <View style={[style.barStyle, {opacity: 0.25}]}/> 
+            <View style={[style.barStyle, {opacity: 0.375}]}/>
+            <View style={[style.barStyle, {opacity: 0.5}]}/>
+            <View style={[style.barStyle, {opacity: 0.625}]}/>
+            <View style={[style.barStyle, {opacity: 0.75}]}/>
+            <View style={[style.barStyle, {opacity: 0.875}]}/>
+            <View style={[style.barStyle, {opacity: 1}]}/>
+            </View>
+            )
+        }
+
+    }
+
     spitOutAnimation() {
+        // console.logs(this.opac)
+        // console.logs(this.opac ? this.opac - 0.125 : 0.125)
+        this.value.addListener(({value}) => {
+           // console.logs(val)
+           if(value === 0) this.setState({flow: false})
+           else if(value === 1) this.setState({flow: true})
+        })
         return(
             <Animated.View 
             style={[
@@ -75,20 +116,13 @@ class QrCodeScanner extends PureComponent {
                     {
                         translateY: this.value.interpolate({
                             inputRange: [0,1],
-                            outputRange:[0,244],
+                            outputRange:[-25,250],
                         }),
                     },
                 ]},
             ]}
             >
-            <View style={style.barStyle}/>
-            <View style={style.barStyle}/>
-            <View style={style.barStyle}/>
-            <View style={style.barStyle}/>
-            <View style={style.barStyle}/>
-            <View style={style.barStyle}/>
-            <View style={style.barStyle}/>
-
+        { this.barOpac()}
             </Animated.View>    
         );
     }
@@ -186,7 +220,7 @@ const style = StyleSheet.create({
         height: '1%',
         flexDirection: 'column',
         justifyContent: 'flex-start',
-        backgroundColor: 'green',
+        backgroundColor: '#39ff14',
         marginTop: '0.2%',
         marginBottom: '0.2%',
     }
