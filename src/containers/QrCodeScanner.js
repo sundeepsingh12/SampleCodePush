@@ -35,14 +35,23 @@ class QrCodeScanner extends PureComponent {
                 [Animated.timing(this.value, {
                     toValue: 1,
                     duration: 5000,
+                    useNativeDriver: true,
                 }),
                 Animated.timing(this.value, {
                     toValue: 0,
                     duration: 5000,
-                })]
-            )
+                    useNativeDriver: true,
+                })],
+            ),
         ).start();
-       ;
+
+        // let a = 42;
+        // setTimeout(()=>{
+        //     while(true){
+        //         a++;
+        //        }
+        // },3000)
+      
     }
 
     _handleQrCodeRead(e) {
@@ -92,7 +101,7 @@ class QrCodeScanner extends PureComponent {
                                                             {
                                                                 translateY: this.value.interpolate({
                                                                     inputRange: [0,1],
-                                                                    outputRange:[0,250],
+                                                                    outputRange:[0,247],
                                                                 }),
                                                             },
                                                         ]},
