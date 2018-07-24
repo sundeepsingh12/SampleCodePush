@@ -12,6 +12,8 @@ import styles from '../themes/FeStyle'
 import platform from '../../native-base-theme/variables/platform'
 import getTheme from '../../native-base-theme/components'
 
+const SCREEN_WIDTH = Dimensions.get('window').width;
+
 
 function mapStateToProps(state) {
     return {
@@ -64,6 +66,26 @@ class QrCodeScanner extends PureComponent {
         }
     }
 
+    spitOutAnimation() {
+        return(
+            <Animated.View 
+            style={[
+                {flex: 1},
+               { transform: [
+                    {
+                        translateY: this.value.interpolate({
+                            inputRange: [0,1],
+                            outputRange:[0,247],
+                        }),
+                    },
+                ]},
+            ]}
+            >
+
+            </Animated.View>    
+        );
+    }
+
     render() {
         if (this.props.scanning) {
             return (
@@ -90,27 +112,14 @@ class QrCodeScanner extends PureComponent {
                                 type={RNCamera.Constants.Type.back}
                                 onBarCodeRead={this._handleQrCodeRead.bind(this)}>
                                 <View style={style.rectangleContainer}>
-                                    <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
-                                    <View style={{flexDirection: 'row',justifyContent: 'center', height: 248}}>
-                                        <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
-                                            <View style={style.rectangle}>
-                                                <Animated.View 
-                                                    style={[
-                                                        style.barStyle,
-                                                       { transform: [
-                                                            {
-                                                                translateY: this.value.interpolate({
-                                                                    inputRange: [0,1],
-                                                                    outputRange:[0,247],
-                                                                }),
-                                                            },
-                                                        ]},
-                                                    ]}
-                                                />    
-                                            </View>
-                                        <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
+                                    <View style={{
+                                        borderWidth: SCREEN_WIDTH,
+                                        borderColor:'rgba(0,0,0,.7)'
+                                    }}>
+                                        <View style={style.rectangle}>
+                                               {this.spitOutAnimation()}
+                                        </View>
                                     </View>
-                                    <View style={{backgroundColor: 'rgba(0,0,0,0.7)',flex: 1}} />
                                 </View>
                             </RNCamera>
                         </View>
@@ -128,14 +137,19 @@ const style = StyleSheet.create({
         flex: 1,
     },
     rectangleContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
         flex: 1,
         backgroundColor: 'transparent',
     },
 
     rectangle: {
-        height: 250,
+        height: 250, 
         width: 250,
         backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderColor: 'rgba(57,255,20,0.4) ',
     },
     header: {
         borderBottomWidth: 0,
