@@ -75,12 +75,19 @@ class QrCodeScanner extends PureComponent {
                     {
                         translateY: this.value.interpolate({
                             inputRange: [0,1],
-                            outputRange:[0,247],
+                            outputRange:[0,244],
                         }),
                     },
                 ]},
             ]}
             >
+            <View style={style.barStyle}/>
+            <View style={style.barStyle}/>
+            <View style={style.barStyle}/>
+            <View style={style.barStyle}/>
+            <View style={style.barStyle}/>
+            <View style={style.barStyle}/>
+            <View style={style.barStyle}/>
 
             </Animated.View>    
         );
@@ -180,6 +187,8 @@ const style = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
         backgroundColor: 'green',
+        marginTop: '0.2%',
+        marginBottom: '0.2%',
     }
 });
 
