@@ -38,6 +38,7 @@ class QrCodeScanner extends PureComponent {
     componentDidMount() {
         this.props.actions.setState(SCANNING, true);
 
+        //Green Bar Up and Down Animation
         Animated.loop(
             Animated.sequence(
                 [Animated.timing(this.value, {
@@ -53,6 +54,7 @@ class QrCodeScanner extends PureComponent {
             ),
         ).start();
 
+        //To detect the end of box and flip bar's trace
         this.value.addListener(({value}) => {
             if(value === 0) this.setState({goingUp: false})
             else if(value === 1) this.setState({goingUp: true})
@@ -68,6 +70,8 @@ class QrCodeScanner extends PureComponent {
             this.props.navigation.state.params.returnData(e.data)
         }
     }
+
+    
     showBar() {
         return(
             <Animated.View 
@@ -122,7 +126,8 @@ class QrCodeScanner extends PureComponent {
                         <View style={{flex: 1}}>
                             <RNCamera style={style.camera}
                                 type={RNCamera.Constants.Type.back}
-                                onBarCodeRead={this._handleQrCodeRead.bind(this)}>
+                                onBarCodeRead={this._handleQrCodeRead.bind(this)}
+                            >
                                 <View style={style.rectangleContainer}>
                                     <View style={{
                                         borderWidth: SCREEN_WIDTH,
