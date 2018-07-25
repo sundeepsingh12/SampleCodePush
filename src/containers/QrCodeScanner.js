@@ -71,17 +71,17 @@ class QrCodeScanner extends PureComponent {
     showBar() {
         return(
             <Animated.View 
-            style={[
-                {flex: 1},
-               { transform: [
-                    {
-                        translateY: this.value.interpolate({
-                            inputRange: [0,1],
-                            outputRange:[-(VIEW_PORT * 0.1),VIEW_PORT],
-                        }),
-                    },
-                ]},
-            ]}
+                style={[
+                    {flex: 1},
+                { transform: [
+                        {
+                            translateY: this.value.interpolate({
+                                inputRange: [0,1],
+                                outputRange:[-(VIEW_PORT * 0.1),VIEW_PORT],
+                            }),
+                        },
+                    ]},
+                ]}
             >
             { 
                 this.state.goingUp
