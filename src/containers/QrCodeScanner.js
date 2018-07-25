@@ -14,6 +14,8 @@ import getTheme from '../../native-base-theme/components'
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const VIEW_PORT =   SCREEN_WIDTH * 0.8;
+const OPAC_DOWN = [0.125,0.25, 0.375, 0.5, 0.625,0.75, 0.875,1]
+const OPAC_UP = [1,0.875,0.75, 0.625, 0.5, 0.375,0.25,0.125]
 
 
 function mapStateToProps(state) {
@@ -31,36 +33,30 @@ function mapDispatchToProps(dispatch) {
 class QrCodeScanner extends PureComponent {
     value  = new Animated.Value(0);
     state = {
-        'flow': false
+        'goingUp': false
     };
     componentDidMount() {
         this.props.actions.setState(SCANNING, true);
+
         Animated.loop(
             Animated.sequence(
                 [Animated.timing(this.value, {
                     toValue: 1,
-                    duration: 3000,
+                    duration: 5000,
                     useNativeDriver: true,
                 }),
                 Animated.timing(this.value, {
                     toValue: 0,
-                    duration: 3000,
+                    duration: 5000,
                     useNativeDriver: true,
                 })],
             ),
         ).start();
-        this.value.addListener(({value}) => {
-            if(value === 0) this.setState({flow: false})
-            else if(value === 1) this.setState({flow: true})
-         });
 
-        // let a = 42;
-        // setTimeout(()=>{
-        //     while(true){
-        //         a++;
-        //        }
-        // },3000)
-      
+        this.value.addListener(({value}) => {
+            if(value === 0) this.setState({goingUp: false})
+            else if(value === 1) this.setState({goingUp: true})
+         });
     }
 
     _handleQrCodeRead(e) {
@@ -72,38 +68,7 @@ class QrCodeScanner extends PureComponent {
             this.props.navigation.state.params.returnData(e.data)
         }
     }
-
-    barOpac() {
-        if(this.state.flow){
-            return(
-            <View style={{flex: 1}}>
-                <View style={[style.barStyle, {opacity: 1}]}/>
-                <View style={[style.barStyle, {opacity: 0.875}]}/>
-                <View style={[style.barStyle, {opacity: 0.75}]}/>
-                <View style={[style.barStyle, {opacity: 0.625}]}/>
-                <View style={[style.barStyle, {opacity: 0.5}]}/>
-                <View style={[style.barStyle, {opacity: 0.375}]}/>
-                <View style={[style.barStyle, {opacity: 0.25}]}/> 
-                <View style={[style.barStyle, {opacity: 0.125 }]}/>
-            </View>)
-        } else {
-            return (
-            <View style={{flex: 1}}>
-                <View style={[style.barStyle, {opacity: 0.125 }]}/>
-                <View style={[style.barStyle, {opacity: 0.25}]}/> 
-                <View style={[style.barStyle, {opacity: 0.375}]}/>
-                <View style={[style.barStyle, {opacity: 0.5}]}/>
-                <View style={[style.barStyle, {opacity: 0.625}]}/>
-                <View style={[style.barStyle, {opacity: 0.75}]}/>
-                <View style={[style.barStyle, {opacity: 0.875}]}/>
-                <View style={[style.barStyle, {opacity: 1}]}/>
-            </View>
-            )
-        }
-
-    }
-
-    spitOutAnimation() {
+    showBar() {
         return(
             <Animated.View 
             style={[
@@ -118,9 +83,34 @@ class QrCodeScanner extends PureComponent {
                 ]},
             ]}
             >
-            { this.barOpac() }
+            { 
+                this.state.goingUp
+            ?   OPAC_UP.map((val) => (<View style={[style.barStyle,{opacity: val}]} />))
+            :   OPAC_DOWN.map((val) => (<View style={[style.barStyle,{opacity: val}]} />))
+            }
             </Animated.View>    
         );
+    }
+
+    showHeader() {
+        return (
+                <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
+                    <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                        <Body>
+                            <View
+                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                </TouchableOpacity>
+                                <View style={[style.headerBody]}>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Scanner</Text>
+                                </View>
+                                <View style={[style.headerRight]} />
+                            </View>
+                        </Body>
+                    </Header>
+                </SafeAreaView>
+        )
     }
 
     render() {
@@ -128,22 +118,7 @@ class QrCodeScanner extends PureComponent {
             return (
                 <StyleProvider style={getTheme(platform)}>
                     <Container>
-                        <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
-                                <Body>
-                                    <View
-                                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                        <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                        </TouchableOpacity>
-                                        <View style={[style.headerBody]}>
-                                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Scanner</Text>
-                                        </View>
-                                        <View style={[style.headerRight]} />
-                                    </View>
-                                </Body>
-                            </Header>
-                        </SafeAreaView>
+                        {this.showHeader()}
                         <View style={{flex: 1}}>
                             <RNCamera style={style.camera}
                                 type={RNCamera.Constants.Type.back}
@@ -154,7 +129,7 @@ class QrCodeScanner extends PureComponent {
                                         borderColor:'rgba(0,0,0,.7)'
                                     }}>
                                         <View style={style.rectangle}>
-                                               {this.spitOutAnimation()}
+                                               {this.showBar()}
                                         </View>
                                     </View>
                                 </View>
