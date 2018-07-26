@@ -3,6 +3,7 @@
 import React from 'react'
 import { Platform, View } from 'react-native'
 import { createBottomTabNavigator, createStackNavigator } from 'react-navigation'
+import { BottomTabBar } from 'react-navigation-tabs'
 import SyncScreen from './SyncScreen'
 import ErpSyncScreen from './ErpSyncScreen'
 import Home from './Home'
@@ -251,6 +252,13 @@ const Tabs = {
     }
   }
 };
+
+const tabBar = (props) => {
+  const color = require('../themes/FeStyle').default.primaryColor;
+  let newProps = {...props, activeTintColor: color}
+  return <BottomTabBar {...newProps} />
+}
+
 const tabStyle = {
   tabBarPosition: 'bottom',
   initialRouteName: 'Home',
@@ -288,7 +296,7 @@ const HomeTab = createBottomTabNavigator({
   SyncScreen: Tabs.SyncScreen,
   Menu: Tabs.Menu,
 },
-  tabStyle
+  {...tabStyle,     tabBarComponent: tabBar,}
 );
 const HomeErpTab = createBottomTabNavigator({
   Home: Tabs.Home,
@@ -296,7 +304,7 @@ const HomeErpTab = createBottomTabNavigator({
   ErpSyncScreen: Tabs.ErpSyncScreen,
   Menu: Tabs.Menu
 },
-  tabStyle,
+  {...tabStyle,     tabBarComponent: tabBar,},
 );
 
 export { HomeTab, HomeErpTab };
