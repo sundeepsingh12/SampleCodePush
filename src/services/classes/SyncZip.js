@@ -17,7 +17,8 @@ import {
     LAST_SYNC_WITH_SERVER,
     JOB_STATUS,
     UNSEEN,
-    USER_EXCEPTION_LOGS
+    USER_EXCEPTION_LOGS,
+    ENCRYPTION_KEY
 } from '../../lib/constants'
 import moment from 'moment'
 import { trackingService } from './Tracking'
@@ -28,6 +29,7 @@ import { userExceptionLogsService } from './UserException'
 import { communicationLogsService } from './CommunicationLogs'
 import { omit } from 'lodash'
 import { Platform } from 'react-native'
+var CryptoJS = require("crypto-js");
 
 class SyncZip {
 
@@ -56,13 +58,26 @@ class SyncZip {
         SYNC_RESULTS.jobSummary = jobSummary
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
-        //Writing Object to File at TEMP location
-        await RNFS.writeFile(PATH_TEMP + '/logs.json', JSON.stringify(SYNC_RESULTS), 'utf8');
+        let isEncryptionSuccessful = true,syncData
+        try{
+             syncData = JSON.stringify(SYNC_RESULTS)
+            const encryptionKey = await keyValueDBService.getValueFromStore(ENCRYPTION_KEY)
+            const keyInside = CryptoJS.enc.Base64.parse(encryptionKey.value);
+            const encryptedResult = CryptoJS.AES.encrypt(syncData, keyInside, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7})
+              //Writing Object to File at TEMP location
+            await RNFS.writeFile(PATH_TEMP + '/logs.json', encryptedResult.toString(), 'utf8');
+        }catch(error){
+            isEncryptionSuccessful = false
+        }
+        //Send data in plain text format to server,sync shouldn't be stopped if encryption failed
+        if(!isEncryptionSuccessful){
+            await RNFS.writeFile(PATH_TEMP + '/logs.json', syncData, 'utf8');
+        }
         //Creating ZIP file
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
-        return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds }
+        return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds,isEncryptionSuccessful }
         //Deleting TEMP folder location
         // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }

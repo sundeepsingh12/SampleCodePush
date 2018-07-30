@@ -9,6 +9,7 @@
     "postinstall": "./src/scripts/camera/camera.sh &&  ./src/scripts/installer/installer.sh"
   },
   "dependencies": {
+    "crypto-js": "3.1.9-1",
     "immutable": "3.8.2",
     "jest-cli": "23.4.1",
     "js-sha512": "0.7.1",

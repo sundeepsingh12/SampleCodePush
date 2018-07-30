@@ -37,13 +37,16 @@ import {
   MDM_POLICIES,
   APP_VERSION,
   APP_THEME,
-  LONG_CODE_SIM_VERIFICATION
+  LONG_CODE_SIM_VERIFICATION,
+  ENCRYPTION_KEY
 } from '../../lib/constants'
 import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER, PATH_COMPANY_LOGO_DIR, PATH_COMPANY_LOGO_IMAGE } from '../../lib/AttributeConstants'
 import _ from 'lodash'
 import { TIME_ERROR_MESSAGE } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
+
+import { cryptoService } from './Crypto'
 class JobMaster {
   /**
    *## This will Download Job Master from server
@@ -153,6 +156,8 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);
     await keyValueDBService.validateAndSaveData(USER, json.user);
+    const encryptionKey =  await cryptoService.createEncryptionKey(json.user.company)
+    await keyValueDBService.validateAndSaveData(ENCRYPTION_KEY,encryptionKey);
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster);
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_VALUE, json.jobAttributeValueMaster);
     await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE, json.fieldAttributeMaster);
