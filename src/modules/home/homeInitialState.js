@@ -30,7 +30,8 @@ var InitialState = Record({
     lastErpSyncTime: null,
     draftNewJobInfo: null,
     checkNewJobTransactionStatus: null,
-    logo: null
+    logo: null,
+    callerIdDisplayData:[]
 })
 export default InitialState
 

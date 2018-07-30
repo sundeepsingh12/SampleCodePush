@@ -8,7 +8,6 @@ var InitialState = Record({
     pendingCount: 0,
     error: null,
     scanSuccess: false,
-    scanError: null,
     jobMaster:null
 })
 

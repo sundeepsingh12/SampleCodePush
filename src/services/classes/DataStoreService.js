@@ -26,10 +26,8 @@ import {
 import * as realm from '../../repositories/realmdb'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import moment from 'moment'
-import { keyValueDb } from '../../repositories/keyValueDb'
 import { dataStoreFilterService } from '../../services/classes/DataStoreFilterService'
 import _ from 'lodash'
-import { jobTransactionService } from './JobTransaction'
 import {
     SEARCH_TEXT_MISSING,
     DATA_STORE_MAP_MISSING,

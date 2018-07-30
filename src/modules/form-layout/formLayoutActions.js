@@ -193,6 +193,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         dispatch(fetchJobs())
                     } else if (routeName == TabScreen) {
                         navDispatch(StackActions.popToTop());
+                        dispatch(pieChartCount())
                         dispatch(fetchJobs())
                     } else if (routeName == Transient) {
                         //When single status is present in transient case navigate to form layout directly

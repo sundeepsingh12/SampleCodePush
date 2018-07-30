@@ -19,6 +19,7 @@ import {
 } from '../../lib/AttributeConstants'
 
 import _ from 'lodash'
+let calls = require('../../wrapper/CALLS')
 
 class JobData {
 
@@ -229,6 +230,27 @@ class JobData {
             jobDataMap[jobId][jobAttributeMasterId] = jobData
         })
         return jobDataMap
+    }
+
+    
+    async getCallerIdListAndJobId(incomingNumber,idJobAttributeMap,query){
+        const allJobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA,query)
+        let isNumberPresentInJobData = false,callerIdDisplayList = [],id=0,jobId
+        for(let jobData of allJobDataList){
+           let isNumberSame =  await calls.compareNumbers(incomingNumber, jobData.value)
+            //Check whether number from which call is made is present in jobdata db and also get job id from that job data
+            if(!isNumberPresentInJobData && idJobAttributeMap[jobData.jobAttributeMasterId].attributeTypeId == CONTACT_NUMBER && isNumberSame){
+                isNumberPresentInJobData = true
+                jobId = jobData.jobId
+            }
+
+            //Prepare callerIdDisplayList,This will be used for displaying info whenever call is made
+            if(idJobAttributeMap[jobData.jobAttributeMasterId]  && idJobAttributeMap[jobData.jobAttributeMasterId].attributeTypeId != CONTACT_NUMBER ){
+                callerIdDisplayList.push({id:id++,jobAttributeLabel:idJobAttributeMap[jobData.jobAttributeMasterId].label,value:jobData.value})
+            }
+        }
+        return {isNumberPresentInJobData,callerIdDisplayList,jobId}
+      
     }
 }
 export let jobDataService = new JobData()

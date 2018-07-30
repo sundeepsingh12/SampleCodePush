@@ -10,7 +10,9 @@ import { addServerSmsService } from '../AddServerSms';
 import { fieldValidationService } from '../FieldValidation';
 import { jobStatusService } from '../JobStatus';
 import { keyValueDBService } from '../KeyValueDBService.js';
+import { communicationLogsService } from '../CommunicationLogs'
 import { runSheetService } from '../RunSheet';
+import { Platform } from 'react-native'
 
 export default class FormLayoutEventImpl {
 
@@ -142,35 +144,31 @@ export default class FormLayoutEventImpl {
      * called on saving button and saves Data in db or store
      * currently saving fieldData, jobTransaction and job
      */
-    async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionList) {
+    async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionList, jobAndFieldAttributesList) {
         let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
         let user = await keyValueDBService.getValueFromStore(USER)
         let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
-        let previouslyTravelledDistance = await keyValueDBService.getValueFromStore(PREVIOUSLY_TRAVELLED_DISTANCE)
-        previouslyTravelledDistance = (!parseFloat(previouslyTravelledDistance)) ? 0 : previouslyTravelledDistance.value
-        let trackKms = userSummary.value.gpsKms - previouslyTravelledDistance
-        let trackTransactionTimeSpent = await keyValueDBService.getValueFromStore(TRANSACTION_TIME_SPENT)
-        trackTransactionTimeSpent = moment().diff(trackTransactionTimeSpent.value, 'seconds')
-        let trackBattery = await keyValueDBService.getValueFromStore(TRACK_BATTERY)
-        let gpsKms = (!userSummary.value.gpsKms) ? "0" : userSummary.value.gpsKms
-        await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, gpsKms)
-        let lastTrackLog = {
-            latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : null,
-            longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : null
-        }
-        let fieldData, jobTransaction, job, dbObjects
+
+        let fieldData, jobTransaction, job, dbObjects, transactionTrackValuesObject = {}, jobIdToJobTransactionMap = {}
+        await this.getJobTransactionTrackValues(userSummary, transactionTrackValuesObject)
+        let { callAndSmsLogs, jobDataList } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogsAndJobDataList(jobTransactionList, jobAndFieldAttributesList, jobMasterId) : { callAndSmsLogs: null, jobDataList: [] }
+
         if (jobTransactionList && jobTransactionList.length) { //Case of bulk
             fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionList, currentTime)
             dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
-            jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap) // to edit later 
+            jobIdToJobTransactionMap = _.mapKeys(dbObjects.jobTransaction, 'jobId')
+            let jobTransactionIdToCallCountMap = await communicationLogsService.getTrackCallCount(callAndSmsLogs, jobDataList, fieldData.value, jobIdToJobTransactionMap)
+            jobTransaction = this._setBulkJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, fieldData.npsFeedbackValue, fieldData.amountMap, jobTransactionIdToCallCountMap) // to edit later 
             job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value, fieldData.reAttemptDate)
         }
         else {
             jobTransactionId = await this.changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList)//In case of new job change jobTransactionId
             fieldData = this._saveFieldData(formLayoutObject, jobTransactionId, null, currentTime)
             dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
-            jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap) //to edit later
-            job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, lastTrackLog)
+            jobIdToJobTransactionMap[jobTransactionList.jobId] = jobTransactionList
+            let jobTransactionIdToCallCountMap = await communicationLogsService.getTrackCallCount(callAndSmsLogs, jobDataList, fieldData.value, jobIdToJobTransactionMap)
+            jobTransaction = this._setJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, fieldData.npsFeedbackValue, fieldData.amountMap, jobTransactionIdToCallCountMap) //to edit later
+            job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, transactionTrackValuesObject.lastTrackLog)
         }
         //TODO add other dbs which needs updation
         const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
@@ -178,7 +176,7 @@ export default class FormLayoutEventImpl {
             await this._getRunsheetIdToUpdateJobTransactions(jobTransaction.value, currentTime, dbObjects.status[0].statusCategory)
         }
         const prevStatusId = (jobTransactionList && jobTransactionList.length) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
-        const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, lastTrackLog)
+        const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, transactionTrackValuesObject.lastTrackLog)
         const runSheet = await this._updateRunsheetSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value);
         await this._updateUserSummary(prevStatusId, dbObjects.status[0].statusCategory, jobTransaction.value, userSummary.value, dbObjects.status[0].id)
         await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionList)
@@ -187,6 +185,22 @@ export default class FormLayoutEventImpl {
         await keyValueDBService.validateAndSaveData(LAST_JOB_COMPLETED_TIME, moment().format('YYYY-MM-DD HH:mm:ss'))
         await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
         return jobTransaction.jobTransactionDTOMap
+    }
+
+    async getJobTransactionTrackValues(userSummary, transactionTrackValuesObject) {
+        let previouslyTravelledDistance = await keyValueDBService.getValueFromStore(PREVIOUSLY_TRAVELLED_DISTANCE)
+        transactionTrackValuesObject.previouslyTravelledDistance = (!parseFloat(previouslyTravelledDistance)) ? 0 : previouslyTravelledDistance.value
+        transactionTrackValuesObject.trackKms = userSummary.value.gpsKms - transactionTrackValuesObject.previouslyTravelledDistance
+        let trackTransactionTimeSpent = await keyValueDBService.getValueFromStore(TRANSACTION_TIME_SPENT)
+        transactionTrackValuesObject.trackTransactionTimeSpent = moment().diff(trackTransactionTimeSpent.value, 'seconds')
+        let trackBattery = await keyValueDBService.getValueFromStore(TRACK_BATTERY)
+        transactionTrackValuesObject.trackBattery = (trackBattery && trackBattery.value) ? trackBattery.value : 0
+        transactionTrackValuesObject.gpsKms = (!userSummary.value.gpsKms) ? "0" : userSummary.value.gpsKms
+        await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, transactionTrackValuesObject.gpsKms)
+        transactionTrackValuesObject.lastTrackLog = {
+            latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : null,
+            longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : null
+        }
     }
 
     async _getRunsheetIdToUpdateJobTransactions(jobTransaction, currentTime, statusCategory) {
@@ -607,25 +621,28 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue, amountMap) {
-        let jobTransactionArray = [], jobTransactionDTOMap = {}, syncTime = moment().format('YYYY-MM-DD HH:mm:ss');
-        let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
+    _setJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, npsFeedbackValue, amountMap, jobTransactionIdToCallCountMap) {
+        let jobTransactionArray = [], jobTransactionDTOMap = {}, syncTime = moment().format('YYYY-MM-DD HH:mm:ss'), status = dbObjects.status[0], jobMaster = dbObjects.jobMaster[0]
+        let jobTransaction = Object.assign({}, dbObjects.jobTransaction) // no need to have null checks as it is called from a private method
         jobTransaction.jobType = jobMaster.code
         jobTransaction.jobStatusId = status.id
         jobTransaction.statusCode = status.code
-        jobTransaction.employeeCode = (user) ? user.employeeCode : null
-        jobTransaction.hubCode = hub.code
+        jobTransaction.employeeCode = (dbObjects.user.value) ? dbObjects.user.value.employeeCode : null
+        jobTransaction.hubCode = dbObjects.hub.value.code
         jobTransaction.lastTransactionTimeOnMobile = currentTime
-        jobTransaction.imeiNumber = imei.imeiNumber
-        jobTransaction.latitude = lastTrackLog.latitude
-        jobTransaction.longitude = lastTrackLog.longitude
-        jobTransaction.trackKm = trackKms
-        jobTransaction.trackTransactionTimeSpent = trackTransactionTimeSpent * 1000
-        jobTransaction.trackBattery = (trackBattery && trackBattery.value) ? trackBattery.value : 0
+        jobTransaction.imeiNumber = dbObjects.imei.value.imeiNumber
+        jobTransaction.latitude = transactionTrackValuesObject.lastTrackLog.latitude
+        jobTransaction.longitude = transactionTrackValuesObject.lastTrackLog.longitude
+        jobTransaction.trackKm = transactionTrackValuesObject.trackKms
+        jobTransaction.trackTransactionTimeSpent = transactionTrackValuesObject.trackTransactionTimeSpent * 1000
+        jobTransaction.trackBattery = (transactionTrackValuesObject.trackBattery && transactionTrackValuesObject.trackBattery.value) ? transactionTrackValuesObject.trackBattery.value : 0
         jobTransaction.npsFeedBack = npsFeedbackValue
         jobTransaction.originalAmount = parseFloat(amountMap.originalAmount) ? parseFloat(amountMap.originalAmount) : 0
         jobTransaction.actualAmount = parseFloat(amountMap.actualAmount) ? parseFloat(amountMap.actualAmount) : 0
         jobTransaction.moneyTransactionType = amountMap.moneyTransactionType
+        jobTransaction.trackCallCount = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].callCount) ? jobTransactionIdToCallCountMap[jobTransaction.id].callCount : 0
+        jobTransaction.trackCallDuration = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].callDuration) ? jobTransactionIdToCallCountMap[jobTransaction.id].callDuration : 0
+        jobTransaction.trackSmsCount = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].smsCount) ? jobTransactionIdToCallCountMap[jobTransaction.id].smsCount : 0
         jobTransactionArray.push(jobTransaction)
         jobTransactionDTOMap[jobTransaction.id] = {
             id: jobTransaction.id,
@@ -639,27 +656,29 @@ export default class FormLayoutEventImpl {
             jobTransactionDTOMap
         }
     }
-
-    _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue, amountMap) {
-        let jobTransactionArray = [], jobTransactionDTOMap = {}, syncTime = moment().format('YYYY-MM-DD HH:mm:ss');
-        for (let jobTransaction1 in jobTransactionList) {
-            let jobTransaction = Object.assign({}, jobTransactionList[jobTransaction1]) // no need to have null checks as it is called from a private method
+    _setBulkJobTransactionValues(dbObjects, currentTime, transactionTrackValuesObject, npsFeedbackValue, amountMap, jobTransactionIdToCallCountMap) {
+        let jobTransactionArray = [], jobTransactionDTOMap = {}, syncTime = moment().format('YYYY-MM-DD HH:mm:ss'), status = dbObjects.status[0], jobMaster = dbObjects.jobMaster[0]
+        for (let jobTransaction1 in dbObjects.jobTransaction) {
+            let jobTransaction = Object.assign({}, dbObjects.jobTransaction[jobTransaction1]) // no need to have null checks as it is called from a private method
             jobTransaction.jobType = jobMaster.code
             jobTransaction.jobStatusId = status.id
             jobTransaction.statusCode = status.code
-            jobTransaction.employeeCode = user.employeeCode
-            jobTransaction.hubCode = hub.code
+            jobTransaction.employeeCode = dbObjects.user.value.employeeCode
+            jobTransaction.hubCode = dbObjects.hub.value.code
             jobTransaction.lastTransactionTimeOnMobile = currentTime
-            jobTransaction.imeiNumber = imei.imeiNumber
-            jobTransaction.latitude = lastTrackLog.latitude
-            jobTransaction.longitude = lastTrackLog.longitude
-            jobTransaction.trackKm = trackKms
-            jobTransaction.trackTransactionTimeSpent = trackTransactionTimeSpent * 1000
-            jobTransaction.trackBattery = (trackBattery && trackBattery.value) ? trackBattery.value : 0
+            jobTransaction.imeiNumber = dbObjects.imei.value.imeiNumber
+            jobTransaction.latitude = transactionTrackValuesObject.lastTrackLog.latitude
+            jobTransaction.longitude = transactionTrackValuesObject.lastTrackLog.longitude
+            jobTransaction.trackKm = transactionTrackValuesObject.trackKms
+            jobTransaction.trackTransactionTimeSpent = transactionTrackValuesObject.trackTransactionTimeSpent * 1000
+            jobTransaction.trackBattery = (transactionTrackValuesObject.trackBattery && transactionTrackValuesObject.trackBattery.value) ? transactionTrackValuesObject.trackBattery.value : 0
             jobTransaction.npsFeedBack = npsFeedbackValue
             jobTransaction.originalAmount = amountMap[jobTransaction.id] ? parseFloat(amountMap[jobTransaction.id].originalAmount) : parseFloat(amountMap.originalAmount) ? parseFloat(amountMap.originalAmount) : 0
             jobTransaction.actualAmount = amountMap[jobTransaction.id] ? parseFloat(amountMap[jobTransaction.id].actualAmount) : parseFloat(amountMap.actualAmount) ? parseFloat(amountMap.actualAmount) : 0
             jobTransaction.moneyTransactionType = amountMap.moneyTransactionType
+            jobTransaction.trackCallCount = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].callCount) ? jobTransactionIdToCallCountMap[jobTransaction.id].callCount : 0
+            jobTransaction.trackCallDuration = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].callDuration) ? jobTransactionIdToCallCountMap[jobTransaction.id].callDuration : 0
+            jobTransaction.trackSmsCount = (jobTransactionIdToCallCountMap[jobTransaction.id] && jobTransactionIdToCallCountMap[jobTransaction.id].smsCount) ? jobTransactionIdToCallCountMap[jobTransaction.id].smsCount : 0
             jobTransactionArray.push(jobTransaction)
             jobTransactionDTOMap[jobTransaction.id] = {
                 id: jobTransaction.id,
