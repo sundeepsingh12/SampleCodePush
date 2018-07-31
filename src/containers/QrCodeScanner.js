@@ -159,6 +159,7 @@ const style = StyleSheet.create({
         alignItems: 'center',
         flex: 1,
         backgroundColor: 'transparent',
+        overflow:'hidden'
     },
 
     rectangle: {
@@ -166,6 +167,7 @@ const style = StyleSheet.create({
         width: VIEW_PORT,
         backgroundColor: 'transparent',
         borderWidth: 2,
+        overflow:'hidden',
         borderColor: 'rgba(57,255,20,0.4) ',
     },
     header: {
