@@ -3,7 +3,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, Platform, ActivityIndicator, SectionList,Modal,TouchableOpacity,FlatList,TouchableHighlight } from 'react-native'
+import { StyleSheet, View, Image, Platform, ActivityIndicator, SectionList, Modal, TouchableOpacity, FlatList, TouchableHighlight } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import Loader from '../components/Loader'
 import PieChart from '../components/PieChart'
@@ -17,7 +17,7 @@ import styles from '../themes/FeStyle'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { UNTITLED, TRANSACTION_SUCCESSFUL, DELETE_DRAFT } from '../lib/ContainerConstants'
-import { Summary, PAGES_LOADING, CHECK_TRANSACTION_STATUS_NEW_JOB, SET_NEWJOB_DRAFT_INFO, SET_CHECK_TRANSACTION_AND_DRAFT, LOADER_FOR_SYNCING, SET_CALLER_ID_POPUP} from '../lib/constants'
+import { Summary, PAGES_LOADING, CHECK_TRANSACTION_STATUS_NEW_JOB, SET_NEWJOB_DRAFT_INFO, SET_CHECK_TRANSACTION_AND_DRAFT, LOADER_FOR_SYNCING, SET_CALLER_ID_POPUP } from '../lib/constants'
 import DraftModal from '../components/DraftModal'
 import TransactionAlert from '../components/TransactionAlert'
 import SyncLoader from '../components/SyncLoader'
@@ -43,7 +43,7 @@ function mapStateToProps(state) {
     checkNewJobTransactionStatus: state.home.checkNewJobTransactionStatus,
     customErpPullActivated: state.home.customErpPullActivated,
     logo: state.home.logo,
-    callerIdDisplayData:state.home.callerIdDisplayData
+    callerIdDisplayData: state.home.callerIdDisplayData
   }
 }
 
@@ -56,8 +56,8 @@ function mapDispatchToProps(dispatch) {
 class Home extends PureComponent {
 
 
- componentDidMount() {
-    (Platform.OS==='android')?this.props.actions.registerCallReceiver():null
+  componentDidMount() {
+    (Platform.OS === 'android') ? this.props.actions.registerCallReceiver() : null
     this.props.actions.fetchPagesAndPiechart();
     this.props.actions.performSyncService(this.props.customErpPullActivated == 'notActivated');
     this.props.actions.startTracking(this.props.trackingServiceStarted);
@@ -131,66 +131,72 @@ class Home extends PureComponent {
     this.props.actions.setState(LOADER_FOR_SYNCING, false)
   }
 
-  renderCallerDisplayData(item){
+  renderCallerDisplayData(item) {
     return (
-       <View style = {[styles.row]}>
-                  <Text style = {[styles.paddingHorizontal10, styles.paddingVertical5, styles.fontDefault, {width: '40%'}]}>
-                    {item.jobAttributeLabel}
-                  </Text>
-                  <Text style={[styles.paddingHorizontal10, styles.paddingVertical5, styles.fontDefault, {width: '60%'}]}>
-                    {item.value}
-                  </Text>
-                </View> 
+      <View style={[styles.row]}>
+        <Text style={[styles.paddingHorizontal10, styles.paddingVertical5, styles.fontDefault, { width: '40%' }]}>
+          {item.jobAttributeLabel}
+        </Text>
+        <Text style={[styles.paddingHorizontal10, styles.paddingVertical5, styles.fontDefault, { width: '60%' }]}>
+          {item.value}
+        </Text>
+      </View>
     )
   }
 
-  showCallerPopupWindow(){
+  showCallerPopupWindow() {
     return (
       <StyleProvider style={getTheme(platform)}>
-      <Modal animationType={"fade"}
-        transparent={true}
-        visible={true}
-        presentationStyle={"overFullScreen"}
-        onRequestClose={()=>{}}
+        <Modal animationType={"fade"}
+          transparent={true}
+          visible={true}
+          presentationStyle={"overFullScreen"}
+          onRequestClose={() => { }}
         >
-        <View style={[styles.flex1, styles.row, styles.justifyCenter, styles.alignCenter, {backgroundColor: 'rgba(225,225,225,.8)'}]}>
-          
-            <View style={[{backgroundColor: 'white', borderRadius: 6}]}>
-              <View style = {{height: 10, borderTopLeftRadius: 6,  borderTopRightRadius: 6, backgroundColor: '#1478f6'}}></View>
-              <View style={[styles.bgPrimary, styles.width100, styles.row, {backgroundColor: '#1478f6'}]}>
+          <View style={[styles.flex1, styles.row, styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(225,225,225,.8)' }]}>
+
+            <View style={[{ backgroundColor: 'white', borderRadius: 6 }]}>
+              <View style={{ height: 10, borderTopLeftRadius: 6, borderTopRightRadius: 6, backgroundColor: '#1478f6' }}></View>
+              <View style={[styles.bgPrimary, styles.width100, styles.row, { backgroundColor: '#1478f6' }]}>
                 <View style={[styles.paddingHorizontal10, styles.flexBasis80, styles.paddingVertical5, styles.paddingBottom10]}>
                   <Text style={[styles.fontWhite]}>{this.props.callerIdDisplayData.referenceNumber}</Text>
                   <View style={[styles.row, styles.alignCenter]}>
-                    <Icon name="md-call" style={[styles.fontWhite, styles.fontDefault]}  />
+                    <Icon name="md-call" style={[styles.fontWhite, styles.fontDefault]} />
                     <Text style={[styles.fontWhite, styles.marginLeft5]}>{this.props.callerIdDisplayData.incomingNumber}</Text>
                   </View>
-                  
+
                 </View>
-                <TouchableHighlight onPress = {this.dismissCallerPopup} style={[styles.flexBasis20, styles.justifyStart, styles.alignEnd]}>
-                  <Icon name="md-close" style={[styles.fontWhite, styles.padding25, styles.paddingTop5, styles.fontDefault]}  />
+                <TouchableHighlight onPress={this.dismissCallerPopup} style={[styles.flexBasis20, styles.justifyStart, styles.alignEnd]}>
+                  <Icon name="md-close" style={[styles.fontWhite, styles.padding25, styles.paddingTop5, styles.fontDefault]} />
                 </TouchableHighlight>
 
               </View>
+              {this.getCallerIdDisplayListView()}
 
-              <View style={[styles.paddingTop5]}>
-                  <FlatList
-                                data={this.props.callerIdDisplayData.callerIdDisplayList}
-                                renderItem={({ item }) => this.renderCallerDisplayData(item)}
-                                keyExtractor={item => String(item.id)}
-                            />
-                <View style = {{height: 10, borderBottomLeftRadius: 6,  borderBottomRightRadius: 6}}></View>
-              </View>
             </View>
-        </View>
-    </Modal>
-  </StyleProvider>
+          </View>
+        </Modal>
+      </StyleProvider>
 
     )
   }
-
+  getCallerIdDisplayListView() {
+    let view
+    if (this.props.callerIdDisplayData && this.props.callerIdDisplayData.callerIdDisplayList && this.props.callerIdDisplayData.callerIdDisplayList.length > 0) {
+      view = <View style={[styles.paddingTop5]}>
+        <FlatList
+          data={this.props.callerIdDisplayData.callerIdDisplayList}
+          renderItem={({ item }) => this.renderCallerDisplayData(item)}
+          keyExtractor={item => String(item.id)}
+        />
+        <View style={{ height: 10, borderBottomLeftRadius: 6, borderBottomRightRadius: 6 }}></View>
+      </View>
+    }
+    return view
+  }
   dismissCallerPopup = () => {
-    this.props.actions.setState(SET_CALLER_ID_POPUP,{
-      showCallerIdPopup:false,
+    this.props.actions.setState(SET_CALLER_ID_POPUP, {
+      showCallerIdPopup: false,
     })
   }
 
@@ -223,11 +229,11 @@ class Home extends PureComponent {
             </Header>
           </SafeAreaView>
           <Content>
-            {(this.props.moduleLoading) ? <SyncLoader moduleLoading={this.props.moduleLoading} cancelModal = {this.onCancelPress}/> : null}
+            {(this.props.moduleLoading) ? <SyncLoader moduleLoading={this.props.moduleLoading} cancelModal={this.onCancelPress} /> : null}
             {pieChartView}
             {(this.props.checkNewJobTransactionStatus && this.props.checkNewJobTransactionStatus != TRANSACTION_SUCCESSFUL && this.props.checkNewJobTransactionStatus != DELETE_DRAFT) ? this.showCheckTransactionAlert() : this.getNewJobDraftModal()}
             <List>{this.getPageListItemsView()}</List>
-            {(this.props.callerIdDisplayData.showCallerIdPopup) ? this.showCallerPopupWindow():null}
+            {(this.props.callerIdDisplayData.showCallerIdPopup) ? this.showCallerPopupWindow() : null}
           </Content>
         </Container>
       </StyleProvider>
