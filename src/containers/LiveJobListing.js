@@ -7,7 +7,7 @@ import * as liveJobActions from '../modules/liveJob/liveJobActions'
 import Loader from '../components/Loader'
 import moment from 'moment'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableHighlight, FlatList, TouchableOpacity, TextInput, ScrollView } from 'react-native'
+import { StyleSheet, View, TouchableHighlight, FlatList, TouchableOpacity, TextInput, ScrollView, Vibration } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import _ from 'lodash'
 import { Container, Header, Button, Text, Body, Icon, Footer, FooterTab, StyleProvider, Toast } from 'native-base'
@@ -19,6 +19,8 @@ import { SET_SEARCH, SET_LIVE_JOB_TOAST, QrCodeScanner } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { LIVE_TASKS, NO_JOBS_PRESENT, SELECT_ALL, ACCEPT, REJECT, SELECTED, OK } from '../lib/ContainerConstants'
 import { navigate } from '../modules/navigators/NavigationService';
+import Sound from 'react-native-sound';
+import BackgroundTimer from 'react-native-background-timer'
 
 function mapStateToProps(state) {
     return {
@@ -38,17 +40,45 @@ function mapDispatchToProps(dispatch) {
 
 class LiveJobListing extends PureComponent {
 
+
     static navigationOptions = ({ navigation }) => {
         return {
             header: null
         }
     }
+    constructor(props) {
+        super(props);
+        var alarm;
+    }
 
     componentDidMount() {
         this.props.actions.fetchAllLiveJobsList()
-        if (this.props.navigation.state.params && this.props.navigation.state.params.callAlarm == true) {
-            // Vibration.vibrate()
-            this.props.navigation.state.params.callAlarm = false
+        if (this.props.navigation.state.params && this.props.navigation.state.params.ringAlarm) {
+            Vibration.vibrate([1000, 2000, 3000], true)
+            this.props.navigation.state.params.ringAlarm = false
+            Sound.setCategory('Playback');
+            this.alarm = new Sound('alarm_notification.mp3', Sound.MAIN_BUNDLE, (error) => {
+                if (error) {
+                    console.log('failed to load the sound', error);
+                    return;
+                }
+                // loaded successfully
+                this.alarm.play((success) => {
+                    if (success) {
+                        console.log('successfully finished playing');
+                    } else {
+                        console.log('playback failed due to audio decoding errors');
+                        // reset the player to its uninitialized state (android only)
+                        // this is the only option to recover after an error occured and use the player again
+                        this.alarm.reset();
+                    }
+                });
+                this.alarm.setNumberOfLoops(-1);
+            });
+            BackgroundTimer.setTimeout(() => {
+                Vibration.cancel()
+                this.alarm.stop()
+            }, 30000)
         }
     }
     componentDidUpdate() {
@@ -63,7 +93,12 @@ class LiveJobListing extends PureComponent {
         }
     }
 
-
+    componentWillUnmount() {
+        if (this.alarm) {
+            Vibration.cancel()
+            this.alarm.stop()
+        }
+    }
     navigateToScene = (item) => {
         if (item.isChecked == 'false' || !item.isChecked && this.props.selectedItems.length == 0) {
             navigate('LiveJob',
@@ -74,6 +109,10 @@ class LiveJobListing extends PureComponent {
                 })
         } else {
             this.toggleLiveJobSelection(item.id)
+        }
+        if (this.alarm) {
+            Vibration.cancel();
+            this.alarm.stop();
         }
     }
     renderData = (item) => {

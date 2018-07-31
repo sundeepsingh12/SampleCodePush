@@ -36,6 +36,7 @@ import FCM from "react-native-fcm"
 import RNFS from 'react-native-fs'
 import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
 import { communicationLogsService } from './CommunicationLogs'
+import { liveJobService } from './LiveJobService';
 class Sync {
 
   async createAndUploadZip(syncStoreDTO, currentDate) {
@@ -136,7 +137,10 @@ class Sync {
    * 
    */
   async processTdcResponse(tdcContentArray, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
-    let tdcContentObject, jobMasterIds, messageIdDto = []
+    let tdcContentObject, jobMasterIds, messageIdDto = [], jobIdToLiveJobMap = {}
+    if (isLiveJob && _.size(tdcContentArray) > 0) {
+      jobIdToLiveJobMap = liveJobService.getAllLiveJobs()
+    }
     //Prepare jobMasterWithAssignOrderToHubEnabledhere only and if it is non empty,then only hit store for below 4 lines
     // const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
     //This loop gets jobMaster map for job master of which assignOrderToHub is enabled
@@ -148,7 +152,7 @@ class Sync {
       }
       const queryType = tdcContentObject.type
       if (queryType == 'insert') {
-        jobMasterIds = await this.saveDataFromServerInDB(contentQuery, isLiveJob)
+        jobMasterIds = await this.saveDataFromServerInDB(contentQuery, isLiveJob, jobIdToLiveJobMap)
       } else if (queryType == 'update') {
         jobMasterIds = await this.insertOrUpdateDataInDb(contentQuery)
       } else if (queryType == 'updateStatus') {
@@ -256,7 +260,7 @@ class Sync {
   }
 
 
-  async saveDataFromServerInDB(contentQuery, isLiveJob) {
+  async saveDataFromServerInDB(contentQuery, isLiveJob, jobIdToLiveJobMap) {
     const jobIds = contentQuery.job.map(jobObject => jobObject.id)
     const existingJobDatas = {
       tableName: TABLE_JOB_DATA,
@@ -286,32 +290,39 @@ class Sync {
       tableName: TABLE_RUNSHEET,
       value: contentQuery.runSheet
     }
-    if (isLiveJob) {
-      await this.saveLiveJobData(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
-    }
+
     //Job data is deleted in insert query also,to handle multiple login case 
     //Ideally Id should be added server side in jobdata table
     realm.deleteRecordsInBatch(existingJobDatas)
     realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
-    const jobMasterIds = this.getJobMasterIds(contentQuery.job)
+    let jobMasterIds = this.getJobMasterIds(contentQuery.job)
+    if (isLiveJob) {
+      await this.saveLiveJobData(jobs, jobIds, jobIdToLiveJobMap)
+    }
     return jobMasterIds
   }
 
-  async saveLiveJobData(jobs, jobDatas) {
-    let jobQuery = jobs.value.map(jobId => 'id = ' + jobId.id).join(' OR ')
+  async saveLiveJobData(jobs, jobIds, jobIdToLiveJobMap) {
+    let uniqueLiveJob = 0
+    for (let jobId of jobIds) {
+      if (!jobIdToLiveJobMap[jobId]) {
+        uniqueLiveJob++
+      }
+    }
+    //let jobQuery = jobs.value.map(jobId => 'id = ' + jobId.id).join(' OR ')
     // job status 
     // 1 : unassigned
     // 2 : assigned
     // 6 : live job
-    jobQuery = jobQuery + ' AND status = 6'
-    let jobsInDbList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
-    if (jobsInDbList.length == 0) {
+    //jobQuery = jobQuery + ' AND status = 6'
+    //let jobsInDbList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
+    if (uniqueLiveJob > 0) {
       await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(true))
       return
     }
     // only delete job data
-    realm.deleteRecordsInBatch(jobDatas)
-    return
+    // realm.deleteRecordsInBatch(jobDatas)
+    // return
   }
 
 
@@ -632,7 +643,7 @@ class Sync {
     let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB');
     if (!_.isEmpty(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value))) {
       this.showJobMasterNotification(_.uniq(jobMasterTitleList))
-      await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+      //await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
     }
     if (jobMasterIdsAndNumberOfMessages && jobMasterIdsAndNumberOfMessages.messageIdDto && jobMasterIdsAndNumberOfMessages.messageIdDto.length > 0) {
       this.showMessageNotification(jobMasterIdsAndNumberOfMessages.messageIdDto.length)
