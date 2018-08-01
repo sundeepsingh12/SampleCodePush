@@ -115,6 +115,8 @@ module.exports = keyMirror({
     TABS_LOADING: null,
     SET_SELECTED_DATE: null,
     LOADER_FOR_SYNCING: null,
+    SET_CALLER_ID_POPUP:null,
+    TASKLIST_LOADER_FOR_SYNC: null,
 
     //Pages
     PAGES_LOADING: null,
@@ -134,7 +136,6 @@ module.exports = keyMirror({
     //Listing Actions
     JOB_LISTING_START: null,
     JOB_LISTING_END: null,
-    TASKLIST_LOADER_FOR_SYNC: null,
 
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
@@ -235,6 +236,7 @@ module.exports = keyMirror({
     MDM_POLICIES: null,
     FCM_TOKEN: null,
     APP_THEME: null,
+    LAST_CALL_AND_SMS_TIME: null,
     LONG_CODE_SIM_VERIFICATION: null,
 
     //Realm Tables
@@ -252,7 +254,7 @@ module.exports = keyMirror({
     TABLE_DRAFT: null,
     SEND_EMAIL_OR_SMS: null,
     TABLE_MESSAGE_INTERACTION: null,
-
+    TABLE_NEGATIVE_COMMUNICATION_LOG: null,
     //Home Actions
     IS_LAST_PAGE: null,
 

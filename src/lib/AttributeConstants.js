@@ -1,7 +1,7 @@
 import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
 module.exports = {
-    APP_VERSION_NUMBER: '0.4.0',
+    APP_VERSION_NUMBER: '0.4.1',
     /**
      * TODO : Change money collect details object keys to attribute type id
      */
@@ -261,7 +261,7 @@ module.exports = {
     View_Parcel_Summary: 'View Parcel Summary',
     Sign_Off_Summary: 'Sign Off Summary',
     Parcel_Summary: 'Parcel Summary',
-    NO:'No',
+    NO: 'No',
     Yes_Checkout: 'Checkout',
     Total: 'Total :',
     Select_Next_Status: 'Select Next Status',
@@ -400,5 +400,9 @@ module.exports = {
     //App Upgrade & Code Push Constants
     LATEST_APK_PATH: '/fareye_latest1.apk',
     MAJOR_VERSION_OUTDATED: '1',
-    MINOR_PATCH_OUTDATED: '2'
+    MINOR_PATCH_OUTDATED: '2',
+
+    //Mobile Login SMS Constans
+    SHOW_LONG_CODE_IOS_SCREEN: 'SHOW_LONG_CODE_IOS_SCREEN',
+    SHOW_LONG_CODE_COMPLETE_SCREEN: 'SHOW_LONG_CODE_COMPLETE_SCREEN'
 }

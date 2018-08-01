@@ -39,7 +39,9 @@ import {
   FCM_TOKEN,
   LOADER_FOR_SYNCING,
   MDM_POLICIES,
-  APP_THEME
+  APP_THEME,
+  JOB_ATTRIBUTE,
+  SET_CALLER_ID_POPUP
 } from '../../lib/constants'
 
 import {
@@ -72,7 +74,7 @@ import {
   SERVER_REACHABLE,
   SERVER_UNREACHABLE,
   Piechart,
-  PATH_COMPANY_LOGO_IMAGE
+  PATH_COMPANY_LOGO_IMAGE,
 } from '../../lib/AttributeConstants'
 import { Toast, ActionSheet, } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -101,9 +103,14 @@ import FCM, { FCMEvent, NotificationType, RemoteNotificationResult, WillPresentN
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK } from '../../lib/ContainerConstants'
+import { FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK, ERROR } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import { navDispatch, navigate } from '../navigators/NavigationService';
+import CallDetectorManager from 'react-native-call-detection'
+import { jobAttributeMasterService } from '../../services/classes/JobAttributeMaster'
+import { jobDataService } from '../../services/classes/JobData'
+import { jobService } from '../../services/classes/Job'
+import { each, size, isNull } from 'lodash'
 
 /**
  * Function which updates STATE when component is mounted
@@ -129,7 +136,7 @@ export function fetchPagesAndPiechart() {
       const utilityList = await keyValueDBService.getValueFromStore(PAGES_ADDITIONAL_UTILITY);
       //Looping over Utility list to check if Piechart and Messaging are enabled
       let utilities = {}
-      _.each(utilityList.value, function (utility) {
+      each(utilityList.value, function (utility) {
         if (utility.utilityID == PAGE_SUMMARY_PIECHART) {
           Piechart.enabled = utilities.pieChartEnabled = utility.enabled
           Piechart.params = JSON.parse(utility.additionalParams).jobMasterIds
@@ -180,12 +187,12 @@ export function navigateToPage(pageObject, navigationProps) {
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
-          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING, navigationProps))
+          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_CUSTOM_WEB_PAGE:
           let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
-          !_.size(customRemarks) || customRemarks.length == 1 ? navigate(CustomApp, { customUrl: (_.size(customRemarks)) ? customRemarks[0].customUrl : null }) : dispatch(customAppSelection(customRemarks, navigationProps))
+          !size(customRemarks) || customRemarks.length == 1 ? navigate(CustomApp, { customUrl: (size(customRemarks)) ? customRemarks[0].customUrl : null }) : dispatch(customAppSelection(customRemarks, navigationProps))
           break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -201,7 +208,7 @@ export function navigateToPage(pageObject, navigationProps) {
         case PAGE_MSWIPE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_NEW_JOB: {
-          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING, navigationProps))
+          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
@@ -296,8 +303,7 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) 
             navigate(BulkListing, { pageObject })
           }
         } else {
-          dispatch(setState(syncLoader, false))
-          alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
+          dispatch(setState(syncLoader, 'error'))
         }
       }
       else {
@@ -317,6 +323,10 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) 
 export function startTracking(trackingServiceStarted) {
   return async function (dispatch) {
     try {
+      const mdmSettings = await keyValueDBService.getValueFromStore(MDM_POLICIES);
+      if (mdmSettings && mdmSettings.value && mdmSettings.value.basicSetting && !mdmSettings.value.gpsTracking) {
+        return;
+      }
       if (!trackingServiceStarted) {
         trackingService.init()
         dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
@@ -340,7 +350,7 @@ export function startFCM() {
           }
           else if (notif.Notification == 'Live Job Notification') {
             keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-            dispatch(performSyncService(true, true))
+            dispatch(performSyncService(true))
           }
           if (notif.local_notification) {
             return
@@ -413,7 +423,7 @@ export function startFCM() {
   }
 }
 
-export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledFromAutoLogout) {
+export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogout) {
   return async function (dispatch) {
     let syncStoreDTO
     try {
@@ -458,9 +468,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
           await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO)
         }
         if (isJobsPresent) {
-          if (Piechart.enabled) {
-            dispatch(pieChartCount())
-          }
+          dispatch(pieChartCount())
           dispatch(fetchJobs())
         }
 
@@ -474,7 +482,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       //Now schedule sync service which will run regularly after 2 mins
       await dispatch(syncService())
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-      if (_.isNull(serverReachable) || serverReachable.value == 2) {
+      if (isNull(serverReachable) || serverReachable.value == 2) {
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
         await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
       }
@@ -493,7 +501,7 @@ export function performSyncService(isCalledFromHome, isLiveJob, erpPull, calledF
       }
       //Update Javadoc
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-      if (_.isNull(serverReachable) || serverReachable.value == 1) {
+      if (isNull(serverReachable) || serverReachable.value == 1) {
         await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
         await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
       }
@@ -538,7 +546,7 @@ export function syncTimer() {
   return async (dispatch) => {
     try {
       const difference = await sync.calculateDifference()
-      dispatch(setState(LAST_SYNC_TIME, difference))      
+      dispatch(setState(LAST_SYNC_TIME, difference))
     } catch (error) {
       //Update UI here
     }
@@ -547,9 +555,11 @@ export function syncTimer() {
 export function pieChartCount() {
   return async (dispatch) => {
     try {
-      dispatch(setState(CHART_LOADING, { loading: true }))
-      const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params)
-      dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
+      if (Piechart.enabled) {
+        dispatch(setState(CHART_LOADING, { loading: true }))
+        const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params)
+        dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
+      }
     } catch (error) {
       showToastAndAddUserExceptionLog(2707, error.message, 'danger', 1)
       dispatch(setState(CHART_LOADING, { loading: false, count: null }))
@@ -586,7 +596,7 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
           syncStatus: 'ERROR'
         }))
         let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-        if (_.isNull(serverReachable) || serverReachable.value == 1) {
+        if (isNull(serverReachable) || serverReachable.value == 1) {
           await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
           await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
         }
@@ -598,7 +608,7 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
 export function uploadUnsyncFiles(backupFilesList) {
   return async function (dispatch) {
     try {
-      const failCount = 0, successCount = 0
+      let failCount = 0, successCount = 0
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       if (!token) {
         throw new Error('Token Missing')
@@ -638,28 +648,32 @@ export function readAndUploadFiles() {
       dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 0))
       dispatch(setState(SET_FAIL_UPLOAD_COUNT, 0))
       const user = await keyValueDBService.getValueFromStore(USER)
-      let backupFilesList = await backupService.checkForUnsyncBackup(user)
+      let backupFilesList = await backupService.checkForUnsyncBackup(user.value)
       dispatch(setState(SET_BACKUP_FILES_LIST, backupFilesList))
       if (backupFilesList.length > 0) {
         dispatch(uploadUnsyncFiles(backupFilesList))
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2710, error.message, 'danger', 1)
+      dispatch(setState(SET_FAIL_UPLOAD_COUNT, 1))
+      await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, 1)
     }
   }
 }
-export function resetFailCountInStore() {
+export function resetFailCountInStore(isNavigateTrue) {
   return async function (dispatch) {
     try {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
-      const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
-      if (ErpCheck) {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
-        navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
-      }
-      else {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
-        navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+      if (isNavigateTrue) {
+        const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
+        if (ErpCheck) {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
+        }
+        else {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+        }
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2711, error.message, 'danger', 1)
@@ -681,4 +695,57 @@ export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
       showToastAndAddUserExceptionLog(2712, error.message, 'danger', 1)
     }
   }
+}
+
+export function registerCallReceiver() {
+  return async function (dispatch) {
+    try {
+
+      const mdmSettings = await keyValueDBService.getValueFromStore(MDM_POLICIES);
+      if (!mdmSettings || !mdmSettings.value || !mdmSettings.value.basicSetting || !mdmSettings.value.enableCallerIdentity || !mdmSettings.value.callerIdentityDisplayList) {
+        return
+      }
+
+      new CallDetectorManager(async (event, number) => {
+        let dataObject = {}
+        if (event === 'Incoming') {
+          const callerIdentityDisplayList = JSON.parse(mdmSettings.value.callerIdentityDisplayList)
+          let callerJobMasterIdList = [],
+            callerJobAttributeIdList = []
+          callerIdentityDisplayList.forEach(callerIdentityObject => {
+            callerJobMasterIdList.push(callerIdentityObject.jobMasterId)
+            callerJobAttributeIdList.push(...callerIdentityObject.jobAttributeIdList)
+          })
+
+          const allJobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+          const callerJobAttributeData = jobAttributeMasterService.getCallerIdJobAttributeMapAndQuery(allJobAttributes, callerJobMasterIdList, callerJobAttributeIdList)
+          dataObject = await jobDataService.getCallerIdListAndJobId(number, callerJobAttributeData.idJobAttributeMap, callerJobAttributeData.query)
+          if (dataObject.isNumberPresentInJobData) {
+            const job = jobService.getJobForJobId(dataObject.jobId)
+            dispatch(setState(SET_CALLER_ID_POPUP, {
+              callerIdDisplayList: dataObject.callerIdDisplayList,
+              incomingNumber: number,
+              referenceNumber: job[0].referenceNo,
+              showCallerIdPopup: true,
+            }))
+          }
+        }
+        else if (event === 'Missed') {
+          dispatch(setState(SET_CALLER_ID_POPUP, {
+            showCallerIdPopup: false,
+          }))
+        }
+      },
+        true, // if you want to read the phone number of the incoming call [ANDROID], otherwise false
+        () => { }, // callback if your permission got denied [ANDROID] [only if you want to read incoming number] default: console.error
+        {
+          title: 'Phone State Permission',
+          message: 'This app needs access to your phone state in order to react and/or to adapt to incoming calls.'
+        } // a custom permission request message to explain to your user, why you need the permission [recommended] - this is the default one
+      )
+    } catch (error) {
+      console.log('error>>>', error)
+    }
+  }
+
 }

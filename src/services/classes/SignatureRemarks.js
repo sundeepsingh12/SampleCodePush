@@ -22,7 +22,8 @@ import {
     ACTUAL_AMOUNT,
     SIGN,
     IMAGE_EXTENSION,
-    PATH_CUSTOMER_IMAGES
+    PATH_CUSTOMER_IMAGES,
+    SKU_PHOTO
 } from '../../lib/AttributeConstants'
 import {
     USER,
@@ -102,8 +103,9 @@ class SignatureRemarks {
         return value
     }
 
-    getValidations(validationArray) {
-        let validationObject = {}, validationCountForImage = 0, remarkValidationCount = 0
+    getValidations(validationArray, attributeTypeId) {
+        let validationObject = {}, validationCountForImage = 0
+        let remarkValidationCount = (attributeTypeId == SKU_PHOTO || attributeTypeId == CAMERA_HIGH) ? 0 : 1
         for (let validation of validationArray) {
             if (validation.timeOfExecution) {
                 switch (validation.timeOfExecution) {

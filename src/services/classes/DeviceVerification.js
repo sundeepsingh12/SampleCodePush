@@ -8,19 +8,14 @@ import DeviceInfo from 'react-native-device-info'
 import { Platform } from 'react-native'
 import _ from 'lodash'
 let imei = require('../../wrapper/IMEI')
-let sendSMSBackGroundService = require('../../wrapper/SendSMSBackGround')
-
 import {
   DEVICE_IMEI,
   DEVICE_SIM,
   IS_PRELOADER_COMPLETE,
   IS_SHOW_MOBILE_OTP_SCREEN,
-  USER,
-  DOMAIN_URL
 } from '../../lib/constants'
-import {
-  LOGIN_SUCCESSFUL
-} from '../../lib/AttributeConstants'
+import { LOGIN_SUCCESSFUL} from '../../lib/AttributeConstants'
+import { SHOW_MOBILE_SCREEN } from '../../lib/ContainerConstants'
 
 class DeviceVerification {
 
@@ -83,7 +78,7 @@ class DeviceVerification {
       await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
       if (user.hubId != deviceIMEI.value.hubId) {
         deviceIMEI.value.hubId = user.hubId;
-        await keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI)
+        await keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI.value)
       }
     }
     return true
@@ -238,13 +233,12 @@ class DeviceVerification {
     if (response.json.deviceSIM && response.json.deviceSIM.isVerified) {
       await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
     } else {
-      await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_OTP_SCREEN, true)
+      await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_OTP_SCREEN, SHOW_MOBILE_SCREEN)
     }
     return response.json.deviceSIM ? response.json.deviceSIM.isVerified : false
   }
 
-  async sendLongSms(user, deviceObject) {
-    let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL);
+  sendLongSms(user, deviceObject, domainUrl) {
     let domain = domainUrl && domainUrl.value ? domainUrl.value.split('//')[1].split('.')[0] : '';
     let longCodePreAppendText = deviceObject.longCodeConfiguration && deviceObject.longCodeConfiguration.value && deviceObject.longCodeConfiguration.value.longCodePreAppendText ? deviceObject.longCodeConfiguration.value.longCodePreAppendText : '';
     let simNumber = deviceObject.deviceSIM && deviceObject.deviceSIM.value && deviceObject.deviceSIM.value.simNumber ? deviceObject.deviceSIM.value.simNumber : '';
@@ -253,10 +247,7 @@ class DeviceVerification {
     let employeeCode = user && user.employeeCode ? user.employeeCode : '';
     let messageBody = longCodePreAppendText + '$' + simNumber + '$' + imeiId + '$' + companyCode + '$' + domain + '$' + employeeCode;
     let recipientPhoneNumber = deviceObject.longCodeConfiguration && deviceObject.longCodeConfiguration.value && deviceObject.longCodeConfiguration.value.longCodeNumber ? deviceObject.longCodeConfiguration.value.longCodeNumber : '';
-    if (Platform.OS === 'ios') {
-    } else {
-      await sendSMSBackGroundService.sendLongCodeSMS(messageBody, recipientPhoneNumber);
-    }
+    return { messageBody, recipientPhoneNumber };
   }
 }
 

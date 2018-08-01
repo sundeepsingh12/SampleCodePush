@@ -94,7 +94,7 @@ export function setCameraInitialView(item) {
             dispatch(setState(SET_CAMERA_LOADER_INITIAL_SET_UP))
             let validation = null, data = null
             if (!_.isEmpty(item.validation)) {
-                validation = await signatureService.getValidations(item.validation)
+                validation = await signatureService.getValidations(item.validation, item.attributeTypeId)
             }
             if (item.value && item.value != '' && item.value != OPEN_CAMERA) {
                 const base64Data = await signatureService.getImageData(item.value)

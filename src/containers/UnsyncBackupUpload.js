@@ -32,7 +32,7 @@ function mapStateToProps(state) {
     }
 };
 
-function mapDispatchToProps(dispatch) { 
+function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...globalActions, ...homeActions }, dispatch)
     }
@@ -45,7 +45,7 @@ class UnsyncBackupUpload extends Component {
     constructor(props) {
         super(props);
         BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid);
-        this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload =>{
+        this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload => {
             BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
             BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
         });
@@ -73,7 +73,7 @@ class UnsyncBackupUpload extends Component {
     }
 
     onBackButtonPressAndroid = () => {
-       BackHandler.exitApp();
+        BackHandler.exitApp();
         return true;
     };
 
@@ -112,15 +112,15 @@ class UnsyncBackupUpload extends Component {
                         <Button transparent style={StyleSheet.flatten([styles.padding10, styles.bgLightGray])}
                             onPress={() => {
                                 this.props.actions.readAndUploadFiles()
-                                this.props.actions.resetFailCountInStore()
+                                this.props.actions.resetFailCountInStore(false)
                             }}  >
                             <Text style={[styles.fontBlack]}>{TRY_AGAIN}</Text>
                         </Button>
                     </View>
                     <View style={[styles.marginTop30, styles.alignCenter]}>
                         <Button transparent style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}
-                            onPress={this.props.actions.resetFailCountInStore}
-                            >
+                            onPress={() => this.props.actions.resetFailCountInStore(true)}
+                        >
                             <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>{CONTINUE}</Text>
                         </Button>
                     </View>

@@ -22,7 +22,7 @@ import _ from 'lodash'
 import { draftService } from '../../services/classes/DraftService'
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
 import { fetchJobs } from '../taskList/taskListActions';
-import { performSyncService } from '../home/homeActions'
+import { performSyncService, pieChartCount } from '../home/homeActions'
 import { checkForPaymentAtEnd } from '../job-details/jobDetailsActions'
 import { navigate } from '../navigators/NavigationService';
 
@@ -69,6 +69,7 @@ export function checkout(previousFormLayoutState, recurringData, jobMasterId, co
                 jobId: -1,
                 jobMasterId
             }, jobMasterId)
+            dispatch(pieChartCount())
             dispatch(performSyncService(true))
             dispatch(setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, responseMessage))
             navigate(CheckoutDetails, {

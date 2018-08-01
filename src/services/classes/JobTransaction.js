@@ -116,7 +116,7 @@ class JobTransaction {
         let jobIdJobTransactionStatusIdMap = {};
         for (let index in jobTransactionList) {
             const transaction = jobTransactionList[index];
-            const { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual } = transaction;
+            const { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual, attemptCount, lastTransactionTimeOnMobile, jobEtaTime, jobCreatedAt, lastUpdatedAtServer } = transaction;
             if (index == 0) {
                 jobQuery += 'id = ' + jobId;
                 jobTransactionQuery += 'id = ' + id;
@@ -126,7 +126,7 @@ class JobTransaction {
                 jobTransactionQuery += ' OR id = ' + id;
                 fieldDataQuery += ' OR jobTransactionId = ' + id;
             }
-            jobTransactionMap[id] = { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual };
+            jobTransactionMap[id] = { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual, attemptCount, lastTransactionTimeOnMobile, jobEtaTime, jobCreatedAt, lastUpdatedAtServer };
             jobIdJobTransactionStatusIdMap[transaction.jobId] = transaction.jobStatusId
         }
         return { jobTransactionMap, jobQuery, jobTransactionQuery, fieldDataQuery, jobIdJobTransactionStatusIdMap};
@@ -199,7 +199,7 @@ class JobTransaction {
         jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobMapAndJobDataQuery.jobDataQuery);
         jobTransactionDTO.jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap,jobTransactionCustomizationListParametersMaps.jobAttributeStatusMap,jobTransactionObject.jobIdJobTransactionStatusIdMap);
         fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, jobTransactionObject.fieldDataQuery);
-        jobTransactionDTO.fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList);
+        jobTransactionDTO.fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList, true);
         let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionDTO, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobTransactionCustomizationListParametersMaps, runsheetObject.runsheetMap);
         return jobTransactionCustomizationList;
     }
@@ -332,6 +332,11 @@ class JobTransaction {
             jobTransactionCustomization.jobLatitude = job.latitude;
             jobTransactionCustomization.jobLongitude = job.longitude;
             jobTransactionCustomization.jobId = jobTransaction.jobId;
+            jobTransactionCustomization.attemptCount = jobTransaction.attemptCount
+            jobTransactionCustomization.jobCreatedAt = jobTransaction.jobCreatedAt
+            jobTransactionCustomization.lastUpdatedAtServer = jobTransaction.lastUpdatedAtServer
+            jobTransactionCustomization.jobEtaTime = jobTransaction.jobEtaTime
+            jobTransactionCustomization.lastTransactionTimeOnMobile = jobTransaction.lastTransactionTimeOnMobile
             jobTransactionCustomization.identifierColor = jobTransactionCustomizationListParametersMaps.jobMasterIdMap[jobMasterId].identifierColor;
             jobTransactionCustomization.seqActual = jobTransaction.seqActual;
             jobTransactionCustomization.seqAssigned = jobTransaction.seqAssigned;

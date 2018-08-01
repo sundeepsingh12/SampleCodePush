@@ -23,9 +23,7 @@ import {
     SKU_REASON,
     NA,
 } from '../../lib/AttributeConstants'
-import {
-    fieldAttributeStatusService
-} from './FieldAttributeStatus'
+
 import {
     SELECT_ANY_REASON,
     TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY,

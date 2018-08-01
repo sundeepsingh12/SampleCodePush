@@ -9,11 +9,12 @@ import * as globalActions from '../modules/global/globalActions';
 import _ from 'lodash';
 import Loader from '../components/Loader';
 import styles from '../themes/FeStyle';
-import {  LISTING_SEARCH_VALUE, BulkListing, JobDetailsV2} from '../lib/constants'
+import {  LISTING_SEARCH_VALUE, BulkListing, JobDetailsV2, TASKLIST_LOADER_FOR_SYNC} from '../lib/constants'
 import JobListItem from '../components/JobListItem';
 import { NO_NEXT_STATUS, OK, ALL, NO_RESULT_FOUND } from '../lib/ContainerConstants';
 import moment from 'moment';
 import { navigate } from '../modules/navigators/NavigationService';
+import { startSyncAndNavigateToContainer } from '../modules/home/homeActions'
 
 
 function mapStateToProps(state) {
@@ -26,7 +27,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...taskListActions, ...globalActions }, dispatch)
+    actions: bindActionCreators({ ...taskListActions, ...globalActions, startSyncAndNavigateToContainer }, dispatch)
   }
 }
 
@@ -65,6 +66,7 @@ class TaskListScreen extends PureComponent {
     return (
       <JobListItem
         data={item}
+        onChatButtonPressed = {(contact, smsTemplatedata) => {this.props.actions.setSmsTemplateList(contact, smsTemplatedata, item)}}
         showIconsInJobListing={true}
         onPressItem={() => { this.navigateToScene(item) }}
         lastId={lastId}
@@ -75,16 +77,15 @@ class TaskListScreen extends PureComponent {
   /**Navigate to bulk update when selecting a group of transactions
     *  
     */
-  updateTransactionForGroupId(item) {
+  updateTransactionForGroupId =(item) => {
     let jobTransaction = item.data[0];
     if (jobTransaction.isNextStatusPresent) {
-      navigate(BulkListing, {
-        pageObject: {
+   this.props.actions.startSyncAndNavigateToContainer({
           jobMasterIds: JSON.stringify([jobTransaction.jobMasterId]),
           additionalParams: JSON.stringify({ statusId: jobTransaction.statusId }),
           groupId: jobTransaction.groupId
-        }
-      })
+        
+      }, true, TASKLIST_LOADER_FOR_SYNC)
     } else {
       Toast.show({
         text: NO_NEXT_STATUS, position: 'bottom', buttonText: OK

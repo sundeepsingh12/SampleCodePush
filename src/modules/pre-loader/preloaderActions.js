@@ -60,9 +60,10 @@ import {
   SET_APP_UPDATE_STATUS,
   IS_SHOW_MOBILE_OTP_SCREEN,
   IS_LOGGING_OUT,
-  LONG_CODE_SIM_VERIFICATION
+  LONG_CODE_SIM_VERIFICATION,
+  DOMAIN_URL,
 } from '../../lib/constants'
-import { MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../lib/AttributeConstants'
+import { MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, SHOW_LONG_CODE_IOS_SCREEN, SHOW_LONG_CODE_COMPLETE_SCREEN } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
@@ -79,6 +80,9 @@ import { SHOW_MOBILE_SCREEN, SHOW_OTP, CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DO
 import codePush from "react-native-code-push"
 import { Platform } from 'react-native'
 import { performSyncService } from '../home/homeActions';
+import feStyle from '../../themes/FeStyle'
+let sendSMSBackGroundService = require('../../wrapper/SendSMSBackGround');
+import Communications from 'react-native-communications';
 
 //This hits JOB Master Api and gets the response 
 export function downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
@@ -174,7 +178,11 @@ export function startLoginScreenWithoutLogout() {
 export function checkForUnsyncBackupFilesAndNavigate(user) {
   return async function (dispatch) {
     try {
-      let unsyncBackupFilesList = await backupService.checkForUnsyncBackup(user)
+      let userFromStore;
+      if (!user) {
+        userFromStore = await keyValueDBService.getValueFromStore(USER);
+      }
+      let unsyncBackupFilesList = await backupService.checkForUnsyncBackup(user ? user : userFromStore ? userFromStore.value : null);
       if (unsyncBackupFilesList.length > 0) {
         keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'UnsyncBackupUpload')
         navDispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
@@ -203,18 +211,28 @@ export function checkForUnsyncBackupFilesAndNavigate(user) {
  * @param {*} configSaveService 
  * @param {*} deviceVerificationService 
  */
-export function saveSettingsAndValidateDevice(configDownloadService, configSaveService, deviceVerificationService) {
+export function saveSettingsAndValidateDevice(configDownloadService, configSaveService, deviceVerificationStatus) {
   return async function (dispatch) {
     try {
       const mobileOtpScreen = await keyValueDBService.getValueFromStore(IS_SHOW_MOBILE_OTP_SCREEN)
-      if (mobileOtpScreen && mobileOtpScreen.value) {
-        dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, SHOW_MOBILE_SCREEN))
+      if (mobileOtpScreen && mobileOtpScreen.value && mobileOtpScreen.value == SHOW_MOBILE_SCREEN) {
+        dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, { showMobileOtpNumberScreen: SHOW_MOBILE_SCREEN }))
+      } else if (mobileOtpScreen && mobileOtpScreen.value && mobileOtpScreen.value == SHOW_LONG_CODE_COMPLETE_SCREEN) {
+        dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, { showMobileOtpNumberScreen: SHOW_LONG_CODE_COMPLETE_SCREEN }));
+      } else if (mobileOtpScreen && mobileOtpScreen.value && mobileOtpScreen.value == SHOW_LONG_CODE_IOS_SCREEN) {
+        const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM);
+        const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI);
+        const user = await keyValueDBService.getValueFromStore(USER);
+        let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL);
+        let longCodeConfiguration = await keyValueDBService.getValueFromStore(LONG_CODE_SIM_VERIFICATION)
+        let longCodeSMSData = deviceVerificationService.sendLongSms(user ? user.value : null, { deviceIMEI, deviceSIM, longCodeConfiguration }, domainUrl)
+        dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, { showMobileOtpNumberScreen: SHOW_LONG_CODE_IOS_SCREEN, longCodeSMSData }))
       } else {
         const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
         const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
         const userObject = await keyValueDBService.getValueFromStore(USER)
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-        if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationService === SERVICE_PENDING || deviceVerificationService == SERVICE_FAILED)) {
+        if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationStatus === SERVICE_PENDING || deviceVerificationStatus == SERVICE_FAILED)) {
           dispatch(checkAsset(deviceIMEI, deviceSIM, userObject ? userObject.value : null, token))
         } else {
           dispatch(downloadJobMaster(deviceIMEI, deviceSIM, userObject ? userObject.value : null, token))
@@ -230,8 +248,6 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
  * otherwise job master failure action is dispatched
  *
  * @param jobMasterResponse
- * @param dispatch
- * @return {Promise.<void>}
  */
 export function validateAndSaveJobMaster(deviceIMEI, deviceSIM, token, jobMasterResponse) {
   return async function (dispatch) {
@@ -239,6 +255,13 @@ export function validateAndSaveJobMaster(deviceIMEI, deviceSIM, token, jobMaster
       await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
       dispatch(setState(MASTER_SAVING_START))
       await jobMasterService.saveJobMaster(jobMasterResponse)
+      if (jobMasterResponse.appTheme) {
+        feStyle.primaryColor = jobMasterResponse.appTheme
+        feStyle.bgPrimaryColor = jobMasterResponse.appTheme
+        feStyle.fontPrimaryColor = jobMasterResponse.appTheme
+        feStyle.shadeColor = jobMasterResponse.appTheme + '98'
+        feStyle.borderLeft4Color = jobMasterResponse.appTheme
+      }
       dispatch(setState(MASTER_SAVING_SUCCESS))
       dispatch(checkAsset(deviceIMEI, deviceSIM, jobMasterResponse.user, token))
     } catch (error) {
@@ -328,8 +351,6 @@ export function checkIfAppIsOutdated(error) {
 
 /**Checks if sim is locally verified or not,if not then check if it's valid on server or not
  *
- * @param dispatch
- * @return {Promise.<void>}
  */
 export function checkAsset(deviceIMEI, deviceSIM, user, token) {
   return async function (dispatch) {
@@ -353,34 +374,41 @@ export function checkAsset(deviceIMEI, deviceSIM, user, token) {
 
 /**Checks if sim is valid on server,called only if sim is not valid locally
  *
- * @return {Promise.<void>}
+ *
  */
 
 
 export function checkIfSimValidOnServer(user, token, longCodeConfiguration) {
   return async function (dispatch) {
     try {
-      const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-      const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-      let responseIsVerified = await deviceVerificationService.checkAssetApiAndSimVerificationOnServer(token, { deviceIMEI, deviceSIM })
+      const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI);
+      const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM);
+      let responseIsVerified = await deviceVerificationService.checkAssetApiAndSimVerificationOnServer(token, { deviceIMEI, deviceSIM });
       if (responseIsVerified) {
-        dispatch(setState(PRELOADER_SUCCESS))
-        dispatch(checkForUnsyncBackupFilesAndNavigate(user))
+        dispatch(setState(PRELOADER_SUCCESS));
+        dispatch(checkForUnsyncBackupFilesAndNavigate(user));
       } else {
-        if (longCodeConfiguration && longCodeConfiguration.value && longCodeConfiguration.value.simVerificationType == 'LongCode' && Platform.OS !== 'ios') {
-          await deviceVerificationService.sendLongSms(user, { deviceIMEI, deviceSIM, longCodeConfiguration })
-          dispatch(setState(PRELOADER_SUCCESS))
-          dispatch(checkForUnsyncBackupFilesAndNavigate(user))
+        if (longCodeConfiguration && longCodeConfiguration.value && longCodeConfiguration.value.simVerificationType == 'LongCode') {
+          let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL);
+          let longCodeSMSData = deviceVerificationService.sendLongSms(user, { deviceIMEI, deviceSIM, longCodeConfiguration }, domainUrl);
+          if (Platform.OS === 'ios') {
+            await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_OTP_SCREEN, SHOW_LONG_CODE_IOS_SCREEN);
+            dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, { showMobileOtpNumberScreen: SHOW_LONG_CODE_IOS_SCREEN, longCodeSMSData }));
+          } else {
+            await sendSMSBackGroundService.sendLongCodeSMS(longCodeSMSData.messageBody, longCodeSMSData.recipientPhoneNumber);
+            dispatch(setState(PRELOADER_SUCCESS));
+            dispatch(checkForUnsyncBackupFilesAndNavigate(user));
+          }
         } else {
-          dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, SHOW_MOBILE_SCREEN))
+          dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, { showMobileOtpNumberScreen: SHOW_MOBILE_SCREEN }));
         }
       }
     } catch (error) {
-      showToastAndAddUserExceptionLog(1809, error.message, 'danger', 0)
+      showToastAndAddUserExceptionLog(1809, error.message, 'danger', 0);
       if (error.code == 403 || error.code == 400) { // clear user session without Logout API call
-        dispatch(setState(ERROR_400_403_LOGOUT, error.message)) // Logout API will return 500 as the session is pre-cleared on Server
+        dispatch(setState(ERROR_400_403_LOGOUT, error.message)); // Logout API will return 500 as the session is pre-cleared on Server
       } else {
-        dispatch(setState(CHECK_ASSET_FAILURE, error.message))
+        dispatch(setState(CHECK_ASSET_FAILURE, error.message));
       }
     }
   }
@@ -396,7 +424,7 @@ export function generateOtp(mobileNumber) {
     try {
       dispatch(setState(OTP_GENERATION_START, false))
       await deviceVerificationService.generateOTP(mobileNumber)
-      dispatch(setState(SHOW_OTP_SCREEN, SHOW_OTP))
+      dispatch(setState(SHOW_OTP_SCREEN, { showMobileOtpNumberScreen: SHOW_OTP }))
     } catch (error) {
       showToastAndAddUserExceptionLog(1810, error.message, 'danger', 0)
       dispatch(setState(OTP_GENERATION_FAILURE, error.message))
@@ -429,7 +457,7 @@ export function checkForUnsyncTransactionAndLogout(calledFromAutoLogout) {
   return async function (dispatch) {
     try {
       dispatch(setState(IS_LOGGING_OUT, true))
-      let message = await dispatch(performSyncService(true, null, null, calledFromAutoLogout))
+      let message = await dispatch(performSyncService(true, null, calledFromAutoLogout))
       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       let isUnsyncTransactionsPresent = logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
       if (isUnsyncTransactionsPresent && !calledFromAutoLogout) {
@@ -440,6 +468,33 @@ export function checkForUnsyncTransactionAndLogout(calledFromAutoLogout) {
     } catch (error) {
       showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0)
       dispatch(setState(ERROR_400_403_LOGOUT, error.message))
+    }
+  }
+}
+
+export function sendSMSForLongCodeVerification(longCodeSMSData) {
+  return async function (dispatch) {
+    try {
+      let recipientPhoneNumber = longCodeSMSData && longCodeSMSData.recipientPhoneNumber ? longCodeSMSData.recipientPhoneNumber : '';
+      let messageBody = longCodeSMSData && longCodeSMSData.messageBody ? longCodeSMSData.messageBody : '';
+      await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_OTP_SCREEN, SHOW_LONG_CODE_COMPLETE_SCREEN);
+      dispatch(setState(SHOW_MOBILE_NUMBER_SCREEN, { showMobileOtpNumberScreen: SHOW_LONG_CODE_COMPLETE_SCREEN }));
+      Communications.text(recipientPhoneNumber, messageBody);
+    } catch (error) {
+      showToastAndAddUserExceptionLog(1813, error.message, 'danger', 0)
+    }
+  }
+}
+
+export function completeLongCodeVerification() {
+  return async function (dispatch) {
+    try {
+      await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true);
+      await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_OTP_SCREEN);
+      let user = await keyValueDBService.getValueFromStore(USER);
+      dispatch(checkForUnsyncBackupFilesAndNavigate(user ? user.value : null));
+    } catch (error) {
+      showToastAndAddUserExceptionLog(1814, error.message, 'danger', 0)
     }
   }
 }
