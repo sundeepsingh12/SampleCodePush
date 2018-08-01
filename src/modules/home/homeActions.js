@@ -84,7 +84,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { setState, showToastAndAddUserExceptionLog, deleteSessionToken } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
-import { Platform} from 'react-native'
+import { Platform } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -110,7 +110,7 @@ import CallDetectorManager from 'react-native-call-detection'
 import { jobAttributeMasterService } from '../../services/classes/JobAttributeMaster'
 import { jobDataService } from '../../services/classes/JobData'
 import { jobService } from '../../services/classes/Job'
-import {each,size, isNull } from 'lodash'
+import { each, size, isNull } from 'lodash'
 
 /**
  * Function which updates STATE when component is mounted
@@ -555,7 +555,7 @@ export function syncTimer() {
 export function pieChartCount() {
   return async (dispatch) => {
     try {
-      if(Piechart.enabled){
+      if (Piechart.enabled) {
         dispatch(setState(CHART_LOADING, { loading: true }))
         const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params)
         dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
@@ -648,28 +648,32 @@ export function readAndUploadFiles() {
       dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 0))
       dispatch(setState(SET_FAIL_UPLOAD_COUNT, 0))
       const user = await keyValueDBService.getValueFromStore(USER)
-      let backupFilesList = await backupService.checkForUnsyncBackup(user)
+      let backupFilesList = await backupService.checkForUnsyncBackup(user.value)
       dispatch(setState(SET_BACKUP_FILES_LIST, backupFilesList))
       if (backupFilesList.length > 0) {
         dispatch(uploadUnsyncFiles(backupFilesList))
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2710, error.message, 'danger', 1)
+      dispatch(setState(SET_FAIL_UPLOAD_COUNT, 1))
+      await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, 1)
     }
   }
 }
-export function resetFailCountInStore() {
+export function resetFailCountInStore(isNavigateTrue) {
   return async function (dispatch) {
     try {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
-      const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
-      if (ErpCheck) {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
-        navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
-      }
-      else {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
-        navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+      if (isNavigateTrue) {
+        const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
+        if (ErpCheck) {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
+        }
+        else {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+        }
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2711, error.message, 'danger', 1)
@@ -693,55 +697,55 @@ export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
   }
 }
 
-export function registerCallReceiver(){
-  return async function(dispatch){
-    try{
+export function registerCallReceiver() {
+  return async function (dispatch) {
+    try {
 
       const mdmSettings = await keyValueDBService.getValueFromStore(MDM_POLICIES);
-      if(!mdmSettings || !mdmSettings.value || !mdmSettings.value.basicSetting || !mdmSettings.value.enableCallerIdentity || !mdmSettings.value.callerIdentityDisplayList ){
+      if (!mdmSettings || !mdmSettings.value || !mdmSettings.value.basicSetting || !mdmSettings.value.enableCallerIdentity || !mdmSettings.value.callerIdentityDisplayList) {
         return
       }
 
-      new CallDetectorManager(async (event,number)=> {
-        let dataObject = {} 
-         if (event === 'Incoming') {
-           const callerIdentityDisplayList = JSON.parse(mdmSettings.value.callerIdentityDisplayList)
-           let callerJobMasterIdList = [],
-             callerJobAttributeIdList = []
-           callerIdentityDisplayList.forEach(callerIdentityObject => {
-             callerJobMasterIdList.push(callerIdentityObject.jobMasterId)
-             callerJobAttributeIdList.push(...callerIdentityObject.jobAttributeIdList)
-           })
+      new CallDetectorManager(async (event, number) => {
+        let dataObject = {}
+        if (event === 'Incoming') {
+          const callerIdentityDisplayList = JSON.parse(mdmSettings.value.callerIdentityDisplayList)
+          let callerJobMasterIdList = [],
+            callerJobAttributeIdList = []
+          callerIdentityDisplayList.forEach(callerIdentityObject => {
+            callerJobMasterIdList.push(callerIdentityObject.jobMasterId)
+            callerJobAttributeIdList.push(...callerIdentityObject.jobAttributeIdList)
+          })
 
-           const allJobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
-           const callerJobAttributeData = jobAttributeMasterService.getCallerIdJobAttributeMapAndQuery(allJobAttributes, callerJobMasterIdList, callerJobAttributeIdList)
-           dataObject = await jobDataService.getCallerIdListAndJobId(number, callerJobAttributeData.idJobAttributeMap, callerJobAttributeData.query)
-           if (dataObject.isNumberPresentInJobData) {
+          const allJobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+          const callerJobAttributeData = jobAttributeMasterService.getCallerIdJobAttributeMapAndQuery(allJobAttributes, callerJobMasterIdList, callerJobAttributeIdList)
+          dataObject = await jobDataService.getCallerIdListAndJobId(number, callerJobAttributeData.idJobAttributeMap, callerJobAttributeData.query)
+          if (dataObject.isNumberPresentInJobData) {
             const job = jobService.getJobForJobId(dataObject.jobId)
-             dispatch(setState(SET_CALLER_ID_POPUP, {
-               callerIdDisplayList: dataObject.callerIdDisplayList,
-               incomingNumber: number,
-               referenceNumber:job[0].referenceNo,
-               showCallerIdPopup: true,
-             }))
-           }
-          }
-          else if(event === 'Missed'){
-            dispatch(setState(SET_CALLER_ID_POPUP,{
-              showCallerIdPopup:false,
+            dispatch(setState(SET_CALLER_ID_POPUP, {
+              callerIdDisplayList: dataObject.callerIdDisplayList,
+              incomingNumber: number,
+              referenceNumber: job[0].referenceNo,
+              showCallerIdPopup: true,
             }))
           }
-          },
-      true, // if you want to read the phone number of the incoming call [ANDROID], otherwise false
-      ()=>{}, // callback if your permission got denied [ANDROID] [only if you want to read incoming number] default: console.error
-      {
-      title: 'Phone State Permission',
-      message: 'This app needs access to your phone state in order to react and/or to adapt to incoming calls.'
-      } // a custom permission request message to explain to your user, why you need the permission [recommended] - this is the default one
+        }
+        else if (event === 'Missed') {
+          dispatch(setState(SET_CALLER_ID_POPUP, {
+            showCallerIdPopup: false,
+          }))
+        }
+      },
+        true, // if you want to read the phone number of the incoming call [ANDROID], otherwise false
+        () => { }, // callback if your permission got denied [ANDROID] [only if you want to read incoming number] default: console.error
+        {
+          title: 'Phone State Permission',
+          message: 'This app needs access to your phone state in order to react and/or to adapt to incoming calls.'
+        } // a custom permission request message to explain to your user, why you need the permission [recommended] - this is the default one
       )
-    }catch(error){
-      console.log('error>>>',error)
+    } catch (error) {
+      console.log('error>>>', error)
     }
   }
- 
+
 }
