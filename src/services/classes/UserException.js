@@ -20,7 +20,7 @@ class UserException {
      */
     async addUserExceptionLogs(errorMessage, errorCode) {
         const userDetails = await keyValueDBService.getValueFromStore(USER)
-        let userId = (userDetails && userDetails.value && userDetails.value.id) ? userDetails.value.id : 0
+        let userId = (userDetails && userDetails.value && userDetails.value.id) ? userDetails.value.id : -1
         let hubId = (userDetails && userDetails.value && userDetails.value.hubId) ? userDetails.value.hubId : 0
         let cityId = (userDetails && userDetails.value && userDetails.value.cityId) ? userDetails.value.cityId : 0
         let companyId = (userDetails && userDetails.value && userDetails.value.company && userDetails.value.company.id) ? userDetails.value.company.id : 0

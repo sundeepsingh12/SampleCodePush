@@ -129,7 +129,6 @@ export function cropImage(uri, setImage) {
                 height: 300,
                 freeStyleCropEnabled: true,
             }).then((image) => {
-                console.logs(image)
                 if (image.path) {
                     setImage(image.path);
                     dispatch(setState(SET_CAMERA_LOADER, false))

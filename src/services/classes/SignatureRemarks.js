@@ -113,13 +113,13 @@ class SignatureRemarks {
                         if (validationCountForImage == 0) {
                             validationObject.imageUploadFromDevice = (validation.condition == 'true')
                             validationCountForImage = 1
-                        } else if(validationCountForImage == 1){
+                        } else if (validationCountForImage == 1) {
                             validationObject.cropImageValidation = (validation.condition == 'true')
                             validationCountForImage = 2
                         }
                         break
                     case REMARKS:
-                        if (true) {
+                        if (remarkValidationCount == 1) {
                             validationObject.isFrontCameraEnabled = (validation.condition == 'true')
                         } else {
                             remarkValidationCount++
