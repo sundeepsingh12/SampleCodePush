@@ -648,7 +648,7 @@ export function readAndUploadFiles() {
       dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 0))
       dispatch(setState(SET_FAIL_UPLOAD_COUNT, 0))
       const user = await keyValueDBService.getValueFromStore(USER)
-      let backupFilesList = await backupService.checkForUnsyncBackup(user)
+      let backupFilesList = await backupService.checkForUnsyncBackup(user.value)
       dispatch(setState(SET_BACKUP_FILES_LIST, backupFilesList))
       if (backupFilesList.length > 0) {
         dispatch(uploadUnsyncFiles(backupFilesList))
