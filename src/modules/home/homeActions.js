@@ -648,28 +648,32 @@ export function readAndUploadFiles() {
       dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 0))
       dispatch(setState(SET_FAIL_UPLOAD_COUNT, 0))
       const user = await keyValueDBService.getValueFromStore(USER)
-      let backupFilesList = await backupService.checkForUnsyncBackup(user)
+      let backupFilesList = await backupService.checkForUnsyncBackup(user.value)
       dispatch(setState(SET_BACKUP_FILES_LIST, backupFilesList))
       if (backupFilesList.length > 0) {
         dispatch(uploadUnsyncFiles(backupFilesList))
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2710, error.message, 'danger', 1)
+      dispatch(setState(SET_FAIL_UPLOAD_COUNT, 1))
+      await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, 1)
     }
   }
 }
-export function resetFailCountInStore() {
+export function resetFailCountInStore(isNavigateTrue) {
   return async function (dispatch) {
     try {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
-      const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
-      if (ErpCheck) {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
-        navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
-      }
-      else {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
-        navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+      if (isNavigateTrue) {
+        const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
+        if (ErpCheck) {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
+        }
+        else {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+        }
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2711, error.message, 'danger', 1)
