@@ -293,6 +293,7 @@ module.exports = {
     EZE_TAP_ID: 10,
     M_SWIPE_ID: 9,
     JOB_ASSIGNMENT_ID: 20,
+    MOSAMBEE_ID: 18,
     MOSAMBEE_WALLET_ID: 19,
     PAGE_NEW_JOB: 2,
     Piechart: {

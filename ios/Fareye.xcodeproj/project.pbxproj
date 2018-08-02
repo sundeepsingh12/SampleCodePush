@@ -730,6 +730,7 @@
 		FC3DF98F2C014B3285292D34 /* libc++.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		95E6D9C2F30D4061950DCA42 /* RCTCallDetection.xcodeproj */ = {isa = PBXFileReference; name = "RCTCallDetection.xcodeproj"; path = "../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		981DC7D8C6F3426E90DB12A2 /* libRCTCallDetection.a */ = {isa = PBXFileReference; name = "libRCTCallDetection.a"; path = "libRCTCallDetection.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		73B69BFFC3E24191A285B666 /* RCTBluetoothSerial.xcodeproj */ = {isa = PBXFileReference; name = "RCTBluetoothSerial.xcodeproj"; path = "../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1244,6 +1245,7 @@
 				B4349F5749F44E62BC93FBC2 /* RNVectorIcons.xcodeproj */,
 				5C6ECEBB729D43D59C56A6AE /* RNFIRMessaging.xcodeproj */,
 				95E6D9C2F30D4061950DCA42 /* RCTCallDetection.xcodeproj */,
+				73B69BFFC3E24191A285B666 /* RCTBluetoothSerial.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -2322,6 +2324,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = FareyeTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2380,6 +2383,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = FareyeTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2442,6 +2446,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = Fareye/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2504,6 +2509,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = Fareye/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2572,6 +2578,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = "Fareye-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2641,6 +2648,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = "Fareye-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

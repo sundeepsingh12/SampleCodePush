@@ -3,14 +3,18 @@
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import { keyValueDBService } from '../classes/KeyValueDBService'
 import {
-    CUSTOMIZATION_APP_MODULE
+    CUSTOMIZATION_APP_MODULE,
+    DEVICE_IMEI
 } from '../../lib/constants'
 import {MOSAMBEE_WALLET_ID} from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
 import jsSha512 from 'js-sha512'
 import { draftService } from '../classes/DraftService'
 import { moduleCustomizationService } from '../classes/ModuleCustomization'
-import _ from 'lodash'
+import {isArray, isEqual, isEmpty, toLower} from 'lodash'
+import { signatureService } from '../classes/SignatureRemarks'
+import { SIGNATURE } from '../../lib/AttributeConstants'
+import moment from 'moment'
 
 class MosambeeWalletPayment {
 
@@ -18,7 +22,7 @@ class MosambeeWalletPayment {
         const jsonArray = await this.fetchDatafromWalletApi(walletParameters.partnerId, walletParameters.walletURL, null, walletParameters.secretKey)
         let walletList = []
         for (let id in jsonArray) {
-            if (_.isEqual(_.toLower(jsonArray[id].status), 'y')) {
+            if (isEqual(toLower(jsonArray[id].status), 'y')) {
                 walletList.push({ code: jsonArray[id].code, name: jsonArray[id].name })
             }
         }
@@ -43,13 +47,13 @@ class MosambeeWalletPayment {
         return jsonArray
     }
 
-    async setWalletListAndWalletParameters(jobTransactionList, jobTransactionIdAmountMap){
+    async setWalletListAndWalletParameters(jobTransactionList, jobTransactionIdAmountMap, id){
         const modulesCustomization = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
-        const walletModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomization.value, MOSAMBEE_WALLET_ID)[0]
+        const walletModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomization.value, id)[0]
         let walletParameters = walletModule && walletModule.remark ? JSON.parse(walletModule.remark) : null
         let actualAmount = 0.00, referenceNoActualAmountMap = '', transactionActualAmount, separator = ''
         const walletList = (walletParameters && walletParameters.partnerId && walletParameters.secretKey && walletParameters.apiPassword && walletParameters.PayProMID) ? await this.hitWalletUrlToGetWalletList(walletParameters) : null
-        if(_.isArray(jobTransactionList)){
+        if(isArray(jobTransactionList)){
             for(let transaction in jobTransactionList){
                 transactionActualAmount = (jobTransactionIdAmountMap[jobTransactionList[transaction].jobTransactionId]) ? jobTransactionIdAmountMap[jobTransactionList[transaction].jobTransactionId].actualAmount : 0
                 actualAmount = actualAmount + transactionActualAmount
@@ -63,6 +67,16 @@ class MosambeeWalletPayment {
         walletParameters.actualAmount = actualAmount
         walletParameters.referenceNoActualAmountMap = referenceNoActualAmountMap
         return { walletParameters, walletList}
+    }
+
+    async setSignatureDataForMosambee(formElement, signature){
+        if(signature == 'N.A' || isEmpty(signature)) return;
+        for (let [key, formElementData] of Object.entries(formElement)) {
+            if(formElementData.attributeTypeId == SIGNATURE){
+                formElementData.value = await signatureService.saveFile(signature, moment(), false)
+                break;
+            }
+        }
     }
     
     updateDraftInMosambee(walletParameters, contactData, selectedWalletDetails, formLayoutState, jobMasterId, jobTransaction) {
