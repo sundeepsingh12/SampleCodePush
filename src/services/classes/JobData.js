@@ -237,7 +237,6 @@ class JobData {
 
     async getCallerIdListAndJobId(incomingNumber, idJobAttributeMap, query, jobMasterList) {
         const allJobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, query)
-        let customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
         let isNumberPresentInJobData = false, callerIdDisplayList = [], id = 0, jobId
         for (let jobData of allJobDataList) {
             let isNumberSame = await calls.compareNumbers(incomingNumber, jobData.value)
@@ -255,6 +254,7 @@ class JobData {
         if (isNumberPresentInJobData) {
             return { isNumberPresentInJobData, callerIdDisplayList, jobId }
         } else {
+            let customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
             for (let customerCareNumber of customerCareList.value) {
                 if ((jobMasterList.includes(customerCareNumber.jobMasterId))) {
                     let isNumberSame = await calls.compareNumbers(incomingNumber, customerCareNumber.mobileNumber)
@@ -264,7 +264,6 @@ class JobData {
                 }
             }
         }
-
     }
 }
 export let jobDataService = new JobData()
