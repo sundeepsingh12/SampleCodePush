@@ -1,21 +1,16 @@
 import RNFS from 'react-native-fs'
 import { zip } from 'react-native-zip-archive'
-import { keyValueDBService } from './KeyValueDBService'
 import { jobTransactionService } from './JobTransaction'
 import { jobSummaryService } from './JobSummary'
 import * as realm from '../../repositories/realmdb'
 import {
     TABLE_TRACK_LOGS,
-    USER_SUMMARY,
     TABLE_FIELD_DATA,
     TABLE_JOB_TRANSACTION,
     TABLE_JOB,
-    PENDING_SYNC_TRANSACTION_IDS,
     TABLE_SERVER_SMS_LOG,
     TABLE_RUNSHEET,
     TABLE_TRANSACTION_LOGS,
-    LAST_SYNC_WITH_SERVER,
-    JOB_STATUS,
     UNSEEN,
     USER_EXCEPTION_LOGS
 } from '../../lib/constants'
@@ -23,7 +18,7 @@ import moment from 'moment'
 import { trackingService } from './Tracking'
 import { userEventLogService } from './UserEvent'
 import { addServerSmsService } from './AddServerSms'
-import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, PENDING, PATH, PATH_TEMP } from '../../lib/AttributeConstants'
+import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, PENDING, PATH, PATH_TEMP,APP_VERSION_NUMBER } from '../../lib/AttributeConstants'
 import { userExceptionLogsService } from './UserException'
 import { communicationLogsService } from './CommunicationLogs'
 import { omit } from 'lodash'
@@ -47,7 +42,7 @@ class SyncZip {
         SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, syncStoreDTO.lastSyncWithServer);
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
-        const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
+        const userSummary = this.updateNextJobTransactionIdAndAppVersion(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
         let { communicationLogs, lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogs(syncStoreDTO, userSummary) : { communicationLogs: [], lastCallTime: null, lastSmsTime: null }
         SYNC_RESULTS.userCommunicationLog = communicationLogs ? communicationLogs : []
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
@@ -67,7 +62,7 @@ class SyncZip {
         // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }
 
-    updateUserSummaryNextJobTransactionId(statusList, jobMasterList, userSummary) {
+    updateNextJobTransactionIdAndAppVersion(statusList, jobMasterList, userSummary) {
         if (!userSummary) {
             throw new Error('User Summary missing in store');
         }
@@ -75,6 +70,7 @@ class SyncZip {
         const jobMasterListWithEnableResequence = jobMasterList ? jobMasterList.filter(jobMaster => jobMaster.enableResequenceRestriction == true) : null;
         const firstEnableSequenceTransaction = (jobMasterListWithEnableResequence && pendingStatusList) ? jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterListWithEnableResequence, pendingStatusList) : null;
         userSummary.nextJobTransactionId = firstEnableSequenceTransaction ? firstEnableSequenceTransaction.id : null;
+        userSummary.appVersion = APP_VERSION_NUMBER
         return userSummary;
     }
 

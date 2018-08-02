@@ -48,7 +48,8 @@ const userSummary = {
     "successCount": { "type": "number", "required": true },
     "travelDuration": { "type": "number", "required": true },
     "userId": { "type": "number", "required": true },
-    "nextJobTransactionId": { "type": [null, "number"], "required": true }
+    "nextJobTransactionId": { "type": [null, "number"], "required": true },
+    "appVersion": { "type": ["string", null], "required": true },
   }
 };
 
