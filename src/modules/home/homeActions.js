@@ -719,13 +719,20 @@ export function registerCallReceiver() {
 
           const allJobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
           const callerJobAttributeData = jobAttributeMasterService.getCallerIdJobAttributeMapAndQuery(allJobAttributes, callerJobMasterIdList, callerJobAttributeIdList)
-          dataObject = await jobDataService.getCallerIdListAndJobId(number, callerJobAttributeData.idJobAttributeMap, callerJobAttributeData.query)
-          if (dataObject.isNumberPresentInJobData) {
+          dataObject = await jobDataService.getCallerIdListAndJobId(number, callerJobAttributeData.idJobAttributeMap, callerJobAttributeData.query, callerJobMasterIdList)
+          if (dataObject && dataObject.isNumberPresentInJobData) {
             const job = jobService.getJobForJobId(dataObject.jobId)
             dispatch(setState(SET_CALLER_ID_POPUP, {
               callerIdDisplayList: dataObject.callerIdDisplayList,
               incomingNumber: number,
               referenceNumber: job[0].referenceNo,
+              showCallerIdPopup: true,
+            }))
+          } else if (dataObject && dataObject.customerCareTitle) {
+            dispatch(setState(SET_CALLER_ID_POPUP, {
+              callerIdDisplayList: [],
+              incomingNumber: number,
+              referenceNumber: dataObject.customerCareTitle,
               showCallerIdPopup: true,
             }))
           }
