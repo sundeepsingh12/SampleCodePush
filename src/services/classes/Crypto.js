@@ -8,8 +8,7 @@ class Crypto {
     const key = `!@#$%${company.id}^&${company.code}+_)(*`,blockSize = 16
     const hashDigest = sha256(key);
     const byteArray = this._wordArrayToByteArray(hashDigest.words,blockSize)
-    const arrayBuffer = this._byteToUint8Array(byteArray)
-    const keyInBase64format = this._arrayBufferToBase64(arrayBuffer)
+    const keyInBase64format = this._arrayBufferToBase64(byteArray)
     return keyInBase64format
   }
 
@@ -53,14 +52,6 @@ _btoa(input = '') {
   
     return ba;
   }
-
-   _byteToUint8Array(byteArray) {
-    var uint8Array = new Uint8Array(byteArray.length);
-    for(var i = 0; i < uint8Array.length; i++) {
-        uint8Array[i] = byteArray[i];
-    }
-    return uint8Array;
-}
 
 _wordArrayToByteArray(wordArray, length) {
     if (wordArray.hasOwnProperty("sigBytes") && wordArray.hasOwnProperty("words")) {

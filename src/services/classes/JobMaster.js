@@ -156,8 +156,6 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);
     await keyValueDBService.validateAndSaveData(USER, json.user);
-    const encryptionKey =  await cryptoService.createEncryptionKey(json.user.company)
-    await keyValueDBService.validateAndSaveData(ENCRYPTION_KEY,encryptionKey);
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster);
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_VALUE, json.jobAttributeValueMaster);
     await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE, json.fieldAttributeMaster);
@@ -187,6 +185,8 @@ class JobMaster {
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.companyMDM, MDM_POLICIES)
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.hubLatLng, HUB_LAT_LONG)
     await keyValueDBService.checkForNullValidateAndSaveInStore(json.deviceSimVerification, LONG_CODE_SIM_VERIFICATION)
+    const encryptionKey =  await cryptoService.createEncryptionKey(json.user.company)
+    await keyValueDBService.validateAndSaveData(ENCRYPTION_KEY,encryptionKey);
   }
 
 
