@@ -41,12 +41,12 @@ export function saveTransactionAfterPayment(jsonData, navigationParams) {
         try {
             dispatch(setState(SET_LOADER_FOR_MOSAMBEE, true))
             let { formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails } = navigationParams
-            paymentService.addPaymentObjectToDetailsArray(jsonData.amount, 12, jsonData.transactionId, jsonData.receiptLink, jsonData, formLayoutState)
+            paymentService.addPaymentObjectToDetailsArray(jsonData.amount, 12, jsonData.transactionId, jsonData.receiptLink ? jsonData.receiptLink : 'N.A' , jsonData, formLayoutState)
             Toast.show({ text: 'payment successful', position: "bottom", buttonText: 'Ok', duration: 5000 }) 
             if(jobTransaction.id < 0) {
                 navDispatch(StackActions.pop())
             }
-            await MosambeeWalletPaymentServices.setSignatureDataForMosambee(formLayoutState.formElement, jsonData.signature)
+            await MosambeeWalletPaymentServices.setSignatureDataForMosambee(formLayoutState.formElement, jsonData.signature ? jsonData.signature : 'N.A')
             dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
         } catch (error) {
             showToastAndAddUserExceptionLog(3002, error.message, 'danger', 0)

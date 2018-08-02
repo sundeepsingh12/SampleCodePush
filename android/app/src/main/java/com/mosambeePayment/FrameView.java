@@ -108,7 +108,7 @@ public class FrameView  extends LinearLayout implements TransactionResult{
         String dateTime = formattedDt.format(new Date());
         moscCallback = new MosCallback(context);
         tc = new MosCallback(context);
-        tc.initialise("355370069303467", mosambeeParameters.getString("userPwd"),this);
+        tc.initialise(mosambeeParameters.getString("userId"), mosambeeParameters.getString("userPwd"),this);
         tc.initializeSignatureView(frameLayout, "#364b68", "#000000");
         moscCallback.initialiseFields("sale", mosambeeParameters.getString("contactNumber"),
                 mosambeeParameters.getString("appKey"), true, "email@test.com",

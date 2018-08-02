@@ -70,7 +70,7 @@ class MosambeeWalletPayment {
     }
 
     async setSignatureDataForMosambee(formElement, signature){
-        if(signature == 'N.A' || isEmpty(signature)) return;
+        if(signature == 'N.A') return;
         for (let [key, formElementData] of Object.entries(formElement)) {
             if(formElementData.attributeTypeId == SIGNATURE){
                 formElementData.value = await signatureService.saveFile(signature, moment(), false)
