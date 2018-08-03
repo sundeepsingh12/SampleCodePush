@@ -75,6 +75,16 @@ export default class JobListItem extends PureComponent {
       }
     )
   }
+  constructor(props) {
+    super(props)
+    this.state = {
+      timer: 0,
+      counter: 0,
+  };
+}
+componentWillUnmount() {
+  clearInterval(this.state.timer);
+}
 
   navigationButtonPressed = () => {
     const addressDatas = this.props.data.jobSwipableDetails.addressData
@@ -149,6 +159,23 @@ export default class JobListItem extends PureComponent {
       </View>
     )
   }
+  componentDidMount(){
+    if(this.props.jobEndTime && !this.state.timer){
+      let currentTime = moment()
+      this.setState({ counter: moment.utc(moment(this.props.jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss") })
+      let timer = setInterval(this.tick, 1000);
+      this.setState({ timer });
+    }
+  }
+  tick = () => { 
+    let currentTime = moment()
+    if(moment(this.props.jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss")) <= 0){
+      this.setState({ counter: moment.utc(moment(currentTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss") }) 
+      clearInterval(this.state.timer);
+    }else{
+      this.setState({ counter: moment.utc(moment(this.props.jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss") }) 
+    }
+  }
 
   render() {
     return (
@@ -209,9 +236,9 @@ export default class JobListItem extends PureComponent {
         {this.props.jobEndTime ?
           <View style={[styles.marginTop10, styles.bgBlack, styles.bgWarning, styles.padding5, { borderRadius: 5 }]}>
             <Text style={[styles.fontWhite, styles.fontDefault, styles.fontCenter]}>
-              {(moment(this.props.jobEndTime, "HH:mm:ss")).hours() + ' hours ' +
-                (moment(this.props.jobEndTime, "HH:mm:ss")).minutes() + ' minutes ' +
-                (moment(this.props.jobEndTime, "HH:mm:ss")).seconds() + ' seconds left'}
+              {(moment(this.state.counter, "HH:mm:ss")).hours() + ' hours ' +
+                (moment(this.state.counter, "HH:mm:ss")).minutes() + ' minutes ' +
+                (moment(this.state.counter, "HH:mm:ss")).seconds() + ' seconds left'}
             </Text>
           </View> : null}
 
