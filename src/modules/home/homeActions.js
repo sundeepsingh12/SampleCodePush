@@ -472,9 +472,9 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB');
           if (showLiveJobNotification && showLiveJobNotification.value) {
             if (AppState.currentState == 'background') {
-              Linking.canOpenURL('peopleapp://people').then(supported => {
+              Linking.canOpenURL('fareyeapp://fareye').then(supported => {
                 if (supported) {
-                  return Linking.openURL('peopleapp://people');
+                  return Linking.openURL('fareyeapp://fareye');
                 }
               });
             } else if (AppState.currentState == 'active') {

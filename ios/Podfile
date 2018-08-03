@@ -8,8 +8,6 @@ target 'Fareye' do
   # Pods for Fareye
   pod 'Firebase/Messaging'
 
-  pod 'RNSound', :path => '../node_modules/react-native-sound'
-
   target 'FareyeTests' do
     inherit! :search_paths
     # Pods for testing
