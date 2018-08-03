@@ -5,7 +5,8 @@ import {
     START_FETCHING_LIVE_JOB,
     SET_SEARCH,
     SET_LIVE_JOB_TOAST,
-    RESET_STATE
+    RESET_STATE,
+    CLEAR_LIVE_JOB_STATE
 } from '../../lib/constants'
 import InitialState from './liveJobListingInitialState.js'
 
@@ -32,6 +33,7 @@ export default function liveJobReducer(state = initialState, action) {
         case SET_LIVE_JOB_TOAST:
             return state.set('liveJobToastMessage', action.payload)
         case RESET_STATE:
+        case CLEAR_LIVE_JOB_STATE:
             return initialState
     }
     return state

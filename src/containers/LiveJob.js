@@ -40,7 +40,8 @@ class LiveJob extends PureComponent {
     }
     state = {
         timer: null,
-        counter: 0
+        counter: 0,
+        counterNegative: false
     };
 
     componentWillUnmount() {
@@ -60,11 +61,11 @@ class LiveJob extends PureComponent {
         this.setCounterNgative(jobEndTime, currentTime)
         if (this.state.counterNegative) {
             this.setState({
-                counter: moment(this.state.counter, 'HH:mm:ss').add(1, 'seconds')
+                counter: moment.utc(moment(currentTime, "HH:mm:ss").diff(moment(jobEndTime, "HH:mm:ss"))).format("HH:mm:ss")
             });
         } else {
             this.setState({
-                counter: moment(this.state.counter, 'HH:mm:ss').subtract(1, 'seconds')
+                counter: moment.utc(moment(jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
             });
         }
     }
