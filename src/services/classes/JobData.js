@@ -6,6 +6,7 @@ import {
 } from './JobDetails'
 import {
     TABLE_JOB_DATA,
+    CUSTOMER_CARE
 } from '../../lib/constants'
 
 import {
@@ -15,9 +16,10 @@ import {
     LANDMARK,
     PINCODE,
     JOB_EXPIRY_TIME,
-
 } from '../../lib/AttributeConstants'
-
+import {
+    keyValueDBService
+} from './KeyValueDBService'
 import _ from 'lodash'
 let calls = require('../../wrapper/CALLS')
 
@@ -232,25 +234,36 @@ class JobData {
         return jobDataMap
     }
 
-    
-    async getCallerIdListAndJobId(incomingNumber,idJobAttributeMap,query){
-        const allJobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA,query)
-        let isNumberPresentInJobData = false,callerIdDisplayList = [],id=0,jobId
-        for(let jobData of allJobDataList){
-           let isNumberSame =  await calls.compareNumbers(incomingNumber, jobData.value)
+
+    async getCallerIdListAndJobId(incomingNumber, idJobAttributeMap, query, jobMasterList) {
+        const allJobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, query)
+        let isNumberPresentInJobData = false, callerIdDisplayList = [], id = 0, jobId
+        for (let jobData of allJobDataList) {
+            let isNumberSame = await calls.compareNumbers(incomingNumber, jobData.value)
             //Check whether number from which call is made is present in jobdata db and also get job id from that job data
-            if(!isNumberPresentInJobData && idJobAttributeMap[jobData.jobAttributeMasterId].attributeTypeId == CONTACT_NUMBER && isNumberSame){
+            if (!isNumberPresentInJobData && idJobAttributeMap[jobData.jobAttributeMasterId].attributeTypeId == CONTACT_NUMBER && isNumberSame) {
                 isNumberPresentInJobData = true
                 jobId = jobData.jobId
             }
 
             //Prepare callerIdDisplayList,This will be used for displaying info whenever call is made
-            if(idJobAttributeMap[jobData.jobAttributeMasterId]  && idJobAttributeMap[jobData.jobAttributeMasterId].attributeTypeId != CONTACT_NUMBER ){
-                callerIdDisplayList.push({id:id++,jobAttributeLabel:idJobAttributeMap[jobData.jobAttributeMasterId].label,value:jobData.value})
+            if (jobData.jobId == jobId && idJobAttributeMap[jobData.jobAttributeMasterId] && idJobAttributeMap[jobData.jobAttributeMasterId].attributeTypeId != CONTACT_NUMBER) {
+                callerIdDisplayList.push({ id: id++, jobAttributeLabel: idJobAttributeMap[jobData.jobAttributeMasterId].label, value: jobData.value })
             }
         }
-        return {isNumberPresentInJobData,callerIdDisplayList,jobId}
-      
+        if (isNumberPresentInJobData) {
+            return { isNumberPresentInJobData, callerIdDisplayList, jobId }
+        } else {
+            let customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
+            for (let customerCareNumber of customerCareList.value) {
+                if ((jobMasterList.includes(customerCareNumber.jobMasterId))) {
+                    let isNumberSame = await calls.compareNumbers(incomingNumber, customerCareNumber.mobileNumber)
+                    if (isNumberSame) {
+                        return { customerCareTitle: customerCareNumber.name }
+                    }
+                }
+            }
+        }
     }
 }
 export let jobDataService = new JobData()

@@ -31,6 +31,7 @@ import PayByLink from '../../containers/PayByLink'
 import MosambeeWalletPayment from '../../containers/MosambeeWalletPayment'
 import QrCodeScanner from '../../containers/QrCodeScanner'
 import MessageBox from '../../containers/MessageBox'
+import MosambeePayment from '../../containers/MosambeePayment'
 
 const MenuStack = createStackNavigator({
     MenuScreen: {

@@ -3,6 +3,7 @@ package com.fareyereact;
 import android.app.Application;
 import com.emekalites.react.compress.image.ImageCompressPackage;
 import com.facebook.react.ReactApplication;
+import com.rusel.RCTBluetoothSerial.RCTBluetoothSerialPackage;
 import com.pritesh.calldetection.CallDetectionManager;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.cnull.apkinstaller.ApkInstallerPackage;
@@ -33,6 +34,7 @@ import java.util.List;
 import android.support.multidex.MultiDexApplication;
 import com.callgetter.CallLogsPackage;
 import com.opendatetimesettings.OpenDateTimeSettingsPackage;
+import com.mosambeePayment.MosambeePaymentPackage;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
 
@@ -52,6 +54,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+          new RCTBluetoothSerialPackage(),
           new CallDetectionManager(MainApplication.this),
           new ImagePickerPackage(),
           new PickerPackage(),
@@ -75,7 +78,8 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
           new RNIMEIPackage(),
           new SendSMSPackage(),
           new CallLogsPackage(),
-          new OpenDateTimeSettingsPackage()
+          new OpenDateTimeSettingsPackage(),
+          new MosambeePaymentPackage()
       );
     }
 

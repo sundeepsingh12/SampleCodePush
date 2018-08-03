@@ -40,6 +40,7 @@ import CustomApp from './CustomApp'
 import Summary from './Summary'
 import LiveJob from './LiveJob'
 import MosambeeWalletPayment from './MosambeeWalletPayment'
+import MosambeePayment from './MosambeePayment'
 import SplitPayment from './SplitPayment'
 import CameraFieldAttribute from './CameraFieldAttribute'
 import QrCodeScanner from './QrCodeScanner'
@@ -177,6 +178,12 @@ const HomeStack = createStackNavigator({
   },
   MosamBeeWalletPayment: {
     screen: MosambeeWalletPayment,
+    navigationOptions: {
+      header: null
+    }
+  },
+  MosambeePayment: {
+    screen: MosambeePayment,
     navigationOptions: {
       header: null
     }

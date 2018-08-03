@@ -171,6 +171,10 @@ module.exports = keyMirror({
     BLUETOOTH_SCANNING_START: null,
     BLUETOOTH_SCANNING_STOP: null,
 
+    //mosambee Payment
+    SET_LOADER_FOR_MOSAMBEE: null,
+    SET_MOSAMBEE_PARAMETERS: null,
+
     //Long running service's possible status
     SERVICE_PENDING: null,
     SERVICE_RUNNING: null,
@@ -238,6 +242,7 @@ module.exports = keyMirror({
     APP_THEME: null,
     LAST_CALL_AND_SMS_TIME: null,
     LONG_CODE_SIM_VERIFICATION: null,
+    ENCRYPTION_KEY:null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
