@@ -115,6 +115,8 @@ module.exports = keyMirror({
     TABS_LOADING: null,
     SET_SELECTED_DATE: null,
     LOADER_FOR_SYNCING: null,
+    SET_CALLER_ID_POPUP:null,
+    TASKLIST_LOADER_FOR_SYNC: null,
 
     //Pages
     PAGES_LOADING: null,
@@ -134,7 +136,6 @@ module.exports = keyMirror({
     //Listing Actions
     JOB_LISTING_START: null,
     JOB_LISTING_END: null,
-    TASKLIST_LOADER_FOR_SYNC: null,
 
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
@@ -169,6 +170,10 @@ module.exports = keyMirror({
     //Bluetooth Actions
     BLUETOOTH_SCANNING_START: null,
     BLUETOOTH_SCANNING_STOP: null,
+
+    //mosambee Payment
+    SET_LOADER_FOR_MOSAMBEE: null,
+    SET_MOSAMBEE_PARAMETERS: null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,
@@ -235,7 +240,9 @@ module.exports = keyMirror({
     MDM_POLICIES: null,
     FCM_TOKEN: null,
     APP_THEME: null,
+    LAST_CALL_AND_SMS_TIME: null,
     LONG_CODE_SIM_VERIFICATION: null,
+    ENCRYPTION_KEY:null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -252,7 +259,7 @@ module.exports = keyMirror({
     TABLE_DRAFT: null,
     SEND_EMAIL_OR_SMS: null,
     TABLE_MESSAGE_INTERACTION: null,
-
+    TABLE_NEGATIVE_COMMUNICATION_LOG: null,
     //Home Actions
     IS_LAST_PAGE: null,
 

@@ -184,13 +184,14 @@ class RestAPI {
     });
   }
 
-  async uploadZipFile(path, fileName, currenDate, syncStoreDTO) {
+  async uploadZipFile(path, fileName, currenDate, syncStoreDTO,isEncryptionSuccessful) {
     // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
+    const baseUrl = (isEncryptionSuccessful) ?  CONFIG.API.POST_ZIP_ENCRYPTED_API : CONFIG.API.UPLOAD_DATA_API
     var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
     var filePath = (!path) ? PATH + '/sync.zip' : PATH
     let responseBody = "Fail"
     let data = await keyValueDBService.getValueFromStore(DOMAIN_URL)
-    await RNFetchBlob.fetch('POST', data.value + CONFIG.API.UPLOAD_DATA_API, {
+    await RNFetchBlob.fetch('POST', data.value +baseUrl, {
       'cookie': this._sessionToken,
       'Content-Type': 'multipart/form-data',
     }, [
@@ -211,7 +212,6 @@ class RestAPI {
           throw new Error(responseBody)
         }
       }).catch(err => {
-
         throw {
           code: err.message ? JSON.parse(err.message).status : null,
         }

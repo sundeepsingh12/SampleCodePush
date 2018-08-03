@@ -80,6 +80,7 @@ import { SHOW_MOBILE_SCREEN, SHOW_OTP, CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DO
 import codePush from "react-native-code-push"
 import { Platform } from 'react-native'
 import { performSyncService } from '../home/homeActions';
+import feStyle from '../../themes/FeStyle'
 let sendSMSBackGroundService = require('../../wrapper/SendSMSBackGround');
 import Communications from 'react-native-communications';
 
@@ -247,8 +248,6 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
  * otherwise job master failure action is dispatched
  *
  * @param jobMasterResponse
- * @param dispatch
- * @return {Promise.<void>}
  */
 export function validateAndSaveJobMaster(deviceIMEI, deviceSIM, token, jobMasterResponse) {
   return async function (dispatch) {
@@ -256,6 +255,13 @@ export function validateAndSaveJobMaster(deviceIMEI, deviceSIM, token, jobMaster
       await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
       dispatch(setState(MASTER_SAVING_START))
       await jobMasterService.saveJobMaster(jobMasterResponse)
+      if (jobMasterResponse.appTheme) {
+        feStyle.primaryColor = jobMasterResponse.appTheme
+        feStyle.bgPrimaryColor = jobMasterResponse.appTheme
+        feStyle.fontPrimaryColor = jobMasterResponse.appTheme
+        feStyle.shadeColor = jobMasterResponse.appTheme + '98'
+        feStyle.borderLeft4Color = jobMasterResponse.appTheme
+      }
       dispatch(setState(MASTER_SAVING_SUCCESS))
       dispatch(checkAsset(deviceIMEI, deviceSIM, jobMasterResponse.user, token))
     } catch (error) {
@@ -345,8 +351,6 @@ export function checkIfAppIsOutdated(error) {
 
 /**Checks if sim is locally verified or not,if not then check if it's valid on server or not
  *
- * @param dispatch
- * @return {Promise.<void>}
  */
 export function checkAsset(deviceIMEI, deviceSIM, user, token) {
   return async function (dispatch) {
@@ -370,7 +374,7 @@ export function checkAsset(deviceIMEI, deviceSIM, user, token) {
 
 /**Checks if sim is valid on server,called only if sim is not valid locally
  *
- * @return {Promise.<void>}
+ *
  */
 
 

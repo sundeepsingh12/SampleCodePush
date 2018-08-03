@@ -18,7 +18,7 @@ module.exports = {
     TOTAL_COUNT: 'Total Count : ',
     PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB: 'Please enable internet connection to update this job!!!',
     UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET: 'unable to sync with server, Please check your internet connection',
-
+    ERROR: 'Error',
     //Common Error Strings
     JOB_STATUS_MISSING: 'Job status missing in store',
 
@@ -458,5 +458,12 @@ module.exports = {
     FCM_PERMISSION_DENIED: 'FCM Request Access Denied',
 
     MANAGER_INTERACTION: 'MANAGERINTERACTION',
-    FIELDEXECUTIVE_INTERACTION: 'FIELDEXECUTIVEINTERACTION'
+    FIELDEXECUTIVE_INTERACTION: 'FIELDEXECUTIVEINTERACTION',
+
+    //Communication Logs
+    CALL_OFFICIAL: 'CALL_OFFICIAL',
+    CALL_CUG: 'CALL_CUG',
+    CALL_PERSONAL: 'CALL_PERSONAL',
+    SMS_OFFICIAL: 'SMS_OFFICIAL',
+    SMS_PERSONAL: 'SMS_PERSONAL'
 }

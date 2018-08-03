@@ -1,26 +1,5 @@
 'use strict'
-import {
-    BACKUP_ID,
-    BLUETOOTH_ID,
-    BULK_ID,
-    EZE_TAP_ID,
-    LIVE_ID,
-    M_SWIPE_ID,
-    OFFLINEDATASTORE_ID,
-    PIECHART_ID,
-    PROFILE_ID,
-    STATISTIC_ID,
-    START_ID,
-    SEQUENCEMODULE_ID,
-    SUMMARY_ID,
-    SORTING_ID,
-    CUSTOMAPP_ID,
-    NEWJOB_ID,
-    NEW_JOB,
-    Piechart,
-    JOB_ASSIGNMENT_ID,
-    Start
-} from '../../lib/AttributeConstants'
+
 import {
     MAIN_MENU
 } from '../../lib/constants'

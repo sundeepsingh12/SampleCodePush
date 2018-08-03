@@ -36,130 +36,143 @@ import UPIPayment from '../../containers/UPIPayment'
 import PayByLink from '../../containers/PayByLink'
 import MosambeeWalletPayment from '../../containers/MosambeeWalletPayment'
 import QrCodeScanner from '../../containers/QrCodeScanner'
+import MosambeePayment from '../../containers/MosambeePayment'
 
 const HomeStack = createStackNavigator({
-    Home: {
-        screen: Home,
-        navigationOptions:{
-            header:null
-        }
-    },
-    TabScreen: {
-        screen: TabScreen,
-    },
-    JobDetailsV2: {
-        screen: JobDetailsV2,
-    },
-    FormLayout: {
-        screen: FormLayout,
-      },
-      ArrayFieldAttribute: {
-        screen: ArrayFieldAttribute
-      },
-      DataStore: {
-        screen: DataStore,
-      },
-      SaveActivated: {
-        screen: SaveActivated,
-      },
-      Transient: {
-        screen: Transient,
-      },
-      CheckoutDetails: {
-        screen: CheckoutDetails,
-      },
-      SignatureAndNps: {
-        screen: SignatureAndNps
-      },
-      BulkListing: {
-        screen: BulkListing,
-      },
-      CashTendering: {
-        screen: CashTendering,
-        navigationOptions: {
-          header: null
-        }
-      },
-      LiveJobs: {
-        screen: LiveJobListing
-      },
-      LiveJob: {
-        screen: LiveJob
-      },
-      PostAssignmentScanner: {
-        screen: PostAssignmentScanner
-      },
-      DataStoreDetails: {
-        screen: DataStoreDetails
-      },
-      SplitPayment: {
-        screen: SplitPayment,
-      },
-      SequenceRunsheetList: {
-        screen: SequenceRunsheetList
-      },
-      Sequence: {
-        screen: Sequence,
-      },
-      CameraAttribute: {
-        screen: CameraFieldAttribute,
-      },
-      ImageDetailsView: {
-        screen: ImageDetailsView,
-      },
-      CustomApp: {
-        screen: CustomApp
-      },
-      FixedSKUListing: {
-        screen: FixedSKUListing,
-        navigationOptions: {
-          header: null
-        }
-      },
-      Sorting: {
-        screen: Sorting,
-        navigationOptions: {
-          title: 'Sorting',
-          header: null,
-        }
-      },
-      Signature: {
-        screen: Signature,
-        navigationOptions: {
-          header: null
-        }
-      },
-      SkuListing: {
-        screen: SkuListing,
-        navigationOptions: {
-          title: 'SKU Listing',
-        }
-      },
-      Summary: {
-        screen: Summary,
-      },
-      Payment: {
-        screen: Payment
-      },
-      UPIPayment: {
-        screen: UPIPayment
-      },
-      PayByLink: {
-        screen: PayByLink
-      },
-      MosamBeeWalletPayment:{
-        screen: MosambeeWalletPayment,
-        navigationOptions: {
-          header: null
-        }
-      },
-      QrCodeScanner: {
-        screen: QrCodeScanner,
-        navigationOptions: {
-          title: 'Scanner',
-          header: null,
-        }
-      },
+  Home: {
+    screen: Home,
+    navigationOptions: {
+      header: null
+    }
+  },
+  TabScreen: {
+    screen: TabScreen,
+  },
+  JobDetailsV2: {
+    screen: JobDetailsV2,
+  },
+  FormLayout: {
+    screen: FormLayout,
+    navigationOptions: {
+      gesturesEnabled: false
+    }
+  },
+  ArrayFieldAttribute: {
+    screen: ArrayFieldAttribute
+  },
+  DataStore: {
+    screen: DataStore,
+  },
+  SaveActivated: {
+    screen: SaveActivated,
+  },
+  Transient: {
+    screen: Transient,
+    navigationOptions: {
+      gesturesEnabled: false
+    }
+  },
+  CheckoutDetails: {
+    screen: CheckoutDetails,
+    navigationOptions: {
+      gesturesEnabled: false
+    }
+  },
+  SignatureAndNps: {
+    screen: SignatureAndNps
+  },
+  BulkListing: {
+    screen: BulkListing,
+  },
+  CashTendering: {
+    screen: CashTendering,
+    navigationOptions: {
+      header: null
+    }
+  },
+  LiveJobs: {
+    screen: LiveJobListing
+  },
+  LiveJob: {
+    screen: LiveJob
+  },
+  PostAssignmentScanner: {
+    screen: PostAssignmentScanner
+  },
+  DataStoreDetails: {
+    screen: DataStoreDetails
+  },
+  SplitPayment: {
+    screen: SplitPayment,
+  },
+  SequenceRunsheetList: {
+    screen: SequenceRunsheetList
+  },
+  Sequence: {
+    screen: Sequence,
+  },
+  CameraAttribute: {
+    screen: CameraFieldAttribute,
+  },
+  ImageDetailsView: {
+    screen: ImageDetailsView,
+  },
+  CustomApp: {
+    screen: CustomApp
+  },
+  FixedSKUListing: {
+    screen: FixedSKUListing,
+    navigationOptions: {
+      header: null
+    }
+  },
+  Sorting: {
+    screen: Sorting,
+    navigationOptions: {
+      title: 'Sorting',
+      header: null,
+    }
+  },
+  Signature: {
+    screen: Signature,
+    navigationOptions: {
+      header: null
+    }
+  },
+  SkuListing: {
+    screen: SkuListing,
+    navigationOptions: {
+      title: 'SKU Listing',
+    }
+  },
+  Summary: {
+    screen: Summary,
+  },
+  Payment: {
+    screen: Payment
+  },
+  UPIPayment: {
+    screen: UPIPayment
+  },
+  PayByLink: {
+    screen: PayByLink
+  },
+  MosambeePayment: {
+    screen: MosambeePayment
+  },
+  MosamBeeWalletPayment: {
+    screen: MosambeeWalletPayment,
+    navigationOptions: {
+      header: null
+    }
+  },
+  QrCodeScanner: {
+    screen: QrCodeScanner,
+    navigationOptions: {
+      title: 'Scanner',
+      header: null,
+    }
+  },
 })
 
 export default HomeStack

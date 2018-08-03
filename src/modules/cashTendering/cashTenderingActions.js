@@ -20,8 +20,6 @@ import {
 } from '../../lib/AttributeConstants'
 import { Toast } from 'native-base'
 import { navigate } from '../navigators/NavigationService';
-
-
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import {
     SKIP_CASH_TENDERING,
