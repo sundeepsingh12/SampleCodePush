@@ -49,19 +49,6 @@ class LiveJobService {
         }
     }
 
-    checkJobExpiryForReloading(liveJobMap){
-        if (!liveJobMap || _.isEmpty(liveJobMap)) {
-            return {}
-        }
-        for (let index in liveJobMap) {
-            let jobEndTime = moment(liveJobMap[index].jobEndTime, 'HH:mm:ss')
-            if (moment(jobEndTime).diff(moment()) <= 0) {
-                delete liveJobMap[index]
-            }
-        }
-        return liveJobMap
-    }
-
     async requestServerForApproval(status, token, job, liveJobList) {
         let postJson = "{\"jobId\":\"" + job.id + "\",\"jobDate\":\"" + job.jobStartTime + "\",\"statusId\":\"" + status + "\"}"
         let toastMessage = '', newLiveJobList

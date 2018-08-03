@@ -170,8 +170,8 @@ componentWillUnmount() {
   tick = () => { 
     let currentTime = moment()
     if(moment(this.props.jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss")) <= 0){
+      this.setState({ counter: moment.utc(moment(currentTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss") }) 
       clearInterval(this.state.timer);
-      this.props.onReloadJob()
     }else{
       this.setState({ counter: moment.utc(moment(this.props.jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss") }) 
     }

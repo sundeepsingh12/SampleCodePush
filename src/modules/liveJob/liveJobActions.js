@@ -85,18 +85,7 @@ export function fetchAllLiveJobsList() {
         }
     }
 }
-export function reloadLiveJobList(liveJobList) {
-    return async function (dispatch) {
-        try {
-            dispatch(setState(START_FETCHING_LIVE_JOB, true))
-            let newLiveJobList =  liveJobService.checkJobExpiryForReloading(liveJobList)
-            dispatch(setState(SET_LIVE_JOB_LIST, newLiveJobList))
-        } catch (error) {
-            showToastAndAddUserExceptionLog(1203, error.message, 'danger', 1)
-            dispatch(setState(START_FETCHING_LIVE_JOB, false))
-        }
-    }
-}
+
 export function toggleLiveJobSelection(jobId, allJobs, searchText) {
     return async function (dispatch) {
         try {

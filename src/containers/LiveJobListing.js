@@ -84,7 +84,6 @@ class LiveJobListing extends PureComponent {
         if (time != 'TimeUp') {
             return (
                 <JobListItem data={item} jobEndTime={time}
-                    onReloadJob = {() => {this.props.actions.reloadLiveJobList(this.props.liveJobList)}}
                     onPressItem={() => { this.navigateToScene(item) }}
                     onLongPressItem={() => this.toggleLiveJobSelection(item.id)}
                 />
