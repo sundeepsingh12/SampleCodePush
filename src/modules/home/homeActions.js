@@ -671,21 +671,25 @@ export function readAndUploadFiles() {
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2710, error.message, 'danger', 1)
+      dispatch(setState(SET_FAIL_UPLOAD_COUNT, 1))
+      await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, 1)
     }
   }
 }
-export function resetFailCountInStore() {
+export function resetFailCountInStore(isNavigateTrue) {
   return async function (dispatch) {
     try {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
-      const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
-      if (ErpCheck) {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
-        navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
-      }
-      else {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
-        navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+      if (isNavigateTrue) {
+        const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
+        if (ErpCheck) {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
+        }
+        else {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+        }
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2711, error.message, 'danger', 1)
@@ -731,13 +735,20 @@ export function registerCallReceiver() {
 
           const allJobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
           const callerJobAttributeData = jobAttributeMasterService.getCallerIdJobAttributeMapAndQuery(allJobAttributes, callerJobMasterIdList, callerJobAttributeIdList)
-          dataObject = await jobDataService.getCallerIdListAndJobId(number, callerJobAttributeData.idJobAttributeMap, callerJobAttributeData.query)
-          if (dataObject.isNumberPresentInJobData) {
+          dataObject = await jobDataService.getCallerIdListAndJobId(number, callerJobAttributeData.idJobAttributeMap, callerJobAttributeData.query, callerJobMasterIdList)
+          if (dataObject && dataObject.isNumberPresentInJobData) {
             const job = jobService.getJobForJobId(dataObject.jobId)
             dispatch(setState(SET_CALLER_ID_POPUP, {
               callerIdDisplayList: dataObject.callerIdDisplayList,
               incomingNumber: number,
               referenceNumber: job[0].referenceNo,
+              showCallerIdPopup: true,
+            }))
+          } else if (dataObject && dataObject.customerCareTitle) {
+            dispatch(setState(SET_CALLER_ID_POPUP, {
+              callerIdDisplayList: [],
+              incomingNumber: number,
+              referenceNumber: dataObject.customerCareTitle,
               showCallerIdPopup: true,
             }))
           }

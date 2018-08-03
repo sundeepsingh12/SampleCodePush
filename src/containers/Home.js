@@ -193,15 +193,8 @@ class Home extends PureComponent {
                 </TouchableHighlight>
 
               </View>
+              {this.getCallerIdDisplayListView()}
 
-              <View style={[styles.paddingTop5]}>
-                <FlatList
-                  data={this.props.callerIdDisplayData.callerIdDisplayList}
-                  renderItem={({ item }) => this.renderCallerDisplayData(item)}
-                  keyExtractor={item => String(item.id)}
-                />
-                <View style={{ height: 10, borderBottomLeftRadius: 6, borderBottomRightRadius: 6 }}></View>
-              </View>
             </View>
           </View>
         </Modal>
@@ -209,7 +202,20 @@ class Home extends PureComponent {
 
     )
   }
-
+  getCallerIdDisplayListView() {
+    let view
+    if (this.props.callerIdDisplayData && this.props.callerIdDisplayData.callerIdDisplayList && this.props.callerIdDisplayData.callerIdDisplayList.length > 0) {
+      view = <View style={[styles.paddingTop5]}>
+        <FlatList
+          data={this.props.callerIdDisplayData.callerIdDisplayList}
+          renderItem={({ item }) => this.renderCallerDisplayData(item)}
+          keyExtractor={item => String(item.id)}
+        />
+        <View style={{ height: 10, borderBottomLeftRadius: 6, borderBottomRightRadius: 6 }}></View>
+      </View>
+    }
+    return view
+  }
   dismissCallerPopup = () => {
     this.props.actions.setState(SET_CALLER_ID_POPUP, {
       showCallerIdPopup: false,
