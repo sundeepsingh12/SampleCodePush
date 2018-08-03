@@ -6,7 +6,7 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
     "release": "cd android && ./gradlew assembleRelease",
-    "postinstall": "./src/scripts/camera/camera.sh &&  ./src/scripts/installer/installer.sh"
+    "postinstall": "./src/scripts/camera/camera.sh &&  ./src/scripts/installer/installer.sh && ./src/scripts/bluetooth/bluetooth.sh"
   },
   "dependencies": {
     "crypto-js": "3.1.9-1",
@@ -24,6 +24,7 @@
     "react-native-background-fetch": "2.4.3",
     "react-native-background-geolocation": "2.12.2",
     "react-native-background-timer": "2.0.1",
+    "react-native-bluetooth-serial": "1.0.0-rc1",
     "react-native-call-detection": "1.6.3",
     "react-native-camera": "git+https://git@github.com/react-native-community/react-native-camera",
     "react-native-cancelable-fetch": "0.1.1",

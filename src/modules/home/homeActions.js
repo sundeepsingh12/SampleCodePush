@@ -41,7 +41,8 @@ import {
   MDM_POLICIES,
   APP_THEME,
   JOB_ATTRIBUTE,
-  SET_CALLER_ID_POPUP
+  SET_CALLER_ID_POPUP,
+  BluetoothListing
 } from '../../lib/constants'
 
 import {
@@ -111,6 +112,7 @@ import { jobAttributeMasterService } from '../../services/classes/JobAttributeMa
 import { jobDataService } from '../../services/classes/JobData'
 import { jobService } from '../../services/classes/Job'
 import { each, size, isNull } from 'lodash'
+
 
 /**
  * Function which updates STATE when component is mounted
@@ -185,7 +187,8 @@ export function navigateToPage(pageObject, navigationProps) {
           navigate(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' })
           break;
         case PAGE_BLUETOOTH_PAIRING:
-          throw new Error("CODE it, if you want to use it !");
+          navigate(BluetoothListing, { pageObject })
+          break;
         case PAGE_BULK_UPDATE: {
           dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
           break;

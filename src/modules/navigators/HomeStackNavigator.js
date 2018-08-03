@@ -36,6 +36,7 @@ import UPIPayment from '../../containers/UPIPayment'
 import PayByLink from '../../containers/PayByLink'
 import MosambeeWalletPayment from '../../containers/MosambeeWalletPayment'
 import QrCodeScanner from '../../containers/QrCodeScanner'
+import MosambeePayment from '../../containers/MosambeePayment'
 
 const HomeStack = createStackNavigator({
   Home: {
@@ -155,6 +156,9 @@ const HomeStack = createStackNavigator({
   },
   PayByLink: {
     screen: PayByLink
+  },
+  MosambeePayment: {
+    screen: MosambeePayment
   },
   MosamBeeWalletPayment: {
     screen: MosambeeWalletPayment,
