@@ -18,7 +18,13 @@
 
 # Disabling obfuscation is useful if you collect stack traces from production crashes
 # (unless you are using a system that supports de-obfuscate the stack traces).
--dontobfuscate
+#-dontobfuscate
+
+-keep class com.facebook.react.bridge.CatalystInstanceImpl { *; }
+-keep class com.facebook.react.bridge.JavaScriptExecutor { *; }
+-keep class com.facebook.react.bridge.queue.NativeRunnable { *; }
+-keep class com.facebook.react.bridge.ReadableType { *; }
+
 -optimizationpasses 5
 # React Native
 
@@ -102,3 +108,6 @@
 
 -keep class io.realm.react.** { *; }
 -dontwarn io.realm.react.**
+
+#mosambee
+-dontwarn com.dspread.xpos.**
