@@ -357,14 +357,8 @@ export function checkAsset(deviceIMEI, deviceSIM, user, token) {
     try {
       let longCodeConfiguration = await keyValueDBService.getValueFromStore(LONG_CODE_SIM_VERIFICATION);
       dispatch(setState(CHECK_ASSET_START))
-      let isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
-      isVerified = longCodeConfiguration && longCodeConfiguration.value && longCodeConfiguration.value.simVerificationType == 'LongCode' ? false : isVerified;
-      if (isVerified) {
-        dispatch(setState(PRELOADER_SUCCESS))
-        dispatch(checkForUnsyncBackupFilesAndNavigate(user))
-      } else {
-        dispatch(checkIfSimValidOnServer(user, token, longCodeConfiguration));
-      }
+      await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
+      dispatch(checkIfSimValidOnServer(user, token, longCodeConfiguration));
     } catch (error) {
       showToastAndAddUserExceptionLog(1808, error.message, 'danger', 0)
       dispatch(setState(CHECK_ASSET_FAILURE, error.message))
