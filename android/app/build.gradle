@@ -144,6 +144,7 @@ repositories {
 }
 
 dependencies {
+    compile project(':react-native-sound')
     implementation project(':react-native-bluetooth-serial')
     implementation project(':react-native-call-detection')
     implementation project(':react-native-image-crop-picker')

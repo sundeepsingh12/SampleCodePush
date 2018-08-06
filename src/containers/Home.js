@@ -3,7 +3,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, Platform, ActivityIndicator, SectionList, Modal, TouchableOpacity, FlatList, TouchableHighlight } from 'react-native'
+import { StyleSheet, View, Image, Platform, ActivityIndicator, SectionList, Modal, TouchableOpacity, FlatList, TouchableHighlight, Linking } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import Loader from '../components/Loader'
 import PieChart from '../components/PieChart'
@@ -24,7 +24,7 @@ import SyncLoader from '../components/SyncLoader'
 import { redirectToFormLayout } from '../modules/newJob/newJobActions'
 import { navigate } from '../modules/navigators/NavigationService'
 import _ from 'lodash'
-
+import { navigateToLiveJob } from '../modules/liveJob/liveJobActions'
 
 function mapStateToProps(state) {
   return {
@@ -49,7 +49,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...homeActions, checkForPaymentAtEnd, redirectToFormLayout }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...homeActions, checkForPaymentAtEnd, redirectToFormLayout, navigateToLiveJob }, dispatch)
   }
 }
 
@@ -57,13 +57,35 @@ class Home extends PureComponent {
 
 
   componentDidMount() {
-    (Platform.OS === 'android') ? this.props.actions.registerCallReceiver() : null
     this.props.actions.fetchPagesAndPiechart();
     this.props.actions.performSyncService(this.props.customErpPullActivated == 'notActivated');
     this.props.actions.startTracking(this.props.trackingServiceStarted);
     this.props.actions.startFCM();
+    if (Platform.OS === 'android') {
+      this.props.actions.registerCallReceiver()
+      Linking.getInitialURL().then(url => {
+        if (url) {
+          this.navigate(url)
+        }
+        console.log('url', url)
+      });
+    } else {
+      Linking.addEventListener('url', this.handleOpenURL);
+    }
+  }
+  handleOpenURL = (event) => {
+    if (event.url) {
+      this.navigate(event.url)
+    }
+  }
+  
+  navigate(url) {
+    this.props.actions.navigateToLiveJob(url)
   }
 
+  componentWillUnmount() {
+    Linking.removeEventListener('url', this.handleOpenURL);
+  }
   getPageView(page) {
     return (
       <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>

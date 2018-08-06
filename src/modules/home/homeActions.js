@@ -106,14 +106,13 @@ import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
 import { FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK, ERROR } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
-import { navDispatch, navigate } from '../navigators/NavigationService';
+import { navDispatch, navigate, popToTop } from '../navigators/NavigationService';
 import CallDetectorManager from 'react-native-call-detection'
 import { jobAttributeMasterService } from '../../services/classes/JobAttributeMaster'
 import { jobDataService } from '../../services/classes/JobData'
 import { jobService } from '../../services/classes/Job'
 import { each, size, isNull } from 'lodash'
-
-
+import { AppState, Linking } from 'react-native'
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -353,7 +352,7 @@ export function startFCM() {
           }
           else if (notif.Notification == 'Live Job Notification') {
             keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-            dispatch(performSyncService(true))
+            dispatch(performSyncService(null, null, null, true))
           }
           if (notif.local_notification) {
             return
@@ -426,7 +425,7 @@ export function startFCM() {
   }
 }
 
-export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogout) {
+export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogout, isLiveJob) {
   return async function (dispatch) {
     let syncStoreDTO
     try {
@@ -456,26 +455,43 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
         const responseBody = await sync.createAndUploadZip(syncStoreDTO, currenDate)
         syncCount = parseInt(responseBody.split(",")[1])
       }
-
+      isCalledFromHome = userData && userData.company && userData.company.customErpPullActivated ? false : isCalledFromHome
       //Downloading starts here
       //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
+      let isJobsPresent
       if (isCalledFromHome || syncCount > 0) {
         dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
           unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
           syncStatus: 'Downloading'
         }))
-        const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, syncStoreDTO);
-        // check if live job module is present
-        const isLiveJobModulePresent = syncStoreDTO.pageList ? syncStoreDTO.pageList.filter((module) => module.screenTypeId == PAGE_LIVE_JOB).length > 0 : false
-        if (isLiveJobModulePresent) {
-          await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO)
-        }
-        if (isJobsPresent) {
-          dispatch(pieChartCount())
-          dispatch(fetchJobs())
-        }
-
+        isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, syncStoreDTO);
       }
+      if (isCalledFromHome || isLiveJob || syncCount > 0) {
+        // check if live job module is present
+        let liveJobPage = syncStoreDTO.pageList ? syncStoreDTO.pageList.filter((module) => module.screenTypeId == PAGE_LIVE_JOB) : null
+        if (liveJobPage && liveJobPage.length > 0) {
+          await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO)
+          let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB');
+          if (showLiveJobNotification && showLiveJobNotification.value) {
+            if (AppState.currentState == 'background' && Platform.OS !== 'ios') {
+              Linking.canOpenURL('fareyeapp://fareye').then(supported => {
+                if (supported) {
+                  return Linking.openURL('fareyeapp://fareye');
+                }
+              });
+            } else if (AppState.currentState == 'active') {
+              popToTop()
+              navigate(LiveJobs, { pageObject: liveJobPage[0], ringAlarm: true })
+            }
+            await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+          }
+        }
+      }
+      if (isJobsPresent) {
+        dispatch(pieChartCount())
+        dispatch(fetchJobs())
+      }
+
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
         unsyncedTransactionList: [],
         syncStatus: 'OK',
