@@ -36,7 +36,6 @@ export function getJobDetails(jobTransactionId) {
             dispatch(setState(SET_MESSAGE, ''))
             dispatch(setState(SET_LIVE_JOB_LOADER, true))
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-            const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)

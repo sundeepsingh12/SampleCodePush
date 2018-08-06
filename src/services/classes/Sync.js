@@ -48,8 +48,8 @@ class Sync {
     if (!token) {
       throw new Error('Token Missing')
     }
-    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds,isEncryptionSuccessful } = await syncZipService.createZip(syncStoreDTO)
-    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO,isEncryptionSuccessful)
+    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful } = await syncZipService.createZip(syncStoreDTO)
+    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO, isEncryptionSuccessful)
     await communicationLogsService.updateLastCallSmsTimeAndNegativeCommunicationLogsDb(lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
     return responseBody
@@ -309,20 +309,10 @@ class Sync {
         uniqueLiveJob++
       }
     }
-    //let jobQuery = jobs.value.map(jobId => 'id = ' + jobId.id).join(' OR ')
-    // job status 
-    // 1 : unassigned
-    // 2 : assigned
-    // 6 : live job
-    //jobQuery = jobQuery + ' AND status = 6'
-    //let jobsInDbList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
     if (uniqueLiveJob > 0) {
       await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(true))
       return
     }
-    // only delete job data
-    // realm.deleteRecordsInBatch(jobDatas)
-    // return
   }
 
 

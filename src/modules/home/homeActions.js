@@ -105,7 +105,7 @@ import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
 import { FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK, ERROR } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
-import { navDispatch, navigate } from '../navigators/NavigationService';
+import { navDispatch, navigate, popToTop } from '../navigators/NavigationService';
 import CallDetectorManager from 'react-native-call-detection'
 import { jobAttributeMasterService } from '../../services/classes/JobAttributeMaster'
 import { jobDataService } from '../../services/classes/JobData'
@@ -471,13 +471,14 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
           await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO)
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB');
           if (showLiveJobNotification && showLiveJobNotification.value) {
-            if (AppState.currentState == 'background') {
+            if (AppState.currentState == 'background' && Platform.OS !== 'ios') {
               Linking.canOpenURL('fareyeapp://fareye').then(supported => {
                 if (supported) {
                   return Linking.openURL('fareyeapp://fareye');
                 }
               });
             } else if (AppState.currentState == 'active') {
+              popToTop()
               navigate(LiveJobs, { pageObject: liveJobPage[0], ringAlarm: true })
             }
             await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
