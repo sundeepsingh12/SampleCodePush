@@ -115,7 +115,7 @@ module.exports = keyMirror({
     TABS_LOADING: null,
     SET_SELECTED_DATE: null,
     LOADER_FOR_SYNCING: null,
-    SET_CALLER_ID_POPUP:null,
+    SET_CALLER_ID_POPUP: null,
     TASKLIST_LOADER_FOR_SYNC: null,
 
     //Pages
@@ -558,6 +558,14 @@ module.exports = keyMirror({
     //Message Actions
     SET_MESSAGE_LIST: null,
     SET_MESSAGE_LOADER: null,
+
+    //QC Attribute Actions
+    SET_QC_LOADING: null,
+    SET_QC_INITIAL_PARAMETERS: null,
+    SET_QC_ARRAY: null,
+    SET_QC_MODAL_VIEW: null,
+    SET_QC_MODAL_LOADING: null,
+    SET_QC_MODAL_VIEW_PARAMETERS: null
 
 })
 

@@ -46,6 +46,7 @@ import backup from './backup/backupReducer'
 import mosambeeWalletPayment from './cardTypePaymentModules/mosambeeWalletPayment/mosambeeWalletReducer'
 import bluetooth from './bluetooth/bluetoothReducer'
 import messageReducer from './message/messageReducer'
+import qc from './qc/qcReducer'
 
 /**
  * ## CombineReducers
@@ -91,7 +92,8 @@ const rootReducer = combineReducers({
   multipleOptionsAttribute,
   mosambeeWalletPayment,
   bluetooth,
-  messageReducer
+  messageReducer,
+  qc
 })
 
 export default rootReducer

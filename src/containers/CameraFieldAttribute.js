@@ -1,6 +1,6 @@
 'use strict';
 import React, { PureComponent } from 'react'
-import {  StyleSheet, View, TouchableOpacity, Image, Platform,TouchableHighlight } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Image, Platform, TouchableHighlight } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Right, Icon, Footer, StyleProvider, Toast } from 'native-base'
 import Loader from '../components/Loader'
@@ -16,7 +16,7 @@ import getTheme from '../../native-base-theme/components'
 import ImagePicker from 'react-native-image-picker'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import platform from '../../native-base-theme/variables/platform'
-import {  SKU_PHOTO } from '../lib/AttributeConstants'
+import { SKU_PHOTO } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
     return {
@@ -73,7 +73,7 @@ class CameraFieldAttribute extends PureComponent {
                 return {
                     cameraType: 'front'
                 }
-            }else {
+            } else {
                 return { cameraType: 'back' }
             }
         })
@@ -94,7 +94,7 @@ class CameraFieldAttribute extends PureComponent {
                 this._setToastForError(response.error)
             }
             else if (response.data) {
-                this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data : response.data, uri: response.uri}) 
+                this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data: response.data, uri: response.uri })
             }
         })
     }
@@ -127,14 +127,14 @@ class CameraFieldAttribute extends PureComponent {
                         <SafeAreaView style={[styles.absolute, styles.paddingTop10, { top: 0, left: 0, height: 60, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
                             <View style={[styles.paddingVertical10, styles.paddingHorizontal15]}>
                                 <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
-                                <TouchableHighlight onPress = {() => {
-                                            this.props.navigation.goBack()
-                                        }}>
-                                    <Icon
-                                        name="md-close"
-                                        style={[styles.fontXxxl, styles.fontWhite]}
-                                       />
-                                        </TouchableHighlight>
+                                    <TouchableHighlight onPress={() => {
+                                        this.props.navigation.goBack()
+                                    }}>
+                                        <Icon
+                                            name="md-close"
+                                            style={[styles.fontXxxl, styles.fontWhite]}
+                                        />
+                                    </TouchableHighlight>
                                     <Right>
                                         {torchView}
                                     </Right>
@@ -179,19 +179,19 @@ class CameraFieldAttribute extends PureComponent {
                         />
                         <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
                             <View style={[styles.paddingLeft15, styles.paddingRight15]}>
-                            <TouchableHighlight onPress = {() => {
-                                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA,'')
-                                    }}>
-                                <Icon
-                                    name="md-close"
-                                    style={[styles.fontXxxl, styles.fontWhite]}
+                                <TouchableHighlight onPress={() => {
+                                    this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, '')
+                                }}>
+                                    <Icon
+                                        name="md-close"
+                                        style={[styles.fontXxxl, styles.fontWhite]}
                                     />
-                                    </TouchableHighlight>
+                                </TouchableHighlight>
                             </View>
                         </SafeAreaView>
                     </View>
                     <SafeAreaView style={[styles.width100, styles.absolute, styles.row, styles.heightAuto, styles.justifyCenter, styles.alignCenter, styles.padding10, { bottom: 0 }]}>
-                        {(getValidationObject && getValidationObject.cropImageValidation && Platform.OS==='android') ?
+                        {(getValidationObject && getValidationObject.cropImageValidation && Platform.OS === 'android') ?
                             <View style={[styles.justifyCenter, styles.alignCenter, { marginRight: 46 }]}>
                                 <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => this.props.actions.cropImage(this.props.imageData.uri)}>
                                     <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
@@ -204,7 +204,7 @@ class CameraFieldAttribute extends PureComponent {
                                     if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
                                         this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData.data, this.props.navigation.state.params.currentElement)
                                     } else {
-                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
+                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
                                     }
                                 }}>
                                     <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
@@ -219,7 +219,7 @@ class CameraFieldAttribute extends PureComponent {
 
     render() {
         let item = this.props.navigation.state.params.currentElement
-        const quality = { 20 : 'low', 42: 'high', 43: 'medium', 55: 'high' }
+        const quality = { 20: 'low', 42: 'high', 43: 'medium', 55: 'high' }
         if (this.props.cameraLoader)
             return <Loader />
         if ((!_.isEmpty(this.props.imageData))) {
@@ -229,7 +229,7 @@ class CameraFieldAttribute extends PureComponent {
         }
     }
 
-    takePicture =  () => {
+    takePicture = () => {
         if (this.camera) {
             this.props.actions.takePicture(this.camera)
         }

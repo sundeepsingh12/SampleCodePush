@@ -51,7 +51,15 @@ import {
     OBJECT_SAROJ_FAREYE,
     BEFORE,
     AFTER,
-    ADVANCE_DROPDOWN
+    ADVANCE_DROPDOWN,
+    OPTION_CHECKBOX_ARRAY,
+    QC_ARRAY,
+    QC_IMAGE,
+    QC_LABEL,
+    QC_PASS_FAIL,
+    QC_REMARK,
+    QC_RESULT,
+    QC_VALUE,
 } from '../lib/AttributeConstants'
 
 import { CameraAttribute, Payment, SET_MODAL_FIELD_ATTRIBUTE } from '../lib/constants'
@@ -133,6 +141,10 @@ class BasicFormElement extends PureComponent {
             case CAMERA_MEDIUM:
             case CAMERA_HIGH: {
                 screenName = CameraAttribute
+                break
+            }
+            case QC_ARRAY: {
+                screenName = 'QCAttribute'
                 break
             }
             default: {
@@ -406,6 +418,7 @@ class BasicFormElement extends PureComponent {
             case CAMERA:
             case CAMERA_HIGH:
             case CAMERA_MEDIUM:
+            case QC_ARRAY:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
             case CHECKBOX:
             case RADIOBUTTON:
@@ -428,6 +441,10 @@ class BasicFormElement extends PureComponent {
                         <FormLayoutActivityComponent item={this.props.item} press={this.onPressModal} />
                     </View>
                 )
+            case OPTION_CHECKBOX_ARRAY:
+            case QC_IMAGE:
+            case QC_PASS_FAIL:
+            case QC_REMARK: return null;
             default:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />

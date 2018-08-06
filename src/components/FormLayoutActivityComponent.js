@@ -1,12 +1,7 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    TouchableHighlight,
-} from 'react-native'
-import {  Icon} from 'native-base'
+import { StyleSheet, View, Text, TouchableHighlight } from 'react-native'
+import { Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 import {
     ARRAY,
@@ -58,7 +53,7 @@ class FormLayoutActivityComponent extends PureComponent {
     }
 
     getComponentLabelStyle(focus, editable) {
-        return focus ? {color : styles.fontPrimaryColor} : editable ? styles.fontBlack : styles.fontLowGray
+        return focus ? { color: styles.fontPrimaryColor } : editable ? styles.fontBlack : styles.fontLowGray
     }
 
     getComponentSubLabelStyle(editable) {
@@ -77,7 +72,7 @@ class FormLayoutActivityComponent extends PureComponent {
         const icon = this.getIcon(this.props.item.attributeTypeId)
         return (
             <TouchableHighlight disabled={!this.props.item.editable} onPress={() => this.props.press(this.props.item)}>
-                <View style={[style.formCard, this.props.item.focus ? {borderLeftColor : styles.borderLeft4Color, borderLeftWidth: 4} : null]}>
+                <View style={[style.formCard, this.props.item.focus ? { borderLeftColor: styles.borderLeft4Color, borderLeftWidth: 4 } : null]}>
 
                     <View style={style.formCardDetail}>
                         <View>

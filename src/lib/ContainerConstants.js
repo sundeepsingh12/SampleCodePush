@@ -465,5 +465,13 @@ module.exports = {
     CALL_CUG: 'CALL_CUG',
     CALL_PERSONAL: 'CALL_PERSONAL',
     SMS_OFFICIAL: 'SMS_OFFICIAL',
-    SMS_PERSONAL: 'SMS_PERSONAL'
+    SMS_PERSONAL: 'SMS_PERSONAL',
+
+    //QC Constants
+    CHECKLIST: 'CHECKLIST',
+    FAIL: 'Fail',
+    PASS: 'Pass',
+    SELECT_REASON: 'Select Reason',
+    TAKE_A_PICTURE: 'Take a picture',
+    REMARKS: 'Remarks',
 }

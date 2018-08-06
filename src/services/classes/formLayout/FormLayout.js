@@ -1,25 +1,8 @@
 import { keyValueDBService } from '../KeyValueDBService.js'
 import { transientStatusAndSaveActivatedService } from '../TransientStatusAndSaveActivatedService.js'
-import {
-    AFTER,
-    OBJECT,
-    STRING,
-    TEXT,
-    DECIMAL,
-    SCAN_OR_TEXT,
-    QR_SCAN,
-    NUMBER
-} from '../../../lib/AttributeConstants'
+import { AFTER, OBJECT, STRING, TEXT, DECIMAL, SCAN_OR_TEXT, QR_SCAN, NUMBER } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
-import {
-    SaveActivated,
-    Transient,
-    CheckoutDetails,
-    TabScreen,
-    SHOULD_RELOAD_START,
-    BACKUP_ALREADY_EXIST,
-    TABLE_FIELD_DATA,
-} from '../../../lib/constants'
+import { SaveActivated, Transient, CheckoutDetails, TabScreen, SHOULD_RELOAD_START, BACKUP_ALREADY_EXIST, TABLE_FIELD_DATA } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
 import { fieldValidationService } from '../FieldValidation'
@@ -134,7 +117,7 @@ class FormLayout {
         let fieldAttributeMasterParentIdMap = {}, sequenceWiseSortedFieldAttributesMasterIds = [], counterPositionId = latestPositionId + 1
         for (let i = 0; i < fieldAttributesMappedToStatus.length; i++) {
             let particularFieldAttributeMap = fieldAttributeMap[fieldAttributesMappedToStatus[i].fieldAttributeId]
-            if(!fieldAttributeMasterIdFromArray){
+            if (!fieldAttributeMasterIdFromArray) {
                 fieldAttributeMasterParentIdMap[fieldAttributesMappedToStatus[i].fieldAttributeId] = particularFieldAttributeMap.parentId
             }
             if ((!fieldAttributeMasterIdFromArray && !particularFieldAttributeMap.parentId) || (fieldAttributeMasterIdFromArray && particularFieldAttributeMap)) {
@@ -220,7 +203,7 @@ class FormLayout {
         }
         else if (currentStatus.transient) {
             routeName = Transient
-            let {jobDetailsScreenKey, pageObjectAdditionalParams}  = taskListScreenDetails 
+            let { jobDetailsScreenKey, pageObjectAdditionalParams } = taskListScreenDetails
             routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, jobDetailsScreenKey, pageObjectAdditionalParams }
         }
         else {

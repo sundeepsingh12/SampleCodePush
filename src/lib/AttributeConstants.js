@@ -40,13 +40,23 @@ module.exports = {
     NUMBER: 6,
     OBJECT: 11,
     OPTION_CHECKBOX: 8,
+    OPTION_CHECKBOX_ARRAY: 76,
+    OPTION_CHECKBOX_KEY: 77,
+    OPTION_CHECKBOX_VALUE: 78,
     OPTION_RADIO_FOR_MASTER: 39,
     OPTION_RADIO_KEY: 40,
     OPTION_RADIO_VALUE: 41,
     ORIGINAL_AMOUNT: 25,
     PASSWORD: 61,
     PINCODE: 31,
+    QC_ARRAY: 71,
+    QC_IMAGE: 75,
+    QC_LABEL: 72,
+    QC_PASS_FAIL: 81,
+    QC_REMARK: 79,
+    QC_RESULT: 74,
     QR_SCAN: 22,
+    QC_VALUE: 73,
     RADIOBUTTON: 9,
     RECEIPT: 'receipt',
     REMARKS: 'remarks',
@@ -66,10 +76,10 @@ module.exports = {
     STRING: 1,
     TEXT: 2,
     TIME: 5,
-    TOTAL_ORIGINAL_QUANTITY: 35,
     TOTAL_ACTUAL_QUANTITY: 36,
     TOTAL_AMOUNT: 'TotalAmount',
     TRANSACTION_NUMBER: 'transaction_number',
+    TOTAL_ORIGINAL_QUANTITY: 35,
 
     // Money Collect Mode Type Constants
     CASH: {
@@ -294,7 +304,6 @@ module.exports = {
     M_SWIPE_ID: 9,
     JOB_ASSIGNMENT_ID: 20,
     MOSAMBEE_WALLET_ID: 19,
-    PAGE_NEW_JOB: 2,
     Piechart: {
         enabled: false,
         params: []

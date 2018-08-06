@@ -44,6 +44,7 @@ import CameraFieldAttribute from './CameraFieldAttribute'
 import QrCodeScanner from './QrCodeScanner'
 import MenuStack from '../modules/navigators/MenuStackNavigator'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import QCAttribute from './QCAttribute'
 
 MenuStack.navigationOptions = ({ navigation }) => {
   let tabBarVisible = true;
@@ -187,6 +188,9 @@ const HomeStack = createStackNavigator({
       header: null,
     }
   },
+  QCAttribute: {
+    screen: QCAttribute,
+  }
 })
 
 HomeStack.navigationOptions = ({ navigation }) => {
