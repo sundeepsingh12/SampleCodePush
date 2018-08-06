@@ -1,7 +1,7 @@
 import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
 module.exports = {
-    APP_VERSION_NUMBER: '0.4.0',
+    APP_VERSION_NUMBER: '0.4.1',
     /**
      * TODO : Change money collect details object keys to attribute type id
      */
@@ -303,6 +303,7 @@ module.exports = {
     EZE_TAP_ID: 10,
     M_SWIPE_ID: 9,
     JOB_ASSIGNMENT_ID: 20,
+    MOSAMBEE_ID: 18,
     MOSAMBEE_WALLET_ID: 19,
     Piechart: {
         enabled: false,

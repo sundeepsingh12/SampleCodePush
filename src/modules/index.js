@@ -47,6 +47,7 @@ import mosambeeWalletPayment from './cardTypePaymentModules/mosambeeWalletPaymen
 import bluetooth from './bluetooth/bluetoothReducer'
 import messageReducer from './message/messageReducer'
 import qc from './qc/qcReducer'
+import mosambeePayment from './cardTypePaymentModules/mosambeePayment/mosambeeReducer'
 
 /**
  * ## CombineReducers
@@ -93,7 +94,8 @@ const rootReducer = combineReducers({
   mosambeeWalletPayment,
   bluetooth,
   messageReducer,
-  qc
+  qc,
+  mosambeePayment
 })
 
 export default rootReducer

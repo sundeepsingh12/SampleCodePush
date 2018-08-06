@@ -41,7 +41,8 @@ import {
   MDM_POLICIES,
   APP_THEME,
   JOB_ATTRIBUTE,
-  SET_CALLER_ID_POPUP
+  SET_CALLER_ID_POPUP,
+  BluetoothListing
 } from '../../lib/constants'
 
 import {
@@ -84,7 +85,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { setState, showToastAndAddUserExceptionLog, deleteSessionToken } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
-import { Platform} from 'react-native'
+import { Platform } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -105,13 +106,13 @@ import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
 import { FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK, ERROR } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
-import { navDispatch, navigate } from '../navigators/NavigationService';
+import { navDispatch, navigate, popToTop } from '../navigators/NavigationService';
 import CallDetectorManager from 'react-native-call-detection'
 import { jobAttributeMasterService } from '../../services/classes/JobAttributeMaster'
 import { jobDataService } from '../../services/classes/JobData'
 import { jobService } from '../../services/classes/Job'
-import {each,size, isNull } from 'lodash'
-
+import { each, size, isNull } from 'lodash'
+import { AppState, Linking } from 'react-native'
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -185,7 +186,8 @@ export function navigateToPage(pageObject, navigationProps) {
           navigate(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' })
           break;
         case PAGE_BLUETOOTH_PAIRING:
-          throw new Error("CODE it, if you want to use it !");
+          navigate(BluetoothListing, { pageObject })
+          break;
         case PAGE_BULK_UPDATE: {
           dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
           break;
@@ -350,7 +352,7 @@ export function startFCM() {
           }
           else if (notif.Notification == 'Live Job Notification') {
             keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-            dispatch(performSyncService(true))
+            dispatch(performSyncService(null, null, null, true))
           }
           if (notif.local_notification) {
             return
@@ -423,7 +425,7 @@ export function startFCM() {
   }
 }
 
-export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogout) {
+export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogout, isLiveJob) {
   return async function (dispatch) {
     let syncStoreDTO
     try {
@@ -453,26 +455,43 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
         const responseBody = await sync.createAndUploadZip(syncStoreDTO, currenDate)
         syncCount = parseInt(responseBody.split(",")[1])
       }
-
+      isCalledFromHome = userData && userData.company && userData.company.customErpPullActivated ? false : isCalledFromHome
       //Downloading starts here
       //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
+      let isJobsPresent
       if (isCalledFromHome || syncCount > 0) {
         dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
           unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
           syncStatus: 'Downloading'
         }))
-        const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, syncStoreDTO);
-        // check if live job module is present
-        const isLiveJobModulePresent = syncStoreDTO.pageList ? syncStoreDTO.pageList.filter((module) => module.screenTypeId == PAGE_LIVE_JOB).length > 0 : false
-        if (isLiveJobModulePresent) {
-          await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO)
-        }
-        if (isJobsPresent) {
-          dispatch(pieChartCount())
-          dispatch(fetchJobs())
-        }
-
+        isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, syncStoreDTO);
       }
+      if (isCalledFromHome || isLiveJob || syncCount > 0) {
+        // check if live job module is present
+        let liveJobPage = syncStoreDTO.pageList ? syncStoreDTO.pageList.filter((module) => module.screenTypeId == PAGE_LIVE_JOB) : null
+        if (liveJobPage && liveJobPage.length > 0) {
+          await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO)
+          let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB');
+          if (showLiveJobNotification && showLiveJobNotification.value) {
+            if (AppState.currentState == 'background' && Platform.OS !== 'ios') {
+              Linking.canOpenURL('fareyeapp://fareye').then(supported => {
+                if (supported) {
+                  return Linking.openURL('fareyeapp://fareye');
+                }
+              });
+            } else if (AppState.currentState == 'active') {
+              popToTop()
+              navigate(LiveJobs, { pageObject: liveJobPage[0], ringAlarm: true })
+            }
+            await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+          }
+        }
+      }
+      if (isJobsPresent) {
+        dispatch(pieChartCount())
+        dispatch(fetchJobs())
+      }
+
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
         unsyncedTransactionList: [],
         syncStatus: 'OK',
@@ -555,7 +574,7 @@ export function syncTimer() {
 export function pieChartCount() {
   return async (dispatch) => {
     try {
-      if(Piechart.enabled){
+      if (Piechart.enabled) {
         dispatch(setState(CHART_LOADING, { loading: true }))
         const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params)
         dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
@@ -648,28 +667,32 @@ export function readAndUploadFiles() {
       dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 0))
       dispatch(setState(SET_FAIL_UPLOAD_COUNT, 0))
       const user = await keyValueDBService.getValueFromStore(USER)
-      let backupFilesList = await backupService.checkForUnsyncBackup(user)
+      let backupFilesList = await backupService.checkForUnsyncBackup(user.value)
       dispatch(setState(SET_BACKUP_FILES_LIST, backupFilesList))
       if (backupFilesList.length > 0) {
         dispatch(uploadUnsyncFiles(backupFilesList))
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2710, error.message, 'danger', 1)
+      dispatch(setState(SET_FAIL_UPLOAD_COUNT, 1))
+      await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, 1)
     }
   }
 }
-export function resetFailCountInStore() {
+export function resetFailCountInStore(isNavigateTrue) {
   return async function (dispatch) {
     try {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
-      const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
-      if (ErpCheck) {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
-        navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
-      }
-      else {
-        keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
-        navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+      if (isNavigateTrue) {
+        const { value: { company: { customErpPullActivated: ErpCheck } } } = await keyValueDBService.getValueFromStore(USER)
+        if (ErpCheck) {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedInERP')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedInERP' }));
+        }
+        else {
+          keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'LoggedIn')
+          navDispatch(NavigationActions.navigate({ routeName: 'LoggedIn' }));
+        }
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2711, error.message, 'danger', 1)
@@ -693,55 +716,62 @@ export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
   }
 }
 
-export function registerCallReceiver(){
-  return async function(dispatch){
-    try{
+export function registerCallReceiver() {
+  return async function (dispatch) {
+    try {
 
       const mdmSettings = await keyValueDBService.getValueFromStore(MDM_POLICIES);
-      if(!mdmSettings || !mdmSettings.value || !mdmSettings.value.basicSetting || !mdmSettings.value.enableCallerIdentity || !mdmSettings.value.callerIdentityDisplayList ){
+      if (!mdmSettings || !mdmSettings.value || !mdmSettings.value.basicSetting || !mdmSettings.value.enableCallerIdentity || !mdmSettings.value.callerIdentityDisplayList) {
         return
       }
 
-      new CallDetectorManager(async (event,number)=> {
-        let dataObject = {} 
-         if (event === 'Incoming') {
-           const callerIdentityDisplayList = JSON.parse(mdmSettings.value.callerIdentityDisplayList)
-           let callerJobMasterIdList = [],
-             callerJobAttributeIdList = []
-           callerIdentityDisplayList.forEach(callerIdentityObject => {
-             callerJobMasterIdList.push(callerIdentityObject.jobMasterId)
-             callerJobAttributeIdList.push(...callerIdentityObject.jobAttributeIdList)
-           })
+      new CallDetectorManager(async (event, number) => {
+        let dataObject = {}
+        if (event === 'Incoming') {
+          const callerIdentityDisplayList = JSON.parse(mdmSettings.value.callerIdentityDisplayList)
+          let callerJobMasterIdList = [],
+            callerJobAttributeIdList = []
+          callerIdentityDisplayList.forEach(callerIdentityObject => {
+            callerJobMasterIdList.push(callerIdentityObject.jobMasterId)
+            callerJobAttributeIdList.push(...callerIdentityObject.jobAttributeIdList)
+          })
 
-           const allJobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
-           const callerJobAttributeData = jobAttributeMasterService.getCallerIdJobAttributeMapAndQuery(allJobAttributes, callerJobMasterIdList, callerJobAttributeIdList)
-           dataObject = await jobDataService.getCallerIdListAndJobId(number, callerJobAttributeData.idJobAttributeMap, callerJobAttributeData.query)
-           if (dataObject.isNumberPresentInJobData) {
+          const allJobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+          const callerJobAttributeData = jobAttributeMasterService.getCallerIdJobAttributeMapAndQuery(allJobAttributes, callerJobMasterIdList, callerJobAttributeIdList)
+          dataObject = await jobDataService.getCallerIdListAndJobId(number, callerJobAttributeData.idJobAttributeMap, callerJobAttributeData.query, callerJobMasterIdList)
+          if (dataObject && dataObject.isNumberPresentInJobData) {
             const job = jobService.getJobForJobId(dataObject.jobId)
-             dispatch(setState(SET_CALLER_ID_POPUP, {
-               callerIdDisplayList: dataObject.callerIdDisplayList,
-               incomingNumber: number,
-               referenceNumber:job[0].referenceNo,
-               showCallerIdPopup: true,
-             }))
-           }
-          }
-          else if(event === 'Missed'){
-            dispatch(setState(SET_CALLER_ID_POPUP,{
-              showCallerIdPopup:false,
+            dispatch(setState(SET_CALLER_ID_POPUP, {
+              callerIdDisplayList: dataObject.callerIdDisplayList,
+              incomingNumber: number,
+              referenceNumber: job[0].referenceNo,
+              showCallerIdPopup: true,
+            }))
+          } else if (dataObject && dataObject.customerCareTitle) {
+            dispatch(setState(SET_CALLER_ID_POPUP, {
+              callerIdDisplayList: [],
+              incomingNumber: number,
+              referenceNumber: dataObject.customerCareTitle,
+              showCallerIdPopup: true,
             }))
           }
-          },
-      true, // if you want to read the phone number of the incoming call [ANDROID], otherwise false
-      ()=>{}, // callback if your permission got denied [ANDROID] [only if you want to read incoming number] default: console.error
-      {
-      title: 'Phone State Permission',
-      message: 'This app needs access to your phone state in order to react and/or to adapt to incoming calls.'
-      } // a custom permission request message to explain to your user, why you need the permission [recommended] - this is the default one
+        }
+        else if (event === 'Missed') {
+          dispatch(setState(SET_CALLER_ID_POPUP, {
+            showCallerIdPopup: false,
+          }))
+        }
+      },
+        true, // if you want to read the phone number of the incoming call [ANDROID], otherwise false
+        () => { }, // callback if your permission got denied [ANDROID] [only if you want to read incoming number] default: console.error
+        {
+          title: 'Phone State Permission',
+          message: 'This app needs access to your phone state in order to react and/or to adapt to incoming calls.'
+        } // a custom permission request message to explain to your user, why you need the permission [recommended] - this is the default one
       )
-    }catch(error){
-      console.log('error>>>',error)
+    } catch (error) {
+      console.log('error>>>', error)
     }
   }
- 
+
 }

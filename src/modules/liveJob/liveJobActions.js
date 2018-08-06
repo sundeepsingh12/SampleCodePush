@@ -19,20 +19,23 @@ import {
     SET_MESSAGE,
     SET_LIVE_JOB_TOAST,
     SET_LIVE_JOB_LOADER,
+    PAGES,
+    LiveJobs
 } from '../../lib/constants'
 import { OK } from '../../lib/ContainerConstants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
 import { StackActions } from 'react-navigation'
-import { navDispatch } from '../navigators/NavigationService'
-
+import { navDispatch, navigate } from '../navigators/NavigationService'
+import {
+    PAGE_LIVE_JOB
+} from '../../lib/AttributeConstants'
 export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_MESSAGE, ''))
             dispatch(setState(SET_LIVE_JOB_LOADER, true))
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-            const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
@@ -85,6 +88,7 @@ export function fetchAllLiveJobsList() {
         }
     }
 }
+
 export function toggleLiveJobSelection(jobId, allJobs, searchText) {
     return async function (dispatch) {
         try {
@@ -183,6 +187,20 @@ export function selectAll(liveJobList) {
                 jobTransactions: allJobs,
                 searchText: ''
             }))
+        } catch (error) {
+            showToastAndAddUserExceptionLog(1208, error.message, 'danger', 1)
+        }
+    }
+}
+
+export function navigateToLiveJob(url) {
+    return async function (dispatch) {
+        try {
+            let pageList = await keyValueDBService.getValueFromStore(PAGES)
+            let liveJobPage = pageList && pageList.value ? pageList.value.filter((module) => module.screenTypeId == PAGE_LIVE_JOB) : null
+            if (liveJobPage && liveJobPage.length > 0) {
+                navigate(LiveJobs, { pageObject: liveJobPage[0], ringAlarm: true })
+            }
         } catch (error) {
             showToastAndAddUserExceptionLog(1208, error.message, 'danger', 1)
         }

@@ -53,23 +53,26 @@ export function getImageData(value) {
     }
 }
 
-export function takePicture(ref) {
-    return async function (dispatch) {
-        try {
-            let options = { quality: 0.2, base64: true, fixOrientation: true };
-            if (Platform.OS === "ios") {
-                options.orientation = 'portrait'
-            }
-            ref.takePictureAsync(options).then((capturedImg) => {
-                const { uri, base64 } = capturedImg;
-                dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64, uri }))
-            })
-        } catch (error) {
-            dispatch(setState(SET_CAMERA_LOADER, false))
-            showToastAndAddUserExceptionLog(316, error.message, 'danger', 1)
-        }
-    }
-}
+// export function takePicture(ref) {
+//     return async function (dispatch) {
+//         // try {
+//         //     let options = { quality: 0.2, base64: true, fixOrientation: true };
+//         //     if (Platform.OS === "ios") {
+//         //         options.orientation = 'portrait'
+//         //     }
+//         //     ref.takePictureAsync(options).then((capturedImg) => {
+//         //         const { uri, base64 } = capturedImg;
+//         //     })
+//         //     dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64, uri }))
+
+//         // } catch (error) {
+//         //     dispatch(setState(SET_CAMERA_LOADER, false))
+//         //     showToastAndAddUserExceptionLog(316, error.message, 'danger', 1)
+//         // }
+//         //console.logs('taking picture')
+//         dispatch(setState(SET_SHOW_IMAGE_AND_DATA, ref))
+//     }
+// }
 
 export function saveImageInFormLayout(data, fieldAttributeMaster, formLayoutState, calledFromArray, rowId, jobTransaction) {
     return async function (dispatch) {
@@ -119,7 +122,7 @@ export function setInitialState() {
     }
 }
 
-export function cropImage(uri) {
+export function cropImage(uri, setImage) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_CAMERA_LOADER, true))
@@ -130,12 +133,8 @@ export function cropImage(uri) {
                 freeStyleCropEnabled: true,
             }).then((image) => {
                 if (image.path) {
-                    ImageStore.getBase64ForTag(image.path, (base64Data) => {
-                        dispatch(setState(SET_SHOW_IMAGE_AND_DATA, { data: base64Data, uri: image.path }))
-                    }, (error) => {
-                        dispatch(setState(SET_CAMERA_LOADER, false))
-                        showToastAndAddUserExceptionLog(314, error.message, 'danger', 1)
-                    })
+                    setImage(image.path);
+                    dispatch(setState(SET_CAMERA_LOADER, false))
                 }
             }).catch(e => {
                 dispatch(setState(SET_CAMERA_LOADER, false))
