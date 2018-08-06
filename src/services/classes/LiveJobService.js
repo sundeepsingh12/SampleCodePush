@@ -110,6 +110,19 @@ class LiveJobService {
         newLiveJobList = this.deleteJob(selectedItems, liveJobList)
         return { newLiveJobList, toastMessage }
     }
+
+    getAllLiveJobs() {
+        let jobQuery = 'status = 6'
+        let jobsInDbList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
+        let jobIdToLiveJobMap = {}
+        for (let index in jobsInDbList) {
+            let jobEndTime = moment(jobsInDbList[index].jobEndTime, 'HH:mm:ss')
+            if (moment(jobEndTime).diff(moment()) > 0) {
+                jobIdToLiveJobMap[jobsInDbList[index].id] = { ...jobsInDbList[index] }
+            }
+        }
+        return jobIdToLiveJobMap
+    }
 }
 
 export let liveJobService = new LiveJobService()

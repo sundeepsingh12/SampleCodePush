@@ -3,6 +3,7 @@ package com.fareyereact;
 import android.app.Application;
 import com.emekalites.react.compress.image.ImageCompressPackage;
 import com.facebook.react.ReactApplication;
+import com.zmxv.RNSound.RNSoundPackage;
 import com.rusel.RCTBluetoothSerial.RCTBluetoothSerialPackage;
 import com.pritesh.calldetection.CallDetectionManager;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
@@ -54,6 +55,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+          new RNSoundPackage(),
           new RCTBluetoothSerialPackage(),
           new CallDetectionManager(MainApplication.this),
           new ImagePickerPackage(),

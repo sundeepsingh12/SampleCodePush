@@ -25,6 +25,8 @@
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		15925B0D560B4327B54D8D34 /* libBVLinearGradient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F5BDB0DBAA64E9DA404CDA8 /* libBVLinearGradient.a */; };
 		1C1D77E71FF7D9B7003594E2 /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C1D77DA1FF68FA3003594E2 /* libRCTPushNotification.a */; };
+		1C68DD5B21141F94009C4E6A /* libRNSound.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C68DD5A21141F5C009C4E6A /* libRNSound.a */; };
+		1C68DD5D21141FD1009C4E6A /* alarm_notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1C68DD5C21141FD1009C4E6A /* alarm_notification.mp3 */; };
 		1C90270E20A5546B00742D7E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1C90270D20A5546B00742D7E /* GoogleService-Info.plist */; };
 		1CE7F3E820D971770067564E /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 1CE7F3E720D971760067564E /* main.jsbundle */; };
 		1CEB61BF211361CF002EE3F1 /* libRCTBluetoothSerial.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CEB61BE2113614B002EE3F1 /* libRCTBluetoothSerial.a */; };
@@ -229,6 +231,20 @@
 			proxyType = 2;
 			remoteGlobalIDString = E72EC1401F7ABB5A0001BC90;
 			remoteInfo = "RNDeviceInfo-tvOS";
+		};
+		1C68DD5321141ED4009C4E6A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 95E6D9C2F30D4061950DCA42 /* RCTCallDetection.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 21AAD4F51EF50F19002E2B59;
+			remoteInfo = RCTCallDetection;
+		};
+		1C68DD5921141F5C009C4E6A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1C68DD5521141F5C009C4E6A /* RNSound.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 19825A1E1BD4A89800EE0337;
+			remoteInfo = RNSound;
 		};
 		1C89743A1F5B212C004418DD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -662,6 +678,8 @@
 		1C1963B71FCEDBC8002AEF2D /* Fareye.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Fareye.entitlements; path = Fareye/Fareye.entitlements; sourceTree = "<group>"; };
 		1C1D77D41FF68FA3003594E2 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		1C1D77DD1FF68FDB003594E2 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
+		1C68DD5521141F5C009C4E6A /* RNSound.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSound.xcodeproj; path = "../node_modules/react-native-sound/RNSound.xcodeproj"; sourceTree = "<group>"; };
+		1C68DD5C21141FD1009C4E6A /* alarm_notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alarm_notification.mp3; path = ../../../alarm_notification.mp3; sourceTree = "<group>"; };
 		1C90270D20A5546B00742D7E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Fareye/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		1CE7F3E720D971760067564E /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		1D1024AA870C46D882256716 /* rubicon-icon-font.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "rubicon-icon-font.ttf"; path = "../node_modules/native-base/Fonts/rubicon-icon-font.ttf"; sourceTree = "<group>"; };
@@ -763,6 +781,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C68DD5B21141F94009C4E6A /* libRNSound.a in Frameworks */,
 				1CEB61BF211361CF002EE3F1 /* libRCTBluetoothSerial.a in Frameworks */,
 				1C1D77E71FF7D9B7003594E2 /* libRCTPushNotification.a in Frameworks */,
 				5A9036971F9DB70F0099D990 /* libART.a in Frameworks */,
@@ -983,6 +1002,22 @@
 			children = (
 				1CA3AFCE1F6697DE00057D5E /* libRNSVG.a */,
 				1C21852A1F5C499D00049EDE /* libRNSVG-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1C68DD5021141ED3009C4E6A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1C68DD5421141ED4009C4E6A /* libRCTCallDetection.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1C68DD5621141F5C009C4E6A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1C68DD5A21141F5C009C4E6A /* libRNSound.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1247,6 +1282,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				1C68DD5521141F5C009C4E6A /* RNSound.xcodeproj */,
 				1C1D77DD1FF68FDB003594E2 /* RCTPushNotification.xcodeproj */,
 				5A90368E1F9DB6740099D990 /* ART.xcodeproj */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
@@ -1296,6 +1332,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				1C68DD5C21141FD1009C4E6A /* alarm_notification.mp3 */,
 				13B07FAE1A68108700A75B9A /* Fareye */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* FareyeTests */,
@@ -1594,6 +1631,10 @@
 					ProjectRef = D08F36E102DE42D48D2EC501 /* RNImagePicker.xcodeproj */;
 				},
 				{
+					ProductGroup = 1C68DD5621141F5C009C4E6A /* Products */;
+					ProjectRef = 1C68DD5521141F5C009C4E6A /* RNSound.xcodeproj */;
+				},
+				{
 					ProductGroup = 1C2184EA1F5C499D00049EDE /* Products */;
 					ProjectRef = 969C6078E5F540BBAB2D29B9 /* RNSVG.xcodeproj */;
 				},
@@ -1770,6 +1811,20 @@
 			fileType = archive.ar;
 			path = "libRNDeviceInfo-tvOS.a";
 			remoteRef = 1C6278631FCE9E5D005E7F6E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1C68DD5421141ED4009C4E6A /* libRCTCallDetection.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTCallDetection.a;
+			remoteRef = 1C68DD5321141ED4009C4E6A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1C68DD5A21141F5C009C4E6A /* libRNSound.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNSound.a;
+			remoteRef = 1C68DD5921141F5C009C4E6A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		1C89743B1F5B212C004418DD /* libCodePush.a */ = {
@@ -2184,6 +2239,7 @@
 				1CE7F3E820D971770067564E /* main.jsbundle in Resources */,
 				BCA07562E66C4769B9BDD979 /* MaterialCommunityIcons.ttf in Resources */,
 				EB095FB96B6A4A86B3A78790 /* MaterialIcons.ttf in Resources */,
+				1C68DD5D21141FD1009C4E6A /* alarm_notification.mp3 in Resources */,
 				0238DAD8CCC64A3B84BDD049 /* SimpleLineIcons.ttf in Resources */,
 				C10D77BF623544AAA9AA8E02 /* Entypo.ttf in Resources */,
 				63F50EE30B4741A980B389F3 /* Octicons.ttf in Resources */,

@@ -3,7 +3,7 @@ import { NavigationActions, StackActions } from 'react-navigation';
 let _navigator = null;
 
 function setTopLevelNavigator(navigatorRef) {
-  if(navigatorRef) {
+  if (navigatorRef) {
     _navigator = navigatorRef;
   }
 }
@@ -34,4 +34,10 @@ function push(routeName, params) {
   );
 }
 
-export { getState, navDispatch, setTopLevelNavigator, navigate, _navigator, push}; 
+function popToTop() {
+  _navigator.dispatch(
+    StackActions.popToTop()
+  );
+}
+
+export { getState, navDispatch, setTopLevelNavigator, navigate, _navigator, push, popToTop }; 
