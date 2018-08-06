@@ -82,7 +82,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = true
+def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion 26
@@ -145,7 +145,8 @@ repositories {
 
 dependencies {
     compile project(':react-native-sound')
-    compile project(':react-native-call-detection')
+    implementation project(':react-native-bluetooth-serial')
+    implementation project(':react-native-call-detection')
     implementation project(':react-native-image-crop-picker')
     implementation project(':react-native-compress-image') 
     implementation project(':react-native-apk-installer')

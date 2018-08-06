@@ -29,6 +29,7 @@
 		1C68DD5D21141FD1009C4E6A /* alarm_notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1C68DD5C21141FD1009C4E6A /* alarm_notification.mp3 */; };
 		1C90270E20A5546B00742D7E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1C90270D20A5546B00742D7E /* GoogleService-Info.plist */; };
 		1CE7F3E820D971770067564E /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 1CE7F3E720D971760067564E /* main.jsbundle */; };
+		1CEB61BF211361CF002EE3F1 /* libRCTBluetoothSerial.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CEB61BE2113614B002EE3F1 /* libRCTBluetoothSerial.a */; };
 		1E5E746C01DE4344A905B2F5 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7BAFBD90623D46009E6F04FE /* OFL.txt */; };
 		1F3F5E4D033D48A886295E57 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D3B9E9A5F194416A862AEDC8 /* libRNImagePicker.a */; };
 		2216829A3047362BEAFC0213 /* libPods-Fareye-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 992D45662F81711DB2FAF73D /* libPods-Fareye-tvOS.a */; };
@@ -413,6 +414,20 @@
 			remoteGlobalIDString = DA5891D81BA9A9FC002B4DB2;
 			remoteInfo = RNDeviceInfo;
 		};
+		1CEB61B82113614B002EE3F1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 95E6D9C2F30D4061950DCA42 /* RCTCallDetection.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 21AAD4F51EF50F19002E2B59;
+			remoteInfo = RCTCallDetection;
+		};
+		1CEB61BD2113614B002EE3F1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 73B69BFFC3E24191A285B666 /* RCTBluetoothSerial.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 69CA06031CC43C2900AF6479;
+			remoteInfo = RCTBluetoothSerial;
+		};
 		1CED3D37206247B60051F1A5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
@@ -697,6 +712,7 @@
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		60C4DDF245954010B99D6CD2 /* libRCTCamera.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTCamera.a; sourceTree = "<group>"; };
 		65789B672F2E48B4BAC1E824 /* libRNFetchBlob.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFetchBlob.a; sourceTree = "<group>"; };
+		73B69BFFC3E24191A285B666 /* RCTBluetoothSerial.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTBluetoothSerial.xcodeproj; path = "../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial.xcodeproj"; sourceTree = "<group>"; };
 		73E47FAA20B04A9DAD2FC3CC /* libRNDeviceInfo.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNDeviceInfo.a; sourceTree = "<group>"; };
 		74D82DE0B02D43FB8C6F237D /* libLottie.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libLottie.a; sourceTree = "<group>"; };
 		78B5101B376CBADBB42DCD09 /* Pods-FareyeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FareyeTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FareyeTests/Pods-FareyeTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -766,6 +782,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1C68DD5B21141F94009C4E6A /* libRNSound.a in Frameworks */,
+				1CEB61BF211361CF002EE3F1 /* libRCTBluetoothSerial.a in Frameworks */,
 				1C1D77E71FF7D9B7003594E2 /* libRCTPushNotification.a in Frameworks */,
 				5A9036971F9DB70F0099D990 /* libART.a in Frameworks */,
 				2F05F48E1F1E274B00B7C50B /* TSLocationManager.framework in Frameworks */,
@@ -1147,6 +1164,22 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		1CEB61B52113614B002EE3F1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1CEB61B92113614B002EE3F1 /* libRCTCallDetection.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1CEB61BA2113614B002EE3F1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1CEB61BE2113614B002EE3F1 /* libRCTBluetoothSerial.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		1CED3D50206247B60051F1A5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1282,6 +1315,7 @@
 				B4349F5749F44E62BC93FBC2 /* RNVectorIcons.xcodeproj */,
 				5C6ECEBB729D43D59C56A6AE /* RNFIRMessaging.xcodeproj */,
 				95E6D9C2F30D4061950DCA42 /* RCTCallDetection.xcodeproj */,
+				73B69BFFC3E24191A285B666 /* RCTBluetoothSerial.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1497,7 +1531,11 @@
 					ProjectRef = 5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */;
 				},
 				{
-					ProductGroup = 1C68DD5021141ED3009C4E6A /* Products */;
+					ProductGroup = 1CEB61BA2113614B002EE3F1 /* Products */;
+					ProjectRef = 73B69BFFC3E24191A285B666 /* RCTBluetoothSerial.xcodeproj */;
+				},
+				{
+					ProductGroup = 1CEB61B52113614B002EE3F1 /* Products */;
 					ProjectRef = 95E6D9C2F30D4061950DCA42 /* RCTCallDetection.xcodeproj */;
 				},
 				{
@@ -1957,6 +1995,20 @@
 			remoteRef = 1CDC04D51F4D5BD90048CD84 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		1CEB61B92113614B002EE3F1 /* libRCTCallDetection.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTCallDetection.a;
+			remoteRef = 1CEB61B82113614B002EE3F1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1CEB61BE2113614B002EE3F1 /* libRCTBluetoothSerial.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTBluetoothSerial.a;
+			remoteRef = 1CEB61BD2113614B002EE3F1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		1CED3D38206247B60051F1A5 /* libjsinspector.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -2384,6 +2436,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = FareyeTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2442,6 +2495,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = FareyeTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2504,6 +2558,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = Fareye/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2566,6 +2621,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = Fareye/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2634,6 +2690,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = "Fareye-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2703,6 +2760,7 @@
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 					"$(SRCROOT)/../node_modules/react-native-call-detection/iOS/RCTCallDetection/RCTCallDetection",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = "Fareye-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

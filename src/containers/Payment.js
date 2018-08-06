@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity, Platform } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Footer, FooterTab, Input, Button, Item, CheckBox, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components';
@@ -197,7 +197,7 @@ class Payment extends PureComponent {
                         this.paymentItemView(this.props.actualAmount, type, paymentModeList.endPaymentModeList[index].moneyTransactionModeId, this.props.selectedPaymentMode, null, type, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
                     )
                 }
-            } else {
+            } else if(paymentModeList.endPaymentModeList[index].moneyTransactionModeId != MOSAMBEE.id || Platform.OS != 'ios'){
                 paymentModeView.push(
                     this.paymentItemView(this.props.actualAmount, paymentModeList.endPaymentModeList[index].id, paymentModeList.endPaymentModeList[index].moneyTransactionModeId, this.props.selectedPaymentMode, null, null, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
                 )

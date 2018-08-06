@@ -14,13 +14,14 @@ import { paymentService } from '../../../services/payment/Payment';
 import _ from 'lodash'
 import { StackActions} from 'react-navigation'
 import { navDispatch } from '../../navigators/NavigationService'
+import { MOSAMBEE_WALLET_ID} from '../../../lib/AttributeConstants'
 
 
 export function setWalletParametersAndGetWalletList(contactNumber, jobTransaction, jobTransactionIdAmountMap) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 1))
-            const { walletParameters, walletList} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap)
+            const { walletParameters, walletList} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, MOSAMBEE_WALLET_ID)
             dispatch(setState(SET_MOSAMBEE_WALLET_PARAMETERS, { walletParameters, walletList, contactNumber, isModalVisible: 1 }))
         } catch (error) {
             showToastAndAddUserExceptionLog(2901, error.message, 'danger', 0)

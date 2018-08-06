@@ -21,8 +21,8 @@ import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import SearchBarV2 from '../components/SearchBarV2'
+import BluetoothSerial from 'react-native-bluetooth-serial'
 
-import anim from '../../animations/bluetooth.json'
 
 function mapStateToProps(state) {
   return {
@@ -58,15 +58,15 @@ class BluetoothListing extends Component {
   }
 
   pairDevice(device){
-    // BluetoothSerial.pairDevice(device.id)
-    // .then(paired => {
-    //   if (paired) {
-    //     Toast.show({text:`Device ${device.name} paired successfully`})
-    //   } else {
-    //     Toast.show({text:`Device ${device.name} pairing failed`})
-    //   }
-    // })
-    // .catch((err) => Toast.show(err.message))
+    BluetoothSerial.connect(device.id)
+    .then(paired => {
+      if (paired) {
+        Toast.show({text:`Device ${device.name} paired successfully`})
+      } else {
+        Toast.show({text:`Device ${device.name} pairing failed`})
+      }
+    })
+    .catch((err) => Toast.show(err.message))
   }
   
   static navigationOptions = ({ navigation }) => {

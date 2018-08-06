@@ -88,6 +88,7 @@ export function fetchAllLiveJobsList() {
         }
     }
 }
+
 export function toggleLiveJobSelection(jobId, allJobs, searchText) {
     return async function (dispatch) {
         try {

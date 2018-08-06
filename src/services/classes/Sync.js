@@ -42,7 +42,7 @@ class Sync {
   async createAndUploadZip(syncStoreDTO, currentDate) {
     let isFileExists = await RNFS.exists(PATH_TEMP);
     if (isFileExists) {
-      await RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { showToastAndAddUserExceptionLog(2901, JSON.stringify(error), 'danger', 0) })
+      await RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { showToastAndAddUserExceptionLog(2951, JSON.stringify(error), 'danger', 0) })
     }
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {

@@ -33,6 +33,7 @@ import QrCodeScanner from '../../containers/QrCodeScanner'
 import MessageBox from '../../containers/MessageBox'
 import LiveJobListing from '../../containers/LiveJobListing'
 import LiveJob from '../../containers/LiveJob'
+import MosambeePayment from '../../containers/MosambeePayment'
 
 const MenuStack = createStackNavigator({
     MenuScreen: {

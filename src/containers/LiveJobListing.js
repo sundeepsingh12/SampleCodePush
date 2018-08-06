@@ -15,7 +15,7 @@ import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import JobListItem from '../components/JobListItem'
-import { SET_SEARCH, SET_LIVE_JOB_TOAST, QrCodeScanner } from '../lib/constants'
+import { SET_SEARCH, SET_LIVE_JOB_TOAST, QrCodeScanner, CLEAR_LIVE_JOB_STATE } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { LIVE_TASKS, NO_JOBS_PRESENT, SELECT_ALL, ACCEPT, REJECT, SELECTED, OK } from '../lib/ContainerConstants'
 import { navigate } from '../modules/navigators/NavigationService';
@@ -81,6 +81,9 @@ class LiveJobListing extends PureComponent {
             }, 30000)
         }
     }
+    componentWillUnmount(){
+        this.props.actions.setState(CLEAR_LIVE_JOB_STATE)
+    }
     componentDidUpdate() {
         if (this.props.liveJobToastMessage && this.props.liveJobToastMessage != '') {
             Toast.show({
@@ -133,7 +136,7 @@ class LiveJobListing extends PureComponent {
             if (moment(jobEndTime).diff(moment(currentTime)) <= 0) {
                 return 'TimeUp'
             }
-            return moment.utc(moment(jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
+            return this.props.liveJobList[id].jobEndTime
         }
     }
     toggleLiveJobSelection = (id) => {
