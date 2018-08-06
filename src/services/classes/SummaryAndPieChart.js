@@ -179,7 +179,7 @@ class SummaryAndPieChart {
     getAllRunSheetSummary() {
         let setRunsheetSummary = []
         let runsheetQuery = 'isClosed = false'
-        const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery, true, 'startDate')
+        const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery, true, 'startDate', true)
         runSheetData.forEach(item => setRunsheetSummary.push([item.runsheetNumber, item.successCount, item.pendingCount, item.failCount, item.cashCollected]))
         return setRunsheetSummary;
     }
