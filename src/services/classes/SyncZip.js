@@ -52,7 +52,6 @@ class SyncZip {
         let jobSummary = jobSummaryService.getJobSummaryListForSync(syncStoreDTO.jobSummaryList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.jobSummary = jobSummary
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
-        console.log('SYNC_RESULTS',SYNC_RESULTS)
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
         let isEncryptionSuccessful = true,syncData
         try{
