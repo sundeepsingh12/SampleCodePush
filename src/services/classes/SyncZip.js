@@ -44,7 +44,7 @@ class SyncZip {
         SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, syncStoreDTO.lastSyncWithServer);
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
-        const userSummary = this.updateNextJobTransactionIdAndAppVersion(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
+        const userSummary = this.updateUserSummary(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
         let { communicationLogs, lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogs(syncStoreDTO, userSummary) : { communicationLogs: [], lastCallTime: null, lastSmsTime: null }
         SYNC_RESULTS.userCommunicationLog = communicationLogs ? communicationLogs : []
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
@@ -52,6 +52,7 @@ class SyncZip {
         let jobSummary = jobSummaryService.getJobSummaryListForSync(syncStoreDTO.jobSummaryList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.jobSummary = jobSummary
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
+        console.log('SYNC_RESULTS',SYNC_RESULTS)
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
         let isEncryptionSuccessful = true,syncData
         try{
@@ -77,7 +78,7 @@ class SyncZip {
         // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }
 
-    updateNextJobTransactionIdAndAppVersion(statusList, jobMasterList, userSummary) {
+    updateUserSummary(statusList, jobMasterList, userSummary) {
         if (!userSummary) {
             throw new Error('User Summary missing in store');
         }
@@ -86,6 +87,7 @@ class SyncZip {
         const firstEnableSequenceTransaction = (jobMasterListWithEnableResequence && pendingStatusList) ? jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterListWithEnableResequence, pendingStatusList) : null;
         userSummary.nextJobTransactionId = firstEnableSequenceTransaction ? firstEnableSequenceTransaction.id : null;
         userSummary.appVersion = APP_VERSION_NUMBER
+        userSummary.lastLocationDatetime = moment().format('YYYY-MM-DD HH:mm:ss')
         return userSummary;
     }
 
