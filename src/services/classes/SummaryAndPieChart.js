@@ -16,7 +16,7 @@ import {
 } from '../../lib/AttributeConstants'
 
 import {jobMasterService} from '../classes/JobMaster'
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 
 class SummaryAndPieChart {
 
@@ -26,7 +26,7 @@ class SummaryAndPieChart {
     async getAllStatusIdsCount(jobMasterList) {
         const { allStatusMap, noNextStatusMap } = await jobStatusService.getStatusIdsForAllStatusCategory() // get all status list
         const allPendingSuccessFailIds = Object.keys(allStatusMap)
-        let jobMasterIdList = (_.isEmpty(jobMasterList)) ? await jobMasterService.getJobMasterIdList() : jobMasterList
+        let jobMasterIdList = (isEmpty(jobMasterList)) ? await jobMasterService.getJobMasterIdList() : jobMasterList
         const transactionList = this.getTransactionsForPieChartAndSummary(allPendingSuccessFailIds, jobMasterIdList) // get all transactions for selected jobMAster list
         const allTransactionOnTodaysDate = (transactionList.length) ? this.isTodaysDateTransactions(transactionList, noNextStatusMap) : [] // get transactions on today's date
         return this.setAllCounts(allTransactionOnTodaysDate, allStatusMap)

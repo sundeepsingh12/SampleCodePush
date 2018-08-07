@@ -1,6 +1,6 @@
 'use strict'
 import * as realm from '../../repositories/realmdb'
-import _ from 'lodash'
+import size from 'lodash/size'
 
 class Logout {
 
@@ -10,7 +10,7 @@ class Logout {
 
     checkForUnsyncTransactions(pendingSyncTransactionIds) {
         let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? {} : pendingSyncTransactionIds.value;
-        return (_.size(transactionsToSync) > 0)
+        return (size(transactionsToSync) > 0)
     }
 }
 

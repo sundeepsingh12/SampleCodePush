@@ -6,7 +6,7 @@ import {
     keyValueDBService
 } from './KeyValueDBService'
 import { geoFencingService } from './GeoFencingService'
-import _ from 'lodash'
+import isNull from 'lodash/isNull'
 
 class UserSummary {
 
@@ -21,7 +21,7 @@ class UserSummary {
             let lastLongitude = userSummary.value.lastLng
             let gpsKms = userSummary.value.gpsKms
             let totalDistanceTravelled = 0
-            if (!_.isNull(lastLatitude)) {
+            if (!isNull(lastLatitude)) {
                 let distanceTravelled = geoFencingService.distance(lastLatitude, lastLongitude, currentLatitude, currentLongitude)
                 totalDistanceTravelled = distanceTravelled*1000 + gpsKms
             }

@@ -2,6 +2,7 @@ import RNFS from 'react-native-fs'
 import { zip } from 'react-native-zip-archive'
 import { jobTransactionService } from './JobTransaction'
 import { jobSummaryService } from './JobSummary'
+import { keyValueDBService } from './KeyValueDBService'
 import * as realm from '../../repositories/realmdb'
 import {
     TABLE_TRACK_LOGS,
@@ -22,7 +23,7 @@ import { addServerSmsService } from './AddServerSms'
 import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, PENDING, PATH, PATH_TEMP,APP_VERSION_NUMBER } from '../../lib/AttributeConstants'
 import { userExceptionLogsService } from './UserException'
 import { communicationLogsService } from './CommunicationLogs'
-import { omit } from 'lodash'
+import  omit  from 'lodash/omit'
 import { Platform } from 'react-native'
 var CryptoJS = require("crypto-js");
 
