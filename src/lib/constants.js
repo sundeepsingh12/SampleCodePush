@@ -446,6 +446,8 @@ module.exports = keyMirror({
     SET_BULK_SEARCH_TEXT: null,
     SET_BULK_ERROR_MESSAGE: null,
     SET_BULK_TRANSACTION_PARAMETERS: null,
+    SET_BULK_PARAMS_FOR_SELECTED_DATA: null,
+    SET_BULK_CHECK_ALERT_VIEW: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,

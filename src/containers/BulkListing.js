@@ -6,20 +6,20 @@ import * as bulkActions from '../modules/bulk/bulkActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, FlatList, TouchableOpacity, TextInput } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, TextInput, Alert } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Header, Button, Text, Body, Icon, Footer, StyleProvider, ActionSheet, Toast } from 'native-base'
+import { Container, Header, Button, Text, Body, Icon, Footer, StyleProvider, ActionSheet, Toast, chec } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import JobListItem from '../components/JobListItem'
 import _ from 'lodash'
 import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED,  NO_JOBS_PRESENT, TOTAL_COUNT } from '../lib/ContainerConstants'
-import { FormLayout, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner } from '../lib/constants'
+import { FormLayout, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner, SET_BULK_TRANSACTION_PARAMETERS, SET_BULK_PARAMS_FOR_SELECTED_DATA, SET_BULK_CHECK_ALERT_VIEW } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
 import { navigate } from '../modules/navigators/NavigationService';
-
+import BulkUnselectJobAlert from '../components/BulkUnselectJobAlert'
 function mapStateToProps(state) {
   return {
     bulkTransactionList: state.bulk.bulkTransactionList,
@@ -28,11 +28,13 @@ function mapStateToProps(state) {
     selectAllNone: state.bulk.selectAllNone,
     isSelectAllVisible: state.bulk.isSelectAllVisible,
     searchText: state.bulk.searchText,
+    wantUnselectJob: state.bulk.wantUnselectJob,
     isManualSelectionAllowed: state.bulk.isManualSelectionAllowed,
     searchSelectionOnLine1Line2: state.bulk.searchSelectionOnLine1Line2,
     idToSeparatorMap: state.bulk.idToSeparatorMap,
     errorToastMessage: state.bulk.errorToastMessage,
-    nextStatusList: state.bulk.nextStatusList
+    nextStatusList: state.bulk.nextStatusList,
+    checkAlertView: state.bulk.checkAlertView
   }
 }
 
@@ -75,7 +77,7 @@ class BulkListing extends PureComponent {
 
   onClickRowItem(item) {
     if (this.props.isManualSelectionAllowed) {
-      this.props.actions.toggleMultipleTransactions([item], this.props.bulkTransactionList, this.props.selectedItems, this.props.navigation.state.params.pageObject)
+      this.props.actions.toggleMultipleTransactions([item], this.props.bulkTransactionList, this.props.selectedItems, this.props.navigation.state.params.pageObject, this.props.checkAlertView)
     }
   }
 
@@ -89,7 +91,7 @@ class BulkListing extends PureComponent {
 
   _setQrValue = (value) => {
     if (value && value != '')
-      this.props.actions.setSearchedItem(value, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems, this.props.navigation.state.params.pageObject)
+      this.props.actions.setSearchedItem(value, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems, this.props.navigation.state.params.pageObject, this.props.checkAlertView)
   }
 
   searchBarView() {
@@ -109,12 +111,12 @@ class BulkListing extends PureComponent {
             }}
             onSubmitEditing={() => {
               if (this.props.searchText && this.props.searchText != '')
-                this.props.actions.setSearchedItem(this.props.searchText, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems, this.props.navigation.state.params.pageObject)
+                this.props.actions.setSearchedItem(this.props.searchText, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems, this.props.navigation.state.params.pageObject, this.props.checkAlertView)
             }}
             value={this.props.searchText} />
           <Button small transparent style={[styles.inputInnerBtn]} onPress={() => {
             if (this.props.searchText && this.props.searchText != '')
-              this.props.actions.setSearchedItem(this.props.searchText, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems, this.props.navigation.state.params.pageObject)
+              this.props.actions.setSearchedItem(this.props.searchText, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems, this.props.navigation.state.params.pageObject, this.props.checkAlertView)
           }}>
             <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
           </Button>
@@ -180,6 +182,7 @@ class BulkListing extends PureComponent {
   }
 
   getBulkTransactionView() {
+    const  alertView = this.props.wantUnselectJob ? this.showAlertForUnselectTransaction() : null
     let nextStatusNames = []
     this.props.nextStatusList.forEach(object => {
         nextStatusNames.push({
@@ -222,6 +225,7 @@ class BulkListing extends PureComponent {
               </Body>
             </Header>
           </SafeAreaView>
+          {alertView}
           <FlatList
             data={this.renderList()}
             renderItem={({ item }) => this.renderData(item)}
@@ -254,6 +258,28 @@ class BulkListing extends PureComponent {
         </Container>
       </StyleProvider>
     )
+  }
+  onLongPressResetSetting = () => {
+    this.props.actions.setState(SET_BULK_TRANSACTION_PARAMETERS, {
+      selectedItems: this.props.wantUnselectJob.cloneSelectedItems,
+      bulkTransactions: this.props.wantUnselectJob.cloneBulkTransactions,
+      displayText: this.props.wantUnselectJob.displayText,
+      searchText: '',
+      selectAll: this.props.wantUnselectJob.selectAll,
+  })
+  }
+
+  onCancelPress = () => {
+    this.props.actions.setState(SET_BULK_PARAMS_FOR_SELECTED_DATA, null)
+  }
+
+  onCheckItem = () => {
+    this.props.actions.setState(SET_BULK_CHECK_ALERT_VIEW, !this.props.checkAlertView)
+  }
+
+  showAlertForUnselectTransaction(){
+      return <BulkUnselectJobAlert onOkPress = {() => this.onLongPressResetSetting()} onCancelPress = {() => this.onCancelPress()} 
+      onRequestClose = {() => this.onCancelPress()} wantUnselectJob = {this.props.wantUnselectJob} checked = {this.props.checkAlertView} checkItem = {() => this.onCheckItem()}/> 
   }
 
   render() {
