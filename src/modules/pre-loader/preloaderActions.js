@@ -63,7 +63,7 @@ import {
   LONG_CODE_SIM_VERIFICATION,
   DOMAIN_URL,
 } from '../../lib/constants'
-import { MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, SHOW_LONG_CODE_IOS_SCREEN, SHOW_LONG_CODE_COMPLETE_SCREEN } from '../../lib/AttributeConstants'
+import { MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, SHOW_LONG_CODE_IOS_SCREEN, SHOW_LONG_CODE_COMPLETE_SCREEN,LOGIN_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
@@ -83,6 +83,7 @@ import { performSyncService } from '../home/homeActions';
 import feStyle from '../../themes/FeStyle'
 let sendSMSBackGroundService = require('../../wrapper/SendSMSBackGround');
 import Communications from 'react-native-communications';
+import { userEventLogService } from '../../services/classes/UserEvent'
 
 //This hits JOB Master Api and gets the response 
 export function downloadJobMaster(deviceIMEI, deviceSIM, userObject, token) {
@@ -182,6 +183,7 @@ export function checkForUnsyncBackupFilesAndNavigate(user) {
       if (!user) {
         userFromStore = await keyValueDBService.getValueFromStore(USER);
       }
+      await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
       let unsyncBackupFilesList = await backupService.checkForUnsyncBackup(user ? user : userFromStore ? userFromStore.value : null);
       if (unsyncBackupFilesList.length > 0) {
         keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'UnsyncBackupUpload')
@@ -209,7 +211,7 @@ export function checkForUnsyncBackupFilesAndNavigate(user) {
  * 
  * @param {*} configDownloadService 
  * @param {*} configSaveService 
- * @param {*} deviceVerificationService 
+ * @param {*} deviceVerificationStatus 
  */
 export function saveSettingsAndValidateDevice(configDownloadService, configSaveService, deviceVerificationStatus) {
   return async function (dispatch) {

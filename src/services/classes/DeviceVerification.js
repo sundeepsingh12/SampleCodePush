@@ -2,7 +2,6 @@
 
 import { keyValueDBService } from './KeyValueDBService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
-import { userEventLogService } from './UserEvent'
 import CONFIG from '../../lib/config'
 import DeviceInfo from 'react-native-device-info'
 import { Platform } from 'react-native'
@@ -14,7 +13,6 @@ import {
   IS_PRELOADER_COMPLETE,
   IS_SHOW_MOBILE_OTP_SCREEN,
 } from '../../lib/constants'
-import { LOGIN_SUCCESSFUL} from '../../lib/AttributeConstants'
 import { SHOW_MOBILE_SCREEN } from '../../lib/ContainerConstants'
 
 class DeviceVerification {
@@ -75,7 +73,6 @@ class DeviceVerification {
       return false
     } else {
       await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
-      await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
       if (user.hubId != deviceIMEI.value.hubId) {
         deviceIMEI.value.hubId = user.hubId;
         await keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI.value)
