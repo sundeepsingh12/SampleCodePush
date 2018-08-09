@@ -39,6 +39,10 @@ module.exports = keyMirror({
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
     SET_LOGIN_PARAMETERS: null,
+    SHOW_RESET_PASSWORD: null,
+    SET_ERROR_RESET_PASSWORD: null,
+    SET_RESET_PASSWORD_LOADER: null,
+    SHOW_RESET_PASSWORD_AND_SET_PASSWORD: null,
 
     //Preloader Actions
     MASTER_DOWNLOAD_START: null,
@@ -115,7 +119,7 @@ module.exports = keyMirror({
     TABS_LOADING: null,
     SET_SELECTED_DATE: null,
     LOADER_FOR_SYNCING: null,
-    SET_CALLER_ID_POPUP:null,
+    SET_CALLER_ID_POPUP: null,
     TASKLIST_LOADER_FOR_SYNC: null,
 
     //Pages
@@ -242,7 +246,7 @@ module.exports = keyMirror({
     APP_THEME: null,
     LAST_CALL_AND_SMS_TIME: null,
     LONG_CODE_SIM_VERIFICATION: null,
-    ENCRYPTION_KEY:null,
+    ENCRYPTION_KEY: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
