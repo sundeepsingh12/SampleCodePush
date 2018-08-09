@@ -3,7 +3,7 @@
 import {
     MAIN_MENU
 } from '../../lib/constants'
-import _ from 'lodash'
+import sortBy from 'lodash/sortBy'
 import { UNTITLED } from '../../lib/ContainerConstants'
 class ModuleCustomization {
 
@@ -60,8 +60,8 @@ class ModuleCustomization {
     }
 
     sortMenuAndSubMenuGroupList(mainMenuObject, subMenuObject) {
-        mainMenuObject = _.sortBy(mainMenuObject, function (option) { return option.sequence });
-        subMenuObject = _.sortBy(subMenuObject, function (option) { return option.sequence });
+        mainMenuObject = sortBy(mainMenuObject, function (option) { return option.sequence });
+        subMenuObject = sortBy(subMenuObject, function (option) { return option.sequence });
         let mainMenuSectionList = this.createSectionListDataAndSortPages(mainMenuObject);
         let subMenuSectionList = this.createSectionListDataAndSortPages(subMenuObject);
         return {
@@ -73,7 +73,7 @@ class ModuleCustomization {
     createSectionListDataAndSortPages(menuObject) {
         let menuList = []
         for (let group in menuObject) {
-            let data = _.sortBy(menuObject[group].pageList, function (option) { return option.sequenceNumber })
+            let data = sortBy(menuObject[group].pageList, function (option) { return option.sequenceNumber })
             let title = menuObject[group].groupName
             menuList.push({ data, title });
         }

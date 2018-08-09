@@ -6,7 +6,8 @@ import {
     keyValueDBService
 } from './KeyValueDBService'
 import { geoFencingService } from './GeoFencingService'
-import _ from 'lodash'
+import isNull from 'lodash/isNull'
+import moment from 'moment'
 
 class UserSummary {
 
@@ -21,13 +22,14 @@ class UserSummary {
             let lastLongitude = userSummary.value.lastLng
             let gpsKms = userSummary.value.gpsKms
             let totalDistanceTravelled = 0
-            if (!_.isNull(lastLatitude)) {
+            if (!isNull(lastLatitude)) {
                 let distanceTravelled = geoFencingService.distance(lastLatitude, lastLongitude, currentLatitude, currentLongitude)
-                totalDistanceTravelled = distanceTravelled*1000 + gpsKms
+                totalDistanceTravelled = (distanceTravelled *1000) + gpsKms
             }
-            userSummary.value.lastLat = currentLatitude,
-            userSummary.value.lastLng = currentLongitude,
+            userSummary.value.lastLat = currentLatitude
+            userSummary.value.lastLng = currentLongitude
             userSummary.value.gpsKms = totalDistanceTravelled
+            userSummary.value.lastLocationDatetime = moment().format('YYYY-MM-DD HH:mm:ss')
             await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
         } catch (error) {
         }
