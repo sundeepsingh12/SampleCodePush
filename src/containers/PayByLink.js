@@ -44,10 +44,10 @@ class PayByLink extends PureComponent {
     render() {
         return (
             <Container>
-                <Content style={StyleSheet.flatten([styles.padding10])}>
+                <Content style={[styles.padding10]}>
                     <View>
                         <Text> Customer Contact </Text>
-                        <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
+                        <View style={[styles.positionRelative, { zIndex: 1 }]} >
                             <Input
                                 defaultValue={this.props.customerContact}
                                 placeholder='Regular Textbox'
@@ -57,7 +57,7 @@ class PayByLink extends PureComponent {
                                         customerContact: value
                                     }
                                 )}
-                                style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
+                                style={[styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }]}
                             />
                         </View>
                     </View>
@@ -66,7 +66,7 @@ class PayByLink extends PureComponent {
                     <FooterTab>
                         <Button success
                             disabled={this.props.isSaveButtonDisabled}
-                            style={StyleSheet.flatten([{ borderRadius: 0 }])}
+                            style={[{ borderRadius: 0 }]}
                             onPress={() => {
                                 this.props.actions.approveTransactionAPIRequest(
                                     this.props.navigation.state.params.actualAmount,

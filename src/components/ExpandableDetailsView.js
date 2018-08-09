@@ -9,7 +9,7 @@ import {
 import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
 import renderIf from '../lib/renderIf'
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import { N_A, TAP_TO_HIDE, TAP_TO_SHOW } from '../lib/ContainerConstants'
 
 class ExpandableDetailsView extends PureComponent {
@@ -21,7 +21,7 @@ class ExpandableDetailsView extends PureComponent {
     }
     checkForChildData(childDataList) {
         for (let data in childDataList) {
-            if (!_.isEmpty(childDataList[data].childDataList) || childDataList[data].attributeTypeId == 8) {
+            if (!isEmpty(childDataList[data].childDataList) || childDataList[data].attributeTypeId == 8) {
                 return true
             }
         }

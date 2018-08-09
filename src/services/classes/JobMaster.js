@@ -41,7 +41,7 @@ import {
   ENCRYPTION_KEY
 } from '../../lib/constants'
 import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER, PATH_COMPANY_LOGO_DIR, PATH_COMPANY_LOGO_IMAGE } from '../../lib/AttributeConstants'
-import _ from 'lodash'
+import isUndefined from 'lodash/isUndefined'
 import { TIME_ERROR_MESSAGE } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
@@ -300,7 +300,7 @@ class JobMaster {
 
   getJobMasterTitleListFromIds(jobMasterIdList, jobMasterList) {
     let jobMasterTitleList = []
-    if (_.isUndefined(jobMasterIdList)) {
+    if (isUndefined(jobMasterIdList)) {
       return jobMasterTitleList
     }
     jobMasterList.forEach(jobMaster => {

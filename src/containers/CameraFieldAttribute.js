@@ -17,6 +17,7 @@ import ImagePicker from 'react-native-image-picker'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import platform from '../../native-base-theme/variables/platform'
 import {  SKU_PHOTO } from '../lib/AttributeConstants'
+import isEmpty from 'lodash/isEmpty'
 
 function mapStateToProps(state) {
     return {
@@ -52,22 +53,22 @@ class CameraFieldAttribute extends PureComponent {
         const imageData = props.imageData;
         let newState = null;
         //copy newprops
-        if(_.isEmpty(imageData)) {
+        if(isEmpty(imageData)) {
             newState = {...state, reduxData: imageData};
         } else {
             newState = {...state, reduxData: {...imageData}};
         }
         
         //Checks to change local state
-        if(_.isEmpty(imageData) ){
-            if(!_.isEmpty(state.reduxData)){
+        if(isEmpty(imageData) ){
+            if(!isEmpty(state.reduxData)){
                 return {...newState, imageData: null};
             }
             else{
                 return null;
             }
         }
-        else if(_.isEmpty(state.reduxData)){//Optional chaining is not available
+        else if(isEmpty(state.reduxData)){//Optional chaining is not available
             return {...newState, imageData: {...imageData}}
         }
         

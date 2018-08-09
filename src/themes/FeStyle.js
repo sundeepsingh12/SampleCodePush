@@ -660,7 +660,6 @@ export default {
         borderRadius: 36,
     },
     footer: {
-        height: 'auto',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3'
     },

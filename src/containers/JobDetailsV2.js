@@ -505,8 +505,8 @@ class JobDetailsV2 extends PureComponent {
           this.showRevertView() : null}
 
         <View style={[styles.marginTop5, styles.bgWhite]}>
-          {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
-            <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
+          {this.props.errorMessage ? <View style={[styles.column, { padding: 12, backgroundColor: 'white' }]}>
+            <Text style={[styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning]}>
               {this.props.errorMessage}
             </Text>
           </View> : null}
@@ -577,7 +577,6 @@ class JobDetailsV2 extends PureComponent {
 
   showFooterView() {
     return (
-      <SafeAreaView style={[styles.bgWhite]}>
         <Footer style={[style.footer]}>
           {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0 && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
             <FooterTab>
@@ -604,7 +603,6 @@ class JobDetailsV2 extends PureComponent {
               </Button>
             </FooterTab>)}
         </Footer>
-      </SafeAreaView>
     )
   }
 

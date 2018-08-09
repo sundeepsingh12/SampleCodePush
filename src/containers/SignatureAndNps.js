@@ -109,7 +109,6 @@ class SignatureAndNps extends PureComponent {
 
     headerView() {
         return (
-            <SafeAreaView style={[styles.bgWhite]}>
                 <Header searchBar style={[styles.bgWhite, style.header]}>
                     <Body>
                         <View
@@ -127,7 +126,6 @@ class SignatureAndNps extends PureComponent {
                         </View>
                     </Body>
                 </Header>
-            </SafeAreaView>
         )
     }
     saveSignButton() {

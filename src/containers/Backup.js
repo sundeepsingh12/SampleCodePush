@@ -36,7 +36,7 @@ import {
     MB,
 } from '../lib/ContainerConstants'
 import { SET_BACKUP_VIEW, SET_BACKUP_TOAST } from '../lib/constants'
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 
 import TitleHeader from '../components/TitleHeader'
 
@@ -183,7 +183,7 @@ class Backup extends Component {
         let flatListView
         let emptyListView
         if (this.props.isLoading || this.props.backupView != 0) return
-        if (!this.props.isLoading && !_.isEmpty(this.props.unSyncedFiles)) {
+        if (!this.props.isLoading && !isEmpty(this.props.unSyncedFiles)) {
             flatListView = < FlatList
                 data={Object.values(this.props.unSyncedFiles)}
                 renderItem={({ item }) => this.renderSyncedData(item)
@@ -191,7 +191,7 @@ class Backup extends Component {
                 keyExtractor={item => String(item.id)}
             />
             return flatListView
-        } else if (_.isEmpty(this.props.unSyncedFiles)) {
+        } else if (isEmpty(this.props.unSyncedFiles)) {
             emptyListView =
                 <View style={[styles.alignCenter, styles.padding20]}>
                     <Text style={styles.fontDarkGray}> {THERE_ARE_NO_UNSYNCED_FILES} </Text>
@@ -210,7 +210,7 @@ class Backup extends Component {
         let flatListView
         let emptyListView
         if (this.props.isLoading || this.props.backupView != 0) return
-        if (!this.props.isLoading && !_.isEmpty(this.props.syncedFiles)) {
+        if (!this.props.isLoading && !isEmpty(this.props.syncedFiles)) {
             flatListView = < FlatList
                 data={this.renderList()}
                 renderItem={({ item }) => this.renderSyncedData(item)
@@ -218,7 +218,7 @@ class Backup extends Component {
                 keyExtractor={item => String(item.id)}
             />
             return flatListView
-        } else if (_.isEmpty(this.props.syncedFiles)) {
+        } else if (isEmpty(this.props.syncedFiles)) {
             emptyListView =
                 <View style={[styles.alignCenter, styles.padding20]}>
                     <Text style={styles.fontDarkGray}> {THERE_ARE_NO_SYNCED_FILES} </Text>

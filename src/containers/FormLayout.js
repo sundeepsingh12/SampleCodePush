@@ -17,7 +17,8 @@ import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_S
 import CustomAlert from "../components/CustomAlert"
 import { ALERT, INVALID_FORM_ALERT, OK } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
-import { navigate } from '../modules/navigators/NavigationService';
+import { navigate } from '../modules/navigators/NavigationService'
+import isEmpty from 'lodash/isEmpty'
 
 function mapStateToProps(state) {
   return {
@@ -241,7 +242,7 @@ class FormLayout extends PureComponent {
             <Button success full
               onPress={() => this.saveJobTransaction()}
               disabled={this.props.isSaveDisabled}>
-              <Text style={[styles.fontLg, styles.fontWhite]}>{!_.isEmpty(this.props.paymentAtEnd) ? (this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName) : (saveActivated || transient) ? 'Continue' : this.props.statusName}</Text>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{!isEmpty(this.props.paymentAtEnd) ? (this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName) : (saveActivated || transient) ? 'Continue' : this.props.statusName}</Text>
             </Button>
           </FooterTab>
         </Footer>

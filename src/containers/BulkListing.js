@@ -152,8 +152,7 @@ class BulkListing extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
-          <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }]}>
-            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }])}>
+            <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }]}>
               <Body>
                 <View
                   style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -169,7 +168,6 @@ class BulkListing extends PureComponent {
                 </View>
               </Body>
             </Header>
-          </SafeAreaView>
 
           <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
             <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
@@ -197,7 +195,7 @@ class BulkListing extends PureComponent {
       <StyleProvider style={getTheme(platform)}>
         <Container>
           <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+            <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
               <Body>
                 <View
                   style={[styles.row, styles.width100, styles.justifySpaceBetween,]}>
@@ -229,7 +227,7 @@ class BulkListing extends PureComponent {
           />
 
           <SafeAreaView>
-            <Footer style={[{ height: 'auto' }, styles.column, styles.padding10]}>
+            <Footer style={[ styles.column, styles.padding10]}>
               <Text style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.selectedItems)}</Text>
               <Button
                 onPress={() => {
@@ -288,7 +286,6 @@ class BulkListing extends PureComponent {
 const style = StyleSheet.create({
   header: {
     borderBottomWidth: 0,
-    height: 'auto',
     padding: 0,
     paddingRight: 0,
     paddingLeft: 0,

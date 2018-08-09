@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, WebView, Platform, ActivityIndicator} from 'react-native'
-import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import getTheme from '../../native-base-theme/components';
@@ -12,6 +11,7 @@ import { WEBVIEW_REF, ENTER_URL_HERE, HTTP } from '../lib/AttributeConstants'
 import { INVALID_URL_OR_NO_INTERNET, OK } from '../lib/ContainerConstants'
 import { START_FETCHING_URL, END_FETCHING_URL, ON_CHANGE_STATE, QrCodeScanner, SCANNER_TEXT } from '../lib/constants'
 import { Container, Header, Button, Text, Body, Input,  Icon, Footer, FooterTab, StyleProvider, Toast } from 'native-base'
+
 function mapStateToProps(state) {
     return {
         isLoaderRunning: state.customApp.isLoaderRunning,
@@ -107,7 +107,6 @@ class CustomApp extends PureComponent {
 
     showFooterView() {
         return (
-            <SafeAreaView>
                 <Footer style={[style.footer]}>
                     <FooterTab>
                         <Button full style={[styles.bgWhite]} onPress={this.goBack}>
@@ -124,7 +123,6 @@ class CustomApp extends PureComponent {
                             </Button>
                         </FooterTab> : null}
                 </Footer>
-            </SafeAreaView>
         )
     }
 
@@ -157,13 +155,11 @@ class CustomApp extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }]}>
-                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                             <Body>
                                 {this.showBody()}
                             </Body>
                         </Header>
-                    </SafeAreaView>
                     {this.props.customUrl || (this.props.scannerText) || (!this.props.navigation.state.params.customUrl) ?
                         <WebView
                             ref={WEBVIEW_REF}

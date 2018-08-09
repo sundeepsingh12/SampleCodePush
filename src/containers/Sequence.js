@@ -302,11 +302,8 @@ class Sequence extends PureComponent {
    */
   headerView() {
     return (
-      <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-        <Header style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
-          <Body>
-            <View
-              style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+        <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+            <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
               <TouchableOpacity style={[style.headerLeft]}
                 onPress={this.goBack}>
                 <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
@@ -317,10 +314,11 @@ class Sequence extends PureComponent {
               <View style={[style.headerRight]}>
               </View>
             </View>
-            {!_.isEmpty(this.props.sequenceList) && !this.props.isSequenceScreenLoading ? <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} /> : null}
-          </Body>
-        </Header>
-      </SafeAreaView>
+            <View>
+            {!_.isEmpty(this.props.sequenceList) && !this.props.isSequenceScreenLoading ? 
+            <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />: null}
+            </View> 
+        </View>
     )
   }
 
@@ -362,8 +360,8 @@ class Sequence extends PureComponent {
                 sortRowStyle={style.sortableListStyle}
                 renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(row)} />} />
               <SafeAreaView>
-                <Footer style={{ height: 'auto' }}>
-                  <FooterTab style={StyleSheet.flatten([styles.padding10])}>
+                <Footer style={{ height: 70 }}>
+                  <FooterTab style={[styles.padding10]}>
                     {buttonView}
                   </FooterTab>
                 </Footer>

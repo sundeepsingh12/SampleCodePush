@@ -91,7 +91,7 @@ class Payment extends PureComponent {
         return (
             <View>
                 <Text> {type} </Text>
-                <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
+                <View style={[styles.positionRelative, { zIndex: 1 }]} >
                     <Input
                         keyboardType="numeric"
                         returnKeyType='done'
@@ -105,7 +105,7 @@ class Payment extends PureComponent {
                                 transactionNumber: value
                             }
                         )}
-                        style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])} />
+                        style={[styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }]} />
 
                 </View>
             </View>
@@ -315,7 +315,7 @@ class Payment extends PureComponent {
                         <View style={[styles.marginBottom15]}>
                             {paymentModeView}
                         </View>
-                        <View style={StyleSheet.flatten([styles.marginTop20, styles.marginBottom20])} >
+                        <View style={[styles.marginTop20, styles.marginBottom20]} >
                             {paymentModeSelectedView}
                         </View>
                     </Content>
@@ -324,7 +324,7 @@ class Payment extends PureComponent {
                             <FooterTab>
                                 <Button success
                                     disabled={this.props.isSaveButtonDisabled}
-                                    style={StyleSheet.flatten([{ borderRadius: 0 }])}
+                                    style={[{ borderRadius: 0 }]}
                                     onPress={() => {
                                         this.moveToSplitOrSavePayment()
                                     }}

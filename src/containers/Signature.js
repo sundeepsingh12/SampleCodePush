@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, TouchableOpacity, BackHandler } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SignatureRemarks from '../components/SignatureRemarks'
@@ -103,7 +102,6 @@ class Signature extends PureComponent {
 
     headerView() {
         return (
-            <SafeAreaView style={[styles.bgWhite]}>
                 <Header searchBar style={[styles.bgWhite, style.header]}>
                     <Body>
                         <View
@@ -125,7 +123,6 @@ class Signature extends PureComponent {
                         </View>
                     </Body>
                 </Header>
-            </SafeAreaView>
         )
     }
     saveSignButton() {

@@ -3,13 +3,9 @@ import { StyleSheet, View, TouchableHighlight, Alert } from 'react-native'
 import styles from '../themes/FeStyle'
 
 import {
-  Header,
   Button,
   Text,
-  List,
-  Left,
   Icon,
-  Title,
   ActionSheet,
 } from 'native-base'
 import moment from 'moment'

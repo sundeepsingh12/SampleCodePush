@@ -58,8 +58,8 @@ class TaskListScreen extends PureComponent {
   /**It renders each job transaction item
     * 
     * @param {*} item 
-    * @param {*} lastId 
-    * @param {*} groupId 
+    * @param {*} index 
+    * @param {*} section 
     */
   renderData = (item, index, section) => {
     let lastId = item.groupId == 'nullGroup' || section.data.length == 1 ? null : (section && section.data.length == (index + 1)) ? 'lastTransaction' : 'groupTransaction'

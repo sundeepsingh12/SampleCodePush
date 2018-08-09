@@ -173,8 +173,7 @@ class LiveJobListing extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
+                        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]}>
                             <Body>
                                 <View
                                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -190,7 +189,6 @@ class LiveJobListing extends PureComponent {
                                 </View>
                             </Body>
                         </Header>
-                    </SafeAreaView>
                     <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
                         <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
                     </View>
@@ -267,7 +265,7 @@ class LiveJobListing extends PureComponent {
     showMultipleSelectList() {
         let view
         if (this.props.selectedItems && this.props.selectedItems.length > 0) {
-            view = <Header style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+            view = <Header style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                 <Body>
                     <View style={[styles.column, { alignSelf: 'stretch' }]}>
                         <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>
