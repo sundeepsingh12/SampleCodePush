@@ -21,6 +21,7 @@ module.exports = {
     ERROR: 'Error',
     //Common Error Strings
     JOB_STATUS_MISSING: 'Job status missing in store',
+    TYPE_HERE: 'Type here...',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',

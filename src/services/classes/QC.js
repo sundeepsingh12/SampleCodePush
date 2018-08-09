@@ -116,19 +116,19 @@ class QC {
             } else if (validationList[validation].timeOfExecution == 'REMARKS') {
                 switch (validationList[validation].id) {
                     case 22: {
-                        qcAttributeMasterArray.qcPassRemarks = validationList[validation].condition == 'TRUE';
+                        qcAttributeMasterArray.qcPassRemarksValidation = validationList[validation].condition == 'TRUE';
                         break;
                     }
                     case 23: {
-                        qcAttributeMasterArray.qcFailReasons = validationList[validation].condition == 'TRUE';
+                        qcAttributeMasterArray.qcFailReasonsValidation = validationList[validation].condition == 'TRUE';
                         break;
                     }
                     case 24: {
-                        qcAttributeMasterArray.qcImage = validationList[validation].condition == 'TRUE';
+                        qcAttributeMasterArray.qcImageValidation = validationList[validation].condition == 'TRUE';
                         break;
                     }
                     case 25: {
-                        qcAttributeMasterArray.qcSummary = validationList[validation].condition == 'TRUE';
+                        qcAttributeMasterArray.qcSummaryValidation = validationList[validation].condition == 'TRUE';
                         break;
                     }
                     case 26: {
@@ -136,19 +136,19 @@ class QC {
                         break;
                     }
                     case 27: {
-                        qcAttributeMasterArray.qcFailRemarks = validationList[validation].condition == 'TRUE';
+                        qcAttributeMasterArray.qcFailRemarksValidation = validationList[validation].condition == 'TRUE';
                         break;
                     }
                     case 28: {
-                        qcAttributeMasterArray.qcResult = validationList[validation].condition == 'TRUE';
+                        qcAttributeMasterArray.qcResultValidation = validationList[validation].condition == 'TRUE';
                         break;
                     }
                     case 29: {
-                        qcAttributeMasterArray.qcPassButtonText = validationList[validation].condition;
+                        qcAttributeMasterArray.qcPassButtonTextValidation = validationList[validation].condition;
                         break;
                     }
                     case 30: {
-                        qcAttributeMasterArray.qcFailButtonText = validationList[validation].condition;
+                        qcAttributeMasterArray.qcFailButtonTextValidation = validationList[validation].condition;
                         break;
                     }
                 }
@@ -228,7 +228,7 @@ class QC {
     getQCFailParameters(qcDataArray, qcAttributeMaster, jobTransaction) {
         let qcFailReasons;
         console.log('wqe')
-        if (qcAttributeMaster.qcFailReasons) {
+        if (qcAttributeMaster.qcFailReasonsValidation) {
             qcFailReasons = this.getQCReasons(qcDataArray, qcAttributeMaster, jobTransaction);
         }
         return { qcFailReasons };

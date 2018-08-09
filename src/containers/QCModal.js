@@ -10,14 +10,17 @@ import { View, Text, TouchableHighlight, Modal, FlatList, TouchableOpacity } fro
 import { CheckBox, Icon, Textarea, Button, Content } from 'native-base';
 import * as globalActions from '../modules/global/globalActions'
 import * as qcActions from '../modules/qc/qcActions'
-import { SET_QC_MODAL_VIEW, CameraAttribute } from '../lib/constants'
-import { SELECT_REASON, FAIL, PASS, CLOSE, PROCEED, TAKE_A_PICTURE, REMARKS } from '../lib/ContainerConstants'
+import { SET_QC_MODAL_VIEW, CameraAttribute, SET_QC_MODAL_REMARKS } from '../lib/constants'
+import { SELECT_REASON, FAIL, PASS, CLOSE, PROCEED, TAKE_A_PICTURE, REMARKS, TAP_TO_SHOW, TYPE_HERE } from '../lib/ContainerConstants'
 import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {
     return {
         qcModalLoading: state.qc.qcModalLoading,
-        qcReasonData: state.qc.qcReasonData
+        qcReasonData: state.qc.qcReasonData,
+        qcPassFailResult: state.qc.qcPassFailResult,
+        qcImageData: state.qc.qcImageData,
+        qcRemarksData: state.qc.qcRemarksData
     }
 }
 
@@ -28,11 +31,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class QCModal extends PureComponent {
-
-    componentDidMount() {
-        console.log('componentDidMount qcmodal', this.props)
-        this.props.actions.getQCPassFailParamaters(this.props.qcDataArray, this.props.qcAttributeMaster, this.props.qcPassFail, this.props.jobTransaction);
-    }
 
     renderQCReasonView(item) {
         return (
@@ -79,44 +77,44 @@ class QCModal extends PureComponent {
 
     cameraNavigation() {
         this.props.actions.setState(SET_QC_MODAL_VIEW, { qcModal: false });
-        navigate(CameraAttribute, { currentElement: this.props.qcAttributeMaster.childList.qcImage });
+        navigate(CameraAttribute, { currentElement: this.props.qcImageData ? this.props.qcImageData : this.props.qcAttributeMaster.childList.qcImage });
     }
 
     getQCImageView() {
-        if (!this.props.qcAttributeMaster || !this.props.qcAttributeMaster.qcImage) {
+        if (!this.props.qcAttributeMaster || !this.props.qcAttributeMaster.qcImageValidation) {
             return null
         }
 
         return (
             <TouchableOpacity style={[styles.row, styles.padding10, styles.alignCenter, { borderTopColor: '#d3d3d3', borderTopWidth: 1, borderBottomColor: '#d3d3d3', borderBottomWidth: 1 }]} onPress={() => { this.cameraNavigation() }}>
                 <Icon name="ios-camera" />
-                <Text style={[{ color: styles.fontPrimaryColor }, styles.fontDefault, styles.paddingLeft10]}>{TAKE_A_PICTURE}</Text>
+                <Text style={[{ color: styles.fontPrimaryColor }, styles.fontDefault, styles.paddingLeft10, styles.paddingRight10]}>{this.props.qcImageData && this.props.qcImageData.value ? TAP_TO_SHOW : TAKE_A_PICTURE}</Text>
+                {this.props.qcImageData && this.props.qcImageData.value ? <Icon name="ios-checkmark-circle" style={[styles.fontXl, styles.fontSuccess, styles.fontXxl]} /> : null}
             </TouchableOpacity>
         )
     }
 
     getQCRemarksView() {
-        if (this.props.qcPassFail == PASS) {
-            if (this.props.qcAttributeMaster.qcPassRemarks) {
+        return (
+            <View style={[styles.paddingVertical15, styles.paddingHorizontal10]}>
+                <Text style={[styles.paddingVertical5, styles.fontDefault]}>{REMARKS}</Text>
+                <Textarea rowSpan={5} bordered placeholder={TYPE_HERE} value={this.props.qcRemarksData}
+                    onChangeText={text => this.props.actions.setState(SET_QC_MODAL_REMARKS, { qcRemarksData: text })} />
+            </View>
+        )
+    }
+
+    checkForQCRemarksView() {
+        if (this.props.qcPassFailResult == PASS) {
+            if (this.props.qcAttributeMaster.qcPassRemarksValidation) {
                 let failList = this.props.qcDataArray.filter(qcObject => !qcObject.qcResult)
                 if (failList.length > 0) {
-                    return (
-                        <View style={[styles.paddingVertical15, styles.paddingHorizontal10]}>
-                            <Text style={[styles.paddingVertical5, styles.fontDefault]}>{REMARKS}</Text>
-                            <Textarea rowSpan={5} bordered placeholder="Textarea" />
-                        </View>
-                    )
+                    return this.getQCRemarksView();
                 }
             }
-        } else if (this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcFailReasons && this.props.qcAttributeMaster.qcFailRemarks) {
-            return (
-                <View style={[styles.paddingVertical15, styles.paddingHorizontal10]}>
-                    <Text style={[styles.paddingVertical5, styles.fontDefault]}>{REMARKS}</Text>
-                    <Textarea rowSpan={5} bordered placeholder="Textarea" />
-                </View>
-            )
+        } else if (this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcFailReasonsValidation && this.props.qcAttributeMaster.qcFailRemarksValidation) {
+            return this.getQCRemarksView();
         }
-
         return null
     }
 
@@ -137,7 +135,7 @@ class QCModal extends PureComponent {
                         <View style={[styles.bgLightGray]}>
                             <View style={[styles.row, styles.padding10, styles.justifySpaceBetween, styles.bgLightGray]}>
                                 <Text style={[styles.paddingVertical5, styles.fontWeight500]}>
-                                    {this.props.qcPassFail == PASS ? (this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcPassButtonText ? this.props.qcAttributeMaster.qcPassButtonText : PASS) : (this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcFailButtonText ? this.props.qcAttributeMaster.qcFailButtonText : FAIL)}
+                                    {this.props.qcPassFailResult == PASS ? (this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcPassButtonTextValidation ? this.props.qcAttributeMaster.qcPassButtonTextValidation : PASS) : (this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcFailButtonTextValidation ? this.props.qcAttributeMaster.qcFailButtonTextValidation : FAIL)}
                                 </Text>
                                 <TouchableOpacity
                                     onPress={() => { this.props.actions.setState(SET_QC_MODAL_VIEW, { qcModal: false }) }}>
@@ -149,10 +147,10 @@ class QCModal extends PureComponent {
                             <Content style={[styles.flex1]}>
                                 {this.getQCReasonDataView()}
                                 {this.getQCImageView()}
-                                {this.getQCRemarksView()}
+                                {this.checkForQCRemarksView()}
                             </Content>
                             <SafeAreaView style={[styles.paddingVertical15, styles.paddingHorizontal10, { bottom: 0, left: 0, right: 0 }]}>
-                                <Button style={{ backgroundColor: styles.bgPrimaryColor }} full>
+                                <Button onPress={() => { this.props.actions.validateQCDataAndProceed(this.props.qcAttributeMaster, { qcReasonData: this.props.qcReasonData, qcImageData: this.props.qcImageData, qcRemarksData: this.props.qcRemarksData, qcPassFailResult: this.props.qcPassFailResult }) }} style={{ backgroundColor: styles.bgPrimaryColor }} full>
                                     <Text style={[styles.fontWhite]}>{PROCEED}</Text>
                                 </Button>
                             </SafeAreaView>
@@ -169,8 +167,7 @@ class QCModal extends PureComponent {
             <Modal
                 // animationType="slide"
                 transparent={true}
-                onRequestClose={() => { }}
-            >
+                onRequestClose={() => { }}>
                 {this.getModalView()}
             </Modal>
 

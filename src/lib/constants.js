@@ -242,7 +242,7 @@ module.exports = keyMirror({
     APP_THEME: null,
     LAST_CALL_AND_SMS_TIME: null,
     LONG_CODE_SIM_VERIFICATION: null,
-    ENCRYPTION_KEY:null,
+    ENCRYPTION_KEY: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -571,7 +571,10 @@ module.exports = keyMirror({
     SET_QC_ARRAY: null,
     SET_QC_MODAL_VIEW: null,
     SET_QC_MODAL_LOADING: null,
-    SET_QC_MODAL_VIEW_PARAMETERS: null
+    SET_QC_MODAL_VIEW_PARAMETERS: null,
+    SET_QC_MODAL_IMAGE: null,
+    SET_QC_MODAL_REASON: null,
+    SET_QC_MODAL_REMARKS: null
 
 })
 

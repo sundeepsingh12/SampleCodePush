@@ -34,7 +34,7 @@ export function saveImage(result, fieldAttributeMaster, formLayoutState, calledF
                     showToastAndAddUserExceptionLog(311, error.message, 'danger', 1)
                 });
             } else {
-                dispatch(saveImageInFormLayout(result.data, fieldAttributeMaster, formLayoutState, calledFromArray, rowId, jobTransaction))
+                dispatch(saveImageInFormLayout(result.uri, fieldAttributeMaster, formLayoutState, calledFromArray, rowId, jobTransaction))
             }
         } catch (error) {
             dispatch(setState(SET_CAMERA_LOADER, false))
@@ -79,7 +79,7 @@ export function saveImageInFormLayout(data, fieldAttributeMaster, formLayoutStat
         try {
             const value = await signatureService.saveFile(data, moment(), true);
             if (fieldAttributeMaster.attributeTypeId == QC_IMAGE) {
-                dispatch(saveQCImageData(fieldAttributeMaster, value))
+                dispatch(saveQCImageData(fieldAttributeMaster, value));
             } else if (calledFromArray) {
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMaster.fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState))
             } else {

@@ -1,7 +1,7 @@
 'use strict'
 
 import InitialState from './qcInitialState'
-import { SET_QC_LOADING, SET_QC_INITIAL_PARAMETERS, SET_QC_ARRAY, SET_QC_MODAL_VIEW, SET_QC_MODAL_LOADING, SET_QC_MODAL_VIEW_PARAMETERS } from '../../lib/constants'
+import { SET_QC_LOADING, SET_QC_INITIAL_PARAMETERS, SET_QC_ARRAY, SET_QC_MODAL_VIEW, SET_QC_MODAL_LOADING, SET_QC_MODAL_VIEW_PARAMETERS, SET_QC_MODAL_IMAGE, SET_QC_MODAL_REASON, SET_QC_MODAL_REMARKS } from '../../lib/constants'
 
 const initialState = new InitialState()
 
@@ -31,6 +31,20 @@ export default function qcReducer(state = initialState, action) {
         case SET_QC_MODAL_VIEW_PARAMETERS: {
             return state.set('qcReasonData', action.payload.qcReasonData)
                 .set('qcModalLoading', false)
+                .set('qcModal', true)
+                .set('qcPassFailResult', action.payload.qcPassFailResult)
+                .set('qcImageData', action.payload.qcImageData)
+                .set('qcRemarksData', action.payload.qcRemarksData)
+        }
+        case SET_QC_MODAL_IMAGE: {
+            return state.set('qcImageData', action.payload.qcImageData)
+                .set('qcModal', true)
+        }
+        case SET_QC_MODAL_REASON: {
+            return state.set('qcReasonData', action.payload.qcReasonData)
+        }
+        case SET_QC_MODAL_REMARKS: {
+            return state.set('qcRemarksData', action.payload.qcRemarksData)
         }
     }
     return state

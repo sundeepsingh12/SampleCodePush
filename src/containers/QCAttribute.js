@@ -72,7 +72,7 @@ class QCAttribute extends PureComponent {
     renderCrouselView() {
         return (
             <Carousel
-                ref={(c) => {}}
+                ref={(c) => { }}
                 data={['a', 'b', 'c']}
                 renderItem={this.renderItem}
                 sliderWidth={sliderWidth}
@@ -123,21 +123,20 @@ class QCAttribute extends PureComponent {
     }
 
     passFailAction(isEventPass) {
-        if (this.props.qcAttributeMaster.qcImage) {
-            this.props.actions.setState(SET_QC_MODAL_VIEW, { qcModal: isEventPass ? PASS : FAIL });
-        }
-        if (isEventPass) {
-            if (this.props.qcAttributeMaster.qcPassRemarks) {
+        if (this.props.qcAttributeMaster.qcImageValidation) {
+            this.props.actions.getQCPassFailParamaters(this.props.qcDataArray, this.props.qcAttributeMaster, isEventPass ? PASS : FAIL, this.props.navigation.state.params.jobTransaction);
+        } else if (isEventPass) {
+            if (this.props.qcAttributeMaster.qcPassRemarksValidation) {
                 let failList = this.props.qcDataArray.filter(qcObject => !qcObject.qcResult)
                 if (failList.length > 0) {
-                    this.props.actions.setState(SET_QC_MODAL_VIEW, { qcModal: PASS });
+                    this.props.actions.getQCPassFailParamaters(this.props.qcDataArray, this.props.qcAttributeMaster, PASS, this.props.navigation.state.params.jobTransaction);
                 } else {
                     console.log('navigate to summary');
                 }
             }
         } else {
-            if (this.props.qcAttributeMaster.qcFailReasons) {
-                this.props.actions.setState(SET_QC_MODAL_VIEW, { qcModal: FAIL });
+            if (this.props.qcAttributeMaster.qcFailReasonsValidation) {
+                this.props.actions.getQCPassFailParamaters(this.props.qcDataArray, this.props.qcAttributeMaster, FAIL, this.props.navigation.state.params.jobTransaction);
             } else {
                 console.log('navigate to summary');
             }
@@ -183,13 +182,13 @@ class QCAttribute extends PureComponent {
                                 <Button danger full
                                     onPress={() => this.passFailAction(false)}
                                     disabled={false}>
-                                    <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcFailButtonText ? this.props.qcAttributeMaster.qcFailButtonText : FAIL}</Text>
+                                    <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcFailButtonTextValidation ? this.props.qcAttributeMaster.qcFailButtonTextValidation : FAIL}</Text>
                                 </Button>
                                 <Button success full
                                     onPress={() => this.passFailAction(true)}
                                     style={[styles.marginLeft10]}
                                     disabled={false}>
-                                    <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcPassButtonText ? this.props.qcAttributeMaster.qcPassButtonText : PASS}</Text>
+                                    <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcPassButtonTextValidation ? this.props.qcAttributeMaster.qcPassButtonTextValidation : PASS}</Text>
                                 </Button>
                             </FooterTab>
                         </Footer>

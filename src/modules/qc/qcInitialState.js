@@ -8,7 +8,10 @@ var InitialState = Record({
     qcDataArray: null,
     qcModal: false,
     qcModalLoading: false,
-    qcReasonData: null
+    qcReasonData: null,
+    qcPassFailResult: null,
+    qcImageData: null,
+    qcRemarksData: null
 })
 
 export default InitialState
