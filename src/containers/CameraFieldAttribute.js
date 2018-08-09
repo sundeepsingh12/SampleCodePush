@@ -189,7 +189,7 @@ class CameraFieldAttribute extends PureComponent {
                 <Image
                     resizeMethod={'resize'}
                     source={{
-                        uri: this.state.imageData != null && this.state.imageData.uri != null ? this.state.imageData.uri : 'data:image/jpeg;base64,' + this.state.imageData.data,
+                        uri: this.state.imageData != null && this.state.imageData.uri != null ? this.state.imageData.uri : 'data:image/jpeg;base64,' + this.state.imageData.base64,
                     }}
                     style={[styles.flex1]}
                 />
