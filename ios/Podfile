@@ -8,6 +8,8 @@ target 'Fareye' do
   # Pods for Fareye
   pod 'Firebase/Messaging'
 
+  pod 'react-native-mail', :path => '../node_modules/react-native-mail'
+
   target 'FareyeTests' do
     inherit! :search_paths
     # Pods for testing

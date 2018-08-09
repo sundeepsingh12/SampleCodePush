@@ -39,6 +39,7 @@
     "react-native-image-crop-picker": "0.20.3",
     "react-native-image-picker": "0.26.10",
     "react-native-linear-gradient": "2.4.0",
+    "react-native-mail": "3.0.6",
     "react-native-modal-datetime-picker": "6.0.0",
     "react-native-qrcode-svg": "5.0.6",
     "react-native-signature-capture": "0.4.9",

@@ -266,6 +266,11 @@ class Backup extends Component {
                                         {UPLOAD}
                                     </Text>
                                 </Button>
+                                <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.mailBackupFile(this.state.indexOfModal, this.props.syncedFiles)}>
+                                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>
+                                        MAIL FILE
+                                    </Text>
+                                </Button>
                                 <Button full transparent style={{ height: 60 }} onPress={() => this.setState({ indexOfModal: 0 })}>
                                     <Text style={[styles.fontDarkGray, styles.fontXl]}>
                                         {CANCEL}

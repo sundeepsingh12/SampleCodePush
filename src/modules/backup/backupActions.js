@@ -27,6 +27,10 @@ import {
     FILE_MISSING,
     TRY_AFTER_CLEARING_YOUR_STORAGE_DATA,
 } from '../../lib/ContainerConstants'
+import Mailer from 'react-native-mail';
+import { Alert, Platform } from 'react-native'
+import RNFS from 'react-native-fs'
+
 
 /** This method creates backup manually when button is pressed.
  * 
@@ -44,8 +48,8 @@ export function createManualBackup(syncedBackupFiles) {
                 dispatch(setState(SET_SYNCED_FILES, backupFilesAndToastMessage))
             }
         } catch (error) {
-            dispatch(setState(SET_BACKUP_TOAST, TRY_AFTER_CLEARING_YOUR_STORAGE_DATA))    
-            showToastAndAddUserExceptionLog(201, error.message, 'danger', 1)            
+            dispatch(setState(SET_BACKUP_TOAST, TRY_AFTER_CLEARING_YOUR_STORAGE_DATA))
+            showToastAndAddUserExceptionLog(201, error.message, 'danger', 1)
         }
     }
 }
@@ -58,12 +62,12 @@ export function getBackupList() {
         try {
             dispatch(setState(SET_LOADER_BACKUP, true))
             const user = await keyValueDBService.getValueFromStore(USER)
-            let domainUrl =await keyValueDBService.getValueFromStore(DOMAIN_URL)
+            let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
             if (!user || !user.value || !domainUrl || !domainUrl.value) throw new Error(USER_MISSING)
             let backupFiles = await backupService.getBackupFilesList(user.value, domainUrl.value) // this method gets backup files list from service
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
-            showToastAndAddUserExceptionLog(202, error.message, 'danger', 1)            
+            showToastAndAddUserExceptionLog(202, error.message, 'danger', 1)
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
@@ -95,7 +99,7 @@ export function uploadBackupFile(index, filesMap) {
                 dispatch(setState(SET_BACKUP_VIEW, 3))
             }
         } catch (error) {
-            showToastAndAddUserExceptionLog(203, error.message, 'danger', 0)          
+            showToastAndAddUserExceptionLog(203, error.message, 'danger', 0)
             dispatch(setState(SET_BACKUP_VIEW, 3))
         }
     }
@@ -111,13 +115,13 @@ export function deleteBackupFile(index, filesMap) {
             dispatch(setState(SET_LOADER_BACKUP, true))
             if (!filesMap || !filesMap[index]) throw new Error(FILE_MISSING)
             const user = await keyValueDBService.getValueFromStore(USER)
-            let domainUrl =await keyValueDBService.getValueFromStore(DOMAIN_URL)
+            let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
             if (!user || !user.value || !domainUrl && !domainUrl.value) throw new Error(USER_MISSING)
             await backupService.deleteBackupFile(index, filesMap) // this method in service will delete backup file.
             let backupFiles = await backupService.getBackupFilesList(user.value, domainUrl.value) // this method
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
-            showToastAndAddUserExceptionLog(204, error.message, 'danger', 1)            
+            showToastAndAddUserExceptionLog(204, error.message, 'danger', 1)
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
@@ -135,10 +139,51 @@ export function autoLogoutAfterUpload(calledFromHome) {
                 dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 3))
             }
             dispatch(setState(PRE_LOGOUT_START))
-            let response = await authenticationService.logout(true, {value : true}) // hit logout api
+            let response = await authenticationService.logout(true, { value: true }) // hit logout api
             dispatch(setState(PRE_LOGOUT_SUCCESS))
             navDispatch(NavigationActions.navigate({ routeName: LoginScreen }))
             dispatch(deleteSessionToken())
+        } catch (error) {
+            showToastAndAddUserExceptionLog(205, error.message, 'danger', 1)
+            dispatch(setState(SET_BACKUP_VIEW, 0))
+        }
+    }
+}
+
+
+export function mailBackupFile(index, filesMap) {
+    return async function (dispatch) {
+        try {
+            if (!filesMap || !filesMap[index]) throw new Error(FILE_MISSING)
+            let destPath
+            if (Platform.OS == 'android') {
+                destPath = RNFS.ExternalDirectoryPath + '/FareyeTemp'
+                RNFS.mkdir(destPath)
+                await RNFS.copyFile(filesMap[index].path, destPath + '/' + filesMap[index].name)
+            }
+            Mailer.mail({
+                subject: 'backup file: ' + filesMap[index].name,
+                recipients: ['udbhav@roboticwares.com'],
+                ccRecipients: [],
+                bccRecipients: [],
+                body: '',
+                isHTML: true,
+                attachment: {
+                    path: (destPath) ? destPath + '/' + filesMap[index].name : filesMap[index].path, // The absolute path of the file from which to read data.
+                    type: 'zip',   // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+                    name: '',   // Optional: Custom filename for attachment
+                }
+            }, (error, event) => {
+                Alert.alert(
+                    error,
+                    event,
+                    [
+                        { text: 'Ok', onPress: () => console.log('OK: Email Error Response') },
+                        { text: 'Cancel', onPress: () => console.log('CANCEL: Email Error Response') }
+                    ],
+                    { cancelable: true }
+                )
+            });
         } catch (error) {
             showToastAndAddUserExceptionLog(205, error.message, 'danger', 1)
             dispatch(setState(SET_BACKUP_VIEW, 0))
