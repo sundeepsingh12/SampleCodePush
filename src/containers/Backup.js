@@ -92,7 +92,7 @@ class Backup extends Component {
     goBack = () => {
         this.props.navigation.goBack()
     }
-    
+
     createBackupPressed = () => {
         var _buttons = new Array();
         _buttons.push({ text: CANCEL, onPress: this.props.onCancelPressed, style: 'cancel' });
@@ -268,7 +268,7 @@ class Backup extends Component {
                                 </Button>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.mailBackupFile(this.state.indexOfModal, this.props.syncedFiles)}>
                                     <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>
-                                        MAIL FILE
+                                        Mail
                                     </Text>
                                 </Button>
                                 <Button full transparent style={{ height: 60 }} onPress={() => this.setState({ indexOfModal: 0 })}>
@@ -296,6 +296,11 @@ class Backup extends Component {
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.uploadBackupFile(this.state.indexOfModal, this.props.unSyncedFiles)}>
                                     <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>
                                         {UPLOAD}
+                                    </Text>
+                                </Button>
+                                <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.mailBackupFile(this.state.indexOfModal, this.props.unSyncedFiles)}>
+                                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>
+                                        Mail
                                     </Text>
                                 </Button>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={
