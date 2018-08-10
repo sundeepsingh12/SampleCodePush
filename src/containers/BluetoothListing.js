@@ -2,12 +2,9 @@
 
 import React, { Component } from 'react'
 import {
-  Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableHighlight,
   View,
   FlatList,
   Animated
@@ -22,7 +19,7 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import SearchBarV2 from '../components/SearchBarV2'
 import BluetoothSerial from 'react-native-bluetooth-serial'
-
+import { SafeAreaView } from 'react-navigation'
 
 function mapStateToProps(state) {
   return {
@@ -99,6 +96,7 @@ class BluetoothListing extends Component {
 
   showHeaderView(){
     return(
+      <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
       <View style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
               <View
                   style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -116,6 +114,7 @@ class BluetoothListing extends Component {
               </View>
               <SearchBarV2 placeholder="Search Device Name/Address" />
       </View>
+      </SafeAreaView>
     )
 }
 

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import {  View, Text, TouchableOpacity } from 'react-native'
 import { Body, Header, Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 

@@ -302,6 +302,7 @@ class Sequence extends PureComponent {
    */
   headerView() {
     return (
+      <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
         <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
             <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
               <TouchableOpacity style={[style.headerLeft]}
@@ -319,6 +320,7 @@ class Sequence extends PureComponent {
             <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />: null}
             </View> 
         </View>
+        </SafeAreaView>
     )
   }
 

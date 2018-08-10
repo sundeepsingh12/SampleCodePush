@@ -238,8 +238,6 @@ class TaskListScreen extends PureComponent {
     )
   }
 
-
-
   render() {
     let jobMasterMap = _.mapKeys(JSON.parse(this.props.pageObject.jobMasterIds));
     let jobTransactionViewStructure = this.getTransactionView(jobMasterMap)

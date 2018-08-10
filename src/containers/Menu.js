@@ -117,6 +117,7 @@ class Menu extends PureComponent {
       />
     )
   }
+
   messageView() {
     let view
     if (this.props.utilities.messagingEnabled) {
@@ -135,6 +136,7 @@ class Menu extends PureComponent {
     }
     return view
   }
+  
   render() {
     return (
       <StyleProvider style={getTheme(platform)}>

@@ -227,7 +227,7 @@ class BulkListing extends PureComponent {
           />
 
           <SafeAreaView>
-            <Footer style={[ styles.column, styles.padding10]}>
+            <Footer style={[ styles.column,style.footer,styles.padding10]}>
               <Text style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.selectedItems)}</Text>
               <Button
                 onPress={() => {
@@ -313,6 +313,9 @@ const style = StyleSheet.create({
     paddingLeft: 0,
     paddingRight: 0
   },
+  footer:{
+    height: 'auto',
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BulkListing)
