@@ -45,6 +45,7 @@ import _ from 'lodash'
 import { TIME_ERROR_MESSAGE } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
+import { userSummaryService } from './UserSummary'
 
 import { cryptoService } from './Crypto'
 class JobMaster {
@@ -174,7 +175,8 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION, json.fieldAttributeMasterValidations);
     await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION_CONDITION, json.fieldAttributeMasterValidationConditions);
     await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses);
-    await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary);
+    const userSummaryWithImeiNo = await userSummaryService.setUserSummaryImeiNo(json.userSummary)
+    await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummaryWithImeiNo);
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary);
     await keyValueDBService.validateAndSaveData(HUB, json.hub);
     await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, moment().format('YYYY-MM-DD HH:mm:ss'));
