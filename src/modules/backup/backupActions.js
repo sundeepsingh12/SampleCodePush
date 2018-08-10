@@ -160,6 +160,10 @@ export function mailBackupFile(index, filesMap) {
                 destPath = RNFS.ExternalDirectoryPath + '/FareyeTemp'
                 RNFS.mkdir(destPath)
                 await RNFS.copyFile(filesMap[index].path, destPath + '/' + filesMap[index].name)
+            } else {
+                destPath = RNFS.LibraryDirectoryPath + '/FareyeTemp'
+                RNFS.mkdir(destPath)
+                await RNFS.copyFile(filesMap[index].path, destPath + '/' + filesMap[index].name)
             }
             Mailer.mail({
                 subject: 'backup file: ' + filesMap[index].name,
@@ -169,7 +173,7 @@ export function mailBackupFile(index, filesMap) {
                 body: '',
                 isHTML: true,
                 attachment: {
-                    path: (destPath) ? destPath + '/' + filesMap[index].name : filesMap[index].path, // The absolute path of the file from which to read data.
+                    path: destPath, // The absolute path of the file from which to read data.
                     type: 'zip',   // Mime Type: jpg, png, doc, ppt, html, pdf, csv
                     name: '',   // Optional: Custom filename for attachment
                 }
