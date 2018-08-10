@@ -9,6 +9,9 @@ import { geoFencingService } from './GeoFencingService'
 import isEmpty from 'lodash/isEmpty'
 import moment from 'moment'
 import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
+let imei = require('../../wrapper/IMEI')
+import { Platform } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
 
 class UserSummary {
 
@@ -50,6 +53,18 @@ class UserSummary {
             userSummary.value.pendingCount = allCount[0], userSummary.value.failCount = allCount[1], userSummary.value.successCount = allCount[2]
         }
         await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)  
+    }
+
+    //Do not set imei no in sync as getting imei no in android is a bridge call which is expensive operation
+    async setUserSummaryImeiNo(userSummary){
+        let imeiNumber
+        if (Platform.OS === 'ios') {
+            imeiNumber = DeviceInfo.getUniqueID()
+          } else {
+            imeiNumber = await imei.getIMEI()
+          }
+          userSummary.imeiNumber = imeiNumber
+          return userSummary
     }
 }
 
