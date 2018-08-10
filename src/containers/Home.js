@@ -67,7 +67,6 @@ class Home extends PureComponent {
         if (url) {
           this.navigate(url)
         }
-        console.log('url', url)
       });
     } else {
       Linking.addEventListener('url', this.handleOpenURL);
