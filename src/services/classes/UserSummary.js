@@ -6,8 +6,9 @@ import {
     keyValueDBService
 } from './KeyValueDBService'
 import { geoFencingService } from './GeoFencingService'
-import isNull from 'lodash/isNull'
+import isEmpty from 'lodash/isEmpty'
 import moment from 'moment'
+import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
 
 class UserSummary {
 
@@ -22,9 +23,16 @@ class UserSummary {
             let lastLongitude = userSummary.value.lastLng
             let gpsKms = userSummary.value.gpsKms
             let totalDistanceTravelled = 0
-            if (!isNull(lastLatitude)) {
+            if (!isEmpty(lastLatitude)) {
                 let distanceTravelled = geoFencingService.distance(lastLatitude, lastLongitude, currentLatitude, currentLongitude)
                 totalDistanceTravelled = (distanceTravelled *1000) + gpsKms
+            }
+            else{
+                userSummary.value.firstLat = currentLatitude
+            }
+
+            if(isEmpty(lastLongitude)){
+                userSummary.value.firstLong = currentLongitude
             }
             userSummary.value.lastLat = currentLatitude
             userSummary.value.lastLng = currentLongitude
@@ -32,6 +40,7 @@ class UserSummary {
             userSummary.value.lastLocationDatetime = moment().format('YYYY-MM-DD HH:mm:ss')
             await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
         } catch (error) {
+            showToastAndAddUserExceptionLog(9001, error.message, 'danger', 0)
         }
     }
 
