@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react'
 import {  StyleSheet, View, TouchableOpacity, Image, Platform,TouchableHighlight, ImageStore } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Right, Icon, Footer, StyleProvider, Toast } from 'native-base'
+import { Container, Right, Icon, StyleProvider, Toast } from 'native-base'
 import Loader from '../components/Loader'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
 import { RNCamera } from 'react-native-camera'
@@ -10,13 +10,14 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import * as cameraActions from '../modules/camera/cameraActions'
-import { SET_SHOW_IMAGE_AND_DATA } from '../lib/constants'
+import { SET_SHOW_IMAGE_AND_DATA,SET_CAMERA_LOADER } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
 import ImagePicker from 'react-native-image-picker'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import platform from '../../native-base-theme/variables/platform'
 import {  SKU_PHOTO } from '../lib/AttributeConstants'
+import isEmpty from 'lodash/isEmpty'
 
 function mapStateToProps(state) {
     return {
@@ -52,22 +53,22 @@ class CameraFieldAttribute extends PureComponent {
         const imageData = props.imageData;
         let newState = null;
         //copy newprops
-        if(_.isEmpty(imageData)) {
+        if(isEmpty(imageData)) {
             newState = {...state, reduxData: imageData};
         } else {
             newState = {...state, reduxData: {...imageData}};
         }
         
         //Checks to change local state
-        if(_.isEmpty(imageData) ){
-            if(!_.isEmpty(state.reduxData)){
+        if(isEmpty(imageData) ){
+            if(!isEmpty(state.reduxData)){
                 return {...newState, imageData: null};
             }
             else{
                 return null;
             }
         }
-        else if(_.isEmpty(state.reduxData)){//Optional chaining is not available
+        else if(isEmpty(state.reduxData)){//Optional chaining is not available
             return {...newState, imageData: {...imageData}}
         }
         
@@ -76,6 +77,7 @@ class CameraFieldAttribute extends PureComponent {
         }
         return {...newState, imageData:{... imageData}};
     }
+
     componentDidMount() {
         this.props.actions.setCameraInitialView(this.props.navigation.state.params.currentElement)
     }
@@ -97,6 +99,7 @@ class CameraFieldAttribute extends PureComponent {
             duration: 5000
         })
     }
+    
     toggleCameraType = () => {
         this.setState(previousState => {
             if (previousState.cameraType == 'back') {
@@ -142,13 +145,13 @@ class CameraFieldAttribute extends PureComponent {
         return view
     }
 
-    setImage = (uri) => {
+    setImage = (uri,base64) => {
         if(uri == null) {
             ImageStore.removeImageForTag(this.state.imageData.uri);
             this.setState({imageData: null});
         }
         else {
-            this.setState({imageData: { uri }})
+            this.setState({imageData: (Platform.OS==='android') ? { uri } : {base64}})
         }
     }
 
@@ -165,7 +168,7 @@ class CameraFieldAttribute extends PureComponent {
         if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
             this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData.data, this.props.navigation.state.params.currentElement)
         } else {
-            this.props.actions.saveImage(this.state.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
+                this.props.actions.saveImage(this.state.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
         }
     }
 
@@ -186,7 +189,7 @@ class CameraFieldAttribute extends PureComponent {
                 <Image
                     resizeMethod={'resize'}
                     source={{
-                        uri: this.state.imageData != null && this.state.imageData.uri != null ? this.state.imageData.uri : 'data:image/jpeg;base64,' + this.state.imageData.data,
+                        uri: this.state.imageData != null && this.state.imageData.uri != null ? this.state.imageData.uri : 'data:image/jpeg;base64,' + this.state.imageData.base64,
                     }}
                     style={[styles.flex1]}
                 />
@@ -259,7 +262,6 @@ class CameraFieldAttribute extends PureComponent {
 
     render() {
         const getValidationObject =  this.props.validation
-        
         if (this.props.cameraLoader)
             return <Loader />
 
@@ -314,8 +316,8 @@ class CameraFieldAttribute extends PureComponent {
                 if (Platform.OS === "ios") {
                     options.orientation = 'portrait'
                 }
-                const { uri } = await this.camera.takePictureAsync(options);
-                    this.setImage(uri)
+                const { uri,base64 } = await this.camera.takePictureAsync(options);
+                this.setImage(uri,base64)
                 
             } catch (error) {
                 this.props.actions.setState(SET_CAMERA_LOADER, false)

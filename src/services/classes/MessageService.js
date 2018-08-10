@@ -1,6 +1,6 @@
 'use strict'
 import * as realm from '../../repositories/realmdb'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import {
     TABLE_MESSAGE_INTERACTION
 } from '../../lib/constants'
@@ -25,7 +25,7 @@ class MessageService {
 
 
     async sendMessage(messageList, token) {
-        let cloneMessageList = _.cloneDeep(messageList)
+        let cloneMessageList = cloneDeep(messageList)
         let pendingMessagesList = []
         for (let message of cloneMessageList) {
             if (message.messageSendingStatus == 'Sending..') {

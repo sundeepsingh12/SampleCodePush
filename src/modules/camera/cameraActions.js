@@ -11,7 +11,7 @@ import { PATH_CUSTOMER_IMAGES } from '../../lib/AttributeConstants'
 import { OPEN_CAMERA } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import ImageCropPicker from 'react-native-image-crop-picker';
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 
 var PATH_COMPRESS_IMAGE = '/compressImages';
 
@@ -33,7 +33,8 @@ export function saveImage(result, fieldAttributeMasterId, formLayoutState, calle
                     showToastAndAddUserExceptionLog(311, error.message, 'danger', 1)
                 });
             } else {
-                dispatch(saveImageInFormLayout(result.data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction))
+                const iosImageData = (result.base64) ? result.base64 : result.data
+                dispatch(saveImageInFormLayout(iosImageData, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction))
             }
         } catch (error) {
             dispatch(setState(SET_CAMERA_LOADER, false))
@@ -93,7 +94,7 @@ export function setCameraInitialView(item) {
         try {
             dispatch(setState(SET_CAMERA_LOADER_INITIAL_SET_UP))
             let validation = null, data = null
-            if (!_.isEmpty(item.validation)) {
+            if (!isEmpty(item.validation)) {
                 validation = await signatureService.getValidations(item.validation, item.attributeTypeId)
             }
             if (item.value && item.value != '' && item.value != OPEN_CAMERA) {
