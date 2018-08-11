@@ -166,6 +166,9 @@ module.exports = keyMirror({
 
     //Pay By Link Payment Actions
     SET_PAY_BY_LINK_PARAMETERS: null,
+    SET_LOADER_FOR_PAYBYLINK: null,
+    ON_CHANGE_PAYBYLINK_MOBILE_NO: null,
+    SET_PAY_BY_LINK_MESSAGE: null,
 
     //Bluetooth Actions
     BLUETOOTH_SCANNING_START: null,

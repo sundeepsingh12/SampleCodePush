@@ -295,6 +295,7 @@ module.exports = {
     JOB_ASSIGNMENT_ID: 20,
     MOSAMBEE_ID: 18,
     MOSAMBEE_WALLET_ID: 19,
+    NET_BANKING_ID: 22,
     PAGE_NEW_JOB: 2,
     Piechart: {
         enabled: false,

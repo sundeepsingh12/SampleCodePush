@@ -174,7 +174,10 @@ const HomeStack = createStackNavigator({
     screen: UPIPayment
   },
   PayByLink: {
-    screen: PayByLink
+    screen: PayByLink,
+    navigationOptions: {
+      header: null
+    }
   },
   MosamBeeWalletPayment: {
     screen: MosambeeWalletPayment,

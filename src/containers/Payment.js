@@ -63,13 +63,9 @@ class Payment extends PureComponent {
             case MOSAMBEE_WALLET.id: return MOSAMBEE_WALLET.displayName
             case MPAY.id: return MPAY.displayName
             case M_SWIPE.id: return M_SWIPE.displayName
-            case NET_BANKING.id: {
-                switch (type) {
-                    case NET_BANKING_LINK.id: return NET_BANKING_LINK.displayName
-                    case NET_BANKING_CARD_LINK.id: return NET_BANKING_CARD_LINK.displayName
-                    case NET_BANKING_UPI_LINK.id: return NET_BANKING_UPI_LINK.displayName
-                }
-            }
+            case NET_BANKING_LINK.id: return NET_BANKING_LINK.displayName
+            case NET_BANKING_CARD_LINK.id: return NET_BANKING_CARD_LINK.displayName
+            case NET_BANKING_UPI_LINK.id: return NET_BANKING_UPI_LINK.displayName
             case NOT_PAID.id: return NOT_PAID.displayName
             case PAYNEAR.id: return PAYNEAR.displayName
             case PAYO.id: return PAYO.displayName
@@ -194,7 +190,7 @@ class Payment extends PureComponent {
             if (paymentModeList.endPaymentModeList[index].moneyTransactionModeId == NET_BANKING.id) {
                 for (let type = 97; type < 100; type++) {
                     paymentModeView.push(
-                        this.paymentItemView(this.props.actualAmount, type, paymentModeList.endPaymentModeList[index].moneyTransactionModeId, this.props.selectedPaymentMode, null, type, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
+                        this.paymentItemView(this.props.actualAmount, type, type, this.props.selectedPaymentMode, null, type, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
                     )
                 }
             } else if(paymentModeList.endPaymentModeList[index].moneyTransactionModeId != MOSAMBEE.id || Platform.OS != 'ios'){
