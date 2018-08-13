@@ -34,6 +34,10 @@ class SkuListItem extends PureComponent {
 
     changeSkuActualQuantity(selectedValue, rowItem) {
         //Call parent component using callback
+        if(selectedValue!=0 && selectedValue.startsWith("0")){
+            //Remove leading zeros
+            selectedValue = selectedValue.replace(/^0+/, '');
+        }
         this.props.updateSkuActualQuantity(selectedValue, rowItem, this.props.title)
     }
 
@@ -82,6 +86,7 @@ class SkuListItem extends PureComponent {
         if (_.isEmpty(_.trim(value))) {
             value = 0
         }
+    
         this.changeSkuActualQuantity(value, rowItem)
     }
 
