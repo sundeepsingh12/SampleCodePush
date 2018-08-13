@@ -158,13 +158,17 @@ export function mailBackupFile(index, filesMap) {
             let destPath
             if (Platform.OS == 'android') {
                 destPath = RNFS.ExternalDirectoryPath + '/FareyeTemp'
-                RNFS.mkdir(destPath)
+                await RNFS.mkdir(destPath)
                 await RNFS.copyFile(filesMap[index].path, destPath + '/' + filesMap[index].name)
             } else {
                 destPath = RNFS.LibraryDirectoryPath + '/FareyeTemp'
-                RNFS.mkdir(destPath)
-                await RNFS.copyFile(filesMap[index].path, destPath + '/' + filesMap[index].name)
+                await RNFS.mkdir(destPath)
+                let fileExists = await RNFS.exists(destPath + '/' + filesMap[index].name)
+                if (!fileExists) {
+                    await RNFS.copyFile(filesMap[index].path, destPath + '/' + filesMap[index].name)
+                }
             }
+
             Mailer.mail({
                 subject: 'backup file: ' + filesMap[index].name,
                 recipients: ['udbhav@roboticwares.com'],
