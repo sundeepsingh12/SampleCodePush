@@ -44,8 +44,8 @@ export function createManualBackup(syncedBackupFiles) {
                 dispatch(setState(SET_SYNCED_FILES, backupFilesAndToastMessage))
             }
         } catch (error) {
-            dispatch(setState(SET_BACKUP_TOAST, TRY_AFTER_CLEARING_YOUR_STORAGE_DATA))    
-            showToastAndAddUserExceptionLog(201, error.message, 'danger', 1)            
+            dispatch(setState(SET_BACKUP_TOAST, TRY_AFTER_CLEARING_YOUR_STORAGE_DATA))
+            showToastAndAddUserExceptionLog(201, error.message, 'danger', 1)
         }
     }
 }
@@ -58,12 +58,12 @@ export function getBackupList() {
         try {
             dispatch(setState(SET_LOADER_BACKUP, true))
             const user = await keyValueDBService.getValueFromStore(USER)
-            let domainUrl =await keyValueDBService.getValueFromStore(DOMAIN_URL)
+            let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
             if (!user || !user.value || !domainUrl || !domainUrl.value) throw new Error(USER_MISSING)
             let backupFiles = await backupService.getBackupFilesList(user.value, domainUrl.value) // this method gets backup files list from service
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
-            showToastAndAddUserExceptionLog(202, error.message, 'danger', 1)            
+            showToastAndAddUserExceptionLog(202, error.message, 'danger', 1)
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
@@ -82,7 +82,7 @@ export function uploadBackupFile(index, filesMap) {
             if (!token) {
                 throw new Error(TOKEN_MISSING)
             }
-            let responseBody = await RestAPIFactory(token.value).uploadZipFile(filesMap[index].path, filesMap[index].name) // Method to upload zip file.
+            let responseBody = await RestAPIFactory(token.value).uploadZipFile(filesMap[index].path, filesMap[index].name, null, null, (index < 0) ? true : false) // Method to upload zip file.
             if (responseBody && responseBody.split(",")[0] == 'success') {
                 dispatch(setState(SET_BACKUP_VIEW, 2))
                 if (index < 0) {
@@ -95,7 +95,7 @@ export function uploadBackupFile(index, filesMap) {
                 dispatch(setState(SET_BACKUP_VIEW, 3))
             }
         } catch (error) {
-            showToastAndAddUserExceptionLog(203, error.message, 'danger', 0)          
+            showToastAndAddUserExceptionLog(203, error.message, 'danger', 0)
             dispatch(setState(SET_BACKUP_VIEW, 3))
         }
     }
@@ -111,13 +111,13 @@ export function deleteBackupFile(index, filesMap) {
             dispatch(setState(SET_LOADER_BACKUP, true))
             if (!filesMap || !filesMap[index]) throw new Error(FILE_MISSING)
             const user = await keyValueDBService.getValueFromStore(USER)
-            let domainUrl =await keyValueDBService.getValueFromStore(DOMAIN_URL)
+            let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
             if (!user || !user.value || !domainUrl && !domainUrl.value) throw new Error(USER_MISSING)
             await backupService.deleteBackupFile(index, filesMap) // this method in service will delete backup file.
             let backupFiles = await backupService.getBackupFilesList(user.value, domainUrl.value) // this method
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
-            showToastAndAddUserExceptionLog(204, error.message, 'danger', 1)            
+            showToastAndAddUserExceptionLog(204, error.message, 'danger', 1)
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
@@ -135,7 +135,7 @@ export function autoLogoutAfterUpload(calledFromHome) {
                 dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 3))
             }
             dispatch(setState(PRE_LOGOUT_START))
-            let response = await authenticationService.logout(true, {value : true}) // hit logout api
+            let response = await authenticationService.logout(true, { value: true }) // hit logout api
             dispatch(setState(PRE_LOGOUT_SUCCESS))
             navDispatch(NavigationActions.navigate({ routeName: LoginScreen }))
             dispatch(deleteSessionToken())
