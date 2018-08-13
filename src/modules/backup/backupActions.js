@@ -173,7 +173,7 @@ export function mailBackupFile(index, filesMap) {
                 body: '',
                 isHTML: true,
                 attachment: {
-                    path: destPath, // The absolute path of the file from which to read data.
+                    path: destPath + '/' + filesMap[index].name, // The absolute path of the file from which to read data.
                     type: 'zip',   // Mime Type: jpg, png, doc, ppt, html, pdf, csv
                     name: '',   // Optional: Custom filename for attachment
                 }
