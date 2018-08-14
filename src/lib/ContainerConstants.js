@@ -351,7 +351,8 @@ module.exports = {
     CONFIRM_RESET: 'Confirm Reset',
     RESET_ACCOUNT_SETTINGS: 'Click OK to reset your account settings.',
     REMEMBER_ME: 'Remember Me',
-
+    PASSWORD_EXPIRED_MESSAGE: 'Your password has expired. In order to proceed further please reset your password',
+    SAVE_AND_PROCEED: 'Save and proceed',
     //Preloader
     SETTING_UP: 'Setting you up ...',
     DOWNLOAD_SETTINGS: 'Downloading settings',

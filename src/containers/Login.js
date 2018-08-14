@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
 import { QrCodeScanner } from '../lib/constants'
 import CONFIG from '../lib/config'
-import { OK, CANCEL, CONFIRM_RESET, RESET_ACCOUNT_SETTINGS, REMEMBER_ME, NEW_PASSWORD, CONFIRM_NEW_PASSWORD } from '../lib/ContainerConstants'
+import { OK, CANCEL, CONFIRM_RESET, RESET_ACCOUNT_SETTINGS, REMEMBER_ME, NEW_PASSWORD, CONFIRM_NEW_PASSWORD, PASSWORD_EXPIRED_MESSAGE, RESET_PASSWORD, SAVE_AND_PROCEED } from '../lib/ContainerConstants'
 import _ from 'lodash'
 var style = StyleSheet.create({
   container: {
@@ -254,18 +254,24 @@ class Login extends PureComponent {
     if (!_.isEmpty(this.props.auth.form.errorMessageResetPassword)) {
       this.props.setErrorMessageResetPassword('')
     }
+    let buttonDisabled
     if (newPasswordOrConfirmPassword == 1) {
       if (this.state.confirmNewPassword != '' && text != '') {
-        this.setState({ newPassword: text, buttonDisabled: false })
+        buttonDisabled = false
       } else {
-        this.setState({ newPassword: text, buttonDisabled: true })
+        buttonDisabled = true
       }
     } else {
       if (this.state.newPassword != '' && text != '') {
-        this.setState({ confirmNewPassword: text, buttonDisabled: false })
+        buttonDisabled = false
       } else {
-        this.setState({ confirmNewPassword: text, buttonDisabled: true })
+        buttonDisabled = true
       }
+    }
+    if (newPasswordOrConfirmPassword == 1) {
+      this.setState({ newPassword: text, buttonDisabled })
+    } else {
+      this.setState({ confirmNewPassword: text, buttonDisabled })
     }
   }
 
@@ -273,6 +279,7 @@ class Login extends PureComponent {
     this.props.setShowResetPassword(false)
     this.setState({ confirmNewPassword: '', newPassword: '', buttonDisabled: true })
   }
+
   showResetPasswordModal() {
     let view
     if (this.props.auth.form.showResetPassword) {
@@ -291,38 +298,18 @@ class Login extends PureComponent {
                       <Iconimg name="md-close" style={[styles.fontBlack, styles.fontXxl, styles.fontLeft]} />
                     </TouchableOpacity>
                     <View style={[styles.flex1, styles.alignCenter]}>
-                      <Text style={[styles.fontBlack, styles.fontXl]}>Reset password</Text>
+                      <Text style={[styles.fontBlack, styles.fontXl]}>{RESET_PASSWORD}</Text>
                     </View>
                   </View>
 
                   <View style={[styles.width100, { paddingTop: 50 }]} >
                     <Text style={[styles.fontLg, styles.fontCenter, styles.margin20]}>
-                      Your password has expired. In order to proceed further please reset your password
+                      {PASSWORD_EXPIRED_MESSAGE}
                     </Text>
                   </View>
                   <View style={[{ paddingTop: 80 }, styles.paddingLeft10, styles.paddingRight10]}>
-                    <Item stackedLabel style={[]}>
-                      <Label style={[{ color: styles.fontPrimaryColor }, styles.fontRegular]}>{NEW_PASSWORD}</Label>
-                      <TextInput
-                        value={this.state.newPassword}
-                        autoCapitalize="none"
-                        underlineColorAndroid='transparent'
-                        onChangeText={(text) => this._setPassword(text, 1)}
-                        secureTextEntry={true}
-                        style={[styles.fontLg, styles.paddingRight15, styles.width100, { height: 40 }]}
-                      />
-                    </Item>
-                    <Item stackedLabel style={[styles.paddingTop10]}>
-                      <Label style={[{ color: styles.fontPrimaryColor }, styles.fontRegular]}>{CONFIRM_NEW_PASSWORD}</Label>
-                      <TextInput
-                        value={this.state.confirmNewPassword}
-                        autoCapitalize="none"
-                        underlineColorAndroid='transparent'
-                        onChangeText={(text) => this._setPassword(text, 2)}
-                        secureTextEntry={true}
-                        style={[styles.fontLg, styles.paddingRight15, styles.width100, { height: 40 }]}
-                      />
-                    </Item>
+                    {this.textInputForResetPassword(NEW_PASSWORD, 1, this.state.newPassword)}
+                    {this.textInputForResetPassword(CONFIRM_NEW_PASSWORD, 2, this.state.confirmNewPassword)}
                   </View>
                   {(!_.isEmpty(this.props.auth.form.errorMessageResetPassword)) ? <View style={[styles.width100, { paddingTop: 30 }]} >
                     <Text style={[styles.fontLg, styles.fontCenter, styles.margin20, styles.fontDanger]}>
@@ -345,7 +332,7 @@ class Login extends PureComponent {
                   }}
                   style={[styles.padding10, styles.width100, { height: 50 }]}
                 >
-                  <Text style={[styles.fontWhite, styles.fontLg]}>Save and proceed</Text>
+                  <Text style={[styles.fontWhite, styles.fontLg]}>{SAVE_AND_PROCEED}</Text>
                 </Button>
               </View>
             </Container>
@@ -354,6 +341,24 @@ class Login extends PureComponent {
     }
     return view
   }
+
+  textInputForResetPassword(displayLabel, newPasswordOrConfirmPassword, ref) {
+    let view
+    view =
+      <Item stackedLabel>
+        <Label style={[{ color: styles.fontPrimaryColor }, styles.fontRegular]}>{displayLabel}</Label>
+        <TextInput
+          value={ref}
+          autoCapitalize="none"
+          underlineColorAndroid='transparent'
+          onChangeText={(text) => this._setPassword(text, newPasswordOrConfirmPassword)}
+          secureTextEntry={true}
+          style={[styles.fontLg, styles.paddingRight15, styles.width100, { height: 40 }]}
+        />
+      </Item>
+    return view
+  }
+
   render() {
     const imageView = this.getImageView()
     return (
