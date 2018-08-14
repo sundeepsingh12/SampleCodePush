@@ -120,12 +120,13 @@ export function setInitialState() {
     }
 }
 
-export function cropImage(uri, setImage) {
+export function cropImage(data, setImage) {
     return async function (dispatch) {
         try {
+            const path  = (Platform.OS == 'android') ? data.uri:data.base64
             dispatch(setState(SET_CAMERA_LOADER, true))
             ImageCropPicker.openCropper({
-                path: uri,
+                path,
                 width: 300,
                 height: 300,
                 freeStyleCropEnabled: true,
