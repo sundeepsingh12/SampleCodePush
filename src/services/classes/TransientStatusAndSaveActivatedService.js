@@ -230,7 +230,6 @@ class TransientStatusAndSaveActivatedService {
      */
 
     async sendEmailOrSms(totalAmount, emailTableElement, emailIdOrSmsList, isEmail, emailGeneratedFromComplete, jobMasterId) {
-        try {
             const userData = await keyValueDBService.getValueFromStore(USER)
             if (userData && userData.value && userData.value.company && userData.value.company.code && (_.startsWith(_.toLower(userData.value.company.code), 'dhl'))) {
                 if (!_.isEmpty(emailIdOrSmsList) && !isEmail) {
@@ -263,9 +262,7 @@ class TransientStatusAndSaveActivatedService {
                         return EMAIL_SENT_SUCCESSFULLY
                     }
                 }
-            } else return ''
-        } catch (error) {
-        }
+            } else return 'companyId is not dhl'
     }
 
     /**
