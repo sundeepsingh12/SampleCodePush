@@ -21,7 +21,11 @@ import {
   BACKUP_UPLOAD_FAIL_COUNT,
   UnsyncBackupUpload,
   DOMAIN_URL,
-  SET_LOGIN_PARAMETERS
+  SET_LOGIN_PARAMETERS,
+  SHOW_RESET_PASSWORD,
+  SET_ERROR_RESET_PASSWORD,
+  SET_RESET_PASSWORD_LOADER,
+  SHOW_RESET_PASSWORD_AND_SET_PASSWORD
 } from '../../lib/constants'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import moment from 'moment'
@@ -35,9 +39,11 @@ import {
 
 import CONFIG from '../../lib/config'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { NavigationActions,StackActions } from 'react-navigation'
+import { NavigationActions, StackActions } from 'react-navigation'
 import { navDispatch } from '../navigators/NavigationService';
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import sha256 from 'sha256';
+import { Toast } from 'native-base';
 
 
 export function loginRequest() {
@@ -55,7 +61,7 @@ export function loginSuccess() {
 export function loginFailure(error, code) {
   return {
     type: LOGIN_FAILURE,
-    payload: {error, code}
+    payload: { error, code }
   }
 }
 
@@ -128,14 +134,18 @@ export function authenticateUser(username, password, rememberMe) {
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)
       await authenticationService.saveLoginCredentials(username, password, rememberMe)
       dispatch(loginSuccess())
-      keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE','PreloaderScreen')
+      keyValueDBService.validateAndSaveData('LOGGED_IN_ROUTE', 'PreloaderScreen')
       navDispatch(StackActions.reset({
         index: 0,
         actions: [NavigationActions.navigate({ routeName: 'PreloaderScreen' })],
       }));
     } catch (error) {
-      showToastAndAddUserExceptionLog(1301, error.message, 'danger', 0)
-      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, ""), error.code))
+      if (error.code == 412) {
+        dispatch(setState(SHOW_RESET_PASSWORD_AND_SET_PASSWORD, password))
+      } else {
+        showToastAndAddUserExceptionLog(1301, error.message, 'danger', 0)
+        dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, ""), error.code))
+      }
     }
   }
 }
@@ -261,3 +271,43 @@ export function checkRememberMe() {
 //     }
 //   }
 // }
+
+
+export function setShowResetPassword(value) {
+  return {
+    type: SHOW_RESET_PASSWORD,
+    payload: value
+  }
+}
+
+
+export function resetPassword(newPassword, confirmNewPassword, username, password) {
+  return async function (dispatch) {
+    try {
+      dispatch(setState(SET_RESET_PASSWORD_LOADER, true))
+      if (newPassword != confirmNewPassword) {
+        throw new Error('Password Mismatch')
+      }
+      if (!authenticationService.validatePassword(newPassword)) {
+        throw new Error('Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.')
+      }
+      let data = new FormData()
+      data.append('userName', username)
+      data.append('newPassword', sha256(newPassword))
+      data.append('password', password)
+      data.append('passwordLength', newPassword.length)
+      const response = await RestAPIFactory().serviceCall(data, CONFIG.API.RESET_PASSWORD_AT_LOGIN, 'LOGIN')
+      dispatch(setShowResetPassword(false))
+      Toast.show({ text: 'Password reset successful. Use the new password next time you log-in', buttonText: 'Ok', duration: 10000 })
+    } catch (error) {
+      dispatch(setState(SET_ERROR_RESET_PASSWORD, error.message))
+    }
+  }
+}
+
+export function setErrorMessageResetPassword(value) {
+  return {
+    type: SET_ERROR_RESET_PASSWORD,
+    payload: value
+  }
+}

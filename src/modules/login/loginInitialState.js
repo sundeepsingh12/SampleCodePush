@@ -29,7 +29,10 @@ const Form = Record({
   isEditTextEnabled: true,
   rememberMe: false,
   isLongPress: false,
-  logo: null
+  logo: null,
+  showResetPassword: false,
+  errorMessageResetPassword: '',
+  showResetPasswordLoader: false
 })
 
 /**
