@@ -11,9 +11,6 @@ import { Button, CheckBox } from 'native-base'
 import { DRAFT_RESTORE_MESSAGE, OK, CANCEL } from '../lib/ContainerConstants'
 
 export default class BulkUnselectJobAlert extends PureComponent {
-    // checkItem = () => {
-    //     this.props.checkItem()
-    // }
 
     _returnModalView() {
         return (

@@ -8,7 +8,7 @@ import Loader from '../components/Loader'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, FlatList, TouchableOpacity, TextInput, Alert } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Header, Button, Text, Body, Icon, Footer, StyleProvider, ActionSheet, Toast, chec } from 'native-base'
+import { Container, Header, Button, Text, Body, Icon, Footer, StyleProvider, ActionSheet, Toast } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -259,7 +259,7 @@ class BulkListing extends PureComponent {
       </StyleProvider>
     )
   }
-  onLongPressResetSetting = () => {
+  onPressSelectedJob = () => {
     this.props.actions.setState(SET_BULK_TRANSACTION_PARAMETERS, {
       selectedItems: this.props.wantUnselectJob.cloneSelectedItems,
       bulkTransactions: this.props.wantUnselectJob.cloneBulkTransactions,
@@ -278,7 +278,7 @@ class BulkListing extends PureComponent {
   }
 
   showAlertForUnselectTransaction(){
-      return <BulkUnselectJobAlert onOkPress = {() => this.onLongPressResetSetting()} onCancelPress = {() => this.onCancelPress()} 
+      return <BulkUnselectJobAlert onOkPress = {() => this.onPressSelectedJob()} onCancelPress = {() => this.onCancelPress()} 
       onRequestClose = {() => this.onCancelPress()} wantUnselectJob = {this.props.wantUnselectJob} checked = {this.props.checkAlertView} checkItem = {() => this.onCheckItem()}/> 
   }
 
