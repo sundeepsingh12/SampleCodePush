@@ -1,6 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { Alert, StyleSheet, View, Text, Image, TouchableOpacity, TextInput, Modal } from 'react-native'
+import { Alert, StyleSheet, View, Text, Image, TouchableOpacity, TextInput, Modal, Keyboard } from 'react-native'
 import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg, ActionSheet, Label, Footer } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -303,8 +303,6 @@ class Login extends PureComponent {
                   <View style={[{ paddingTop: 80 }, styles.paddingLeft10, styles.paddingRight10]}>
                     <Item stackedLabel style={[]}>
                       <Label style={[{ color: styles.fontPrimaryColor }, styles.fontRegular]}>{NEW_PASSWORD}</Label>
-                      {/* <TextInput underlineColorAndroid='transparent'
-                        style={[styles.fontSm, { height: 20 }, styles.fontLeft]} secureTextEntry={true} onChangeText={(text) => this._setPassword(text, 1)} value={this.state.newPassword} /> */}
                       <TextInput
                         value={this.state.newPassword}
                         autoCapitalize="none"
@@ -341,7 +339,10 @@ class Login extends PureComponent {
                 <Button
                   full success
                   disabled={this.state.buttonDisabled || this.props.auth.form.showResetPasswordLoader || !_.isEmpty(this.props.auth.form.errorMessageResetPassword)}
-                  onPress={() => this.props.resetPassword(this.state.newPassword, this.state.confirmNewPassword, this.props.auth.form.username)}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    this.props.resetPassword(this.state.newPassword, this.state.confirmNewPassword, this.props.auth.form.username, this.props.auth.form.password)
+                  }}
                   style={[styles.padding10, styles.width100, { height: 50 }]}
                 >
                   <Text style={[styles.fontWhite, styles.fontLg]}>Save and proceed</Text>

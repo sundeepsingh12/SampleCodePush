@@ -272,36 +272,16 @@ export function checkRememberMe() {
 //   }
 // }
 
-export function resetPasswordOnLogin(username) {
-  return async function (dispatch) {
-    try {
-      if (!username) {
-        throw new Error('Please enter a valid username')
-      }
-      let data = new FormData()
-      data.append('usernameToResetPass', username)
-      dispatch(forgetPassword())
-      const response = await RestAPIFactory().serviceCall(data, CONFIG.API.FORGET_PASSWORD, 'LOGIN')
-      dispatch(loginFailure(response.json.message.replace(/<\/?[^>]+(>|$)/g, "")))
-    } catch (error) {
-      showToastAndAddUserExceptionLog(1303, error.message, 'danger', 0)
-      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, ""), error.code))
-    }
-  }
-}
 
-export function setShowResetPassword(payload) {
-  return async function (dispatch) {
-    try {
-      dispatch(setState(SHOW_RESET_PASSWORD, payload))
-    } catch (error) {
-      showToastAndAddUserExceptionLog(1303, error.message, 'danger', 0)
-    }
+export function setShowResetPassword(value) {
+  return {
+    type: SHOW_RESET_PASSWORD,
+    payload: value
   }
 }
 
 
-export function resetPassword(newPassword, confirmNewPassword, username) {
+export function resetPassword(newPassword, confirmNewPassword, username, password) {
   return async function (dispatch) {
     try {
       dispatch(setState(SET_RESET_PASSWORD_LOADER, true))
@@ -312,10 +292,9 @@ export function resetPassword(newPassword, confirmNewPassword, username) {
         throw new Error('Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.')
       }
       let data = new FormData()
-      let oldPassword = await keyValueDBService.getValueFromStore(PASSWORD)
       data.append('userName', username)
       data.append('newPassword', sha256(newPassword))
-      data.append('password', oldPassword.value)
+      data.append('password', password)
       data.append('passwordLength', newPassword.length)
       const response = await RestAPIFactory().serviceCall(data, CONFIG.API.RESET_PASSWORD_AT_LOGIN, 'LOGIN')
       dispatch(setShowResetPassword(false))
@@ -326,12 +305,9 @@ export function resetPassword(newPassword, confirmNewPassword, username) {
   }
 }
 
-export function setErrorMessageResetPassword(payload) {
-  return async function (dispatch) {
-    try {
-      dispatch(setState(SET_ERROR_RESET_PASSWORD, payload))
-    } catch (error) {
-      showToastAndAddUserExceptionLog(1303, error.message, 'danger', 0)
-    }
+export function setErrorMessageResetPassword(value) {
+  return {
+    type: SET_ERROR_RESET_PASSWORD,
+    payload: value
   }
 }
