@@ -23,7 +23,8 @@ import { addServerSmsService } from './AddServerSms'
 import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, PENDING, PATH, PATH_TEMP,APP_VERSION_NUMBER } from '../../lib/AttributeConstants'
 import { userExceptionLogsService } from './UserException'
 import { communicationLogsService } from './CommunicationLogs'
-import  omit  from 'lodash/omit'
+import _ from 'lodash'
+
 import { Platform } from 'react-native'
 var CryptoJS = require("crypto-js");
 
@@ -36,7 +37,9 @@ class SyncZip {
         //Prepare the SYNC_RESULTS
         var SYNC_RESULTS = {};
         let lastSyncTime = syncStoreDTO.lastSyncWithServer
+      
         let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced, lastSyncTime);
+        const allowedTransactionIds = realmDbData.allowedTransactionIdList
         SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
         SYNC_RESULTS.job = realmDbData.jobList;
         SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
@@ -73,7 +76,7 @@ class SyncZip {
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
-        return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds,isEncryptionSuccessful }
+        return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds,isEncryptionSuccessful,allowedTransactionIds }
         //Deleting TEMP folder location
         // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }
@@ -160,19 +163,38 @@ class SyncZip {
             serverSmsLogs = this.getDataFromRealmDB(null, TABLE_SERVER_SMS_LOG);
             return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog };
         }
-        let fieldDataQuery, jobTransactionQuery, jobQuery, transactionLogQuery
-        let firstIndex = Object.keys(transactionIdList)[0];
-        for (let index in transactionIdList) {
+        let fieldDataQuery, jobTransactionQuery, jobQuery, transactionLogQuery,allowedTransactionIdList = {},counter = 0,firstIndex
+
+        //Prepare logs.json for 150 job transactions at a time
+            if(_.size(transactionIdList) >= 150){
+                for(let index in transactionIdList){
+                    if(counter == 0){
+                        firstIndex = index
+                    }
+                    else if(counter == 150){
+                        break
+                    }
+                    allowedTransactionIdList[index] = transactionIdList[index]
+                    counter++
+                }
+            }
+            //Run old logic
+            else{
+                allowedTransactionIdList = transactionIdList
+                firstIndex = Object.keys(allowedTransactionIdList)[0];
+            }
+        
+        for (let index in allowedTransactionIdList) {
             if (index == firstIndex) {
-                fieldDataQuery = `jobTransactionId = ${transactionIdList[index].id}`;
-                jobTransactionQuery = `id = ${transactionIdList[index].id}`;
-                jobQuery = `id = ${transactionIdList[index].jobId}`;
-                transactionLogQuery = `transactionId = ${transactionIdList[index].id}`;
+                fieldDataQuery = `jobTransactionId = ${allowedTransactionIdList[index].id}`;
+                jobTransactionQuery = `id = ${allowedTransactionIdList[index].id}`;
+                jobQuery = `id = ${allowedTransactionIdList[index].jobId}`;
+                transactionLogQuery = `transactionId = ${allowedTransactionIdList[index].id}`;
             } else {
-                fieldDataQuery += ` OR jobTransactionId = ${transactionIdList[index].id}`;
-                jobTransactionQuery += ` OR id = ${transactionIdList[index].id}`;
-                jobQuery += ` OR id = ${transactionIdList[index].jobId}`;
-                transactionLogQuery += ` OR transactionId = ${transactionIdList[index].id}`;
+                fieldDataQuery += ` OR jobTransactionId = ${allowedTransactionIdList[index].id}`;
+                jobTransactionQuery += ` OR id = ${allowedTransactionIdList[index].id}`;
+                jobQuery += ` OR id = ${allowedTransactionIdList[index].jobId}`;
+                transactionLogQuery += ` OR transactionId = ${allowedTransactionIdList[index].id}`;
             }
         }
         fieldDataList = this.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA, lastSyncTime);
@@ -180,7 +202,7 @@ class SyncZip {
         jobList = this.getDataFromRealmDB(jobQuery, TABLE_JOB);
         serverSmsLogs = this.getDataFromRealmDB(fieldDataQuery, TABLE_SERVER_SMS_LOG);
         transactionLogs = this.getDataFromRealmDB(transactionLogQuery, TABLE_TRANSACTION_LOGS);
-        return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog }
+        return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog,allowedTransactionIdList }
     }
 
     /**
@@ -220,7 +242,7 @@ class SyncZip {
                 let fieldData = { ...data[index] }
                 if (moment(fieldData.dateTime).isAfter(lastSyncTime)) {
                     fieldData.id = 0
-                    fieldDataList.push(omit(fieldData, ['dateTime']))
+                    fieldDataList.push(_.omit(fieldData, ['dateTime']))
                 }
             }
             return fieldDataList
