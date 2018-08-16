@@ -33,11 +33,11 @@ const Item = Picker.Item;
 class SkuListItem extends PureComponent {
 
     changeSkuActualQuantity(selectedValue, rowItem) {
-        //Call parent component using callback
         if(selectedValue!=0 && selectedValue.startsWith("0")){
             //Remove leading zeros
             selectedValue = selectedValue.replace(/^0+/, '');
         }
+          //Call parent component using callback
         this.props.updateSkuActualQuantity(selectedValue, rowItem, this.props.title)
     }
 
@@ -102,7 +102,9 @@ class SkuListItem extends PureComponent {
                             value={parseInt(rowItem.value)}
                             maximumValue={parseInt(originalQuantityValue[0])}
                             minimumValue={0}
-                            onSlidingComplete={(value) => this.changeSkuActualQuantity(value, rowItem)}
+                            onSlidingComplete={(value) => {
+                                this.changeSkuActualQuantity(value+"", rowItem)}
+                            }
                         />
                     </View>
                     <TextInput

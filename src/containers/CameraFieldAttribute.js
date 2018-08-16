@@ -166,7 +166,7 @@ class CameraFieldAttribute extends PureComponent {
 
     submitImage = () => {
         if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
-            this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData.data, this.props.navigation.state.params.currentElement)
+            this.props.navigation.state.params.changeSkuActualQuantity(this.state.imageData+"", this.props.navigation.state.params.currentElement)
         } else {
                 this.props.actions.saveImage(this.state.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
         }
