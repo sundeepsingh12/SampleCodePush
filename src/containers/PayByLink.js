@@ -14,7 +14,8 @@ import {
 
 import {
     ON_CHANGE_PAYBYLINK_MOBILE_NO,
-    SET_PAY_BY_LINK_MESSAGE
+    SET_PAY_BY_LINK_MESSAGE,
+    CLEAR_STATE_FOR_PAY_BY_LINK
 } from '../lib/constants'
 
 import { Container, Content, Footer, FooterTab, Button, Icon, Body, Header, StyleProvider } from 'native-base';
@@ -28,15 +29,16 @@ import { SafeAreaView } from 'react-navigation'
 import getTheme from '../../native-base-theme/components';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import platform from '../../native-base-theme/variables/platform';
-import { 
-    TOTAL_AMOUNT_FOR_WALLET, 
-    ENTER_REGISTERED, MOBILE_NUMBER, 
-    TRANSACTION_PENDING, 
-    TRANSACTION_SUCCESSFUL, 
-    PAYMENT_SUCCESSFUL, 
-    SMS_LINK_SENT_SUCCESSFULLY, 
+import {
+    TOTAL_AMOUNT_FOR_WALLET,
+    ENTER_CUSTOMER,
+    MOBILE_NUMBER,
+    TRANSACTION_PENDING,
+    TRANSACTION_SUCCESSFUL,
+    PAYMENT_SUCCESSFUL,
+    SMS_LINK_SENT_SUCCESSFULLY,
     RESEND_SMS,
-    TRANSACTION_CONFIRMATION ,
+    TRANSACTION_CONFIRMATION,
     TRANSACTION_IS_IN_PENDING_WANT_TO_CANCEL_IT,
     CANCEL,
     SURE_WANT_TO_SEND_SMS_AGAIN,
@@ -50,6 +52,8 @@ import {
     NO_TRANSACTION_FOUND_UNABLE_TO_CONTACT_SERVER,
     CHECK_TRANSACTION_STATUS
 } from '../lib/ContainerConstants'
+import { isEmpty, size, trim } from 'lodash'
+import PaymentSuccessfullScreen from '../components/mosambeeWallet/PaymentSuccessfullScreen'
 
 
 function mapStateToProps(state) {
@@ -81,10 +85,11 @@ class PayByLink extends PureComponent {
     }
 
     onBackButtonPressAndroid = () => {
-        return !_.isEmpty(this.props.payByLinkMessage)
+        return !isEmpty(this.props.payByLinkMessage) || this.props.payByLinkScreenLoader
     }
 
     componentWillUnmount() {
+        this.props.actions.setState(CLEAR_STATE_FOR_PAY_BY_LINK)
         this._didFocusSubscription && this._didFocusSubscription.remove();
         this._willBlurSubscription && this._willBlurSubscription.remove();
     }
@@ -100,11 +105,11 @@ class PayByLink extends PureComponent {
                     <Body>
                         <View
                             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                            {!this.props.payByLinkMessage ? <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                            {!this.props.payByLinkMessage && !this.props.payByLinkScreenLoader ? <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
                                 <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                             </TouchableOpacity> : null}
                             <View style={[style.headerBody]}>
-                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500, this.props.payByLinkMessage ? { marginLeft: 110 } : null]}>{NET_BANKING}</Text>
+                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter, styles.fontWeight500, (this.props.payByLinkMessage || this.props.payByLinkScreenLoader) ? { marginLeft: 110 } : null]}>{NET_BANKING}</Text>
                             </View>
                             <View style={[style.headerRight]}>
                             </View>
@@ -122,8 +127,8 @@ class PayByLink extends PureComponent {
             case SMS_LINK_SENT_SUCCESSFULLY: return this._sendSmsView()
             case RESEND_SMS: return this._reSendLinkView()
             case TRANSACTION_PENDING: return this._checkTransactionView()
-            case TRANSACTION_SUCCESSFUL: return this.showPaymentSuccessfulScreen()
-            default : return this.showSmsFailedScreen()
+            case TRANSACTION_SUCCESSFUL: return <PaymentSuccessfullScreen/>
+            default: return this.showSmsFailedScreen()
         }
     }
 
@@ -153,7 +158,7 @@ class PayByLink extends PureComponent {
                     </View>
                     <View>
                         <View style={{ marginTop: 50 }}>
-                            <Text style={[{ color: styles.fontPrimaryColor }, styles.paddingHorizontal10, styles.fontSm]}>{ENTER_REGISTERED + ' ' + MOBILE_NUMBER}</Text>
+                            <Text style={[{ color: styles.fontPrimaryColor }, styles.paddingHorizontal10, styles.fontSm]}>{ENTER_CUSTOMER + ' ' + MOBILE_NUMBER}</Text>
                         </View>
                         <View>
                             <TextInput
@@ -230,7 +235,7 @@ class PayByLink extends PureComponent {
                     <View>
                         <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#F2F1FF', borderWidth: 1 }, { height: 50, width: 240 }, styles.alignCenter, styles.justifyCenter, { marginTop: 140 }]}
                             onPress={() => { this.props.actions.hitCheckTransactionApiForCheckingPayment(this.props.payByLinkConfigJSON, this.props.navigation.state.params) }} >
-                            <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}>{CHECK_TRANSACTION_STATUS}</Text>
+                            <Text style={[{ color: '#000', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}>{CHECK_TRANSACTION_STATUS}</Text>
                         </Button>
                     </View>
                     <View>
@@ -253,7 +258,7 @@ class PayByLink extends PureComponent {
     }
 
     showSmsFailedScreen() {
-        let buttonView =  this.retrySmsView() 
+        let buttonView = this.retrySmsView()
         return (
             <Content>
                 <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
@@ -293,6 +298,7 @@ class PayByLink extends PureComponent {
                 { text: NO, style: 'cancel' },
                 { text: YES_CANCEL, onPress: this.onAlertPress },
             ],
+            { cancelable: false }
         )
     }
 
@@ -306,7 +312,7 @@ class PayByLink extends PureComponent {
                 <Footer style={[style.footer]}>
                     <FooterTab style={[styles.padding10]}>
                         <Button success full
-                            disabled={!_.size(_.trim(this.props.customerContact))}
+                            disabled={!size(trim(this.props.customerContact))}
                             onPress={() => { this.props.actions.hitPayByLinkApiForPayment(this.props.customerContact, this.props.payByLinkConfigJSON, this.props.navigation.state.params.paymentAtEnd.modeTypeId) }}>
                             <Text style={[styles.fontLg, styles.fontWhite]}>{SEND_SMS}</Text>
                         </Button>
@@ -321,7 +327,7 @@ class PayByLink extends PureComponent {
         const viewModal = (this.props.payByLinkScreenLoader) ? <Loader /> : this._switchModal(this.props.payByLinkMessage)
         return (
             <StyleProvider style={getTheme(platform)}>
-                <Container>
+                <Container style={{ backgroundColor: '#fff' }}>
                     {headerView}
                     {viewModal}
                 </Container>

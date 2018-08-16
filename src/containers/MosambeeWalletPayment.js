@@ -30,6 +30,8 @@ import {
     MOSAMBEE_WALLET,
     PAYMENT
 } from '../lib/ContainerConstants'
+import PaymentSuccessfullScreen from '../components/mosambeeWallet/PaymentSuccessfullScreen'
+
 
 function mapStateToProps(state) {
     return {
@@ -150,21 +152,6 @@ class MosambeeWalletPayment extends PureComponent {
         )
     }
 
-    showPaymentSuccessfulScreen() {
-        return (
-            <Content>
-                <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
-                    <Image
-                        style={style.imageSync}
-                        source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
-                    />
-                    <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
-                        {PAYMENT_SUCCESSFUL}
-                    </Text>
-                </View>
-            </Content>
-        )
-    }
     transactionStatusButtonView() {
         let checkForRetryButtonView = _.isEqual(this.props.errorMessage, FAILED)
         return (
@@ -185,21 +172,6 @@ class MosambeeWalletPayment extends PureComponent {
                     <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}>Retry Payment</Text>
                 </Button>
             </View>
-        )
-    }
-    showPaymentSuccessfulScreen() {
-        return (
-            <Content>
-                <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
-                    <Image
-                        style={style.imageSync}
-                        source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
-                    />
-                    <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
-                        {PAYMENT_SUCCESSFUL}
-                    </Text>
-                </View>
-            </Content>
         )
     }
 
@@ -228,7 +200,7 @@ class MosambeeWalletPayment extends PureComponent {
     checkForModalToShow(errorMessage) {
         switch (errorMessage) {
             case null: return this.setModal(this.props.isModalVisible)
-            case TRANSACTION_SUCCESSFUL: return this.showPaymentSuccessfulScreen()
+            case TRANSACTION_SUCCESSFUL: return <PaymentSuccessfullScreen/>
             case FAILED: return this.showPaymentFailedScreen()
             default: return this.showErrorScreen()
         }

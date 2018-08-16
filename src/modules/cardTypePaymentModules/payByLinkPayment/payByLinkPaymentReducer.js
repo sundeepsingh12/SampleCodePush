@@ -6,7 +6,8 @@ import {
     SET_PAY_BY_LINK_PARAMETERS,
     SET_LOADER_FOR_PAYBYLINK,
     ON_CHANGE_PAYBYLINK_MOBILE_NO,
-    SET_PAY_BY_LINK_MESSAGE
+    SET_PAY_BY_LINK_MESSAGE,
+    CLEAR_STATE_FOR_PAY_BY_LINK
 } from '../../../lib/constants'
 
 const initialState = new InitialState()
@@ -32,6 +33,8 @@ export default function payByLinkPaymentReducer(state = initialState, action) {
                         .set('customerContact',action.payload.customerContact)
                         .set('payByLinkScreenLoader',false)
                         .set('payByLinkMessage',null)
+        case CLEAR_STATE_FOR_PAY_BY_LINK:
+           return initialState
     }
 
     return state

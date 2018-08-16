@@ -57,9 +57,6 @@ export function hitCheckTransactionApiForCheckingPayment(payByLinkConfigJSON, na
             if (!_.isEmpty(responseMessage.transId)) {
                 paymentService.addPaymentObjectToDetailsArray(payByLinkConfigJSON.actualAmount, 16, responseMessage.transId, 'N.A', responseMessage, formLayoutState)
                 setTimeout(() => { dispatch(setState(SET_PAY_BY_LINK_MESSAGE, TRANSACTION_SUCCESSFUL)) }, 1000);
-                if(jobTransaction.id < 0) {
-                    navDispatch(StackActions.pop())
-                }
                 dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
             }else{
                 dispatch(setState(SET_PAY_BY_LINK_MESSAGE, TRANSACTION_PENDING))

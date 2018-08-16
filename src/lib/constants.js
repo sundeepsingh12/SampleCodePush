@@ -169,6 +169,7 @@ module.exports = keyMirror({
     SET_LOADER_FOR_PAYBYLINK: null,
     ON_CHANGE_PAYBYLINK_MOBILE_NO: null,
     SET_PAY_BY_LINK_MESSAGE: null,
+    CLEAR_STATE_FOR_PAY_BY_LINK: null,
 
     //Bluetooth Actions
     BLUETOOTH_SCANNING_START: null,
