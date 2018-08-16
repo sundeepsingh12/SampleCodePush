@@ -58,7 +58,7 @@ class ImageDetailsView extends PureComponent {
                 <Container>
                     <View style={{ flex: 1 , backgroundColor: '#fff'}}>
                         {this.getImageView()}
-                        <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, flex: 2 }]}>
+                        <SafeAreaView style={[styles.absolute, styles.marginLeft5, styles.padding15, { top: 0, left: 0, flex: 2 }]}>
                             <View>
                                 <Icon
                                     name="md-close"
