@@ -124,7 +124,7 @@ class SaveActivated extends PureComponent {
     }
 
     navigateToFormLayout = (statusId, statusName) => {
-        let cloneJobTransaction = _.cloneDeep(this.props.navigation.state.params.jobTransaction)
+        let cloneJobTransaction = JSON.parse(JSON.stringify(this.props.navigation.state.params.jobTransaction)) 
         let lastIndex = parseInt(_.findLastKey(this.props.recurringData))
         let userHubId = cloneJobTransaction.referenceNumber.split('/')
         if (!lastIndex) {

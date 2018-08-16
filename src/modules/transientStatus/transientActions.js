@@ -6,7 +6,6 @@ import {
     LOADER_IS_RUNNING,
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService'
-import _ from 'lodash'
 /**This action is called from componentDidMount 
  * 
  * Add form layout state of current status to transientFormLayoutMap
@@ -22,8 +21,8 @@ export function setStateFromNavigationParams(navigationParams, transientFormLayo
             if (!currentStatus || !formLayoutState) {
                 throw new Error('current status missing')
             }
-            let cloneTransientFormLayoutMap = _.cloneDeep(transientFormLayoutMap)
-            cloneTransientFormLayoutMap[currentStatus.id] = _.cloneDeep(formLayoutState)
+            let cloneTransientFormLayoutMap = JSON.parse(JSON.stringify(transientFormLayoutMap))
+            cloneTransientFormLayoutMap[currentStatus.id] = JSON.parse(JSON.stringify(formLayoutState))
             dispatch(setState(ADD_FORM_LAYOUT_STATE, cloneTransientFormLayoutMap))
             draftService.saveDraftInDb(formLayoutState, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
         } catch (error) {

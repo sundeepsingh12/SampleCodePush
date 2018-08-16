@@ -4,7 +4,6 @@ import { setState, showToastAndAddUserExceptionLog } from '../global/globalActio
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { postAssignmentService } from '../../services/classes/PostAssignment'
 import { PENDING, SET_POST_ASSIGNMENT_TRANSACTION_LIST, SET_POST_ASSIGNMENT_ERROR, SET_POST_SCAN_SUCCESS, } from '../../lib/constants'
-import _ from 'lodash'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { DISMISS } from '../../lib/ContainerConstants'
@@ -42,7 +41,7 @@ export function checkScannedJob(referenceNumber, jobTransactionMap, jobMaster, i
         try {
             dispatch(setState(SET_POST_ASSIGNMENT_TRANSACTION_LIST, { jobTransactionMap, loading: true, pendingCount, scanError: null, jobMaster, scanSuccess: false }));
             let pendingStatus = await jobStatusService.getStatusForJobMasterIdAndCode(jobMaster.id, PENDING);
-            let jobTransactionMapClone = _.cloneDeep(jobTransactionMap);
+            let jobTransactionMapClone = JSON.parse(JSON.stringify(jobTransactionMap));
             let transactionObject = await postAssignmentService.checkScanResult(referenceNumber, jobTransactionMapClone, pendingStatus, jobMaster, isForceAssignmentAllowed, pendingCount);
             if (transactionObject.scanError && transactionObject.scanError !== '') {
                 Toast.show({ text: transactionObject.scanError, buttonText: DISMISS, duration: 10000, buttonTextStyle: { color: "#FFE200" }, });

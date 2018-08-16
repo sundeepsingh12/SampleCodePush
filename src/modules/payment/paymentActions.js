@@ -34,7 +34,6 @@ import {
     COLLECTION_SOD,
     VALID_AMOUNT_ERROR
 } from '../../lib/ContainerConstants'
-import _ from 'lodash'
 import { Toast } from 'native-base'
 import { CashTenderingService } from '../../services/classes/CashTenderingServices'
 
@@ -192,7 +191,7 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formLa
 export function paymentModeSelect(selectedPaymentMode, splitPaymentMode, modeTypeId, actualAmount, transactionNumber) {
     return async function (dispatch) {
         try {
-            let tempSelectedPaymentMode = _.cloneDeep(selectedPaymentMode), isSaveButtonDisabled = false, otherPaymentEnable = false
+            let tempSelectedPaymentMode = JSON.parse(JSON.stringify(selectedPaymentMode)), isSaveButtonDisabled = false, otherPaymentEnable = false
             //Check if actual amount is valid string
             if (!actualAmount) {
                 isSaveButtonDisabled = true
@@ -257,7 +256,7 @@ export function getSplitPaymentModeList(selectedPaymentMode) {
 export function changeChequeOrDDPaymentModeList(modeTypeId, splitPaymentModeMap, arrayIndex) {
     return async function (dispatch) {
         try {
-            let splitPaymentModeMapClone = _.cloneDeep(splitPaymentModeMap)
+            let splitPaymentModeMapClone = JSON.parse(JSON.stringify(splitPaymentModeMap))
             let paymentModeObject = splitPaymentModeMapClone[modeTypeId]
             let paymentModeArray = splitPaymentModeMapClone[modeTypeId].list
             //If array index is present means have to remove row else add row
@@ -288,7 +287,7 @@ export function changeChequeOrDDPaymentModeList(modeTypeId, splitPaymentModeMap,
 export function setPaymentAmount(modeTypeId, amount, splitPaymentModeMap) {
     return async function (dispatch) {
         try {
-            let splitPaymentModeMapClone = _.cloneDeep(splitPaymentModeMap)
+            let splitPaymentModeMapClone = JSON.parse(JSON.stringify(splitPaymentModeMap))
             let paymentModeObject = splitPaymentModeMapClone[modeTypeId]
             paymentModeObject.amount = amount
             dispatch(setState(SET_SPLIT_PAYMENT_MODE_LIST, { splitPaymentModeMap: splitPaymentModeMapClone }))
@@ -309,7 +308,7 @@ export function setPaymentAmount(modeTypeId, amount, splitPaymentModeMap) {
 export function setPaymentParameterForChequeOrDD(modeTypeId, arrayIndex, splitPaymentModeMap, amount, transactionNumber) {
     return async function (dispatch) {
         try {
-            let splitPaymentModeMapClone = _.cloneDeep(splitPaymentModeMap)
+            let splitPaymentModeMapClone = JSON.parse(JSON.stringify(splitPaymentModeMap))
             let paymentModeObject = splitPaymentModeMapClone[modeTypeId]
             let paymentModeArray = splitPaymentModeMapClone[modeTypeId].list
             if (amount || amount === '') {

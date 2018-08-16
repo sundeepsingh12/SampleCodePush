@@ -647,9 +647,9 @@ class DataStoreService {
             throw new Error(DATA_STORE_MAP_MISSING)
         }
         if (_.isEmpty(cloneDataStoreAttrValueMap)) {
-            cloneDataStoreAttrValueMap = _.cloneDeep(dataStoreAttrValueMap)
+            cloneDataStoreAttrValueMap = JSON.parse(JSON.stringify(dataStoreAttrValueMap))
         } else {
-            dataStoreAttrValueMap = _.cloneDeep(cloneDataStoreAttrValueMap)
+            dataStoreAttrValueMap = JSON.parse(JSON.stringify(cloneDataStoreAttrValueMap))
         }
         let searchedDataStoreAttrValueObject = {} //contains filtered object
         // This loop check if searched value is present in dataStoreAttrValueMap and if present then add this to searchedDataStoreAttrValueObject
@@ -681,9 +681,9 @@ class DataStoreService {
         let rowFormElement = formLayoutState.formElement[rowId].formLayoutObject //get current formElement
         let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] //get map for current array this may contain map of multiple arrays
         //let returnParams = await this.checkForFiltersAndValidations(currentElement, rowFormElement, jobTransaction, dataStoreFilterReverseMap) //check for filters and if not present than check for validations
-        let cloneFormElement = _.cloneDeep(rowFormElement)
+        let cloneFormElement = JSON.parse(JSON.stringify(rowFormElement))
         let returnParams = await this.runDataStoreBeforeValidations(currentElement, formLayoutState, jobTransaction, cloneFormElement, dataStoreFilterReverseMap)
-        let cloneArrayReverseDataStoreFilterMap = _.cloneDeep(arrayReverseDataStoreFilterMap)
+        let cloneArrayReverseDataStoreFilterMap = JSON.parse(JSON.stringify(arrayReverseDataStoreFilterMap))
         cloneArrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] = returnParams.dataStoreFilterReverseMap //change reverse DSF map which contains all mapping related to DSF and Data store
         return {
             dataStoreAttrValueMap: returnParams.dataStoreAttrValueMap,

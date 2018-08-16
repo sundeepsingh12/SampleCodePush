@@ -83,7 +83,7 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
                     value = await signatureService.saveFile(value, moment(), true)
                     navigation.pop(1)
                 }
-                let copyOfskuListItems = _.cloneDeep(skuListItems)
+                let copyOfskuListItems = JSON.parse(JSON.stringify(skuListItems))
                 copyOfskuListItems[jobId][rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value
                 dispatch(setState(UPDATE_SKU_LIST_ITEMS, copyOfskuListItems))
             } else {
