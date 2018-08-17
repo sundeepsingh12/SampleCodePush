@@ -26,7 +26,11 @@ import {
   TOGGLE_CHECKBOX,
   REMEMBER_ME_SET_TRUE,
   RESET_STATE,
-  SET_LOGIN_PARAMETERS
+  SET_LOGIN_PARAMETERS,
+  SHOW_RESET_PASSWORD,
+  SET_ERROR_RESET_PASSWORD,
+  SET_RESET_PASSWORD_LOADER,
+  SHOW_RESET_PASSWORD_AND_SET_PASSWORD
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -50,7 +54,7 @@ export default function authReducer(state = initialState, action) {
       return state.setIn(['form', 'authenticationService'], true)
         .setIn(['form', 'displayMessage'], '')
         .setIn(['form', 'isButtonDisabled'], true)
-        .setIn(['form','isEditTextEnabled'],false)
+        .setIn(['form', 'isEditTextEnabled'], false)
 
 
     /**
@@ -62,7 +66,7 @@ export default function authReducer(state = initialState, action) {
       return state.setIn(['form', 'authenticationService'], false)
         .setIn(['form', 'displayMessage'], '')
         .setIn(['form', 'isButtonDisabled'], false)
-        .setIn(['form','isEditTextEnabled'],true)
+        .setIn(['form', 'isEditTextEnabled'], true)
 
 
     case ON_LONG_PRESS_ICON:
@@ -73,9 +77,9 @@ export default function authReducer(state = initialState, action) {
     case LOGIN_FAILURE:
       return state.setIn(['form', 'authenticationService'], false)
         .setIn(['form', 'displayMessage'], action.payload.error)
-        .setIn(['form','password'],(action.payload.code == 401) ? '' : state.form.password)
-        .setIn(['form','isEditTextEnabled'],true)
-        .setIn(['form','isButtonDisabled'],(action.payload.code == 401) ? true : false)
+        .setIn(['form', 'password'], (action.payload.code == 401) ? '' : state.form.password)
+        .setIn(['form', 'isEditTextEnabled'], true)
+        .setIn(['form', 'isButtonDisabled'], (action.payload.code == 401) ? true : false)
 
     case ON_LOGIN_USERNAME_CHANGE:
       const username = action.payload
@@ -115,6 +119,30 @@ export default function authReducer(state = initialState, action) {
 
     case RESET_STATE:
       return initialState
+
+    case SHOW_RESET_PASSWORD:
+      return state.setIn(['form', 'showResetPassword'], action.payload)
+        .setIn(['form', 'authenticationService'], false)
+        .setIn(['form', 'isEditTextEnabled'], true)
+        .setIn(['form', 'isButtonDisabled'], false)
+        .setIn(['form', 'showResetPasswordLoader'], false)
+        .setIn(['form', 'errorMessageResetPassword'], '')
+
+    case SET_ERROR_RESET_PASSWORD:
+      return state.setIn(['form', 'errorMessageResetPassword'], action.payload)
+        .setIn(['form', 'showResetPasswordLoader'], false)
+    case SET_RESET_PASSWORD_LOADER:
+      return state.setIn(['form', 'showResetPasswordLoader'], action.payload)
+        .setIn(['form', 'errorMessageResetPassword'], '')
+
+    case SHOW_RESET_PASSWORD_AND_SET_PASSWORD:
+      return state.setIn(['form', 'showResetPassword'], true)
+        .setIn(['form', 'authenticationService'], false)
+        .setIn(['form', 'isEditTextEnabled'], true)
+        .setIn(['form', 'isButtonDisabled'], false)
+        .setIn(['form', 'showResetPasswordLoader'], false)
+        .setIn(['form', 'errorMessageResetPassword'], '')
+        .setIn(['form', 'password'], action.payload)
   }
   return state
 }

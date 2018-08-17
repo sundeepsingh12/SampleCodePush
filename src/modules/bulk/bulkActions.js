@@ -7,6 +7,7 @@ import {
     CUSTOMIZATION_LIST_MAP,
     SET_BULK_ERROR_MESSAGE,
     SET_BULK_TRANSACTION_PARAMETERS,
+    SET_BULK_PARAMS_FOR_SELECTED_DATA
 } from '../../lib/constants'
 import {
     setState,
@@ -88,7 +89,6 @@ export function toggleAllItems(allTransactions, selectAllNone, selectedItems, pa
                 }
             }
             let { displayText, selectAll } = bulkService.getDisplayTextAndSelectAll(bulkJobSimilarityConfig, cloneSelectedItems, enabledJobs, bulkTransactions, clonePageObject)
-
             dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
                 selectedItems: cloneSelectedItems, bulkTransactions, displayText, selectAll
             }))
@@ -107,20 +107,24 @@ export function toggleAllItems(allTransactions, selectAllNone, selectedItems, pa
  * @param {*} idToSeparatorMap 
  * @param {*} selectedItems 
  */
-export function setSearchedItem(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, selectedItems, pageObject) {
+export function setSearchedItem(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, selectedItems, pageObject, checkAlertView) {
     return function (dispatch) {
         try {
             let cloneBulkTransactions = _.cloneDeep(bulkTransactions)
             let cloneSelectedItems = _.cloneDeep(selectedItems)
             let searchResultObject = bulkService.performSearch(searchValue, cloneBulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, cloneSelectedItems, pageObject)
             if (!searchResultObject.errorMessage && searchResultObject.errorMessage == '') { // If after search there is any error
-                dispatch(setState(SET_BULK_TRANSACTION_PARAMETERS, {
-                    selectedItems: cloneSelectedItems,
-                    bulkTransactions: cloneBulkTransactions,
-                    displayText: searchResultObject.displayText,
-                    searchText: '',
-                    selectAll: searchResultObject.selectAll
-                }))
+                if (!checkAlertView && !_.isEmpty(searchResultObject.isTransactionSelected)) {
+                    dispatch(setState(SET_BULK_PARAMS_FOR_SELECTED_DATA, { cloneSelectedItems, cloneBulkTransactions, displayText: searchResultObject.displayText, selectAll: searchResultObject.selectAll, referenceNumber: searchResultObject.isTransactionSelected }))
+                } else {
+                    dispatch(setState(SET_BULK_TRANSACTION_PARAMETERS, {
+                        selectedItems: cloneSelectedItems,
+                        bulkTransactions: cloneBulkTransactions,
+                        displayText: searchResultObject.displayText,
+                        searchText: '',
+                        selectAll: searchResultObject.selectAll
+                    }))
+                }
             } else {
                 dispatch(setState(SET_BULK_ERROR_MESSAGE, searchResultObject.errorMessage))
             }
@@ -136,15 +140,16 @@ export function setSearchedItem(searchValue, bulkTransactions, searchSelectionOn
  * @param {*} allTransactions 
  * @param {*} selectedItems 
  */
-export function toggleMultipleTransactions(jobTransactionList, allTransactions, selectedItems, pageObject) {
+export function toggleMultipleTransactions(jobTransactionList, allTransactions, selectedItems, pageObject, checkAlertView) {
     return function (dispatch) {
         try {
             let bulkTransactions = _.cloneDeep(allTransactions)
             let cloneSelectedItems = _.cloneDeep(selectedItems)
             let clonePageObject = _.cloneDeep(pageObject)
             let bulkJobSimilarityConfig = bulkService.getBulkJobSimilarityConfig(clonePageObject)
-            let numberOfEnabledItems = 0
+            let numberOfEnabledItems = 0, isTransactionSelected = false
             for (let jobTransaction of jobTransactionList) {
+                isTransactionSelected = bulkTransactions[jobTransaction.id].isChecked
                 if (bulkJobSimilarityConfig) {
                     numberOfEnabledItems = bulkService.setEnabledTransactions(bulkTransactions, jobTransaction, bulkJobSimilarityConfig, selectedItems)
                 }
@@ -154,12 +159,16 @@ export function toggleMultipleTransactions(jobTransactionList, allTransactions, 
                 }
             }
             let { displayText, selectAll } = bulkService.getDisplayTextAndSelectAll(bulkJobSimilarityConfig, cloneSelectedItems, numberOfEnabledItems, bulkTransactions, clonePageObject)
-            dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
-                selectedItems: cloneSelectedItems,
-                bulkTransactions,
-                displayText,
-                selectAll
-            }))
+            if (!checkAlertView && isTransactionSelected) {
+                dispatch(setState(SET_BULK_PARAMS_FOR_SELECTED_DATA, { cloneSelectedItems, cloneBulkTransactions: bulkTransactions, displayText, selectAll, referenceNumber: jobTransactionList[0].referenceNumber }))
+            } else {
+                dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
+                    selectedItems: cloneSelectedItems,
+                    bulkTransactions,
+                    displayText,
+                    selectAll
+                }))
+            }
         } catch (error) {
             showToastAndAddUserExceptionLog(2804, error.message, 'danger', 1)
         }

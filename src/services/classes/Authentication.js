@@ -66,7 +66,7 @@ class Authentication {
         }
     }
 
-    
+
     async logout(calledFromAutoLogout, isPreLoaderComplete) {
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (!token || !token.value) {
@@ -85,6 +85,11 @@ class Authentication {
             await trackingService.inValidateStoreVariables(fenceIdentifier)
         }
         return logoutResponse
+    }
+
+    validatePassword(password) {
+        let regex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+        return regex.test(password)
     }
 }
 

@@ -12,12 +12,14 @@ var InitialState = Record({
     selectedItems: {},
     selectAllNone: SELECT_ALL,
     isSelectAllVisible: false,
+    wantUnselectJob: null,
     searchText: null,
     isManualSelectionAllowed: true,
     searchSelectionOnLine1Line2: false,
     idToSeparatorMap: {},
     errorToastMessage: '',
-    nextStatusList: []
+    nextStatusList: [],
+    checkAlertView: false
 })
 
 export default InitialState

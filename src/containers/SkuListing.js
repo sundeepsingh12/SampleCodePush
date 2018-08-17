@@ -17,7 +17,6 @@ import SearchBarV2 from '../components/SearchBarV2'
 import { SEARCH_PLACE_HOLDER, PROCEED, SKU } from '../lib/ContainerConstants'
 import { SET_SKU_CODE, SKU_CODE_CHANGE } from '../lib/constants'
 import TitleHeader from '../components/TitleHeader'
-import { navigate } from '../modules/navigators/NavigationService'
 
 class SkuListing extends PureComponent {
 

@@ -52,7 +52,7 @@ class MosambeeWalletPayment {
         const walletModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomization.value, id)[0]
         let walletParameters = walletModule && walletModule.remark ? JSON.parse(walletModule.remark) : null
         let actualAmount = 0.00, referenceNoActualAmountMap = '', transactionActualAmount, separator = ''
-        const walletList = (walletParameters && walletParameters.partnerId && walletParameters.secretKey && walletParameters.apiPassword && walletParameters.PayProMID) ? await this.hitWalletUrlToGetWalletList(walletParameters) : null
+        const walletList = (walletParameters && walletParameters.walletURL && walletParameters.partnerId && walletParameters.secretKey && walletParameters.apiPassword && walletParameters.PayProMID) ? await this.hitWalletUrlToGetWalletList(walletParameters) : null
         if(isArray(jobTransactionList)){
             for(let transaction in jobTransactionList){
                 transactionActualAmount = (jobTransactionIdAmountMap[jobTransactionList[transaction].jobTransactionId]) ? jobTransactionIdAmountMap[jobTransactionList[transaction].jobTransactionId].actualAmount : 0

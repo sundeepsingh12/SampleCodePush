@@ -62,7 +62,7 @@ export function checkAndResetPassword(currentPassword, newPassword, confirmNewPa
             dispatch(setState(CLEAR_PASSWORD_TEXTINPUT))
             navDispatch(StackActions.pop())
         } catch (error) {
-            showToastAndAddUserExceptionLog(1902, error.message, 'danger', 1)
+            Toast.show({ text: error.message, buttonText: 'Ok', duration: 10000 })
         } finally {
             dispatch(setState(IS_PROFILE_LOADING, false))
         }

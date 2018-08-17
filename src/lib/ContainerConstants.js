@@ -129,7 +129,6 @@ module.exports = {
     TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: 'transactionsWithChangedSeqeunceMap not present',
     SEARCH_TEXT_MISSING: 'searchText not present',
     SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
-    TOKEN_MISSING: 'Token missing',
     JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING: 'jobMasterIdCustomizationMap is missing',
     AUTO_ROUTING_MESSAGE: 'This will run route optimization for ',
     AUTO_ROUTING_EXTRA_MESSAGE: ' job transactions',
@@ -339,6 +338,7 @@ module.exports = {
     NEW_PASSWORD: 'New Password',
     CONFIRM_NEW_PASSWORD: 'Confirm New Password',
     USERNAME_IS_MISSING: 'Username is missing',
+    PASSWORD_INVALID: 'Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.',
 
     //Error Message for NonExpandableDetailsView
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',
@@ -350,7 +350,8 @@ module.exports = {
     CONFIRM_RESET: 'Confirm Reset',
     RESET_ACCOUNT_SETTINGS: 'Click OK to reset your account settings.',
     REMEMBER_ME: 'Remember Me',
-
+    PASSWORD_EXPIRED_MESSAGE: 'Your password has expired. In order to proceed further please reset your password',
+    SAVE_AND_PROCEED: 'Save and proceed',
     //Preloader
     SETTING_UP: 'Setting you up ...',
     DOWNLOAD_SETTINGS: 'Downloading settings',
@@ -377,25 +378,38 @@ module.exports = {
     SIM_VERIFIED_SUCCESSFULLY: 'Sim Verified Successsfully',
     GO_TO_HOME: 'Go to Home',
 
-    //Mosambee Wallet
+    //Mosambee Wallet and Net Banking
     FAILED: 'Failed',
     RESEND: 'reSend',
     TRANSACTION_SUCCESSFUL: 'Transaction Successfull',
+    TRANSACTION_PENDING: 'Transaction Pending',
+    SMS_LINK_SENT_SUCCESSFULLY: 'SMS sent successfully.',
+    RESEND_SMS: 'Resend SMS',
     FINISH: 'Finish',
     RETRY_PAYMENT: 'Retry Payment',
     SUBMIT: 'Submit',
     PAYMENT_SUCCESSFUL: 'Payment Successful',
     PAYMENT_FAILED: 'Payment Failed',
     MOSAMBEE_WALLET: 'Mosambee Wallet',
-    PAYMENT: 'Payment',
     SELECT_PREFERRED_METHOD: 'Select Preferred method',
     ENTER_OTP_SENT_TO_MOBILE_NO: 'Enter One Time Password (OTP) Sent to Mobile Number ',
     CHANGE_MOBILE_NO: 'Change Mobile Number',
     ENTER_OTP_SENT_TO_CUSTOMER: 'Enter OTP Sent to Customer',
     RESEND_OTP: 'Resend OTP',
-    ENTER_OTP: 'Enter OTP',
     ENTER_REGISTERED: 'Enter Registered ',
+    ENTER_CUSTOMER:'Enter Customer’s',
     TOTAL_AMOUNT_FOR_WALLET: 'Total Amount',
+    TRANSACTION_CONFIRMATION: 'Transaction Confirmation',
+    TRANSACTION_IS_IN_PENDING_WANT_TO_CANCEL_IT: 'Transaction is still pending, are you sure you want to cancel transaction?',
+    SURE_WANT_TO_SEND_SMS_AGAIN: 'Are you sure you want to send the link via SMS again?',
+    NET_BANKING: 'Pay by Link',
+    CUSTOMER_APPROVAL:'Customer Approval',
+    LINK_IS_SENT_TO_CUSTOMER_ASK_TO_INTIATE_PAYMENT: 'A link has been sent via SMS to the Customer to complete payment. Ask Customer to initiate payment.',
+    YES_SEND: 'Yes, Send',
+    SEND_SMS: 'Send SMS',
+    YES_CANCEL: 'Yes, Cancel',
+    NO_TRANSACTION_FOUND_UNABLE_TO_CONTACT_SERVER: 'No Transaction found or unable to contact server',
+    CHECK_TRANSACTION_STATUS: 'Check Transaction Status',
 
     //TaskListCalender
     ALL: 'All',
@@ -465,5 +479,5 @@ module.exports = {
     CALL_CUG: 'CALL_CUG',
     CALL_PERSONAL: 'CALL_PERSONAL',
     SMS_OFFICIAL: 'SMS_OFFICIAL',
-    SMS_PERSONAL: 'SMS_PERSONAL'
+    SMS_PERSONAL: 'SMS_PERSONAL',
 }

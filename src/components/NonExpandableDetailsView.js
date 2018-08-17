@@ -69,7 +69,7 @@ export default class NonExpandableDetailsView extends PureComponent {
                     {renderIf(this.props.attributeTypeId == CAMERA || this.props.attributeTypeId == CAMERA_HIGH || this.props.attributeTypeId == CAMERA_MEDIUM || this.props.attributeTypeId == SIGNATURE || this.props.attributeTypeId == SKU_PHOTO,
                         <Text style={[styles.fontDefault, {color : styles.fontPrimaryColor}, styles.textUnderline]}
                             onPress={() => this.props.navigateToCameraDetails({
-                                value: this.props.value,
+                                value: this.props.value,isSignature: this.props.attributeTypeId == SIGNATURE
                             })}>
                             Tap to View
                         </Text>)}

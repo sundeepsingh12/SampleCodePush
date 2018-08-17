@@ -25,6 +25,7 @@
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		15925B0D560B4327B54D8D34 /* libBVLinearGradient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F5BDB0DBAA64E9DA404CDA8 /* libBVLinearGradient.a */; };
 		1C02C13D2119644C004B77D9 /* alarm_notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1C02C13C2119644C004B77D9 /* alarm_notification.mp3 */; };
+		1C077905211C9665009C63D7 /* libRNMail.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0778F8211C9633009C63D7 /* libRNMail.a */; };
 		1C1D77E71FF7D9B7003594E2 /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C1D77DA1FF68FA3003594E2 /* libRCTPushNotification.a */; };
 		1C68DD5B21141F94009C4E6A /* libRNSound.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C68DD5A21141F5C009C4E6A /* libRNSound.a */; };
 		1C90270E20A5546B00742D7E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1C90270D20A5546B00742D7E /* GoogleService-Info.plist */; };
@@ -147,6 +148,20 @@
 			proxyType = 2;
 			remoteGlobalIDString = 83CBBA2E1A601D0E00E9B192;
 			remoteInfo = React;
+		};
+		1C0778F7211C9633009C63D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1C0778B2211C9633009C63D7 /* RNMail.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 46FEDE7F1AFF192F00D3261C;
+			remoteInfo = RNMail;
+		};
+		1C0778F9211C9633009C63D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1C0778B2211C9633009C63D7 /* RNMail.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 46FEDE8A1AFF192F00D3261C;
+			remoteInfo = RNMailTests;
 		};
 		1C0A59041F59386800642F8B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -669,6 +684,7 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Fareye/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		1C02C13C2119644C004B77D9 /* alarm_notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = alarm_notification.mp3; sourceTree = "<group>"; };
+		1C0778B2211C9633009C63D7 /* RNMail.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNMail.xcodeproj; path = "../node_modules/react-native-mail/RNMail.xcodeproj"; sourceTree = "<group>"; };
 		1C1963B71FCEDBC8002AEF2D /* Fareye.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Fareye.entitlements; path = Fareye/Fareye.entitlements; sourceTree = "<group>"; };
 		1C1D77D41FF68FA3003594E2 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		1C1D77DD1FF68FDB003594E2 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
@@ -774,6 +790,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C077905211C9665009C63D7 /* libRNMail.a in Frameworks */,
 				1C68DD5B21141F94009C4E6A /* libRNSound.a in Frameworks */,
 				1CEB61BF211361CF002EE3F1 /* libRCTBluetoothSerial.a in Frameworks */,
 				1C1D77E71FF7D9B7003594E2 /* libRCTPushNotification.a in Frameworks */,
@@ -961,6 +978,15 @@
 			children = (
 				1C8974721F5B212C004418DD /* libRNBackgroundTimer.a */,
 				1C8974741F5B212C004418DD /* libRNBackgroundTimer.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1C0778B3211C9633009C63D7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1C0778F8211C9633009C63D7 /* libRNMail.a */,
+				1C0778FA211C9633009C63D7 /* RNMailTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1268,6 +1294,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				1C0778B2211C9633009C63D7 /* RNMail.xcodeproj */,
 				1C68DD5521141F5C009C4E6A /* RNSound.xcodeproj */,
 				1C1D77DD1FF68FDB003594E2 /* RCTPushNotification.xcodeproj */,
 				5A90368E1F9DB6740099D990 /* ART.xcodeproj */,
@@ -1616,6 +1643,10 @@
 					ProjectRef = D08F36E102DE42D48D2EC501 /* RNImagePicker.xcodeproj */;
 				},
 				{
+					ProductGroup = 1C0778B3211C9633009C63D7 /* Products */;
+					ProjectRef = 1C0778B2211C9633009C63D7 /* RNMail.xcodeproj */;
+				},
+				{
 					ProductGroup = 1C68DD5621141F5C009C4E6A /* Products */;
 					ProjectRef = 1C68DD5521141F5C009C4E6A /* RNSound.xcodeproj */;
 				},
@@ -1712,6 +1743,20 @@
 			fileType = archive.ar;
 			path = libReact.a;
 			remoteRef = 146834031AC3E56700842450 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1C0778F8211C9633009C63D7 /* libRNMail.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNMail.a;
+			remoteRef = 1C0778F7211C9633009C63D7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1C0778FA211C9633009C63D7 /* RNMailTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = RNMailTests.xctest;
+			remoteRef = 1C0778F9211C9633009C63D7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		1C0A59051F59386800642F8B /* libRNFS.a */ = {
@@ -2499,7 +2544,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Fareye/Fareye.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Gaurav Srivastava (V5RMU6PK5W)";
-				CURRENT_PROJECT_VERSION = 0.4.0;
+				CURRENT_PROJECT_VERSION = 0.5.0;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 484RJ94GY3;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2563,7 +2608,7 @@
 				CODE_SIGN_ENTITLEMENTS = Fareye/Fareye.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: ROBOTIC WARES PRIVATE LIMITED (484RJ94GY3)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: ROBOTIC WARES PRIVATE LIMITED (484RJ94GY3)";
-				CURRENT_PROJECT_VERSION = 0.4.0;
+				CURRENT_PROJECT_VERSION = 0.5.0;
 				DEVELOPMENT_TEAM = 484RJ94GY3;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",

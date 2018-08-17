@@ -12,7 +12,9 @@ import {
     CLEAR_BULK_STATE,
     SET_BULK_SEARCH_TEXT,
     SET_BULK_ERROR_MESSAGE,
-    SET_BULK_TRANSACTION_PARAMETERS
+    SET_BULK_TRANSACTION_PARAMETERS,
+    SET_BULK_PARAMS_FOR_SELECTED_DATA,
+    SET_BULK_CHECK_ALERT_VIEW
 } from '../../lib/constants'
 
 import {
@@ -31,7 +33,15 @@ export default function bulkReducer(state = initialState, action) {
                 .set('bulkTransactionList', {})
                 .set('selectedItems', {})
                 .set('searchText', null)
+                .set('checkAlertView',false)
                 .set('selectAllNone', SELECT_ALL)
+        }
+        case SET_BULK_PARAMS_FOR_SELECTED_DATA: {
+            return state.set('wantUnselectJob', action.payload)
+        }
+
+        case SET_BULK_CHECK_ALERT_VIEW: {
+            return state.set('checkAlertView', action.payload)
         }
 
         case STOP_FETCHING_BULK_TRANSACTIONS:
@@ -73,6 +83,7 @@ export default function bulkReducer(state = initialState, action) {
                 .set('selectAllNone', action.payload.displayText)
                 .set('searchText', action.payload.searchText)
                 .set('isSelectAllVisible', action.payload.selectAll)
+                .set('wantUnselectJob', null)
         }
     }
     return state

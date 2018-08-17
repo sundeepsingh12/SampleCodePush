@@ -1,7 +1,7 @@
 'use strict'
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import CONFIG from '.././../lib/config'
 import { REFERENCE_NO, GET, NA } from '../../lib/AttributeConstants'
 import { REF_UNAVAILABLE, FAILURE_SORTING, } from '../../lib/ContainerConstants'
@@ -26,13 +26,13 @@ class Sorting {
    */
 
   async getSortingData(referenceNumber, token) {
-    if ( _.isEmpty(referenceNumber))
+    if (isEmpty(referenceNumber))
       throw new Error(REF_UNAVAILABLE)
     let referenceData = REFERENCE_NO + referenceNumber;
     const url = (referenceData == null) ? CONFIG.API.SCAN_AND_SEARCH_SORTING : CONFIG.API.SCAN_AND_SEARCH_SORTING + "?" + referenceData
     let getSortingData = await RestAPIFactory(token).serviceCall(null, url, GET)
     let json = await getSortingData.json
-    let data = (!_.isEmpty(json)) ? json : null
+    let data = (!isEmpty(json)) ? json : null
     return data
   }
 

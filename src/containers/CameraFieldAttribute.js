@@ -1,8 +1,8 @@
 'use strict';
 import React, { PureComponent } from 'react'
-import {  StyleSheet, View, TouchableOpacity, Image, Platform,TouchableHighlight, ImageStore } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Image, Platform, TouchableHighlight, ImageStore } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Right, Icon, Footer, StyleProvider, Toast } from 'native-base'
+import { Container, Right, Icon, StyleProvider, Toast } from 'native-base'
 import Loader from '../components/Loader'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
 import { RNCamera } from 'react-native-camera'
@@ -10,13 +10,13 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import * as cameraActions from '../modules/camera/cameraActions'
-import { SET_SHOW_IMAGE_AND_DATA } from '../lib/constants'
+import { SET_SHOW_IMAGE_AND_DATA, SET_CAMERA_LOADER } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
 import ImagePicker from 'react-native-image-picker'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import platform from '../../native-base-theme/variables/platform'
-import {  SKU_PHOTO } from '../lib/AttributeConstants'
+import { SKU_PHOTO } from '../lib/AttributeConstants'
 import isEmpty from 'lodash/isEmpty'
 
 function mapStateToProps(state) {
@@ -49,34 +49,35 @@ class CameraFieldAttribute extends PureComponent {
         return { header: null }
     }
 
-    static getDerivedStateFromProps(props, state){
+    static getDerivedStateFromProps(props, state) {
         const imageData = props.imageData;
         let newState = null;
         //copy newprops
-        if(isEmpty(imageData)) {
-            newState = {...state, reduxData: imageData};
+        if (isEmpty(imageData)) {
+            newState = { ...state, reduxData: imageData };
         } else {
-            newState = {...state, reduxData: {...imageData}};
+            newState = { ...state, reduxData: { ...imageData } };
         }
-        
+
         //Checks to change local state
-        if(isEmpty(imageData) ){
-            if(!isEmpty(state.reduxData)){
-                return {...newState, imageData: null};
+        if (isEmpty(imageData)) {
+            if (!isEmpty(state.reduxData)) {
+                return { ...newState, imageData: null };
             }
-            else{
+            else {
                 return null;
             }
         }
-        else if(isEmpty(state.reduxData)){//Optional chaining is not available
-            return {...newState, imageData: {...imageData}}
+        else if (isEmpty(state.reduxData)) {//Optional chaining is not available
+            return { ...newState, imageData: { ...imageData } }
         }
-        
-        if(imageData.data === state.reduxData.data) { //Assuming base64 string changes on change in image
-            return {...newState};
+
+        if (imageData.data === state.reduxData.data) { //Assuming base64 string changes on change in image
+            return { ...newState };
         }
-        return {...newState, imageData:{... imageData}};
+        return { ...newState, imageData: { ...imageData } };
     }
+
     componentDidMount() {
         this.props.actions.setCameraInitialView(this.props.navigation.state.params.currentElement)
     }
@@ -98,13 +99,14 @@ class CameraFieldAttribute extends PureComponent {
             duration: 5000
         })
     }
+
     toggleCameraType = () => {
         this.setState(previousState => {
             if (previousState.cameraType == 'back') {
                 return {
                     cameraType: 'front'
                 }
-            }else {
+            } else {
                 return { cameraType: 'back' }
             }
         })
@@ -126,7 +128,7 @@ class CameraFieldAttribute extends PureComponent {
             }
             else if (response.data) {
                 this.setImage(response.uri)
-                this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data : response.data, uri: response.uri}) 
+                this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, { data: response.data, uri: response.uri })
             }
         })
     }
@@ -143,18 +145,18 @@ class CameraFieldAttribute extends PureComponent {
         return view
     }
 
-    setImage = (uri) => {
-        if(uri == null) {
+    setImage = (uri, base64) => {
+        if (uri == null) {
             ImageStore.removeImageForTag(this.state.imageData.uri);
-            this.setState({imageData: null});
+            this.setState({ imageData: null });
         }
         else {
-            this.setState({imageData: { uri }})
+            this.setState({ imageData: (Platform.OS === 'android') ? { uri } : { base64 } })
         }
     }
 
     onCrossPress = () => {
-        if(this.state.imageData == null){
+        if (this.state.imageData == null) {
             this.props.navigation.goBack()
         }
         else {
@@ -164,14 +166,14 @@ class CameraFieldAttribute extends PureComponent {
 
     submitImage = () => {
         if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
-            this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData.data, this.props.navigation.state.params.currentElement)
+            this.props.navigation.state.params.changeSkuActualQuantity(this.state.imageData, this.props.navigation.state.params.currentElement)
         } else {
             this.props.actions.saveImage(this.state.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
         }
     }
 
     showCameraOrImage() {
-        if( this.state.imageData == null){
+        if (this.state.imageData == null) {
             return (
                 <RNCamera
                     ref={(cam) => {
@@ -187,26 +189,26 @@ class CameraFieldAttribute extends PureComponent {
                 <Image
                     resizeMethod={'resize'}
                     source={{
-                        uri: this.state.imageData != null && this.state.imageData.uri != null ? this.state.imageData.uri : 'data:image/jpeg;base64,' + this.state.imageData.data,
+                        uri: this.state.imageData != null && this.state.imageData.uri != null ? this.state.imageData.uri : 'data:image/jpeg;base64,' + this.state.imageData.base64,
                     }}
                     style={[styles.flex1]}
                 />
             );
-        }                
+        }
     }
 
     showSwitchCamera(getValidationObject) {
-        if(this.state.imageData == null){
+        if (this.state.imageData == null) {
             return (
-                    (getValidationObject && getValidationObject.isFrontCameraEnabled) 
-                ? 
-                    <MaterialIcons 
-                        name={'switch-camera'} 
-                        style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} 
-                        onPress={() => this.toggleCameraType()} 
-                    /> 
-                :
-                    <View style={{width: 28}}/>
+                (getValidationObject && getValidationObject.isFrontCameraEnabled)
+                    ?
+                    <MaterialIcons
+                        name={'switch-camera'}
+                        style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]}
+                        onPress={() => this.toggleCameraType()}
+                    />
+                    :
+                    <View style={{ width: 28 }} />
 
             );
         }
@@ -216,17 +218,17 @@ class CameraFieldAttribute extends PureComponent {
     }
 
     showGalleryPicker(getValidationObject) {
-        if(this.state.imageData == null){
-            return(
-                    (getValidationObject && getValidationObject.imageUploadFromDevice && this.state.imageData == null) 
-                ? 
-                    <MaterialIcons 
-                        name={'photo'} 
-                        style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} 
-                        onPress={() => this.getImageGallery()} 
+        if (this.state.imageData == null) {
+            return (
+                (getValidationObject && getValidationObject.imageUploadFromDevice && this.state.imageData == null)
+                    ?
+                    <MaterialIcons
+                        name={'photo'}
+                        style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]}
+                        onPress={() => this.getImageGallery()}
                     />
-                : 
-                    <View style={{width: 28}}/>
+                    :
+                    <View style={{ width: 28 }} />
             );
         } else {
             return null;
@@ -235,32 +237,31 @@ class CameraFieldAttribute extends PureComponent {
 
     showCenterButton() {
         if (this.state.imageData == null) {
-            return(
+            return (
                 <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
-                    <TouchableOpacity 
-                        style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} 
-                        onPress={this.takePicture} 
+                    <TouchableOpacity
+                        style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }}
+                        onPress={this.takePicture}
                     />
                 </View>
             );
         } else {
-            return(
-                <TouchableOpacity 
-                    style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} 
+            return (
+                <TouchableOpacity
+                    style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]}
                     onPress={this.submitImage}
                 >
-                    <Icon 
-                        name="md-checkmark"  
-                        style={[styles.fontWhite, styles.fontXxxl]} 
-                    /> 
+                    <Icon
+                        name="md-checkmark"
+                        style={[styles.fontWhite, styles.fontXxxl]}
+                    />
                 </TouchableOpacity>
             );
         }
     }
 
     render() {
-        const getValidationObject =  this.props.validation
-        
+        const getValidationObject = this.props.validation
         if (this.props.cameraLoader)
             return <Loader />
 
@@ -269,9 +270,9 @@ class CameraFieldAttribute extends PureComponent {
                 <Container>
                     <View style={{ flex: 1 }}>
                         {this.showCameraOrImage()}
-                        <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%'},styles.paddingLeft15, styles.paddingRight15, styles.row, styles.justifySpaceBetween, styles.alignCenter ]}>
-                            <TouchableHighlight 
-                                onPress = {this.onCrossPress}
+                        <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }, styles.paddingLeft15, styles.paddingRight15, styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
+                            <TouchableHighlight
+                                onPress={this.onCrossPress}
                             >
                                 <Icon
                                     name="md-close"
@@ -279,8 +280,8 @@ class CameraFieldAttribute extends PureComponent {
                                 />
                             </TouchableHighlight>
                             {
-                                this.state.imageData == null 
-                                && 
+                                this.state.imageData == null
+                                &&
                                 <Right>
                                     {this.renderTorch()}
                                 </Right>
@@ -289,18 +290,18 @@ class CameraFieldAttribute extends PureComponent {
                     </View>
                     <SafeAreaView style={[style.footer]} >
                         {
-                                (getValidationObject && getValidationObject.cropImageValidation && Platform.OS==='android' && this.state.imageData != null) 
-                            ?
+                            (getValidationObject && getValidationObject.cropImageValidation && Platform.OS === 'android' && this.state.imageData != null)
+                                ?
                                 <View>
-                                    <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={this.props.actions.cropImage.bind(this,this.state.imageData.uri, this.setImage)}>
+                                    <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={this.props.actions.cropImage.bind(this, this.state.imageData.uri, this.setImage)}>
                                         <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
                                     </TouchableOpacity>
                                 </View>
-                            : 
+                                :
                                 null
                         }
                         {this.showGalleryPicker(getValidationObject)}
-                        { this.showCenterButton()}
+                        {this.showCenterButton()}
                         {this.showSwitchCamera(getValidationObject)}
                     </SafeAreaView>
                 </Container>
@@ -315,9 +316,9 @@ class CameraFieldAttribute extends PureComponent {
                 if (Platform.OS === "ios") {
                     options.orientation = 'portrait'
                 }
-                const { uri } = await this.camera.takePictureAsync(options);
-                    this.setImage(uri)
-                
+                const { uri, base64 } = await this.camera.takePictureAsync(options);
+                this.setImage(uri, base64)
+
             } catch (error) {
                 this.props.actions.setState(SET_CAMERA_LOADER, false)
                 this.props.actions.showToastAndAddUserExceptionLog(316, error.message, 'danger', 1)
