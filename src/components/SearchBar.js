@@ -5,6 +5,7 @@ import styles from '../themes/FeStyle'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import size from 'lodash/size'
 import { SEARCH } from '../lib/ContainerConstants'
+
 export default class SearchBar extends PureComponent {
 
     _startScanner() {

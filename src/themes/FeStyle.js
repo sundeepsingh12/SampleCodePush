@@ -181,7 +181,9 @@ export default {
     marginTop30: {
         marginTop: 30
     },
-
+    marginTop8:{
+        marginTop:8
+    },
     marginBottom5: {
         marginBottom: 5
     },

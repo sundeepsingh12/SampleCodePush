@@ -370,7 +370,6 @@ class CheckoutDetails extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
                         <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                             <Body>
                                 <View
@@ -386,7 +385,6 @@ class CheckoutDetails extends PureComponent {
                                 </View>
                             </Body>
                         </Header>
-                    </SafeAreaView>
 
                     <Content style={[styles.flex1, styles.bgLightGray]}>
                         {emailSmsPrintViewButton}
@@ -433,7 +431,6 @@ class CheckoutDetails extends PureComponent {
                             </List>
                         </View>)}
                     </Content>
-                    <SafeAreaView style = {[styles.bgWhite]}>
                         <Footer style={[style.footer]}>
                             <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
                                 <Button onPress={() => {
@@ -443,7 +440,6 @@ class CheckoutDetails extends PureComponent {
                                 </Button>
                             </FooterTab>
                         </Footer>
-                    </SafeAreaView>
                 </Container>
             </StyleProvider>
         )

@@ -172,18 +172,18 @@ const style = StyleSheet.create({
         paddingLeft: 0
     },
     headerLeft: {
-        width: '15%',
+        width: '20%',
         padding: 15
     },
     headerBody: {
-        width: '70%',
+        width: '60%',
         paddingTop: 15,
         paddingBottom: 15,
         paddingLeft: 10,
         paddingRight: 10
     },
     headerRight: {
-        width: '15%',
+        width: '20%',
         padding: 15
     },
     fabButton: {

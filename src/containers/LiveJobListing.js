@@ -223,7 +223,7 @@ class LiveJobListing extends PureComponent {
                     <Button small transparent
                         style={[style.headerQRButton]}
                         onPress={() => this.props.navigation.navigate(QrCodeScanner, { returnData: this.toggleItemOnSearchBar.bind(this) })} >
-                        <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={styles.fontWhite.color} />
+                        <MaterialCommunityIcons name='qrcode' style={[styles.fontLg]} color={styles.fontWhite.color} />
                     </Button>
                 </View>
             </View>

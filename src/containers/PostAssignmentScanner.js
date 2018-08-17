@@ -13,7 +13,7 @@ import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures'
 import * as postAssignmentActions from '../modules/postAssignment/postAssignmentActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
-import { SET_POST_ASSIGNMENT_ERROR, SET_POST_SCAN_SUCCESS, } from '../lib/constants'
+import { SET_POST_ASSIGNMENT_ERROR } from '../lib/constants'
 import { FORCE_ASSIGNED, POST_SEARCH_PLACEHOLDER, OK, DISMISS } from '../lib/ContainerConstants'
 import * as homeActions from '../modules/home/homeActions'
 import * as taskListActions from '../modules/taskList/taskListActions'
@@ -196,9 +196,8 @@ class PostAssignmentScanner extends PureComponent {
 
     getHeader() {
         return (
-            <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]} hasTabs>
-                    <Body>
+            <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]}>
+                <View style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]} >
                         <View
                             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                             <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
@@ -211,9 +210,8 @@ class PostAssignmentScanner extends PureComponent {
                             </View>
                         </View>
                         {this.getSearchPlaceHolder()}
-                    </Body>
-                </Header>
-            </SafeAreaView>
+                </View>
+                </SafeAreaView>
         )
     }
 

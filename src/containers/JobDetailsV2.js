@@ -447,15 +447,13 @@ class JobDetailsV2 extends PureComponent {
 
   showHeaderView() {
     return (
-      <SafeAreaView style={[style.header]}>
-        <Header style={[style.header]}>
-          <View style={style.seqCard}>
-            {this.showJobMasterIdentifier()}
-            <Line1Line2View data={this.props.navigation.state.params.jobTransaction} />
-            {this.showCloseIcon()}
-          </View>
-        </Header>
-      </SafeAreaView>
+      <Header style={[style.header]}>
+        <View style={style.seqCard}>
+          {this.showJobMasterIdentifier()}
+          <Line1Line2View data={this.props.navigation.state.params.jobTransaction} />
+          {this.showCloseIcon()}
+        </View>
+      </Header>
     )
   }
 
@@ -500,7 +498,7 @@ class JobDetailsV2 extends PureComponent {
     const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
     const etaTimer = this.etaUpdateTimer()
     return (
-      <Content>
+      <Content style={[styles.marginTop8]}>
         {!this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0 ?
           this.showRevertView() : null}
 
@@ -693,6 +691,7 @@ class JobDetailsV2 extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgLightGray]}>
+        
           {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal = {this.onCancelPress}/> : null}
           {draftAlert}
           {mismatchAlert}
