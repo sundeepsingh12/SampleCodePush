@@ -52,7 +52,7 @@ class Payment extends PureComponent {
         this.props.actions.getPaymentParameters(this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState.formElement, this.props.navigation.state.params.formLayoutState.statusId)
     }
 
-    renderPaymentModeId(modeId, type) {
+    renderPaymentModeId(modeId) {
         switch (modeId) {
             case CASH.id: return CASH.displayName
             case CHEQUE.id: return CHEQUE.displayName
@@ -157,7 +157,7 @@ class Payment extends PureComponent {
                 onPress={() => { this.props.actions.paymentModeSelect(this.props.selectedPaymentMode, this.props.splitPaymentMode, moneyTransactionModeId, this.props.actualAmount, this.props.transactionNumber) }}
             >
                 <Text style={disabled ? [styles.fontDarkGray, { width: '80%' }] : [styles.fontBlack, { width: '80%' }]}>
-                    {this.renderPaymentModeId(moneyTransactionModeId, type)}
+                    {this.renderPaymentModeId(moneyTransactionModeId)}
                 </Text>
                 <View style={[styles.justifyCenter, styles.row, { width: '20%' }]}>
                     <CheckBox onPress={() => { this.props.actions.paymentModeSelect(this.props.selectedPaymentMode, this.props.splitPaymentMode, moneyTransactionModeId, this.props.actualAmount, this.props.transactionNumber) }} color={disabled ? styles.fontDarkGray.color : styles.primaryColor} style={{ borderRadius: 15 }} checked={paymentSelectedResult} />
