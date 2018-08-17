@@ -19,13 +19,15 @@ import {
     SET_ERROR_AND_ADV_DROPDOWN_MESSAGE_NULL
 } from '../lib/constants'
 import { DONE, NO_OPTIONS_PRESENT, DISMISS, MULTIPLE_SELECT_OPTIONS } from '../lib/ContainerConstants'
+import Loader from '../components/Loader'
 
 function mapStateToProps(state) {
     return {
         optionsMap: state.multipleOptionsAttribute.optionsMap,
         error: state.multipleOptionsAttribute.error,
         searchInput: state.multipleOptionsAttribute.searchInput,
-        advanceDropdownMessageObject: state.multipleOptionsAttribute.advanceDropdownMessageObject
+        advanceDropdownMessageObject: state.multipleOptionsAttribute.advanceDropdownMessageObject,
+        isLoading: state.multipleOptionsAttribute.isLoading,
     }
 }
 
@@ -97,9 +99,15 @@ class MultipleOptionsAttribute extends PureComponent {
 
     renderListViewData(optionsList) {
         if (optionsList.length == 0) {
-            return (
-                <Text style={[styles.fontCenter, styles.fontDarkGray]}>{NO_OPTIONS_PRESENT}</Text>
-            )
+            if (!this.props.isLoading) {
+                return (
+                    <Text style={[styles.fontCenter, styles.fontDarkGray]}>{NO_OPTIONS_PRESENT}</Text>
+                )
+            } else {
+                return (
+                    <Loader />
+                )
+            }
         }
         let view = []
         for (let index in optionsList) {
