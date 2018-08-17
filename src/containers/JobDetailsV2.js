@@ -447,15 +447,13 @@ class JobDetailsV2 extends PureComponent {
 
   showHeaderView() {
     return (
-      <SafeAreaView style={[style.header]}>
-        <Header style={[style.header]}>
-          <View style={style.seqCard}>
-            {this.showJobMasterIdentifier()}
-            <Line1Line2View data={this.props.navigation.state.params.jobTransaction} />
-            {this.showCloseIcon()}
-          </View>
-        </Header>
-      </SafeAreaView>
+      <Header style={[style.header]}>
+        <View style={style.seqCard}>
+          {this.showJobMasterIdentifier()}
+          <Line1Line2View data={this.props.navigation.state.params.jobTransaction} />
+          {this.showCloseIcon()}
+        </View>
+      </Header>
     )
   }
 
@@ -500,13 +498,13 @@ class JobDetailsV2 extends PureComponent {
     const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
     const etaTimer = this.etaUpdateTimer()
     return (
-      <Content>
+      <Content style={[styles.marginTop8]}>
         {!this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0 ?
           this.showRevertView() : null}
 
         <View style={[styles.marginTop5, styles.bgWhite]}>
-          {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
-            <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
+          {this.props.errorMessage ? <View style={[styles.column, { padding: 12, backgroundColor: 'white' }]}>
+            <Text style={[styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning]}>
               {this.props.errorMessage}
             </Text>
           </View> : null}
@@ -577,7 +575,6 @@ class JobDetailsV2 extends PureComponent {
 
   showFooterView() {
     return (
-      <SafeAreaView style={[styles.bgWhite]}>
         <Footer style={[style.footer]}>
           {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0 && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
             <FooterTab>
@@ -604,7 +601,6 @@ class JobDetailsV2 extends PureComponent {
               </Button>
             </FooterTab>)}
         </Footer>
-      </SafeAreaView>
     )
   }
 
@@ -695,6 +691,7 @@ class JobDetailsV2 extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgLightGray]}>
+        
           {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal = {this.onCancelPress}/> : null}
           {draftAlert}
           {mismatchAlert}

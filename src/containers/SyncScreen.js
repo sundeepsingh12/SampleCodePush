@@ -184,10 +184,8 @@ class SyncScreen extends PureComponent {
     const syncView = this.getSyncView()
     const transactionView = this.getTransactionView()
     return (
-      <StyleProvider style={getTheme(platform)}>
         <Container>
-          <SafeAreaView>
-            <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
+            <Header searchBar style={[styles.bgWhite, style.header]}>
               <Body>
                 <View
                   style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -199,13 +197,11 @@ class SyncScreen extends PureComponent {
                 </View>
               </Body>
             </Header>
-          </SafeAreaView>
           <Content style={[styles.bgLightGray]}>
             {syncView}
             {transactionView}
           </Content>
         </Container>
-      </StyleProvider>
 
     )
   }
@@ -228,18 +224,11 @@ const style = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10
   },
-
-  footer: {
-    height: 'auto',
-    borderTopWidth: 1,
-    borderTopColor: '#f3f3f3'
-  },
   imageSync: {
     width: 116,
     height: 116,
     resizeMode: 'contain'
   }
-
 });
 
 

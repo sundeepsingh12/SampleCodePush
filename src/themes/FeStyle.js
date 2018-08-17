@@ -181,7 +181,9 @@ export default {
     marginTop30: {
         marginTop: 30
     },
-
+    marginTop8:{
+        marginTop:8
+    },
     marginBottom5: {
         marginBottom: 5
     },
@@ -660,7 +662,6 @@ export default {
         borderRadius: 36,
     },
     footer: {
-        height: 'auto',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3'
     },

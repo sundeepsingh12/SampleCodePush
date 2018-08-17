@@ -81,9 +81,7 @@ class LiveJobListing extends PureComponent {
             }, 30000)
         }
     }
-    componentWillUnmount(){
-        this.props.actions.setState(CLEAR_LIVE_JOB_STATE)
-    }
+
     componentDidUpdate() {
         if (this.props.liveJobToastMessage && this.props.liveJobToastMessage != '') {
             Toast.show({
@@ -97,11 +95,13 @@ class LiveJobListing extends PureComponent {
     }
 
     componentWillUnmount() {
+        this.props.actions.setState(CLEAR_LIVE_JOB_STATE)
         if (this.alarm) {
             Vibration.cancel()
             this.alarm.stop()
         }
     }
+
     navigateToScene = (item) => {
         if (item.isChecked == 'false' || !item.isChecked && this.props.selectedItems.length == 0) {
             navigate('LiveJob',
@@ -118,6 +118,7 @@ class LiveJobListing extends PureComponent {
             this.alarm.stop();
         }
     }
+
     renderData = (item) => {
         let time = this.getJobEtaTime(item.id)
         if (time != 'TimeUp') {
@@ -129,6 +130,7 @@ class LiveJobListing extends PureComponent {
             )
         }
     }
+
     getJobEtaTime = (id) => {
         if (this.props.liveJobList[id]) {
             let jobEndTime = moment(this.props.liveJobList[id].jobEndTime, 'HH:mm:ss')
@@ -139,12 +141,15 @@ class LiveJobListing extends PureComponent {
             return this.props.liveJobList[id].jobEndTime
         }
     }
+
     toggleLiveJobSelection = (id) => {
         this.props.actions.toggleLiveJobSelection(id, this.props.liveJobList, this.props.searchText)
     }
+
     acceptOrRejectMultiple = (status) => {
         this.props.actions.acceptOrRejectMultiple(status, this.props.selectedItems, this.props.liveJobList)
     }
+
     renderList() {
         let jobMasterId = JSON.parse(this.props.navigation.state.params.pageObject.jobMasterIds)[0]
         let jobTransactionArray = []
@@ -156,6 +161,7 @@ class LiveJobListing extends PureComponent {
         }
         return jobTransactionArray
     }
+
     checkTransactionForSearchText(jobTransaction) {
         let trimmedSearchText = _.trim(this.props.searchText);
         if (!_.trim(trimmedSearchText)) {
@@ -173,8 +179,7 @@ class LiveJobListing extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
+                        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]}>
                             <Body>
                                 <View
                                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -190,7 +195,6 @@ class LiveJobListing extends PureComponent {
                                 </View>
                             </Body>
                         </Header>
-                    </SafeAreaView>
                     <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
                         <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
                     </View>
@@ -219,7 +223,7 @@ class LiveJobListing extends PureComponent {
                     <Button small transparent
                         style={[style.headerQRButton]}
                         onPress={() => this.props.navigation.navigate(QrCodeScanner, { returnData: this.toggleItemOnSearchBar.bind(this) })} >
-                        <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={styles.fontWhite.color} />
+                        <MaterialCommunityIcons name='qrcode' style={[styles.fontLg]} color={styles.fontWhite.color} />
                     </Button>
                 </View>
             </View>
@@ -240,10 +244,10 @@ class LiveJobListing extends PureComponent {
     showListWithSearchBar() {
         let view
         if (!this.props.selectedItems || this.props.selectedItems.length == 0) {
-            view = <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-                <Body>
-                    <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+            view =  
+            <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+            <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+                    <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                         <TouchableOpacity style={[style.headerLeft]} onPress={() => {
                             this.props.navigation.goBack(null)
                         }}>
@@ -258,8 +262,8 @@ class LiveJobListing extends PureComponent {
                         <View />
                     </View>
                     {this.searchBar()}
-                </Body>
-            </Header>
+            </View>
+            </SafeAreaView>
         }
         return view
     }
@@ -267,8 +271,9 @@ class LiveJobListing extends PureComponent {
     showMultipleSelectList() {
         let view
         if (this.props.selectedItems && this.props.selectedItems.length > 0) {
-            view = <Header style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
-                <Body>
+            view =
+            <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+            <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                     <View style={[styles.column, { alignSelf: 'stretch' }]}>
                         <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>
                             <View style={[styles.row, styles.justifySpaceAround, styles.alignCenter]}>
@@ -285,11 +290,12 @@ class LiveJobListing extends PureComponent {
                         </View>
                         {this.searchBar()}
                     </View>
-                </Body>
-            </Header>
+            </View>
+            </SafeAreaView>
         }
         return view
     }
+
     getSelectedReferenceNo() {
         let referenceList = ''
         this.props.selectedItems.forEach((item) => { referenceList += this.props.liveJobList[item].referenceNumber + ",  " })
@@ -300,6 +306,7 @@ class LiveJobListing extends PureComponent {
             </ScrollView>
         )
     }
+
     showFooterView() {
         if (this.props.selectedItems && this.props.selectedItems.length > 0) {
             let referenceNumberView = this.getSelectedReferenceNo()
@@ -325,6 +332,7 @@ class LiveJobListing extends PureComponent {
             )
         }
     }
+
     render() {
         if (this.props.loaderRunning) {
             return <Loader />
@@ -351,6 +359,7 @@ class LiveJobListing extends PureComponent {
         }
     }
 }
+
 const style = StyleSheet.create({
     header: {
         borderBottomWidth: 0,

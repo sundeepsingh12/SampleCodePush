@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import {  View, Text, TouchableOpacity } from 'react-native'
 import { Body, Header, Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 
@@ -7,7 +7,7 @@ class TitleHeader extends PureComponent {
 
     render() {
         return (
-            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])} hasTabs>
+            <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]} hasTabs>
                 <Body>
                     <View
                         style={[styles.row, styles.width100, styles.justifySpaceBetween]}>

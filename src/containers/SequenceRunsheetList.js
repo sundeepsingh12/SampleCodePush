@@ -78,7 +78,7 @@ class SequenceRunsheetList extends Component {
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                        <Header style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                        <Header style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                             <Body>
                                 <View
                                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>

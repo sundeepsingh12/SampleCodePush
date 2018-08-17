@@ -109,7 +109,7 @@ class UnsyncBackupUpload extends Component {
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button transparent style={StyleSheet.flatten([styles.padding10, styles.bgLightGray])}
+                        <Button transparent style={[styles.padding10, styles.bgLightGray]}
                             onPress={() => {
                                 this.props.actions.readAndUploadFiles()
                                 this.props.actions.resetFailCountInStore(false)
@@ -118,7 +118,7 @@ class UnsyncBackupUpload extends Component {
                         </Button>
                     </View>
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button transparent style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}
+                        <Button transparent style={[styles.padding10, styles.bgWhite]}
                             onPress={() => this.props.actions.resetFailCountInStore(true)}
                         >
                             <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>{CONTINUE}</Text>
