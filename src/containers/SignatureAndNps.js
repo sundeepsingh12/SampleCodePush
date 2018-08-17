@@ -109,7 +109,6 @@ class SignatureAndNps extends PureComponent {
 
     headerView() {
         return (
-            <SafeAreaView style={[styles.bgWhite]}>
                 <Header searchBar style={[styles.bgWhite, style.header]}>
                     <Body>
                         <View
@@ -127,7 +126,6 @@ class SignatureAndNps extends PureComponent {
                         </View>
                     </Body>
                 </Header>
-            </SafeAreaView>
         )
     }
     saveSignButton() {
@@ -161,10 +159,10 @@ class SignatureAndNps extends PureComponent {
                                 viewMode={this.state.isLandscape} />
                         </View>
                         <View style={[style.feedback]}>
-                                    <View style={[{ paddingLeft: 150, paddingRight: 150 }]}>
-                                        <NPSFeedback onStarPress={this.onStarRatingPress} showSave={true} />
-                                    </View>
-                                </View>
+                            <View style={[styles.justifyCenter, styles.paddingHorizontal15, styles.marginLeft30,{width: "70%", margin: 'auto'}]}>
+                                <NPSFeedback onStarPress={this.onStarRatingPress} showSave={true} />
+                            </View>
+                        </View>
                     </View>
                     {this.saveSignButton()}
                 </Container>
@@ -184,18 +182,18 @@ const style = StyleSheet.create({
         paddingLeft: 0
     },
     headerLeft: {
-        width: '15%',
+        width: '20%',
         padding: 15
     },
     headerBody: {
-        width: '70%',
+        width: '60%',
         paddingTop: 15,
         paddingBottom: 15,
         paddingLeft: 10,
         paddingRight: 10
     },
     headerRight: {
-        width: '15%',
+        width: '20%',
         padding: 15
     },
     fabButton: {

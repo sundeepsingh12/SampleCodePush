@@ -251,8 +251,7 @@ class ErpSyncScreen extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
-          <SafeAreaView>
-            <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
+            <Header searchBar style={[styles.bgWhite, style.header]}>
               <Body>
                 <View
                   style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -264,7 +263,6 @@ class ErpSyncScreen extends PureComponent {
                 </View>
               </Body>
             </Header>
-          </SafeAreaView>
 
           <Content style={[styles.bgLightGray]}>
             {syncView}

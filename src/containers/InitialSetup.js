@@ -26,6 +26,8 @@ import {
     RETRY,
     TIME_ERROR_MESSAGE
 } from '../lib/ContainerConstants'
+import isEmpty from 'lodash/isEmpty'
+
 function mapStateToProps(state) {
     return {
         configDownloadService: state.preloader.configDownloadService,
@@ -137,7 +139,7 @@ class InitialSetup extends PureComponent {
     }
     }
     _renderErrorMessage() {
-        if (!_.isEmpty(this.props.error)) {
+        if (!isEmpty(this.props.error)) {
             return (
                 <View>
                     <View>

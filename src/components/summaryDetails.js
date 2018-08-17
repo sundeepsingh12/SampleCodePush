@@ -6,6 +6,8 @@ import { Parcel_Summary } from '../lib/AttributeConstants'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
+import values from 'lodash/values'
+
 export default class SummaryDetails extends PureComponent {
 
     renderParcelData = (item) => {
@@ -53,7 +55,7 @@ export default class SummaryDetails extends PureComponent {
                 <StyleProvider style={getTheme(platform)}>
                     <Container>
                         <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                            <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                                 <Body>
                                     <View
                                         style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -74,7 +76,7 @@ export default class SummaryDetails extends PureComponent {
                         <Content style={[styles.bgLightGray]}>
                             <FlatList
                                 style={[styles.marginTop10]}
-                                data={_.values(this.props.recurringData)}
+                                data={values(this.props.recurringData)}
                                 extraData={this.state}
                                 renderItem={(item) => this.renderParcelData(item.item)}
                                 keyExtractor={this._keyExtractor}>

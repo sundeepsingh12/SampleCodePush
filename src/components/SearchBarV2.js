@@ -7,11 +7,11 @@ import {
 import styles from '../themes/FeStyle'
 import { QrCodeScanner } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import _ from 'lodash'
+import trim from 'lodash/trim'
 
 export default class SearchBarV2 extends PureComponent {
     _setQrValue = (value) => {
-        this.props.returnValue(_.trim(value))
+        this.props.returnValue(trim(value))
     }
     onPress = () => {
         this.props.onPress()

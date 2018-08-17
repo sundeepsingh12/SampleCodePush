@@ -2,6 +2,7 @@ import {
   keyValueDB
 } from '../../repositories/keyValueDb'
 import validate from "json-schema"
+import isEmpty from 'lodash/isEmpty'
 
 class KeyValueDB {
 
@@ -40,7 +41,7 @@ class KeyValueDB {
   
 // used for check of null json and save data in store
  async checkForNullValidateAndSaveInStore(json,schemaName){
-    if(!_.isEmpty(json)) {
+    if(!isEmpty(json)) {
       await keyValueDBService.validateAndSaveData(schemaName, json)
     }
  }

@@ -6,9 +6,8 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text,  Body, Right, Icon, StyleProvider } from 'native-base'
+import { View, TouchableOpacity } from 'react-native'
+import { Container, Content, Header, Text,  Body, Icon, StyleProvider } from 'native-base'
 import * as profileActions from '../modules/profile/profileActions'
 import * as globalActions from '../modules/global/globalActions'
 import { RESET_PASSWORD, CONTACT_NUMBER, EMAIL, PROFILE, } from '../lib/ContainerConstants'
@@ -46,8 +45,7 @@ class ProfileView extends PureComponent {
 
   _getHeaderView() {
     return (
-      <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
+        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]}>
           <Body>
             <View
               style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -63,7 +61,6 @@ class ProfileView extends PureComponent {
             </View>
           </Body>
         </Header>
-      </SafeAreaView>
     )
   }
 

@@ -48,8 +48,8 @@ export default class NonExpandableDetailsView extends PureComponent {
                     {renderIf(this.props.attributeTypeId == IMAGE_URL,
                         <TouchableOpacity onPress={() => this._openURL(this.props.value)}>
                             <View style={[styles.row]}>
-                                <Icon name={'ios-image'} style={StyleSheet.flatten([styles.alignSelfEnd, styles.fontBlack, styles.fontXl, {color : styles.fontPrimaryColor}])} />
-                                <Text style={StyleSheet.flatten([styles.fontSm, styles.paddingLeft5, {color : styles.fontPrimaryColor}])}>
+                                <Icon name={'ios-image'} style={[styles.alignSelfEnd, styles.fontBlack, styles.fontXl, {color : styles.fontPrimaryColor}]} />
+                                <Text style={[styles.fontSm, styles.paddingLeft5, {color : styles.fontPrimaryColor}]}>
                                     {VIEW_TEXT_LABEL}
                                 </Text>
                             </View>
