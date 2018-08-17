@@ -391,7 +391,7 @@ export function startFCM() {
             alert: true
           });
         } catch (e) {
-          showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED, 'danger', 1)
+          showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED+'\n'+e.message, 'danger', 1)
         }
         const userObject = await keyValueDBService.getValueFromStore(USER)
         const topic = `FE_${userObject.value.id}`
@@ -401,7 +401,7 @@ export function startFCM() {
           await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
 
         }, (error) => {
-        }).catch(() => showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR, 'danger', 1))
+        }).catch((error) => showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR+'\n'+error.message, 'danger', 1))
 
         if (Platform.OS === 'ios') {
           FCM.getAPNSToken().then(token => {
