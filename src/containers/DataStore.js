@@ -12,7 +12,7 @@ import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { SET_DATA_STORE_ATTR_MAP, SET_SEARCH_TEXT, SHOW_DETAILS, _id, SET_INITIAL_STATE, QrCodeScanner, DISABLE_AUTO_START_SCANNER, SHOW_LOADER_DS } from '../lib/constants'
 import { FooterTab, Card, Container, Content, Button, Text, Footer, Toast } from 'native-base'
-import { EXTERNAL_DATA_STORE, } from '../lib/AttributeConstants'
+import { EXTERNAL_DATA_STORE, DATA_STORE } from '../lib/AttributeConstants'
 import _ from 'lodash'
 import { SUGGESTIONS, OK } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
@@ -238,7 +238,7 @@ class DataStore extends PureComponent {
                         {this.getSuggestionsText()}
                         {this.flatListView()}
                     </Content>
-                    {((this.props.isMinMaxValidation || this.props.isAllowFromFieldInExternalDS) && _.size(this.props.searchText) > 2) &&
+                    {(((this.props.isMinMaxValidation && this.props.navigation.state.params.currentElement.attributeTypeId == DATA_STORE) || this.props.isAllowFromFieldInExternalDS) && _.size(this.props.searchText) > 2) &&
                         <SafeAreaView style={{ backgroundColor: 'white' }}>
                             <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
                                 <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
