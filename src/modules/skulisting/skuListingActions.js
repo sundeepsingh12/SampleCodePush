@@ -23,6 +23,7 @@ import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutAc
 import { SKIP_SKU_MESSAGE, OK } from '../../lib/ContainerConstants'
 import _ from 'lodash'
 import { navigate } from '../navigators/NavigationService';
+import { ImageStore, Platform } from 'react-native';
 
 export function prepareSkuList(fieldAttributeMaster, jobId) {
     return async function (dispatch) {
@@ -80,13 +81,25 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
         try {
             if (rowItem.attributeTypeId == SKU_PHOTO || rowItem.attributeTypeId == SKU_REASON) {
                 if (rowItem.attributeTypeId == SKU_PHOTO) {
-                    value = await signatureService.saveFile(value, moment(), true)
-                    navigation.pop(1)
+                    let imageData
+                    if (Platform.OS == 'android') {
+                        ImageStore.getBase64ForTag(value.uri, (base64Data) => {
+                            dispatch(saveImageForSku(base64Data, skuListItems, navigation, jobId, rowItem))
+                        }, (reason) => {
+                            console.log(reason)
+                        })
+                    }
+                    else {
+                        imageData = (value.base64) ? value.base64 : value.data
+                        dispatch(saveImageForSku(imageData, skuListItems, navigation, jobId, rowItem))
+                    }
+                } else {
+                    let copyOfskuListItems = _.cloneDeep(skuListItems)
+                    copyOfskuListItems[jobId][rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value
+                    dispatch(setState(UPDATE_SKU_LIST_ITEMS, copyOfskuListItems))
                 }
-                let copyOfskuListItems = _.cloneDeep(skuListItems)
-                copyOfskuListItems[jobId][rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value
-                dispatch(setState(UPDATE_SKU_LIST_ITEMS, copyOfskuListItems))
-            } else {
+            }
+            else {
                 const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId)
                 dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY, {
                     skuListItems: updatedSkuArray.updatedSkuList,
@@ -97,7 +110,20 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
             showToastAndAddUserExceptionLog(2202, error.message, 'danger', 1)
         }
     }
+}
 
+export function saveImageForSku(base64Data, skuListItems, navigation, jobId, rowItem) {
+    return async function (dispatch) {
+        try {
+            let value = await signatureService.saveFile(base64Data, moment(), true)
+            let copyOfskuListItems = _.cloneDeep(skuListItems)
+            copyOfskuListItems[jobId][rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value
+            dispatch(setState(UPDATE_SKU_LIST_ITEMS, copyOfskuListItems))
+            navigation.pop(1)
+        } catch (error) {
+            showToastAndAddUserExceptionLog(2206, error.message, 'danger', 1)
+        }
+    }
 }
 
 /**This is called when Proceed button is clicked
