@@ -38,10 +38,11 @@ class ImageDetailsView extends PureComponent {
         if (this.props.viewData) {
             return <Image
                 resizeMethod={'resize'}
+                resizeMode={(this.props.navigation.state.params.isSignature) ? 'contain' : 'cover'}
                 source={{
                     uri: 'data:image/jpeg;base64,' + this.props.viewData,
                 }}
-                style={[{ height: '100%', width: '100%', padding: 5 }, styles.flex1]}
+                style={[{ height: '100%', width: '100%'}, styles.flex1]}
             />
         } else {
             let view =
@@ -55,9 +56,9 @@ class ImageDetailsView extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1 , backgroundColor: '#fff'}}>
                         {this.getImageView()}
-                        <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, flex: 2 }]}>
+                        <SafeAreaView style={[styles.absolute, styles.marginLeft5, styles.padding15, { top: 0, left: 0, flex: 2 }]}>
                             <View>
                                 <Icon
                                     name="md-close"
