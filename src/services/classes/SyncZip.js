@@ -2,6 +2,7 @@ import RNFS from 'react-native-fs'
 import { zip } from 'react-native-zip-archive'
 import { jobTransactionService } from './JobTransaction'
 import { jobSummaryService } from './JobSummary'
+import { keyValueDBService } from './KeyValueDBService'
 import * as realm from '../../repositories/realmdb'
 import {
     TABLE_TRACK_LOGS,
@@ -19,10 +20,10 @@ import moment from 'moment'
 import { trackingService } from './Tracking'
 import { userEventLogService } from './UserEvent'
 import { addServerSmsService } from './AddServerSms'
-import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, PENDING, PATH, PATH_TEMP,APP_VERSION_NUMBER } from '../../lib/AttributeConstants'
+import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, PENDING, PATH, PATH_TEMP, APP_VERSION_NUMBER, SKU_PHOTO } from '../../lib/AttributeConstants'
 import { userExceptionLogsService } from './UserException'
 import { communicationLogsService } from './CommunicationLogs'
-import { omit } from 'lodash'
+import omit from 'lodash/omit'
 import { Platform } from 'react-native'
 var CryptoJS = require("crypto-js");
 
@@ -44,7 +45,7 @@ class SyncZip {
         SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, syncStoreDTO.lastSyncWithServer);
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
-        const userSummary = this.updateNextJobTransactionIdAndAppVersion(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
+        const userSummary = this.updateUserSummary(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
         let { communicationLogs, lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogs(syncStoreDTO, userSummary) : { communicationLogs: [], lastCallTime: null, lastSmsTime: null }
         SYNC_RESULTS.userCommunicationLog = communicationLogs ? communicationLogs : []
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
@@ -53,31 +54,31 @@ class SyncZip {
         SYNC_RESULTS.jobSummary = jobSummary
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
-        let isEncryptionSuccessful = true,syncData
-        try{
-             syncData = JSON.stringify(SYNC_RESULTS)
+        let isEncryptionSuccessful = true, syncData
+        try {
+            syncData = JSON.stringify(SYNC_RESULTS)
             const encryptionKey = await keyValueDBService.getValueFromStore(ENCRYPTION_KEY)
             const keyInside = CryptoJS.enc.Base64.parse(encryptionKey.value);
-            const encryptedResult = CryptoJS.AES.encrypt(syncData, keyInside, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7})
-              //Writing Object to File at TEMP location
+            const encryptedResult = CryptoJS.AES.encrypt(syncData, keyInside, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 })
+            //Writing Object to File at TEMP location
             await RNFS.writeFile(PATH_TEMP + '/logs.json', encryptedResult.toString(), 'utf8');
-        }catch(error){
+        } catch (error) {
             isEncryptionSuccessful = false
         }
         //Send data in plain text format to server,sync shouldn't be stopped if encryption failed
-        if(!isEncryptionSuccessful){
+        if (!isEncryptionSuccessful) {
             await RNFS.writeFile(PATH_TEMP + '/logs.json', syncData, 'utf8');
         }
         //Creating ZIP file
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
-        return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds,isEncryptionSuccessful }
+        return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful }
         //Deleting TEMP folder location
         // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }
 
-    updateNextJobTransactionIdAndAppVersion(statusList, jobMasterList, userSummary) {
+    updateUserSummary(statusList, jobMasterList, userSummary) {
         if (!userSummary) {
             throw new Error('User Summary missing in store');
         }
@@ -86,6 +87,7 @@ class SyncZip {
         const firstEnableSequenceTransaction = (jobMasterListWithEnableResequence && pendingStatusList) ? jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterListWithEnableResequence, pendingStatusList) : null;
         userSummary.nextJobTransactionId = firstEnableSequenceTransaction ? firstEnableSequenceTransaction.id : null;
         userSummary.appVersion = APP_VERSION_NUMBER
+        userSummary.lastLocationDatetime = moment().format('YYYY-MM-DD HH:mm:ss')
         return userSummary;
     }
 
@@ -234,7 +236,7 @@ class SyncZip {
 
         let masterIdToAttributeMap = {}
         for (let fieldAttribute of fieldAttributesList) {
-            if (fieldAttribute.attributeTypeId == SIGNATURE || fieldAttribute.attributeTypeId == CAMERA || fieldAttribute.attributeTypeId == CAMERA_HIGH || fieldAttribute.attributeTypeId == CAMERA_MEDIUM) {
+            if (fieldAttribute.attributeTypeId == SIGNATURE || fieldAttribute.attributeTypeId == CAMERA || fieldAttribute.attributeTypeId == CAMERA_HIGH || fieldAttribute.attributeTypeId == CAMERA_MEDIUM || fieldAttribute.attributeTypeId == SKU_PHOTO) {
                 masterIdToAttributeMap[fieldAttribute.id] = fieldAttribute
             }
         }

@@ -52,7 +52,7 @@ class Payment extends PureComponent {
         this.props.actions.getPaymentParameters(this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState.formElement, this.props.navigation.state.params.formLayoutState.statusId)
     }
 
-    renderPaymentModeId(modeId, type) {
+    renderPaymentModeId(modeId) {
         switch (modeId) {
             case CASH.id: return CASH.displayName
             case CHEQUE.id: return CHEQUE.displayName
@@ -63,13 +63,9 @@ class Payment extends PureComponent {
             case MOSAMBEE_WALLET.id: return MOSAMBEE_WALLET.displayName
             case MPAY.id: return MPAY.displayName
             case M_SWIPE.id: return M_SWIPE.displayName
-            case NET_BANKING.id: {
-                switch (type) {
-                    case NET_BANKING_LINK.id: return NET_BANKING_LINK.displayName
-                    case NET_BANKING_CARD_LINK.id: return NET_BANKING_CARD_LINK.displayName
-                    case NET_BANKING_UPI_LINK.id: return NET_BANKING_UPI_LINK.displayName
-                }
-            }
+            case NET_BANKING_LINK.id: return NET_BANKING_LINK.displayName
+            case NET_BANKING_CARD_LINK.id: return NET_BANKING_CARD_LINK.displayName
+            case NET_BANKING_UPI_LINK.id: return NET_BANKING_UPI_LINK.displayName
             case NOT_PAID.id: return NOT_PAID.displayName
             case PAYNEAR.id: return PAYNEAR.displayName
             case PAYO.id: return PAYO.displayName
@@ -91,7 +87,7 @@ class Payment extends PureComponent {
         return (
             <View>
                 <Text> {type} </Text>
-                <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
+                <View style={[styles.positionRelative, { zIndex: 1 }]} >
                     <Input
                         keyboardType="numeric"
                         returnKeyType='done'
@@ -105,7 +101,7 @@ class Payment extends PureComponent {
                                 transactionNumber: value
                             }
                         )}
-                        style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])} />
+                        style={[styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }]} />
 
                 </View>
             </View>
@@ -161,7 +157,7 @@ class Payment extends PureComponent {
                 onPress={() => { this.props.actions.paymentModeSelect(this.props.selectedPaymentMode, this.props.splitPaymentMode, moneyTransactionModeId, this.props.actualAmount, this.props.transactionNumber) }}
             >
                 <Text style={disabled ? [styles.fontDarkGray, { width: '80%' }] : [styles.fontBlack, { width: '80%' }]}>
-                    {this.renderPaymentModeId(moneyTransactionModeId, type)}
+                    {this.renderPaymentModeId(moneyTransactionModeId)}
                 </Text>
                 <View style={[styles.justifyCenter, styles.row, { width: '20%' }]}>
                     <CheckBox onPress={() => { this.props.actions.paymentModeSelect(this.props.selectedPaymentMode, this.props.splitPaymentMode, moneyTransactionModeId, this.props.actualAmount, this.props.transactionNumber) }} color={disabled ? styles.fontDarkGray.color : styles.primaryColor} style={{ borderRadius: 15 }} checked={paymentSelectedResult} />
@@ -194,7 +190,7 @@ class Payment extends PureComponent {
             if (paymentModeList.endPaymentModeList[index].moneyTransactionModeId == NET_BANKING.id) {
                 for (let type = 97; type < 100; type++) {
                     paymentModeView.push(
-                        this.paymentItemView(this.props.actualAmount, type, paymentModeList.endPaymentModeList[index].moneyTransactionModeId, this.props.selectedPaymentMode, null, type, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
+                        this.paymentItemView(this.props.actualAmount, type, type, this.props.selectedPaymentMode, null, type, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
                     )
                 }
             } else if(paymentModeList.endPaymentModeList[index].moneyTransactionModeId != MOSAMBEE.id || Platform.OS != 'ios'){
@@ -315,7 +311,7 @@ class Payment extends PureComponent {
                         <View style={[styles.marginBottom15]}>
                             {paymentModeView}
                         </View>
-                        <View style={StyleSheet.flatten([styles.marginTop20, styles.marginBottom20])} >
+                        <View style={[styles.marginTop20, styles.marginBottom20]} >
                             {paymentModeSelectedView}
                         </View>
                     </Content>
@@ -324,7 +320,7 @@ class Payment extends PureComponent {
                             <FooterTab>
                                 <Button success
                                     disabled={this.props.isSaveButtonDisabled}
-                                    style={StyleSheet.flatten([{ borderRadius: 0 }])}
+                                    style={[{ borderRadius: 0 }]}
                                     onPress={() => {
                                         this.moveToSplitOrSavePayment()
                                     }}

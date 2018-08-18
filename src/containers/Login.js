@@ -1,7 +1,7 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { Alert, StyleSheet, View, Text, Image, TouchableOpacity, TextInput } from 'react-native'
-import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg, ActionSheet } from 'native-base'
+import { Alert, StyleSheet, View, Text, Image, TouchableOpacity, TextInput, Modal, Keyboard } from 'react-native'
+import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg, ActionSheet, Label, Footer } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -10,8 +10,8 @@ import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
 import { QrCodeScanner } from '../lib/constants'
 import CONFIG from '../lib/config'
-import { OK, CANCEL, CONFIRM_RESET, RESET_ACCOUNT_SETTINGS, REMEMBER_ME } from '../lib/ContainerConstants'
-
+import { OK, CANCEL, CONFIRM_RESET, RESET_ACCOUNT_SETTINGS, REMEMBER_ME, NEW_PASSWORD, CONFIRM_NEW_PASSWORD, PASSWORD_EXPIRED_MESSAGE, RESET_PASSWORD, SAVE_AND_PROCEED } from '../lib/ContainerConstants'
+import _ from 'lodash'
 var style = StyleSheet.create({
   container: {
     flex: 1,
@@ -54,6 +54,15 @@ function mapStateToProps(state) {
 
 class Login extends PureComponent {
   _didFocusSubscription;
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      newPassword: '',
+      confirmNewPassword: '',
+      buttonDisabled: true
+    }
+  }
 
   componentDidMount() {
     this.props.checkRememberMe()
@@ -241,6 +250,115 @@ class Login extends PureComponent {
     )
   }
 
+  _setPassword(text, newPasswordOrConfirmPassword) {
+    if (!_.isEmpty(this.props.auth.form.errorMessageResetPassword)) {
+      this.props.setErrorMessageResetPassword('')
+    }
+    let buttonDisabled
+    if (newPasswordOrConfirmPassword == 1) {
+      if (this.state.confirmNewPassword != '' && text != '') {
+        buttonDisabled = false
+      } else {
+        buttonDisabled = true
+      }
+    } else {
+      if (this.state.newPassword != '' && text != '') {
+        buttonDisabled = false
+      } else {
+        buttonDisabled = true
+      }
+    }
+    if (newPasswordOrConfirmPassword == 1) {
+      this.setState({ newPassword: text, buttonDisabled })
+    } else {
+      this.setState({ confirmNewPassword: text, buttonDisabled })
+    }
+  }
+
+  closeModal() {
+    this.props.setShowResetPassword(false)
+    this.setState({ confirmNewPassword: '', newPassword: '', buttonDisabled: true })
+  }
+
+  showResetPasswordModal() {
+    let view
+    if (this.props.auth.form.showResetPassword) {
+      view =
+        <Modal animationType={"fade"}
+          transparent={true}
+          visible={this.props.auth.form.showResetPassword}
+          onRequestClose={() => this.closeModal()}
+          presentationStyle={"overFullScreen"}>
+          <StyleProvider style={getTheme(platform)}>
+            <Container style={[styles.bgWhite]}>
+              <Content style={[styles.flexBasis90]} >
+                <View >
+                  <View style={[styles.paddingTop10, { top: 0, left: 0, height: 50, width: '100%' }, styles.paddingLeft15, styles.row]}>
+                    <TouchableOpacity onPress={() => this.closeModal()}>
+                      <Iconimg name="md-close" style={[styles.fontBlack, styles.fontXxl, styles.fontLeft]} />
+                    </TouchableOpacity>
+                    <View style={[styles.flex1, styles.alignCenter]}>
+                      <Text style={[styles.fontBlack, styles.fontXl]}>{RESET_PASSWORD}</Text>
+                    </View>
+                  </View>
+
+                  <View style={[styles.width100, { paddingTop: 50 }]} >
+                    <Text style={[styles.fontLg, styles.fontCenter, styles.margin20]}>
+                      {PASSWORD_EXPIRED_MESSAGE}
+                    </Text>
+                  </View>
+                  <View style={[{ paddingTop: 80 }, styles.paddingLeft10, styles.paddingRight10]}>
+                    {this.textInputForResetPassword(NEW_PASSWORD, 1, this.state.newPassword)}
+                    {this.textInputForResetPassword(CONFIRM_NEW_PASSWORD, 2, this.state.confirmNewPassword)}
+                  </View>
+                  {(!_.isEmpty(this.props.auth.form.errorMessageResetPassword)) ? <View style={[styles.width100, { paddingTop: 30 }]} >
+                    <Text style={[styles.fontLg, styles.fontCenter, styles.margin20, styles.fontDanger]}>
+                      {this.props.auth.form.errorMessageResetPassword}
+                    </Text>
+                  </View> : null}
+                  {_.isEmpty(this.props.auth.form.errorMessageResetPassword) && this.props.auth.form.showResetPasswordLoader ?
+                    <Spinner />
+                    : null
+                  }
+                </View>
+              </Content>
+              <View style={[styles.padding10]}>
+                <Button
+                  full success
+                  disabled={this.state.buttonDisabled || this.props.auth.form.showResetPasswordLoader || !_.isEmpty(this.props.auth.form.errorMessageResetPassword)}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    this.props.resetPassword(this.state.newPassword, this.state.confirmNewPassword, this.props.auth.form.username, this.props.auth.form.password)
+                  }}
+                  style={[styles.padding10, styles.width100, { height: 50 }]}
+                >
+                  <Text style={[styles.fontWhite, styles.fontLg]}>{SAVE_AND_PROCEED}</Text>
+                </Button>
+              </View>
+            </Container>
+          </StyleProvider>
+        </Modal>
+    }
+    return view
+  }
+
+  textInputForResetPassword(displayLabel, newPasswordOrConfirmPassword, ref) {
+    let view
+    view =
+      <Item stackedLabel>
+        <Label style={[{ color: styles.fontPrimaryColor }, styles.fontRegular]}>{displayLabel}</Label>
+        <TextInput
+          value={ref}
+          autoCapitalize="none"
+          underlineColorAndroid='transparent'
+          onChangeText={(text) => this._setPassword(text, newPasswordOrConfirmPassword)}
+          secureTextEntry={true}
+          style={[styles.fontLg, styles.paddingRight15, styles.width100, { height: 40 }]}
+        />
+      </Item>
+    return view
+  }
+
   render() {
     const imageView = this.getImageView()
     return (
@@ -257,7 +375,7 @@ class Login extends PureComponent {
                 {this.showLoginButton()}
                 {this.showRememberMe()}
                 {this.showDisplayMessageAndScanner()}
-
+                {this.showResetPasswordModal()}
               </View>
             </View>
           </Content>

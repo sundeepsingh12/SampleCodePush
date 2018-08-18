@@ -36,7 +36,7 @@ import {
     MB,
 } from '../lib/ContainerConstants'
 import { SET_BACKUP_VIEW, SET_BACKUP_TOAST } from '../lib/constants'
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 
 import TitleHeader from '../components/TitleHeader'
 
@@ -92,7 +92,7 @@ class Backup extends Component {
     goBack = () => {
         this.props.navigation.goBack()
     }
-    
+
     createBackupPressed = () => {
         var _buttons = new Array();
         _buttons.push({ text: CANCEL, onPress: this.props.onCancelPressed, style: 'cancel' });
@@ -183,7 +183,7 @@ class Backup extends Component {
         let flatListView
         let emptyListView
         if (this.props.isLoading || this.props.backupView != 0) return
-        if (!this.props.isLoading && !_.isEmpty(this.props.unSyncedFiles)) {
+        if (!this.props.isLoading && !isEmpty(this.props.unSyncedFiles)) {
             flatListView = < FlatList
                 data={Object.values(this.props.unSyncedFiles)}
                 renderItem={({ item }) => this.renderSyncedData(item)
@@ -191,7 +191,7 @@ class Backup extends Component {
                 keyExtractor={item => String(item.id)}
             />
             return flatListView
-        } else if (_.isEmpty(this.props.unSyncedFiles)) {
+        } else if (isEmpty(this.props.unSyncedFiles)) {
             emptyListView =
                 <View style={[styles.alignCenter, styles.padding20]}>
                     <Text style={styles.fontDarkGray}> {THERE_ARE_NO_UNSYNCED_FILES} </Text>
@@ -210,7 +210,7 @@ class Backup extends Component {
         let flatListView
         let emptyListView
         if (this.props.isLoading || this.props.backupView != 0) return
-        if (!this.props.isLoading && !_.isEmpty(this.props.syncedFiles)) {
+        if (!this.props.isLoading && !isEmpty(this.props.syncedFiles)) {
             flatListView = < FlatList
                 data={this.renderList()}
                 renderItem={({ item }) => this.renderSyncedData(item)
@@ -218,7 +218,7 @@ class Backup extends Component {
                 keyExtractor={item => String(item.id)}
             />
             return flatListView
-        } else if (_.isEmpty(this.props.syncedFiles)) {
+        } else if (isEmpty(this.props.syncedFiles)) {
             emptyListView =
                 <View style={[styles.alignCenter, styles.padding20]}>
                     <Text style={styles.fontDarkGray}> {THERE_ARE_NO_SYNCED_FILES} </Text>
@@ -266,6 +266,11 @@ class Backup extends Component {
                                         {UPLOAD}
                                     </Text>
                                 </Button>
+                                <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.mailBackupFile(this.state.indexOfModal, this.props.syncedFiles)}>
+                                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>
+                                        Mail
+                                    </Text>
+                                </Button>
                                 <Button full transparent style={{ height: 60 }} onPress={() => this.setState({ indexOfModal: 0 })}>
                                     <Text style={[styles.fontDarkGray, styles.fontXl]}>
                                         {CANCEL}
@@ -291,6 +296,11 @@ class Backup extends Component {
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.uploadBackupFile(this.state.indexOfModal, this.props.unSyncedFiles)}>
                                     <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>
                                         {UPLOAD}
+                                    </Text>
+                                </Button>
+                                <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.mailBackupFile(this.state.indexOfModal, this.props.unSyncedFiles)}>
+                                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontXl]}>
+                                        Mail
                                     </Text>
                                 </Button>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={

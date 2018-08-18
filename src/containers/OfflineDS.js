@@ -40,7 +40,6 @@ class OfflineDS extends Component {
 
     headerView() {
         return (
-            <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
                 <Header style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                     <Body>
                         <View
@@ -56,7 +55,6 @@ class OfflineDS extends Component {
                         </View>
                     </Body>
                 </Header>
-            </SafeAreaView>
         )
 
     }

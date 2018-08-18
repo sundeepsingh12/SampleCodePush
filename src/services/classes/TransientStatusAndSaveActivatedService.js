@@ -319,8 +319,8 @@ class TransientStatusAndSaveActivatedService {
     }
 
     createObjectForStore(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates) {
-        let cloneSaveActivatedState = _.cloneDeep(saveActivatedState)
-        let cloneNavigationFormLayoutStates = _.cloneDeep(navigationFormLayoutStates)
+        let cloneSaveActivatedState = JSON.parse(JSON.stringify(saveActivatedState))
+        let cloneNavigationFormLayoutStates = JSON.parse(JSON.stringify(navigationFormLayoutStates))
         let storeObject = {}
         storeObject[jobMasterId] = {
             saveActivatedState: cloneSaveActivatedState, 

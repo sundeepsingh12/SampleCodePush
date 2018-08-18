@@ -57,6 +57,7 @@ module.exports = {
     FCM_TOKEN_DEREGISTRATION: '/app/rest/fcm/deRegister',
     SEND_MESSAGE: '/app/rest/device/send_message',
     UPDATE_LAST_SEEN: '/app/rest/device/update_last_seen',
-    POST_ZIP_ENCRYPTED_API:'/app/rest/device/v2/sync'
+    POST_ZIP_ENCRYPTED_API: '/app/rest/device/v2/sync',
+    RESET_PASSWORD_AT_LOGIN: '/forgot_password/reset_expired_password'
   }
 }

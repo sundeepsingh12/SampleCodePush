@@ -3,13 +3,9 @@ import { StyleSheet, View, TouchableHighlight, Alert } from 'react-native'
 import styles from '../themes/FeStyle'
 
 import {
-  Header,
   Button,
   Text,
-  List,
-  Left,
   Icon,
-  Title,
   ActionSheet,
 } from 'native-base'
 import moment from 'moment'
@@ -154,7 +150,7 @@ componentWillUnmount() {
           {this.props.data.jobMasterIdentifier}
         </Text>
         {this.props.data.isChecked ? <View style={[styles.absolute, styles.bgSuccess, styles.justifyCenter, styles.alignCenter, style.selectedItemCircle]}>
-          <Icon name="ios-checkmark" style={[styles.bgTransparent, styles.fontWhite]} />
+          <Icon name="ios-checkmark" style={[styles.bgTransparent, styles.fontWhite, {marginTop: -5}]} />
         </View> : null}
       </View>
     )

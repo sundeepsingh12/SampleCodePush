@@ -10,15 +10,22 @@ import { fieldAttributeMasterService } from '../../services/classes/FieldAttribu
 import { fieldAttributeValueMasterService } from '../../services/classes/FieldAttributeValueMaster'
 import { CHECKBOX, ARRAY_SAROJ_FAREYE, OPTION_RADIO_FOR_MASTER, OBJECT_SAROJ_FAREYE, OPTION_RADIO_VALUE, ADVANCE_DROPDOWN } from '../../lib/AttributeConstants'
 import { FIELD_ATTRIBUTE_VALUE, FIELD_ATTRIBUTE, SET_OPTIONS_LIST, NEXT_FOCUS, SET_ADV_DROPDOWN_MESSAGE_OBJECT, SET_OPTION_ATTRIBUTE_ERROR } from '../../lib/constants'
-import _ from 'lodash'
 
 export function getOptionsList(fieldAttributeMasterId, formElement) {
     return async function (dispatch) {
         try {
+            dispatch(setState(SET_OPTIONS_LIST, {
+                optionsMap: {},
+                isLoading: true
+            }))
             let optionList = [];
             const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE);
             if (!fieldAttributeValueList || !fieldAttributeValueList.value) {
-                return;
+                dispatch(setState(SET_OPTIONS_LIST, {
+                    optionsMap: {},
+                    isLoading: false
+                }))
+                return
             }
             let childDataList = [];
             childDataList = formElement[fieldAttributeMasterId].childDataList ? formElement[fieldAttributeMasterId].childDataList : formElement[fieldAttributeMasterId].value ? childDataList.concat(formElement[fieldAttributeMasterId]) : [];
@@ -28,7 +35,7 @@ export function getOptionsList(fieldAttributeMasterId, formElement) {
             }
             optionList = fieldAttributeValueMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, fieldAttributeMasterId);
             let optionsMap = multipleOptionsAttributeService.changeOptionStatus(optionList, selectedOptionsMap);
-            dispatch(setState(SET_OPTIONS_LIST, { optionsMap }));
+            dispatch(setState(SET_OPTIONS_LIST, { optionsMap, isLoading: false }));
         } catch (error) {
             showToastAndAddUserExceptionLog(1401, error.message, 'danger', 0);
         }
@@ -38,9 +45,17 @@ export function getOptionsList(fieldAttributeMasterId, formElement) {
 export function getOptionsListFromJobData(currentElement, jobTransaction) {
     return async function (dispatch) {
         try {
+            dispatch(setState(SET_OPTIONS_LIST, {
+                optionsMap: {},
+                isLoading: true
+            }))
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             let selectedOption
             if (!fieldAttributeMasterList || !fieldAttributeMasterList.value || jobTransaction.length) {
+                dispatch(setState(SET_OPTIONS_LIST, {
+                    optionsMap: {},
+                    isLoading: false
+                }))
                 return
             }
 
@@ -58,7 +73,8 @@ export function getOptionsListFromJobData(currentElement, jobTransaction) {
             }
             let optionsMap = multipleOptionsAttributeService.getOptionsListForJobData(fieldAttributeMasterChildList, currentElement, jobTransaction, selectedOption)
             dispatch(setState(SET_OPTIONS_LIST, {
-                optionsMap
+                optionsMap,
+                isLoading: false
             }))
         } catch (error) {
             showToastAndAddUserExceptionLog(1402, error.message, 'danger', 0)
@@ -70,7 +86,7 @@ export function getOptionsListFromJobData(currentElement, jobTransaction) {
 export function toggleCheckStatus(optionsMap, id) {
     return async function (dispatch) {
         try {
-            let optionsMapClone = _.cloneDeep(optionsMap)
+            let optionsMapClone = JSON.parse(JSON.stringify(optionsMap))
             optionsMapClone[id].selected = !optionsMapClone[id].selected
             dispatch(setState(SET_OPTIONS_LIST, {
                 optionsMap: optionsMapClone

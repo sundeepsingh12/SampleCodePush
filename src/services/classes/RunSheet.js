@@ -5,7 +5,7 @@ import { RUNSHEET_MISSING } from '../../lib/ContainerConstants'
 import { keyValueDBService } from './KeyValueDBService'
 import { userSummaryService } from './UserSummary';
 import { jobSummaryService } from './JobSummary'
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 class RunSheet {
 
   /**@function updateRunSheetAndUserSummary()
@@ -86,7 +86,7 @@ class RunSheet {
       const runsheetClone = { ...runsheetObject }
       runsheetNumberList.push(runsheetClone.runsheetNumber)
     })
-    if (_.isEmpty(runsheetNumberList)) {
+    if (isEmpty(runsheetNumberList)) {
       throw new Error(RUNSHEET_MISSING)
     }
     return runsheetNumberList
