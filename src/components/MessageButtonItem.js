@@ -1,12 +1,7 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    FlatList,
-    Text
-} from 'react-native'
+
 import {
     SELECT_TEMPLATE,
     SELECT_NUMBER

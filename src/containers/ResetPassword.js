@@ -3,8 +3,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
+import { View, Text, TouchableOpacity } from 'react-native'
 import { Container, Content, Header, Button, Body, Icon, Item, Input, Label, Footer, FooterTab, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -67,11 +66,9 @@ class ResetPassword extends PureComponent {
 
   _getHeaderView() {
     return (
-      <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
+        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]}>
           <Body>
-            <View
-              style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+            <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
               <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
                 <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
               </TouchableOpacity>
@@ -84,7 +81,6 @@ class ResetPassword extends PureComponent {
             </View>
           </Body>
         </Header>
-      </SafeAreaView>
     )
   }
 
@@ -110,7 +106,6 @@ class ResetPassword extends PureComponent {
 
   _getFooterView() {
     return (
-      <SafeAreaView>
         <Footer style={[styles.footer]}>
           <FooterTab style={[styles.padding10]}>
             <Button success full onPress={this._onResetPress} disabled={this.props.isSaveResetButtonDisabled}>
@@ -118,7 +113,6 @@ class ResetPassword extends PureComponent {
             </Button>
           </FooterTab>
         </Footer>
-      </SafeAreaView>
     )
   }
 

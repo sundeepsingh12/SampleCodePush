@@ -17,7 +17,8 @@ import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_S
 import CustomAlert from "../components/CustomAlert"
 import { ALERT, INVALID_FORM_ALERT, OK } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
-import { navigate } from '../modules/navigators/NavigationService';
+import { navigate } from '../modules/navigators/NavigationService'
+import isEmpty from 'lodash/isEmpty'
 
 function mapStateToProps(state) {
   return {

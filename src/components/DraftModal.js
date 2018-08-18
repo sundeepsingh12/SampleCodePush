@@ -9,6 +9,7 @@ import styles from '../themes/FeStyle'
 
 import {Button} from 'native-base'
 import { DRAFT_RESTORE_MESSAGE, OK, CANCEL } from '../lib/ContainerConstants'
+import isEmpty from 'lodash/isEmpty'
 
 export default class DraftModal extends PureComponent {
 
@@ -16,7 +17,7 @@ export default class DraftModal extends PureComponent {
         return (
             <Modal animationType={"fade"}
                 transparent={true}
-                visible={!_.isEmpty(this.props.draftStatusInfo)}
+                visible={!isEmpty(this.props.draftStatusInfo)}
                 onRequestClose={this.props.onRequestClose}
                 presentationStyle={"overFullScreen"}>
                 <View style={[styles.relative, styles.alignCenter, styles.justifyCenter, { height: '100%' }]}>

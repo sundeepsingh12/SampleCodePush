@@ -129,7 +129,7 @@ class Home extends PureComponent {
     if (this.props.chartLoading) {
       return (
         <ActivityIndicator animating={this.props.chartLoading}
-          style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color={styles.bgPrimaryColor} />
+          style={[{ marginTop: 10 }]} size="small" color={styles.bgPrimaryColor} />
       )
     }
 

@@ -11,6 +11,7 @@ import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
 import { SET_DSF_SEARCH_TEXT, DATA_STORE_FILTER_LIST, SET_DSF_INITIAL_STATE, } from '../lib/constants'
 import { SEARCH } from '../lib/AttributeConstants'
+import isEmpty from 'lodash/isEmpty'
 
 function mapStateToProps(state) {
     return {
@@ -89,7 +90,7 @@ class DataStoreFilter extends PureComponent {
         this.props.actions.setState(SET_DSF_SEARCH_TEXT, searchText)
         if (searchText != '') {
             this.props.actions.getFilteredResults(this.props.dataStoreFilterList, this.props.cloneDataStoreFilterList, searchText)
-        } else if (!_.isEmpty(this.props.cloneDataStoreFilterList)) {
+        } else if (!isEmpty(this.props.cloneDataStoreFilterList)) {
             this.props.actions.setState(DATA_STORE_FILTER_LIST, this.props.cloneDataStoreFilterList)
         }
     }

@@ -5,6 +5,7 @@ import { Container, Content, Header, Button, Text, Body, Icon, Footer, FooterTab
 import { _id, } from '../lib/constants'
 import { SAVE, CONFIRM } from '../lib/ContainerConstants'
 import styles from '../themes/FeStyle'
+
 export default class DataStoreItemDetails extends PureComponent {
 
     renderData = (item) => {
@@ -39,8 +40,7 @@ export default class DataStoreItemDetails extends PureComponent {
                 animationType="slide"
                 onRequestClose={() => { this.props.goBack(-1, null, true) }}>
                 <Container>
-                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                             <Body>
                                 <View
                                     style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
@@ -56,7 +56,6 @@ export default class DataStoreItemDetails extends PureComponent {
                                 </View>
                             </Body>
                         </Header>
-                    </SafeAreaView>
                     <Content style={[styles.margin5]}>
                         <FlatList
                             data={this.createDetails(this.props.selectedElement.dataStoreAttributeValueMap)}
@@ -66,7 +65,7 @@ export default class DataStoreItemDetails extends PureComponent {
                     </Content>
                     <SafeAreaView style={[styles.bgWhite]}>
                         <Footer style={{ backgroundColor: 'white' }}>
-                            <FooterTab style={StyleSheet.flatten([ styles.bgWhite])}>
+                            <FooterTab style={[ styles.bgWhite]}>
                                 <Button success full style={{ backgroundColor: styles.bgPrimaryColor }}
                                     onPress={() => {
                                         this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.uniqueKey])

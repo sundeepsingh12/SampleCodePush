@@ -59,7 +59,7 @@ class UPIPayment extends PureComponent {
                         </View>
                         <View style={[styles.row, styles.justifyCenter, styles.marginTop30]}>
                             <Button onPress={() => console.log()}
-                                full rounded style={StyleSheet.flatten(styles.margin10)}
+                                full rounded style={styles.margin10}
                             >
                                 <Text style={[styles.fontWhite]}>Proceed</Text>
                             </Button>
@@ -71,16 +71,16 @@ class UPIPayment extends PureComponent {
                                     }
                                 )}
                                 full rounded danger
-                                style={StyleSheet.flatten(styles.margin10, styles.bgDanger)}>
+                                style={[styles.margin10, styles.bgDanger]}>
                                 <Text style={[styles.fontWhite]}>Cancel</Text>
                             </Button>
                         </View>
                     </View>
                 </Modal>
-                <Content style={StyleSheet.flatten([styles.padding10])}>
+                <Content style={[styles.padding10]}>
                     <View>
                         <Text> Customer Name </Text>
-                        <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
+                        <View style={[styles.positionRelative, { zIndex: 1 }]} >
                             <Input
                                 placeholder='Regular Textbox'
                                 onChangeText={value => this.onTextChange(
@@ -89,14 +89,14 @@ class UPIPayment extends PureComponent {
                                         customerName: value
                                     }
                                 )}
-                                style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
+                                style={[styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }]}
                                 defaultValue={this.props.customerName}
                             />
                             {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
                         <PopOver visible={this.checkValidation()} /> */}
                         </View>
                         <Text> Customer Contact </Text>
-                        <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
+                        <View style={[styles.positionRelative, { zIndex: 1 }]} >
                             <Input
                                 placeholder='Regular Textbox'
                                 onChangeText={value => this.onTextChange(
@@ -105,11 +105,11 @@ class UPIPayment extends PureComponent {
                                         customerContact: value
                                     }
                                 )}
-                                style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
+                                style={[styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }]}
                             />
                         </View>
                         <Text> Payer VPA </Text>
-                        <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
+                        <View style={[styles.positionRelative, { zIndex: 1 }]} >
                             <Input
                                 placeholder='Regular Textbox'
                                 onChangeText={value => this.onTextChange(
@@ -118,7 +118,7 @@ class UPIPayment extends PureComponent {
                                         payerVPA: value
                                     }
                                 )}
-                                style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
+                                style={[styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }]}
                             />
                         </View>
                     </View>
@@ -127,7 +127,7 @@ class UPIPayment extends PureComponent {
                     <FooterTab>
                         <Button success
                             disabled={this.props.isSaveButtonDisabled}
-                            style={StyleSheet.flatten([{ borderRadius: 0 }])}
+                            style={[{ borderRadius: 0 }]}
                             onPress={() => {
                                 this.props.actions.approveTransactionAPIRequest(
                                     this.props.navigation.state.params.actualAmount,
