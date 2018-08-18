@@ -126,7 +126,7 @@ class SkuListItem extends PureComponent {
 
     _displaySkuItems(rowItem, originalQuantityValue) {
         if (!_.isEmpty(this.props.skuValidationForImageAndReason) && !_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_REASON) {
-            let reasonList = _.cloneDeep(this.props.reasonsList)
+            let reasonList = JSON.parse(JSON.stringify(this.props.reasonsList))
             if (Platform.OS === 'ios') {
                 reasonList.splice(0, 1)
             }

@@ -75,7 +75,7 @@ export function getSortedRootFieldAttributes(statusData, jobTransactionId, jobTr
 export function getNextFocusableAndEditableElements(attributeMasterId, formLayoutState, value, event, jobTransaction) {
     return async function (dispatch) {
         try {
-            const cloneFormElement = _.cloneDeep(formLayoutState.formElement)
+            const cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
             const { formLayoutObject, isSaveDisabled } = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, formLayoutState.isSaveDisabled, value, null, event, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList, formLayoutState.sequenceWiseFieldAttributeMasterIds);
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, { formLayoutObject, isSaveDisabled }))
             if (formLayoutState.updateDraft) {
@@ -111,7 +111,7 @@ export function setSequenceDataAndNextFocus(currentElement, formLayoutState, seq
 export function updateFieldData(attributeId, value, formLayoutState, jobTransaction) {
     return async function (dispatch) {
         try {
-            const cloneFormElement = _.cloneDeep(formLayoutState.formElement)
+            const cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
             const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeId, value, cloneFormElement)
             dispatch(setState(UPDATE_FIELD_DATA, updatedFieldData))
             if (formLayoutState.updateDraft) {
@@ -127,7 +127,7 @@ export function updateFieldData(attributeId, value, formLayoutState, jobTransact
 export function updateFieldDataWithChildData(attributeMasterId, formLayoutState, value, fieldDataListObject, jobTransaction, modalPresent, containerValue) {
     return function (dispatch) {
         try {
-            const cloneFormElement = _.cloneDeep(formLayoutState.formElement)
+            const cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
             cloneFormElement[attributeMasterId].displayValue = value
             cloneFormElement[attributeMasterId].childDataList = fieldDataListObject.fieldDataList
             cloneFormElement[attributeMasterId].alertMessage = null
@@ -174,7 +174,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 syncRunningAndTransactionSaving.value.transactionSaving = true
             }
             await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, syncRunningAndTransactionSaving.value)
-            let cloneFormLayoutState = _.cloneDeep(formLayoutState)
+            let cloneFormLayoutState = JSON.parse(JSON.stringify(formLayoutState))
             const userData = await keyValueDBService.getValueFromStore(USER)
             if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
                 navDispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
@@ -202,7 +202,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                             if (!navigationFormLayoutStates) {
                                 navigationFormLayoutStates = {}
                             }
-                            let cloneTransientFormLayoutMap = _.cloneDeep(navigationFormLayoutStates)
+                            let cloneTransientFormLayoutMap = JSON.parse(JSON.stringify(navigationFormLayoutStates))
                             cloneTransientFormLayoutMap[currentStatus.id] = formLayoutState
                             dispatch(setState(ADD_FORM_LAYOUT_STATE, cloneTransientFormLayoutMap))
                             push(FormLayout, {
@@ -252,7 +252,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
 export function fieldValidations(currentElement, formLayoutState, timeOfExecution, jobTransaction) {
     return async function (dispatch) {
         try {
-            let cloneFormElement = _.cloneDeep(formLayoutState.formElement)
+            let cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
             let isValuePresentInAnotherTransaction = false
             let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, timeOfExecution, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
             if (timeOfExecution == AFTER) {
@@ -290,7 +290,7 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formLayoutState, v
     return async function (dispatch) {
         try {
             let isValuePresentInAnotherTransaction = await dataStoreService.checkForUniqueValidation(value, fieldAtrribute)
-            let cloneFormElement = _.cloneDeep(formLayoutState.formElement)
+            let cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
             if (isValuePresentInAnotherTransaction) {
                 cloneFormElement[fieldAtrribute.fieldAttributeMasterId].alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
                 cloneFormElement[fieldAtrribute.fieldAttributeMasterId].displayValue = value

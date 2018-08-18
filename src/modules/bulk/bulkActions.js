@@ -30,7 +30,7 @@ export function getBulkJobTransactions(bulkParams) {
     return async function (dispatch) {
         try {
             dispatch(setState(START_FETCHING_BULK_TRANSACTIONS));
-            let cloneBulkParams = _.cloneDeep(bulkParams);
+            let cloneBulkParams = JSON.parse(JSON.stringify(bulkParams))
             cloneBulkParams.pageObject.additionalParams = JSON.parse(cloneBulkParams.pageObject.additionalParams)
             cloneBulkParams.pageObject.jobMasterIds = JSON.parse(cloneBulkParams.pageObject.jobMasterIds)
             const bulkTransactions = await bulkService.getJobListingForBulk(cloneBulkParams);
@@ -73,9 +73,9 @@ export function getBulkJobTransactions(bulkParams) {
 export function toggleAllItems(allTransactions, selectAllNone, selectedItems, pageObject, searchText) {
     return function (dispatch) {
         try {
-            const bulkTransactions = _.cloneDeep(allTransactions)
-            const cloneSelectedItems = _.cloneDeep(selectedItems)
-            let clonePageObject = _.cloneDeep(pageObject)
+            const bulkTransactions = JSON.parse(JSON.stringify(allTransactions))
+             const cloneSelectedItems = JSON.parse(JSON.stringify(selectedItems))
+            let clonePageObject = JSON.parse(JSON.stringify(pageObject))
             let enabledJobs = 0
             let bulkJobSimilarityConfig = bulkService.getBulkJobSimilarityConfig(clonePageObject)
             for (let index in bulkTransactions) {
@@ -110,8 +110,8 @@ export function toggleAllItems(allTransactions, selectAllNone, selectedItems, pa
 export function setSearchedItem(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, selectedItems, pageObject, checkAlertView) {
     return function (dispatch) {
         try {
-            let cloneBulkTransactions = _.cloneDeep(bulkTransactions)
-            let cloneSelectedItems = _.cloneDeep(selectedItems)
+            let cloneBulkTransactions = JSON.parse(JSON.stringify(bulkTransactions))
+            let cloneSelectedItems = JSON.parse(JSON.stringify(selectedItems))
             let searchResultObject = bulkService.performSearch(searchValue, cloneBulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, cloneSelectedItems, pageObject)
             if (!searchResultObject.errorMessage && searchResultObject.errorMessage == '') { // If after search there is any error
                 if (!checkAlertView && !_.isEmpty(searchResultObject.isTransactionSelected)) {
@@ -143,9 +143,9 @@ export function setSearchedItem(searchValue, bulkTransactions, searchSelectionOn
 export function toggleMultipleTransactions(jobTransactionList, allTransactions, selectedItems, pageObject, checkAlertView) {
     return function (dispatch) {
         try {
-            let bulkTransactions = _.cloneDeep(allTransactions)
-            let cloneSelectedItems = _.cloneDeep(selectedItems)
-            let clonePageObject = _.cloneDeep(pageObject)
+            const bulkTransactions = JSON.parse(JSON.stringify(allTransactions))
+             const cloneSelectedItems = JSON.parse(JSON.stringify(selectedItems))
+            let clonePageObject = JSON.parse(JSON.stringify(pageObject))
             let bulkJobSimilarityConfig = bulkService.getBulkJobSimilarityConfig(clonePageObject)
             let numberOfEnabledItems = 0, isTransactionSelected = false
             for (let jobTransaction of jobTransactionList) {

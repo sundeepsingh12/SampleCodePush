@@ -343,9 +343,9 @@ class SkuListing {
     }
 
     prepareUpdatedSkuArray(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId) {
-        let updatedSkuList = _.cloneDeep(skuListItems)
+        let updatedSkuList = JSON.parse(JSON.stringify(skuListItems))
         let updatedObject = updatedSkuList[jobId]
-        let updatedSkuChildList = _.cloneDeep(skuChildElements)
+        let updatedSkuChildList = JSON.parse(JSON.stringify(skuChildElements))
         let updatedChildElements = updatedSkuChildList[jobId]
         let actualQuantity = 0, oldActualQty = 0, originalQuantityValue = 0, unitPriceValue = 0
         for (let index in updatedObject[rowItem.parentId]) {
@@ -381,7 +381,7 @@ class SkuListing {
 
     scanSKUCode(functionParams) {
         let { skuListItems, searchText, skuObjectValidation, skuValidationForImageAndReason, skuChildItems, skuCodeMap } = functionParams
-        let cloneSKUListItems = _.cloneDeep(skuListItems), errorMessage, cloneSkuChildItems = _.cloneDeep(skuChildItems)
+        let cloneSKUListItems = JSON.parse(JSON.stringify(skuListItems)), errorMessage, cloneSkuChildItems = JSON.parse(JSON.stringify(skuChildItems))
         let codeMatches = skuCodeMap[searchText.toLowerCase()], orignalQuantityAndActualQuantity = {}
         if (codeMatches) {
             let skuListItemValue = cloneSKUListItems[codeMatches[1]][codeMatches[0]]
