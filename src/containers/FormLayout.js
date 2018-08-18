@@ -242,7 +242,7 @@ class FormLayout extends PureComponent {
             <Button success full
               onPress={() => this.saveJobTransaction()}
               disabled={this.props.isSaveDisabled}>
-              <Text style={[styles.fontLg, styles.fontWhite]}>{!isEmpty(this.props.paymentAtEnd) ? (this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName) : (saveActivated || transient) ? 'Continue' : this.props.statusName}</Text>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{!_.isEmpty(this.props.paymentAtEnd) ? (this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : (saveActivated || transient)?'Continue':this.props.statusName) : (saveActivated || transient) ? 'Continue' : this.props.statusName}</Text>
             </Button>
           </FooterTab>
         </Footer>
