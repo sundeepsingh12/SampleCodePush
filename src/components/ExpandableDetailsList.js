@@ -56,7 +56,7 @@ class ExpandableDetailsList extends PureComponent {
 
     render() {
         return (
-            <View style={StyleSheet.flatten([{ flex: 1, minHeight: '50%', maxHeight: '100%' }])}>
+            <View style={[{ flex: 1, minHeight: '50%', maxHeight: '100%' }]}>
                 <List>
                     <FlatList
                         data={this.props.dataList}

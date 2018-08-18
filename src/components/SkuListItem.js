@@ -33,6 +33,12 @@ const Item = Picker.Item;
 class SkuListItem extends PureComponent {
 
     changeSkuActualQuantity(selectedValue, rowItem) {
+        if (!_.isObject) {
+            if (selectedValue != 0 && selectedValue.startsWith("0")) {
+                //Remove leading zeros
+                selectedValue = selectedValue.replace(/^0+/, '');
+            }
+        }
         //Call parent component using callback
         this.props.updateSkuActualQuantity(selectedValue, rowItem, this.props.title)
     }
@@ -56,7 +62,7 @@ class SkuListItem extends PureComponent {
 
     _getViewOfHeader(rowItem, originalQuantityValue) {
         if (rowItem.attributeTypeId == SKU_PHOTO) {
-            return <Icon name="ios-camera" style={[styles.flexBasis50, styles.fontDefault, styles.fontXxl, styles.marginTop15, {color : styles.fontPrimaryColor}]} />
+            return <Icon name="ios-camera" style={[styles.flexBasis50, styles.fontDefault, styles.fontXxl, styles.marginTop15, { color: styles.fontPrimaryColor }]} />
         } else if (!(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY && originalQuantityValue > 1)) {
             return <View style={[styles.flexBasis50, styles.column, styles.justifyCenter, { height: 60 }]}>
                 <Text style={[styles.fontSm]}>
@@ -82,35 +88,39 @@ class SkuListItem extends PureComponent {
         if (_.isEmpty(_.trim(value))) {
             value = 0
         }
+
         this.changeSkuActualQuantity(value, rowItem)
     }
 
-    renderQuantitySelectorForLargeQuantity(rowItem,originalQuantityValue){
+    renderQuantitySelectorForLargeQuantity(rowItem, originalQuantityValue) {
         return (
             <View style={[styles.flex1, styles.row, styles.paddingTop10]}>
-                    <View style={[styles.flexBasis80, styles.paddingTop10]}>
-                        <Slider
-                            step = {1}
-                            thumbTintColor='#00796B'
-                            maximumTrackTintColor='#00796B'
-                            minimumTrackTintColor='#00796B'
-                            value={parseInt(rowItem.value)}
-                            maximumValue={parseInt(originalQuantityValue[0])}
-                            minimumValue={0}
-                            onSlidingComplete={(value) => this.changeSkuActualQuantity(value, rowItem)}
-                        />
-                    </View>
-                    <TextInput
-                        style={[styles.flexBasis20, styles.marginTop5, { borderColor: '#00796B', borderWidth: 1, height: 33, paddingTop: 0, paddingBottom: 0 }]}
-                        editable={true}
-                        maxLength={4}
-                        keyboardType={'numeric'}
-                        underlineColorAndroid='transparent'
-                        returnKeyType='done'
-                        value={parseInt(rowItem.value).toString()}
-                        onChangeText={(value) => this.checkForProperActualQuantityInput(value, rowItem, originalQuantityValue)}
+                <View style={[styles.flexBasis80, styles.paddingTop10]}>
+                    <Slider
+                        step={1}
+                        thumbTintColor='#00796B'
+                        maximumTrackTintColor='#00796B'
+                        minimumTrackTintColor='#00796B'
+                        value={parseInt(rowItem.value)}
+                        maximumValue={parseInt(originalQuantityValue[0])}
+                        minimumValue={0}
+                        onSlidingComplete={(value) => {
+                            this.changeSkuActualQuantity(value + "", rowItem)
+                        }
+                        }
                     />
                 </View>
+                <TextInput
+                    style={[styles.flexBasis20, styles.marginTop5, { borderColor: '#00796B', borderWidth: 1, height: 33, paddingTop: 0, paddingBottom: 0 }]}
+                    editable={true}
+                    maxLength={4}
+                    keyboardType={'numeric'}
+                    underlineColorAndroid='transparent'
+                    returnKeyType='done'
+                    value={parseInt(rowItem.value).toString()}
+                    onChangeText={(value) => this.checkForProperActualQuantityInput(value, rowItem, originalQuantityValue)}
+                />
+            </View>
         )
     }
 
@@ -133,7 +143,7 @@ class SkuListItem extends PureComponent {
         } else if (!_.isEmpty(this.props.skuValidationForImageAndReason) && !_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
             return (
                 <View style={[styles.row, styles.flexBasis50, styles.alignCenter, styles.marginTop15]}>
-                    <Text style={[styles.fontDefault, styles.padding10, styles.paddingLeft0, {color : styles.fontPrimaryColor}]}
+                    <Text style={[styles.fontDefault, styles.padding10, styles.paddingLeft0, { color: styles.fontPrimaryColor }]}
                         onPress={() => { navigate('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
                         {OPEN_CAMERA}
                     </Text>
@@ -145,11 +155,11 @@ class SkuListItem extends PureComponent {
             if (originalQuantityValue <= 1) {
                 quantitySelector =
                     <View style={[styles.paddingTop20]}>
-                        <CheckBox color={ styles.bgPrimaryColor } style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value, this.props.title)} />
+                        <CheckBox color={styles.bgPrimaryColor} style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value, this.props.title)} />
                     </View>
             }
             else if (originalQuantityValue > 1) {
-                quantitySelector = this.renderQuantitySelectorForLargeQuantity(rowItem,originalQuantityValue)
+                quantitySelector = this.renderQuantitySelectorForLargeQuantity(rowItem, originalQuantityValue)
             }
             return (
                 <View style={[{ flexBasis: '60%', height: 40 }]}>
@@ -170,7 +180,7 @@ class SkuListItem extends PureComponent {
     renderListRow(rowItem, originalQuantityValue) {
         if (rowItem.attributeTypeId != SKU_ORIGINAL_QUANTITY) {
             return (
-                <View key = {rowItem.autoIncrementId} style={[styles.row, styles.borderBottomLightGray, styles.paddingHorizontal10, { height: 'auto' }]}>
+                <View key={rowItem.autoIncrementId} style={[styles.row, styles.borderBottomLightGray, styles.paddingHorizontal10, { height: 'auto' }]}>
                     <View style={[styles.row]}>
                         {this._getViewOfHeader(rowItem, originalQuantityValue)}
                         <View style={[styles.width100, { height: 60 }]}>
@@ -185,9 +195,9 @@ class SkuListItem extends PureComponent {
     render() {
         const originalQuantityValue = this.props.item.filter(object => object.attributeTypeId == SKU_ORIGINAL_QUANTITY).map(item => item.value)
         return (
-                <View style={[style.card]} >
-                    {this.props.item.map(object => this.renderListRow(object, originalQuantityValue))}
-                </View>
+            <View style={[style.card]} >
+                {this.props.item.map(object => this.renderListRow(object, originalQuantityValue))}
+            </View>
         )
     }
 }

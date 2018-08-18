@@ -18,6 +18,7 @@ import { IS_CALENDAR_VISIBLE, LISTING_SEARCH_VALUE, SET_LANDING_TAB, SET_SELECTE
 import TaskListCalender from '../components/TaskListCalender'
 import TitleHeader from '../components/TitleHeader'
 import SyncLoader from '../components/SyncLoader'
+import size from 'lodash/size'
 
 function mapStateToProps(state) {
   return {
@@ -60,7 +61,7 @@ class TabScreen extends PureComponent {
     const tabs = this.props.tabsList
     const renderTabList = []
     for (let index in tabs) {
-      if (_.size(tabListForPage) > 0 && !tabListForPage.includes(tabs[index].id)) {
+      if (size(tabListForPage) > 0 && !tabListForPage.includes(tabs[index].id)) {
         continue
       }
       if (this.props.tabIdStatusIdMap[tabs[index].id]) {
@@ -121,7 +122,7 @@ class TabScreen extends PureComponent {
           <Loader />
         </Container>
       )
-    } else if (_.size(this.props.tabsList) == 0) {
+    } else if (size(this.props.tabsList) == 0) {
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container>
@@ -136,7 +137,7 @@ class TabScreen extends PureComponent {
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container>
-            <View style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.header])}>
+            <View style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]}>
               <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.fetchDataForScanner.bind(this)} />
               {this.props.syncLoadingInTaskList ? <SyncLoader moduleLoading={this.props.syncLoadingInTaskList } cancelModal = {this.onCancelPress}/> : null}
             </View>

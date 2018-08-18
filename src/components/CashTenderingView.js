@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { View, Text, TextInput, Input } from 'react-native'
+import { View, Text, TextInput } from 'react-native'
 import { connect } from 'react-redux'
 import {  Toast } from 'native-base'
 import {

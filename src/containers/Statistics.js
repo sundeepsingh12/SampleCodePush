@@ -23,8 +23,7 @@ class Statistics extends PureComponent {
 
   showHeaderView() {
     return (
-      <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
           <Body>
             <View
               style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
@@ -35,7 +34,6 @@ class Statistics extends PureComponent {
             </View>
           </Body>
         </Header>
-      </SafeAreaView>
     )
   }
 

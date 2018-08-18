@@ -17,7 +17,6 @@ import SearchBarV2 from '../components/SearchBarV2'
 import { SEARCH_PLACE_HOLDER, PROCEED, SKU } from '../lib/ContainerConstants'
 import { SET_SKU_CODE, SKU_CODE_CHANGE } from '../lib/constants'
 import TitleHeader from '../components/TitleHeader'
-import { navigate } from '../modules/navigators/NavigationService'
 
 class SkuListing extends PureComponent {
 
@@ -96,7 +95,7 @@ class SkuListing extends PureComponent {
             </Content>
 
             <SafeAreaView style={[styles.bgWhite]}>
-              <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
+              <Footer style={[ style.footer,styles.column, styles.padding10]}>
                 <Button primary full onPress={this.saveSkuList}>
                   <Text style={[styles.fontLg, styles.fontWhite]}>{PROCEED}</Text>
                 </Button>
@@ -165,6 +164,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 const style = StyleSheet.create({
+  footer:{
+    height:'auto'
+  },
   header: {
     borderBottomWidth: 0,
     height: 'auto',
