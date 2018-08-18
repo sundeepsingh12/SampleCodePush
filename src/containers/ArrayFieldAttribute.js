@@ -7,7 +7,7 @@ import * as arrayActions from '../modules/array/arrayActions'
 import ArrayBasicComponent from '../components/ArrayBasicComponent.js'
 import CustomAlert from '../components/CustomAlert.js'
 import { Container, Content, Header, Button, Body, Icon, Footer, StyleProvider, Toast } from 'native-base'
-import _ from 'lodash'
+import size from 'lodash/size'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -127,7 +127,7 @@ class ArrayFieldAttribute extends PureComponent {
     }
     headerView() {
         let view
-        view = <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+        view = <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
             <Body>
                 <View
                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -162,7 +162,7 @@ class ArrayFieldAttribute extends PureComponent {
                             style={[style.footer, styles.bgWhite]}>
                             <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
                                 <Text
-                                    style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.arrayElements)}</Text>
+                                    style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {size(this.props.arrayElements)}</Text>
                                 <Button bordered success small onPress={this.addPressed}>
                                     <Text style={[styles.fontSuccess]}>{ADD}</Text>
                                 </Button>

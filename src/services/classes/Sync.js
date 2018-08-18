@@ -709,7 +709,7 @@ class Sync {
    * @param {*} topic 
    */
   sendRegistrationTokenToServer(token, fcmToken, topic) {
-    const url = CONFIG.API.FCM_TOKEN_REGISTRATON + '?topic=' + topic
+    const url = CONFIG.API.FCM_TOKEN_REGISTRATON + '?topic=' + encodeURIComponent(topic) +'&type='+encodeURIComponent('device')
     RestAPIFactory(token.value).serviceCall(fcmToken, url, 'POST')
   }
 
@@ -720,16 +720,15 @@ class Sync {
    * 
    * @param {*} userObject 
    * @param {*} token 
-   * @param {*} fcmToken 
    */
-  deregisterFcmTokenFromServer(userObject, token, fcmToken) {
+  deregisterFcmTokenFromServer(userObject, token) {
     try {
       FCM.cancelAllLocalNotifications()
       FCM.removeAllDeliveredNotifications()
       const topic = `FE_${userObject.value.id}`
       FCM.unsubscribeFromTopic(topic);
       const url = CONFIG.API.FCM_TOKEN_DEREGISTRATION + '?topic=' + topic
-      RestAPIFactory(token.value).serviceCall(fcmToken.value, url, 'POST')
+      RestAPIFactory(token.value).serviceCall(null, url, 'POST')
     } catch (error) {
     }
   }

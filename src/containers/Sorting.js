@@ -198,7 +198,7 @@ class Sorting extends PureComponent {
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                             <Body>
                                 {this.showTitleAndBackArrow()}
 

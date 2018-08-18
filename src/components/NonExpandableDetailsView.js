@@ -48,8 +48,8 @@ export default class NonExpandableDetailsView extends PureComponent {
                     {renderIf(this.props.attributeTypeId == IMAGE_URL,
                         <TouchableOpacity onPress={() => this._openURL(this.props.value)}>
                             <View style={[styles.row]}>
-                                <Icon name={'ios-image'} style={StyleSheet.flatten([styles.alignSelfEnd, styles.fontBlack, styles.fontXl, {color : styles.fontPrimaryColor}])} />
-                                <Text style={StyleSheet.flatten([styles.fontSm, styles.paddingLeft5, {color : styles.fontPrimaryColor}])}>
+                                <Icon name={'ios-image'} style={[styles.alignSelfEnd, styles.fontBlack, styles.fontXl, {color : styles.fontPrimaryColor}]} />
+                                <Text style={[styles.fontSm, styles.paddingLeft5, {color : styles.fontPrimaryColor}]}>
                                     {VIEW_TEXT_LABEL}
                                 </Text>
                             </View>
@@ -69,7 +69,7 @@ export default class NonExpandableDetailsView extends PureComponent {
                     {renderIf(this.props.attributeTypeId == CAMERA || this.props.attributeTypeId == CAMERA_HIGH || this.props.attributeTypeId == CAMERA_MEDIUM || this.props.attributeTypeId == SIGNATURE || this.props.attributeTypeId == SKU_PHOTO,
                         <Text style={[styles.fontDefault, {color : styles.fontPrimaryColor}, styles.textUnderline]}
                             onPress={() => this.props.navigateToCameraDetails({
-                                value: this.props.value,
+                                value: this.props.value,isSignature: this.props.attributeTypeId == SIGNATURE
                             })}>
                             Tap to View
                         </Text>)}

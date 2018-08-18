@@ -18,6 +18,7 @@ export default function multipleOptionsAttributeReducer(state = initialState, ac
         case SET_OPTIONS_LIST: {
             return state.set('optionsMap', action.payload.optionsMap)
                 .set('searchInput', null)
+                .set('isLoading', action.payload.isLoading)
         }
         case SET_OPTION_ATTRIBUTE_ERROR: {
             return state.set('error', action.payload.error)

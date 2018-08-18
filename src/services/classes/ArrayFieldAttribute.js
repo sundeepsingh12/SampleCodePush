@@ -44,7 +44,7 @@ class ArrayFieldAttribute {
     }
 
     addArrayRow(lastRowId, childElementsTemplate, arrayElements, jobTransaction, isSaveDisabled, sequenceWiseSortedFieldAttributesMasterIds) {
-        let cloneArrayElements = _.cloneDeep(arrayElements)
+        let cloneArrayElements = JSON.parse(JSON.stringify(arrayElements))
         cloneArrayElements[lastRowId] = childElementsTemplate
         cloneArrayElements[lastRowId].rowId = lastRowId
         cloneArrayElements[lastRowId].allRequiredFieldsFilled = false
@@ -57,7 +57,7 @@ class ArrayFieldAttribute {
     }
 
     deleteArrayRow(arrayElements, rowId) {
-        let cloneArrayElements = _.cloneDeep(arrayElements)
+        let cloneArrayElements = JSON.parse(JSON.stringify(arrayElements))
         let newArrayElements = _.omit(cloneArrayElements, [rowId])
         return newArrayElements
     }

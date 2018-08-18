@@ -239,7 +239,7 @@ class Sequence {
         if (!sequenceList) {
             throw new Error(SEQUENCELIST_MISSING)
         }
-        let cloneSequenceList = _.cloneDeep(sequenceList)
+        let cloneSequenceList = JSON.parse(JSON.stringify(sequenceList))
         if (!isCalledFromJumpSequence) {
             cloneSequenceList[rowParam.from].seqAssigned = cloneSequenceList[rowParam.from].seqSelected = cloneSequenceList[rowParam.to].seqSelected
             transactionsWithChangedSeqeunceMap[cloneSequenceList[rowParam.from].id] = cloneSequenceList[rowParam.from]

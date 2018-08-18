@@ -46,7 +46,7 @@ export function sendMessage(messageText, messageList) {
             }
             let user = await keyValueDBService.getValueFromStore(USER)
             let messageInteraction = messageService.setMessageDto(messageText, messageList, user.value.id)
-            let cloneMessageList = _.cloneDeep(messageList)
+            let cloneMessageList = JSON.parse(JSON.stringify(messageList))
             cloneMessageList.push(messageInteraction)
             dispatch(setState(SET_MESSAGE_LIST, cloneMessageList))
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)

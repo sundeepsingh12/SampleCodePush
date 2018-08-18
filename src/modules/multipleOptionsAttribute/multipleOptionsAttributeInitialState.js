@@ -5,7 +5,8 @@ const InitialState = Record({
     optionsMap: {},
     error: null,
     searchInput: null,
-    advanceDropdownMessageObject: {}
+    advanceDropdownMessageObject: {},
+    isLoading: false
 })
 
 export default InitialState

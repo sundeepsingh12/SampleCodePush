@@ -11,7 +11,6 @@ import {
     PASSWORD,
     REMEMBER_ME,
     USER,
-    FCM_TOKEN,
     GEO_FENCING
 } from '../../lib/constants'
 import { backupService } from './BackupService'
@@ -76,8 +75,7 @@ class Authentication {
             await backupService.createBackupOnLogout()
         }
         const userObject = await keyValueDBService.getValueFromStore(USER)
-        const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
-        await sync.deregisterFcmTokenFromServer(userObject, token, fcmToken)
+        await sync.deregisterFcmTokenFromServer(userObject, token)
         let logoutResponse = await RestAPIFactory(token.value).serviceCall(null, CONFIG.API.LOGOUT_API, 'GET')
         await logoutService.deleteDataBase()
         if (calledFromAutoLogout) {

@@ -27,7 +27,7 @@ class MessagesListView extends PureComponent {
 
     render() {
         return (
-            <View style={StyleSheet.flatten([{ flex: 1, minHeight: '50%', maxHeight: '100%' }])}>
+            <View style={[{ flex: 1, minHeight: '50%', maxHeight: '100%' }]}>
                 <FlatList
                     data={this.props.dataList}
                     renderItem={({ item }) => this.renderData(item)}

@@ -12,6 +12,7 @@ import { ENTER_MOBILE, SEND_OTP, ENTER_OTP, OTP_CODE_SENT, PROCEED, EDIT, RESEND
 import { ON_MOBILE_NO_CHANGE, ON_OTP_CHANGE, SHOW_MOBILE_NUMBER_SCREEN } from '../lib/constants'
 import { SHOW_LONG_CODE_COMPLETE_SCREEN } from '../lib/AttributeConstants'
 import SimVerify from '../svg_components/icons/SimVerifyIcon'
+import _ from 'lodash'
 
 function mapStateToProps(state) {
     return {

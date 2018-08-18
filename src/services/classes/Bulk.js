@@ -57,7 +57,7 @@ class Bulk {
         let searchText = _.toLower(searchValue)
         let isSearchFound = false
         let errorMessage = '', numberOfEnabledItems
-        let clonePageObject = _.cloneDeep(pageObject)
+        let clonePageObject = JSON.parse(JSON.stringify(pageObject))
         let bulkJobSimilarityConfig = this.getBulkJobSimilarityConfig(clonePageObject)
         let isTransactionSelected = false
         for (let key in bulkTransactions) {

@@ -3,8 +3,9 @@ import { StyleSheet, View } from 'react-native'
 import { Header, Button, Text, Input, Body } from 'native-base';
 import styles from '../themes/FeStyle'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import _ from 'lodash'
+import size from 'lodash/size'
 import { SEARCH } from '../lib/ContainerConstants'
+
 export default class SearchBar extends PureComponent {
 
     _startScanner() {
@@ -30,7 +31,7 @@ export default class SearchBar extends PureComponent {
     render() {
         let scanner = this._startScanner()
         return (
-            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+            <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                 <Body>
                     <View style={[styles.row]}>
                         <View
@@ -47,7 +48,7 @@ export default class SearchBar extends PureComponent {
                             />
                             {scanner}
                         </View>
-                        {(_.size(this.props.searchText) > 2 && !this.props.isFiltersPresent) &&
+                        {(size(this.props.searchText) > 2 && !this.props.isFiltersPresent) &&
                             <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
                                 <Text style={[styles.fontDefault, styles.fontWhite, styles.paddingTop10, styles.paddingBottom10]}
                                     onPress={() => {

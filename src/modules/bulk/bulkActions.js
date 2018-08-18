@@ -75,8 +75,8 @@ export function toggleAllItems(allTransactions, selectAllNone, selectedItems, pa
     return function (dispatch) {
         try {
             const bulkTransactions = JSON.parse(JSON.stringify(allTransactions))
-            const cloneSelectedItems = JSON.parse(JSON.stringify(selectedItems))
-            const clonePageObject = JSON.parse(JSON.stringify(pageObject))
+             const cloneSelectedItems = JSON.parse(JSON.stringify(selectedItems))
+            let clonePageObject = JSON.parse(JSON.stringify(pageObject))
             let enabledJobs = 0
             let bulkJobSimilarityConfig = bulkService.getBulkJobSimilarityConfig(clonePageObject)
             for (let index in bulkTransactions) {
