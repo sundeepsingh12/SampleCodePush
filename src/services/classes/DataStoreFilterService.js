@@ -86,7 +86,7 @@ class DataStoreFilterService {
         if (!jobAttributes || !jobAttributes.value) {
             throw new Error(JOBATTRIBUTES_MISSING)
         }
-        let cloneDataStoreFilterReverseMap = _.cloneDeep(dataStoreFilterReverseMap)
+        let cloneDataStoreFilterReverseMap = JSON.parse(JSON.stringify(dataStoreFilterReverseMap))
         let dataStoreAttributeIdtoValueMap = {}
         let dataStoreFilterList = JSON.parse(currentElement.dataStoreFilterMapping)
         for (let filter of dataStoreFilterList) {
@@ -165,9 +165,9 @@ class DataStoreFilterService {
             throw new Error(SEARCH_TEXT_MISSING)
         }
         if (_.isEmpty(cloneDataStoreFilterList)) {
-            cloneDataStoreFilterList = _.cloneDeep(dataStoreFilterList)
+            cloneDataStoreFilterList = JSON.parse(JSON.stringify(dataStoreFilterList))
         } else {
-            dataStoreFilterList = _.cloneDeep(cloneDataStoreFilterList)
+            dataStoreFilterList = JSON.parse(JSON.stringify(cloneDataStoreFilterList))
         }
         let filteredData = dataStoreFilterList.filter(DSFlistObject => (DSFlistObject.toUpperCase()).indexOf(searchText.toUpperCase()) == 0)
         return {
@@ -226,7 +226,7 @@ class DataStoreFilterService {
         let rowFormElement = formElement[rowId].formLayoutObject //get current formElement 
         let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] //get map for current array this may contain map of multiple arrays
         let returnParams = await this.fetchDataForFilter(token, currentElement, false, rowFormElement, jobTransaction, dataStoreFilterReverseMap) //get Data for DSF
-        let cloneArrayReverseDataStoreFilterMap = _.cloneDeep(arrayReverseDataStoreFilterMap)
+        let cloneArrayReverseDataStoreFilterMap = JSON.parse(JSON.stringify(arrayReverseDataStoreFilterMap))
         cloneArrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] = returnParams.dataStoreFilterReverseMap //change reverse DSF map which contains all mapping related to DSF and Data store
         return {
             dataStoreFilterResponse: returnParams.dataStoreFilterResponse,
