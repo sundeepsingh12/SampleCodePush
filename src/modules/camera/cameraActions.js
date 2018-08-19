@@ -129,10 +129,11 @@ export function cropImage(path, setImage) {
                 width: 300,
                 height: 300,
                 freeStyleCropEnabled: true,
+                includeBase64:(Platform.OS==='android')?false:true
 
             }).then((image) => {
-                if (image.path) {
-                    setImage(image.path);
+                if (image) {
+                    (Platform.OS==='android')?setImage(image.path):setImage(image.path,image.data)
                     dispatch(setState(SET_CAMERA_LOADER, false))
                 }
             }).catch(e => {
