@@ -25,7 +25,7 @@ import { Toast } from 'native-base'
 export function showOrDropModal(arrayElements, rowId, idToSet, isSaveDisabled) {
     return async function (dispatch) {
         try {
-            let newArray = _.cloneDeep(arrayElements)
+            let newArray = JSON.parse(JSON.stringify(arrayElements))
             newArray[rowId].modalFieldAttributeMasterId = idToSet
             dispatch(setState(SET_ARRAY_ELEMENTS, { newArrayElements: newArray, isSaveDisabled }))
         } catch (error) {
@@ -47,7 +47,7 @@ export function addRowInArray(lastrowId, childElementsTemplate, arrayElements, j
 export function deleteArrayRow(arrayElements, rowId, lastrowId) {
     return async function (dispatch) {
         try {
-            let newArrayElements = arrayService.deleteArrayRow(arrayElements, rowId, lastrowId)
+            let newArrayElements = arrayService.deleteArrayRow(arrayElements, rowId)
             let isSaveDisabled = arrayService.enableSaveIfRequired(newArrayElements)
             if (!newArrayElements) throw new Error(DELETE_ROW_ERROR)
             dispatch(setState(SET_ARRAY_ELEMENTS, {
@@ -63,7 +63,7 @@ export function deleteArrayRow(arrayElements, rowId, lastrowId) {
 export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisabled, value, arrayElements, rowId, fieldDataList, event, backPressOrModalPresent, containerValue, formLayoutState) {
     return async function (dispatch) {
         try {
-            let cloneArrayElements = _.cloneDeep(arrayElements)
+            let cloneArrayElements = JSON.parse(JSON.stringify(arrayElements))
             let arrayRow = cloneArrayElements[rowId]
             arrayRow.formLayoutObject[attributeMasterId].displayValue = value
             arrayRow.formLayoutObject[attributeMasterId].childDataList = fieldDataList
@@ -91,7 +91,7 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
 export function getNextFocusableForArrayWithoutChildDatalist(attributeMasterId, isSaveDisabled, value, arrayElements, rowId, event, formLayoutState) {
     return async function (dispatch) {
         try {
-            let cloneArrayElements = _.cloneDeep(arrayElements)
+            let cloneArrayElements = JSON.parse(JSON.stringify(arrayElements))
             let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, null, event, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.sequenceWiseMasterIds)
             if (!newArrayElements) throw new Error(DELETE_ROW_ERROR)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
@@ -138,7 +138,7 @@ export function clearArrayState() {
 export function fieldValidationsArray(currentElement, arrayElements, timeOfExecution, jobTransaction, rowId, isSaveDisabled, scanValue, formLayoutState) {
     return function (dispatch) {
         try {
-            let newArray = _.cloneDeep(arrayElements)
+            let newArray = JSON.parse(JSON.stringify(arrayElements))
             let formElement = newArray[rowId].formLayoutObject
             let isValuePresentInAnotherTransaction = false
             let validationsResult = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)

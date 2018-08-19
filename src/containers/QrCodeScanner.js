@@ -1,7 +1,6 @@
 'use strict';
 import React, { PureComponent } from 'react';
 import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native';
-import { SafeAreaView } from 'react-navigation'
 import { Container, Header,Body, Icon,StyleProvider } from 'native-base';
 import { RNCamera } from 'react-native-camera'
 import { bindActionCreators } from 'redux'
@@ -98,8 +97,7 @@ class QrCodeScanner extends PureComponent {
 
     showHeader() {
         return (
-                <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                    <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                    <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -113,7 +111,6 @@ class QrCodeScanner extends PureComponent {
                             </View>
                         </Body>
                     </Header>
-                </SafeAreaView>
         )
     }
 

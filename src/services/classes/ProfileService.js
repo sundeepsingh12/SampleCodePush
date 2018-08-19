@@ -49,7 +49,7 @@ class ProfileService {
         }
         else {
             //hit API
-            const url = CONFIG.API.SERVICE_RESET_PASSWORD + LOGIN + encodeURIComponent(userObject.value.username)
+            const url = CONFIG.API.SERVICE_RESET_PASSWORD + LOGIN + encodeURIComponent(userObject.value.username) + '&passwordLength=' + newPassword.length
             const response = RestAPIFactory(token.value).serviceCall(sha256(newPassword), url, POST) // hits api to reset password. 
             return response
         }

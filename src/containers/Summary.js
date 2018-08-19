@@ -10,7 +10,7 @@ import styles from '../themes/FeStyle'
 import LinearGradient from 'react-native-linear-gradient'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
-import { Container, Content, Header,Text, Body, Icon, StyleProvider } from 'native-base';
+import { Container, Content, Header, Text, Body, Icon, StyleProvider } from 'native-base';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { RESET_SUMMARY_STATE } from '../lib/constants'
 
@@ -84,13 +84,14 @@ class SummaryListing extends PureComponent {
 
     renderDataForCollection(data) {
         let collectionMode = ['cashCollected', 'cashCollectedByCard', 'cashPayment']
+        let displayName = {'cashCollected' : 'Cash Collected', 'cashCollectedByCard' : 'SOD Collected', 'cashPayment' : 'Cash Payment'}
         return collectionMode.map(function (collectionMode, i) {
             return (
                 (data[collectionMode] > 0) ?
                     <View style={[styles.padding10, { borderBottomColor: '#d3d3d3', borderBottomWidth: 1 }]} key={String(i)}>
                         <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
                             <Text style={[styles.fontLg, styles.fontWeight500]}>
-                                {collectionMode}
+                                {displayName[collectionMode]}
                             </Text>
                             <Text style={[styles.fontDefault, styles.fontWeight500]}>
                                 {data[collectionMode]}
@@ -133,7 +134,7 @@ class Summary extends PureComponent {
     }
 
     _renderItem({ item, index }) {
-        const runSheetCount = ['Successful', 'Pending', 'Failed', 'Cash Collected']
+        const runSheetCount = ['Successful', 'Pending', 'Failed', 'Cash Collected', 'SOD Collected']
         let runSheetView = runSheetCount.map((name => <View key={runSheetCount.indexOf(name)} style={[styles.row, styles.alignCenter, styles.marginTop10, styles.bgTransparent]}>
             <View style={[styles.justifyCenter, { flexBasis: '45%' }]}>
                 <Text style={[styles.fontLeft, styles.fontWhite, styles.fontWeight500]}>{name}</Text>
@@ -155,8 +156,7 @@ class Summary extends PureComponent {
 
     _renderHeader() {
         return (
-            <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                     <Body>
                         <View
                             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -172,7 +172,6 @@ class Summary extends PureComponent {
                         </View>
                     </Body>
                 </Header>
-            </SafeAreaView>
         )
     }
 

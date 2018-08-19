@@ -19,7 +19,8 @@ import {
   SET_UNSYNC_TRANSACTION_PRESENT,
 } from '../lib/constants'
 import { OK, CANCEL, LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE, UNTITLED, APP, LOGOUT } from '../lib/ContainerConstants'
-import { navigate } from '../modules/navigators/NavigationService';
+import { navigate } from '../modules/navigators/NavigationService'
+import isEmpty from 'lodash/isEmpty'
 
 function mapStateToProps(state) {
   return {
@@ -61,8 +62,7 @@ class Menu extends PureComponent {
 
   renderMenuHeader() {
     return (
-      <SafeAreaView style={[styles.bgWhite]}>
-        <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
+        <Header searchBar style={[styles.bgWhite, style.header]}>
           <Body>
             <View
               style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -73,7 +73,6 @@ class Menu extends PureComponent {
             </View>
           </Body>
         </Header>
-      </SafeAreaView>
     )
   }
 
@@ -118,6 +117,7 @@ class Menu extends PureComponent {
       />
     )
   }
+
   messageView() {
     let view
     if (this.props.utilities.messagingEnabled) {
@@ -136,19 +136,20 @@ class Menu extends PureComponent {
     }
     return view
   }
+  
   render() {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
           {this.renderMenuHeader()}
-          {(!_.isEmpty(this.props.errorMessage_403_400_Logout) &&
+          {(!isEmpty(this.props.errorMessage_403_400_Logout) &&
             <CustomAlert
               title="Unauthorised Device"
               message={this.props.errorMessage_403_400_Logout}
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
           {this.getUnsyncTransactionPresentAlert()}
-          {((this.props.isLoggingOut && _.isEmpty(this.props.errorMessage_403_400_Logout)) ? <Loader /> :
+          {((this.props.isLoggingOut && isEmpty(this.props.errorMessage_403_400_Logout)) ? <Loader /> :
             <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
               {this.getPageListItemsView()}
               {this.messageView()}

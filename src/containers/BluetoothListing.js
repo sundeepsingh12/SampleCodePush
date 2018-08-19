@@ -2,12 +2,9 @@
 
 import React, { Component } from 'react'
 import {
-  Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableHighlight,
   View,
   FlatList,
   Animated
@@ -22,7 +19,7 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import SearchBarV2 from '../components/SearchBarV2'
 import BluetoothSerial from 'react-native-bluetooth-serial'
-
+import { SafeAreaView } from 'react-navigation'
 
 function mapStateToProps(state) {
   return {
@@ -77,10 +74,10 @@ class BluetoothListing extends Component {
   
   renderHeadeView(){
     return (
-      <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
+      <Header searchBar style={[{backgroundColor : styles.bgPrimaryColor}, styles.header]}>
         <Body>
-          <View
-            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+          <View>
+          <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
             <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
               <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
             </TouchableOpacity>
@@ -91,6 +88,7 @@ class BluetoothListing extends Component {
             </View>
             <View />
           </View>
+          </View>
         </Body>
       </Header>
     )
@@ -98,8 +96,8 @@ class BluetoothListing extends Component {
 
   showHeaderView(){
     return(
-      <Header searchBar style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
-          <Body>
+      <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+      <View style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
               <View
                   style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                   <TouchableOpacity style={[style.headerLeft]} onPress={() => {
@@ -115,8 +113,8 @@ class BluetoothListing extends Component {
                   <View />
               </View>
               <SearchBarV2 placeholder="Search Device Name/Address" />
-          </Body>
-      </Header>
+      </View>
+      </SafeAreaView>
     )
 }
 
