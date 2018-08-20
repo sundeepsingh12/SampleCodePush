@@ -218,7 +218,7 @@ const Tabs = {
       tabBarIcon: ({ tintColor }) => (
         <MaterialIcons
           name='home'
-          style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
+          style={[{ fontSize: 18, marginTop: 0, color: tintColor }]}
         />
       ),
     }
@@ -231,7 +231,7 @@ const Tabs = {
       tabBarIcon: ({ tintColor }) => (
         <MaterialIcons
           name='sync'
-          style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
+          style={[{ fontSize: 18, marginTop: 0, color: tintColor }]}
         />
       ),
     }
@@ -256,7 +256,7 @@ const Tabs = {
       tabBarIcon: ({ tintColor }) => (
         <MaterialIcons
           name='menu'
-          style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
+          style={[{ fontSize: 18, marginTop: 0, color: tintColor }]}
         />
       ),
     }
