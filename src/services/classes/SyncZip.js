@@ -20,7 +20,7 @@ import moment from 'moment'
 import { trackingService } from './Tracking'
 import { userEventLogService } from './UserEvent'
 import { addServerSmsService } from './AddServerSms'
-import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, PENDING, PATH, PATH_TEMP, APP_VERSION_NUMBER, SKU_PHOTO } from '../../lib/AttributeConstants'
+import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, PENDING, PATH, PATH_TEMP, APP_VERSION_NUMBER, QC_IMAGE, SKU_PHOTO } from '../../lib/AttributeConstants'
 import { userExceptionLogsService } from './UserException'
 import { communicationLogsService } from './CommunicationLogs'
 import omit from 'lodash/omit'
@@ -236,7 +236,7 @@ class SyncZip {
 
         let masterIdToAttributeMap = {}
         for (let fieldAttribute of fieldAttributesList) {
-            if (fieldAttribute.attributeTypeId == SIGNATURE || fieldAttribute.attributeTypeId == CAMERA || fieldAttribute.attributeTypeId == CAMERA_HIGH || fieldAttribute.attributeTypeId == CAMERA_MEDIUM || fieldAttribute.attributeTypeId == SKU_PHOTO) {
+            if (fieldAttribute.attributeTypeId == SIGNATURE || fieldAttribute.attributeTypeId == CAMERA || fieldAttribute.attributeTypeId == CAMERA_HIGH || fieldAttribute.attributeTypeId == CAMERA_MEDIUM || fieldAttribute.attributeTypeId == QC_IMAGE || fieldAttribute.attributeTypeId == SKU_PHOTO) {
                 masterIdToAttributeMap[fieldAttribute.id] = fieldAttribute
             }
         }

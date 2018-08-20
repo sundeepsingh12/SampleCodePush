@@ -1,6 +1,6 @@
 'use strict';
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Image, Platform, TouchableHighlight, ImageStore } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Image, Platform, TouchableHighlight, ImageStore, BackHandler } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Right, Icon, StyleProvider, Toast } from 'native-base'
 import Loader from '../components/Loader'
@@ -10,6 +10,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import * as cameraActions from '../modules/camera/cameraActions'
+import * as qcActions from '../modules/qc/qcActions';
 import { SET_SHOW_IMAGE_AND_DATA, SET_CAMERA_LOADER } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
@@ -29,11 +30,14 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...globalActions, ...cameraActions, ...skuListingActions }, dispatch)
+        actions: bindActionCreators({ ...globalActions, ...cameraActions, ...skuListingActions, ...qcActions }, dispatch)
     }
 }
 
 class CameraFieldAttribute extends PureComponent {
+
+    didFocusSubscription;
+    willBlurSubscription;
 
     constructor(props) {
         super(props);
@@ -79,8 +83,24 @@ class CameraFieldAttribute extends PureComponent {
     }
 
     componentDidMount() {
-        this.props.actions.setCameraInitialView(this.props.navigation.state.params.currentElement)
+        this.props.actions.setCameraInitialView(this.props.navigation.state.params.currentElement);
+        this.didFocusSubscription = this.props.navigation.addListener('didFocus', payload =>
+            BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
+        this.willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
+
+    componentWillUnmount() {
+        this.didFocusSubscription && this.didFocusSubscription.remove();
+        this.willBlurSubscription && this.willBlurSubscription.remove();
+    }
+
+    onBackButtonPressAndroid = () => {
+        this.onCrossPress();
+        return true;
+    };
 
     _setTorchOn = () => {
         this.setState({ torchOff: RNCamera.Constants.FlashMode.on })
@@ -151,13 +171,13 @@ class CameraFieldAttribute extends PureComponent {
             this.setState({ imageData: null });
         }
         else {
-            this.setState({imageData: (Platform.OS==='android') ? { uri } : {base64,uri}})
+            this.setState({ imageData: (Platform.OS === 'android') ? { uri } : { base64, uri } })
         }
     }
 
     onCrossPress = () => {
         if (this.state.imageData == null) {
-            this.props.navigation.goBack()
+            this.props.navigation.goBack();
         }
         else {
             this.setImage(null);
@@ -168,7 +188,7 @@ class CameraFieldAttribute extends PureComponent {
         if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
             this.props.navigation.state.params.changeSkuActualQuantity(this.state.imageData, this.props.navigation.state.params.currentElement)
         } else {
-            this.props.actions.saveImage(this.state.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
+            this.props.actions.saveImage(this.state.imageData, this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.jobTransaction)
         }
     }
 
@@ -271,13 +291,8 @@ class CameraFieldAttribute extends PureComponent {
                     <View style={{ flex: 1 }}>
                         {this.showCameraOrImage()}
                         <SafeAreaView style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }, styles.paddingLeft15, styles.paddingRight15, styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
-                            <TouchableHighlight
-                                onPress={this.onCrossPress}
-                            >
-                                <Icon
-                                    name="md-close"
-                                    style={[styles.fontXxxl, styles.fontWhite]}
-                                />
+                            <TouchableHighlight onPress={this.onCrossPress}>
+                                <Icon name="md-close" style={[styles.fontXxxl, styles.fontWhite]} />
                             </TouchableHighlight>
                             {
                                 this.state.imageData == null
@@ -290,8 +305,8 @@ class CameraFieldAttribute extends PureComponent {
                     </View>
                     <SafeAreaView style={[style.footer]} >
                         {
-                                (getValidationObject && getValidationObject.cropImageValidation && this.state.imageData != null) 
-                            ?
+                            (getValidationObject && getValidationObject.cropImageValidation && this.state.imageData != null)
+                                ?
                                 <View>
                                     <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={this.props.actions.cropImage.bind(this, this.state.imageData.uri, this.setImage)}>
                                         <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />

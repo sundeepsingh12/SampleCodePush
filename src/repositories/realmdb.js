@@ -143,7 +143,7 @@ export function updateTableRecordOnProperty(tableName, property, valueList, newV
     });
 }
 
-export function getRecordListOnQuery(tableName, query, isSorted, sortProperty, reverse = false) {
+export function getRecordListOnQuery(tableName, query, isSorted, sortProperty, isRealmObjectRequired, reverse = false) {
     let records
     if (query) {
         records = realm.objects(tableName).filtered(query)
@@ -153,7 +153,7 @@ export function getRecordListOnQuery(tableName, query, isSorted, sortProperty, r
     if (isSorted && sortProperty) {
         records = records.sorted(`${sortProperty}`, reverse)
     }
-    if (tableName == TABLE_FIELD_DATA || tableName == TABLE_JOB_DATA) {
+    if (!isRealmObjectRequired && (tableName == TABLE_FIELD_DATA || tableName == TABLE_JOB_DATA)) {
         let imeiNumber = DeviceInfo.getUniqueID()
         let recordList = []
         for (let index in records) {
