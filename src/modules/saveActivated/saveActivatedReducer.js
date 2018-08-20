@@ -45,6 +45,8 @@ export default function saveActivatedReducer(state = initialState, action) {
 
         case CONTACT_NUMBER_TO_SEND_SMS:
             return state.set('inputTextToSendSms', action.payload)
+                        .set('errorToastMessage','')
+
 
         case SET_SAVE_ACTIVATED_TOAST_MESSAGE:
             return state.set('errorToastMessage', action.payload)
@@ -53,6 +55,7 @@ export default function saveActivatedReducer(state = initialState, action) {
         case EMAILID_VIEW_ARRAY:
             return state.set('emailIdViewArray', action.payload.email)
                 .set('inputTextEmailIds', action.payload.inputTextEmail)
+                .set('errorToastMessage','')
 
         case IS_COMPANY_CODE_DHL:
             return state.set('companyCodeDhl', action.payload)

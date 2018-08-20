@@ -725,7 +725,6 @@ class Sync {
       FCM.cancelAllLocalNotifications()
       FCM.removeAllDeliveredNotifications()
       const topic = `FE_${userObject.value.id}`
-      FCM.unsubscribeFromTopic(topic);
       const url = CONFIG.API.FCM_TOKEN_DEREGISTRATION + '?topic=' + topic
       RestAPIFactory(token.value).serviceCall(null, url, 'POST')
     } catch (error) {
