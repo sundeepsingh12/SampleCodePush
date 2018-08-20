@@ -85,7 +85,6 @@ class FormLayout extends PureComponent {
   // }
 
   componentDidMount() {
-   
     this.props.navigation.setParams({ backForTransient: this._goBack });
     if (!this.props.navigation.state.params.isDraftRestore) {
       let {statusId,statusName} = this.props.navigation.state.params
