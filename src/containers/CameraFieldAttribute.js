@@ -151,7 +151,7 @@ class CameraFieldAttribute extends PureComponent {
             this.setState({ imageData: null });
         }
         else {
-            this.setState({ imageData: (Platform.OS === 'android') ? { uri } : { base64 } })
+            this.setState({imageData: (Platform.OS==='android') ? { uri } : {base64,uri}})
         }
     }
 
@@ -290,8 +290,8 @@ class CameraFieldAttribute extends PureComponent {
                     </View>
                     <SafeAreaView style={[style.footer]} >
                         {
-                            (getValidationObject && getValidationObject.cropImageValidation && Platform.OS === 'android' && this.state.imageData != null)
-                                ?
+                                (getValidationObject && getValidationObject.cropImageValidation && this.state.imageData != null) 
+                            ?
                                 <View>
                                     <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, { backgroundColor: 'rgba(0,0,0,0.3)' }, { width: 70, height: 70, borderRadius: 35 }]} onPress={this.props.actions.cropImage.bind(this, this.state.imageData.uri, this.setImage)}>
                                         <MaterialIcons name={"crop"} style={[styles.fontWhite, styles.fontXxxl]} />
