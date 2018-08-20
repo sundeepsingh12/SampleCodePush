@@ -1,6 +1,6 @@
 import React, { PureComponent,  } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, FlatList, TouchableOpacity, Modal, BackHandler} from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, Modal, BackHandler,KeyboardAvoidingView} from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Body, Right, Item, Input, Icon, List, ListItem, StyleProvider, Footer, FooterTab, Toast, } from 'native-base';
 import { Print, Receipt, SMS, TotalAmount, CONTACT_NUMBER_TO_SEND_SMS, SET_SAVE_ACTIVATED_TOAST_MESSAGE, EMAILID_VIEW_ARRAY, USER, RETURN_TO_HOME, } from '../lib/constants'
@@ -273,13 +273,16 @@ class CheckoutDetails extends PureComponent {
                 <View style={[styles.relative, styles.alignCenter, styles.justifyCenter, { height: '100%' }]}>
                     <View style={[styles.absolute, { height: '100%', left: 0, right: 0, backgroundColor: 'rgba(0,0,0,.6)' }]}>
                     </View>
+                    <KeyboardAvoidingView behavior="padding">
                     <View style={[styles.bgWhite, styles.shadow, { width: '90%' , height : 320}]}>
+                   
                         <View style={[styles.padding10, styles.marginBottom10, styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.borderBottomLightGray]}>
                             <Text style={[styles.bold, {marginBottom : 7}]}>{RECEPIENTS_EMAIL_ADDRESS}</Text>
                             <Text style={[styles.marginBottom10, styles.fontSm]}>
                                 Total {_.size(this.props.emailIdViewArray)}
                             </Text>
                         </View>
+                      
                         <Content>
                             {emailIds}
                         </Content>
@@ -312,13 +315,14 @@ class CheckoutDetails extends PureComponent {
                             </View>
                         </View>
                     </View>
+                    </KeyboardAvoidingView>
                 </View>
              </Modal>
         )
     }
 
     _checkForEmailSmsPrintViewButton = () => {
-          if (this.props.companyCodeDhl) {
+        if (this.props.companyCodeDhl) {
             return (
                 <View style={[styles.bgWhite]} >
                     <List>

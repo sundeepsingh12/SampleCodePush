@@ -414,7 +414,6 @@ export function startFCM() {
           await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
         });
 
-        FCM.subscribeToTopic(topic)
       }
       else {
         Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
