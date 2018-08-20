@@ -33,7 +33,7 @@ export function saveImage(result, fieldAttributeMasterId, formLayoutState, calle
                     showToastAndAddUserExceptionLog(311, error.message, 'danger', 1)
                 });
             } else {
-                const iosImageData = (result.base64) ? result.base64 : result.data
+                const iosImageData = (result.base64) ? result.base64 : (result.data) ? result.data :  result.uri
                 dispatch(saveImageInFormLayout(iosImageData, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction))
             }
         } catch (error) {
@@ -120,18 +120,20 @@ export function setInitialState() {
     }
 }
 
-export function cropImage(uri, setImage) {
+export function cropImage(path, setImage) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_CAMERA_LOADER, true))
             ImageCropPicker.openCropper({
-                path: uri,
+                path,
                 width: 300,
                 height: 300,
                 freeStyleCropEnabled: true,
+                includeBase64:(Platform.OS==='android')?false:true
+
             }).then((image) => {
-                if (image.path) {
-                    setImage(image.path);
+                if (image) {
+                    (Platform.OS==='android')?setImage(image.path):setImage(image.path,image.data)
                     dispatch(setState(SET_CAMERA_LOADER, false))
                 }
             }).catch(e => {
