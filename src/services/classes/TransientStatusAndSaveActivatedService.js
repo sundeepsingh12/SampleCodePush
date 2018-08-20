@@ -213,7 +213,8 @@ class TransientStatusAndSaveActivatedService {
                 jobId: dataForSingleTransaction.id,
                 referenceNumber: dataForSingleTransaction.referenceNumber
             }
-            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, dataForSingleTransaction.id, statusId, jobMasterId, jobTransaction)
+            let index = Object.keys(previousFormLayoutState)[0]
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, dataForSingleTransaction.id, statusId, jobMasterId, jobTransaction,previousFormLayoutState[index].jobAndFieldAttributesList)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
         }
         return { emailTableElement, emailIdInFieldData, contactNumberInFieldData }
@@ -230,7 +231,6 @@ class TransientStatusAndSaveActivatedService {
      */
 
     async sendEmailOrSms(totalAmount, emailTableElement, emailIdOrSmsList, isEmail, emailGeneratedFromComplete, jobMasterId) {
-        try {
             const userData = await keyValueDBService.getValueFromStore(USER)
             if (userData && userData.value && userData.value.company && userData.value.company.code && (_.startsWith(_.toLower(userData.value.company.code), 'dhl'))) {
                 if (!_.isEmpty(emailIdOrSmsList) && !isEmail) {
@@ -263,9 +263,7 @@ class TransientStatusAndSaveActivatedService {
                         return EMAIL_SENT_SUCCESSFULLY
                     }
                 }
-            } else return ''
-        } catch (error) {
-        }
+            } else return 'companyId is not dhl'
     }
 
     /**
@@ -322,8 +320,8 @@ class TransientStatusAndSaveActivatedService {
     }
 
     createObjectForStore(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates) {
-        let cloneSaveActivatedState = _.cloneDeep(saveActivatedState)
-        let cloneNavigationFormLayoutStates = _.cloneDeep(navigationFormLayoutStates)
+        let cloneSaveActivatedState = JSON.parse(JSON.stringify(saveActivatedState))
+        let cloneNavigationFormLayoutStates = (navigationFormLayoutStates)?JSON.parse(JSON.stringify(navigationFormLayoutStates)):null
         let storeObject = {}
         storeObject[jobMasterId] = {
             saveActivatedState: cloneSaveActivatedState, 

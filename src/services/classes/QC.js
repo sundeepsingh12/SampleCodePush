@@ -7,6 +7,7 @@ import { PASS, FAIL } from '../../lib/ContainerConstants'
 import { fieldValidationService } from './FieldValidation'
 import { paymentService } from '../payment/Payment'
 import { fieldDataService } from './FieldData';
+import sortBy from 'lodash/sortBy'
 
 class QC {
 
@@ -101,7 +102,7 @@ class QC {
         let positionIdOfArray = qcJobArrayData[0].positionId;
         let decryptionKey = DeviceInfo.getUniqueID();
         this.getChildQCData(positionIdOfArray, { realmDBObject: jobDataDBObject, jobId: jobTransaction.jobId, decryptionKey, qcAttributeMasterArray }, qcDataArray, qcDataObjectId);
-        qcDataArray = _.sortBy(qcDataArray, function (object) { return object.qcSequence })
+        qcDataArray = sortBy(qcDataArray, function (object) { return object.qcSequence });
         let qcImageUrlDataArray = this.getQCImageUrlData(jobTransaction, qcAttributeMasterArray, jobDataDBObject, decryptionKey);
         return { qcDataArray, qcImageUrlDataArray };
     }

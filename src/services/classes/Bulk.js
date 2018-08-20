@@ -57,9 +57,9 @@ class Bulk {
         let searchText = _.toLower(searchValue)
         let isSearchFound = false
         let errorMessage = '', numberOfEnabledItems
-        let clonePageObject = _.cloneDeep(pageObject)
+        let clonePageObject = JSON.parse(JSON.stringify(pageObject))
         let bulkJobSimilarityConfig = this.getBulkJobSimilarityConfig(clonePageObject)
-
+        let isTransactionSelected = false
         for (let key in bulkTransactions) {
             if (_.isEqual(_.toLower(bulkTransactions[key].referenceNumber), searchText) || _.isEqual(_.toLower(bulkTransactions[key].runsheetNo), searchText)) { // If search text is equal to reference number or runsheet number.Search on reference or runsheet can toggle multiple transactions
                 if (bulkJobSimilarityConfig && isSearchFound) {
@@ -69,6 +69,7 @@ class Bulk {
                 if (bulkJobSimilarityConfig) {
                     numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedItems)
                 }
+                isTransactionSelected = (bulkTransactions[key].isChecked) ? bulkTransactions[key].referenceNumber : null
                 isSearchFound = this.toggleTransaction(bulkTransactions, key, isSearchFound, selectedItems)
             } else if (searchSelectionOnLine1Line2 && this.checkForPresenceInDisplayText(searchText, bulkTransactions[key], idToSeparatorMap)) { // If search on line1 and line2 is allowed and search text is present in line1 or line2
                 if (isSearchFound) { // Search on lin1 or line2 cannot toggle multiple transactions
@@ -78,6 +79,7 @@ class Bulk {
                 if (bulkJobSimilarityConfig) {
                     numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedItems)
                 }
+                isTransactionSelected = (bulkTransactions[key].isChecked) ? bulkTransactions[key].referenceNumber : null
                 isSearchFound = this.toggleTransaction(bulkTransactions, key, isSearchFound, selectedItems)
             }
         }
@@ -85,7 +87,7 @@ class Bulk {
         if (!isSearchFound) { // If transaction not found
             return { errorMessage: INVALID_SCAN }
         } else {
-            return { errorMessage, displayText, selectAll }
+            return { errorMessage, displayText, selectAll, isTransactionSelected }
         }
     }
 

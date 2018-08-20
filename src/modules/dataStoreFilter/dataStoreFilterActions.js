@@ -12,7 +12,6 @@ import {
     NEXT_FOCUS,
 } from '../../lib/constants'
 import CONFIG from '../../lib/config'
-import _ from 'lodash'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 
@@ -71,11 +70,11 @@ export function onSave(fieldAttributeMasterId, formLayoutState, dataStoreFilterv
             if (calledFromArray) {
                 let rowFormElement = formLayoutState.formElement[rowId].formLayoutObject // get current formElement from rowId
                 let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] // get DSF reverse Map in case of array used for back tracking, if it is edited
-                let singleFormElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(rowFormElement))
+                let singleFormElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, JSON.parse(JSON.stringify(rowFormElement)))
                 formLayoutState.formElement[rowId].formLayoutObject = singleFormElement
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStoreFiltervalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 2, null, formLayoutState)) // call save method of array actions and pass NEXT_FOCUS as event
             } else {
-                let formElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(formLayoutState.formElement))
+                let formElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, JSON.parse(JSON.stringify(formLayoutState.formElement)))
                 formLayoutState.formElement = formElement
                 formLayoutState.dataStoreFilterReverseMap = dataStoreFilterReverseMap
                 dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStoreFiltervalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction, true))

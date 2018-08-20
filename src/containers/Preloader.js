@@ -21,6 +21,7 @@ import { LATEST_APK_PATH } from '../lib/AttributeConstants'
 import CodePushUpdate from './CodePushUpdate'
 import Loader from '../components/Loader'
 import { HANG_ON, PLEASE_WAIT_FOR_IOS_LINK_URL } from '../lib/ContainerConstants'
+import isEmpty from 'lodash/isEmpty'
 
 function mapStateToProps(state) {
     return {
@@ -157,14 +158,14 @@ class Preloader extends PureComponent {
         } else {
             return (
                 <Container>
-                    {(_.isEmpty(this.props.showMobileOtpNumberScreen) ? <InitialSetup showMobileOtpNumberScreen = {this.props.showMobileOtpNumberScreen}  /> : null)}
-                    {(!_.isEmpty(this.props.errorMessage_403_400_Logout) &&
+                    {(isEmpty(this.props.showMobileOtpNumberScreen) ? <InitialSetup showMobileOtpNumberScreen = {this.props.showMobileOtpNumberScreen}  /> : null)}
+                    {(!isEmpty(this.props.errorMessage_403_400_Logout) &&
                         <CustomAlert
                             title="Unauthorised Device"
                             message={this.props.errorMessage_403_400_Logout}
                             onOkPressed={this.startLoginScreenWithoutLogout} />
                     )}
-                    {(!_.isEmpty(this.props.showMobileOtpNumberScreen) ? <MobileOtpScreen invalidateUserSession={this.invalidateSession} isMobileScreen={this.props.showMobileOtpNumberScreen} /> : null)}
+                    {(!isEmpty(this.props.showMobileOtpNumberScreen) ? <MobileOtpScreen invalidateUserSession={this.invalidateSession} isMobileScreen={this.props.showMobileOtpNumberScreen} /> : null)}
                     
                     {renderIf(this.props.downloadLatestAppMessage,
                         <AppOutdated downloadLatestApk={this.downloadLatestApk} />

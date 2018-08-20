@@ -22,9 +22,9 @@ module.exports = {
         url: 'https://qa.fareye.co'
       },
       {
-        name: 'LocalRahul',
-        url: 'http://172.16.10.141:8080'
-      },
+        name: 'Local',
+        url: 'http://192.168.43.60:8080'
+      }
     ],
     port: 8083,
     PUSH_QOS: 2
@@ -61,6 +61,7 @@ module.exports = {
     FCM_TOKEN_DEREGISTRATION: '/app/rest/fcm/deRegister',
     SEND_MESSAGE: '/app/rest/device/send_message',
     UPDATE_LAST_SEEN: '/app/rest/device/update_last_seen',
-    POST_ZIP_ENCRYPTED_API: '/app/rest/device/v2/sync'
+    POST_ZIP_ENCRYPTED_API: '/app/rest/device/v2/sync',
+    RESET_PASSWORD_AT_LOGIN: '/forgot_password/reset_expired_password'
   }
 }

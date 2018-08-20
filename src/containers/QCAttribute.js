@@ -14,9 +14,7 @@ import { connect } from 'react-redux';
 import TitleHeader from '../components/TitleHeader';
 import Carousel from 'react-native-snap-carousel';
 import Loader from '../components/Loader';
-import { PASS, FAIL, CHECKLIST, OF } from '../lib/ContainerConstants';
-import { QCReasonScreen } from '../lib/constants';
-// import QCModal from './QCModal';
+import { PASS, FAIL, OF } from '../lib/ContainerConstants';
 import isEmpty from 'lodash/isEmpty';
 
 function mapStateToProps(state) {
@@ -24,7 +22,6 @@ function mapStateToProps(state) {
         qcLoading: state.qc.qcLoading,
         qcAttributeMaster: state.qc.qcAttributeMaster,
         qcDataArray: state.qc.qcDataArray,
-        qcModal: state.qc.qcModal,
         qcImageURLDataArray: state.qc.qcImageURLDataArray
     }
 }
@@ -140,7 +137,6 @@ class QCAttribute extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    {/* {(this.props.qcModal) ? <QCModal qcDataArray={this.props.qcDataArray} qcAttributeMaster={this.props.qcAttributeMaster} qcPassFail={this.props.qcModal} jobTransaction={this.props.navigation.state.params.jobTransaction} /> : null} */}
                     <Content style={[styles.flex1, styles.bgWhite, styles.padding10]}>
                         <View>
                             {

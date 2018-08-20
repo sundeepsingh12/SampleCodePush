@@ -6,7 +6,6 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Body, Icon, StyleProvider, Footer, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as liveJobActions from '../modules/liveJob/liveJobActions'
@@ -145,7 +144,6 @@ class LiveJob extends PureComponent {
 
     showHeaderView() {
         return (
-            <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
                 <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                     <Body>
                         <View
@@ -162,7 +160,6 @@ class LiveJob extends PureComponent {
                         </View>
                     </Body>
                 </Header>
-            </SafeAreaView>
         )
     }
 

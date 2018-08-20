@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent,  } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, FlatList, TouchableOpacity, Modal, BackHandler } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, Modal, BackHandler,KeyboardAvoidingView} from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Body, Right, Item, Input, Icon, List, ListItem, StyleProvider, Footer, FooterTab, Toast, } from 'native-base';
 import { Print, Receipt, SMS, TotalAmount, CONTACT_NUMBER_TO_SEND_SMS, SET_SAVE_ACTIVATED_TOAST_MESSAGE, EMAILID_VIEW_ARRAY, USER, RETURN_TO_HOME, } from '../lib/constants'
@@ -80,7 +80,7 @@ class CheckoutDetails extends PureComponent {
     }
 
     componentDidUpdate() {
-        if (this.props.errorToastMessage && this.props.errorToastMessage != '') {
+        if (this.props.errorToastMessage && this.props.errorToastMessage != '' && this.props.errorToastMessage != PLEASE_ENTER_A_VALID_EMAIL_ID && this.props.errorToastMessage != CONTACT_NUMBER_SHOULD_START_WITH_0_AND_CONTAINS_MINIMUM_OF_10_DIGITS) {
             Toast.show({
                 text: this.props.errorToastMessage,
                 position: 'bottom',
@@ -164,15 +164,22 @@ class CheckoutDetails extends PureComponent {
         this.props.actions.setState(CONTACT_NUMBER_TO_SEND_SMS, value)
     }
 
+    _setSmsEmailModal(modalStatus){
+        this.setState({isModalVisible: modalStatus })
+        this.props.actions.setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, '')
+    }
+
     onChangeEmailText = (value) => {
-        if (_.includes(value, ' ')) {
-            if (!_.includes(value, '@') || !_.includes(value, '.')) {
-                this.props.actions.setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, PLEASE_ENTER_A_VALID_EMAIL_ID)
+        const mailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+        let splitValue = _.trim(value.split(',')[0]) + _.trim(value.split(',')[1])
+        if (_.includes(value, ',')) {
+            if (!mailFormat.test(splitValue)) {
+             this.props.actions.setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, PLEASE_ENTER_A_VALID_EMAIL_ID)
             } else {
                 let emails = this.props.emailIdViewArray
-                emails.push(value.split(' ')[0])
+                emails.push(splitValue)
                 this.props.actions.setState(EMAILID_VIEW_ARRAY, { email: emails, inputTextEmail: '' })
-            }
+             }
         } else {
             this.props.actions.setState(EMAILID_VIEW_ARRAY, { email: this.props.emailIdViewArray, inputTextEmail: value })
         }
@@ -183,7 +190,7 @@ class CheckoutDetails extends PureComponent {
             <Modal animationType={"fade"}
                 transparent={true}
                 visible={true}
-                onRequestClose={() => this._showModalView(-1)}
+                onRequestClose={() => this._setSmsEmailModal(-1)}
                 presentationStyle={"overFullScreen"}>
                 <View style={[styles.relative, styles.alignCenter, styles.justifyCenter, { height: '100%' }]}>
                     <View style={[styles.absolute, { height: '100%', left: 0, right: 0, backgroundColor: 'rgba(0,0,0,.6)' }]}>
@@ -192,22 +199,23 @@ class CheckoutDetails extends PureComponent {
                         <View style={[styles.padding10, styles.marginBottom10, styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.borderBottomLightGray]}>
                             <Text style={[styles.bold, styles.marginBottom10]}>{RECEPIENTS_CONTACT_NUMBER}</Text>
                         </View>
-                        <View style={[styles.paddingHorizontal10]}>
-                            <Item >
+                        <View style={[{height : 40}]}>
                                 <Input placeholder={MOBILE_NUMBER}
                                     value={this.props.inputTextToSendSms}
                                     keyboardType='numeric'
                                     returnKeyType='done'
                                     onChangeText={this.onChangeMobileNo}
                                     style={[styles.fontSm]} />
-                            </Item>
                         </View>
-
-
+                        <View>
+                            <Text style={[ {color: styles.bgDanger.backgroundColor}, styles.fontSm, {marginLeft : 6}]}>
+                            {this.props.errorToastMessage}
+                            </Text>
+                        </View>
                         <View style={[styles.row, { borderTopColor: '#d3d3d3', borderTopWidth: 1 }]}>
                             <View style={{ width: '50%' }}>
                                 <Button transparent full
-                                    onPress={() => { this._showModalView(-1) }} >
+                                    onPress={() => { this._setSmsEmailModal(-1) }} >
                                     <Text style={{ color: styles.fontPrimaryColor }}>{CANCEL}</Text>
                                 </Button>
                             </View>
@@ -236,17 +244,21 @@ class CheckoutDetails extends PureComponent {
             let emails = this.props.emailIdViewArray
             for (let counter in emails) {
                 view.push(
-                    <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.padding5, styles.bgLightGray, styles.marginBottom10, styles.marginRight10, { borderRadius: 15 }]}>
-                        <Text style={[styles.fontSm]}>
+                    <View style={[styles.justifySpaceBetween, styles.alignCenter, styles.padding5, styles.bgLightGray, styles.marginBottom10, styles.marginRight10, { borderRadius: 15 }]}>
+                        <View style = {[styles.row, styles.alignCenter, styles.justifyCenter]}>
+                        <Text style={[styles.fontSm, {marginLeft : 7}]}>
                             {emails[counter]}
                         </Text>
-                        <View style={[{ paddingVertical: 3, paddingHorizontal: 5 }]}>
-                            <Icon name="ios-close-outline" style={[styles.fontLg, { color: styles.fontPrimaryColor }]} onPress={() => { this._deleteEmailId(counter) }} />
+                        <Icon name="ios-close-outline" style={[styles.fontXxl,styles.fontWeight500, { color: styles.fontPrimaryColor , paddingHorizontal: 5, marginBottom: 3, width: 20, height: 20}]} onPress={() => { this._deleteEmailId(counter) }} />
                         </View>
                     </View>
                 )
             }
-            return view
+            return(
+                <View style={[styles.padding10, styles.marginBottom10, styles.row, styles.flexWrap]} scrollEnabled = {true}  >
+                            {view}
+                </View>
+            )
         }
     }
 
@@ -256,36 +268,42 @@ class CheckoutDetails extends PureComponent {
             <Modal animationType={"fade"}
                 transparent={true}
                 visible={true}
-                onRequestClose={() => this._showModalView(-1)}
+                onRequestClose={() => this._setSmsEmailModal(-1)}
                 presentationStyle={"overFullScreen"}>
                 <View style={[styles.relative, styles.alignCenter, styles.justifyCenter, { height: '100%' }]}>
                     <View style={[styles.absolute, { height: '100%', left: 0, right: 0, backgroundColor: 'rgba(0,0,0,.6)' }]}>
                     </View>
-                    <View style={[styles.bgWhite, styles.shadow, styles.borderRadius3, { width: '90%' }]}>
+                    <KeyboardAvoidingView behavior="padding">
+                    <View style={[styles.bgWhite, styles.shadow, { width: '90%' , height : 320}]}>
+                   
                         <View style={[styles.padding10, styles.marginBottom10, styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.borderBottomLightGray]}>
-                            <Text style={[styles.bold, styles.marginBottom10]}>{RECEPIENTS_EMAIL_ADDRESS}</Text>
+                            <Text style={[styles.bold, {marginBottom : 7}]}>{RECEPIENTS_EMAIL_ADDRESS}</Text>
                             <Text style={[styles.marginBottom10, styles.fontSm]}>
                                 Total {_.size(this.props.emailIdViewArray)}
                             </Text>
                         </View>
-                        <View style={[styles.padding10, styles.marginBottom10, styles.row, styles.flexWrap]}>
+                      
+                        <Content>
                             {emailIds}
-                        </View>
-                        <View style={[styles.paddingHorizontal10]}>
-                            <Item >
+                        </Content>
+                        <View style={[{height : 50}]}>
                                 <Input
                                     placeholder={ENTER_EMAIL_IDS}
                                     value={this.props.inputTextEmailIds}
                                     onChangeText={this.onChangeEmailText}
-                                    style={[styles.fontSm]} />
-                            </Item>
+                                    style={[styles.fontSm, styles.marginTop5]} />
+                                    </View>
+                                    <View>
+                            <Text style={[ {color: styles.bgDanger.backgroundColor}, styles.fontSm, {marginLeft : 6}]}>
+                            {this.props.errorToastMessage}
+                            </Text>
                         </View>
 
 
                         <View style={[styles.row, { borderTopColor: '#d3d3d3', borderTopWidth: 1 }]}>
                             <View style={{ width: '50%' }}>
                                 <Button transparent full
-                                    onPress={() => { this._showModalView(-1) }} >
+                                    onPress={() => { this._setSmsEmailModal(-1) }} >
                                     <Text style={{ color: styles.fontPrimaryColor }}>{CANCEL}</Text>
                                 </Button>
                             </View>
@@ -297,8 +315,9 @@ class CheckoutDetails extends PureComponent {
                             </View>
                         </View>
                     </View>
+                    </KeyboardAvoidingView>
                 </View>
-            </Modal>
+             </Modal>
         )
     }
 
@@ -348,16 +367,11 @@ class CheckoutDetails extends PureComponent {
 
     render() {
         let emailSmsPrintViewButton = this._checkForEmailSmsPrintViewButton()
+        let smsEmailModalView = (this.state.isModalVisible == 4) ? this._showSmsBoxModal() : (this.state.isModalVisible == 3) ? this._showEmailModal() : null
         if (this.props.loading) {
             return (
                 <Loader />
             )
-        }
-        if (this.state.isModalVisible == 4) {
-            return this._showSmsBoxModal()
-        }
-        if (this.state.isModalVisible == 3) {
-            return this._showEmailModal()
         }
         if (this.state.isModalVisible == 1) {
             return (<SummaryDetails recurringData={this.props.navigation.state.params.recurringData} showParcelSummary={this._showModalView} />)
@@ -370,8 +384,7 @@ class CheckoutDetails extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                             <Body>
                                 <View
                                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -386,10 +399,10 @@ class CheckoutDetails extends PureComponent {
                                 </View>
                             </Body>
                         </Header>
-                    </SafeAreaView>
 
                     <Content style={[styles.flex1, styles.bgLightGray]}>
                         {emailSmsPrintViewButton}
+                        {smsEmailModalView}
                         <View style={[styles.marginTop10, styles.bgWhite]}>
                             <FlatList
                                 data={this.props.navigation.state.params.commonData}
@@ -433,7 +446,6 @@ class CheckoutDetails extends PureComponent {
                             </List>
                         </View>)}
                     </Content>
-                    <SafeAreaView style = {[styles.bgWhite]}>
                         <Footer style={[style.footer]}>
                             <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
                                 <Button onPress={() => {
@@ -443,7 +455,6 @@ class CheckoutDetails extends PureComponent {
                                 </Button>
                             </FooterTab>
                         </Footer>
-                    </SafeAreaView>
                 </Container>
             </StyleProvider>
         )

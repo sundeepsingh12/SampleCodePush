@@ -39,6 +39,10 @@ module.exports = keyMirror({
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
     SET_LOGIN_PARAMETERS: null,
+    SHOW_RESET_PASSWORD: null,
+    SET_ERROR_RESET_PASSWORD: null,
+    SET_RESET_PASSWORD_LOADER: null,
+    SHOW_RESET_PASSWORD_AND_SET_PASSWORD: null,
 
     //Preloader Actions
     MASTER_DOWNLOAD_START: null,
@@ -166,6 +170,10 @@ module.exports = keyMirror({
 
     //Pay By Link Payment Actions
     SET_PAY_BY_LINK_PARAMETERS: null,
+    SET_LOADER_FOR_PAYBYLINK: null,
+    ON_CHANGE_PAYBYLINK_MOBILE_NO: null,
+    SET_PAY_BY_LINK_MESSAGE: null,
+    CLEAR_STATE_FOR_PAY_BY_LINK: null,
 
     //Bluetooth Actions
     BLUETOOTH_SCANNING_START: null,
@@ -450,6 +458,8 @@ module.exports = keyMirror({
     SET_BULK_SEARCH_TEXT: null,
     SET_BULK_ERROR_MESSAGE: null,
     SET_BULK_TRANSACTION_PARAMETERS: null,
+    SET_BULK_PARAMS_FOR_SELECTED_DATA: null,
+    SET_BULK_CHECK_ALERT_VIEW: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,

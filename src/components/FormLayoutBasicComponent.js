@@ -365,9 +365,9 @@ class BasicFormElement extends PureComponent {
                             <View>
                                 {renderIf((this.props.item.attributeTypeId == 62),
                                     this.props.item.displayValue ?
-                                        <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.marginRight20, styles.absolute, { top: 10, right: 10 }, styles.fontSuccess, { marginTop: -10 }])} /> :
+                                        <Icon name='ios-checkmark' style={[styles.fontXxxl, styles.marginRight20, styles.absolute, { top: 10, right: 10 }, styles.fontSuccess, { marginTop: -10 }]} /> :
                                         (this.props.item.isLoading) ?
-                                            <ActivityIndicator animating={true} style={StyleSheet.flatten([styles.absolute, styles.marginRight20, { top: 10, right: 10 }, { marginTop: -10 }])} size="small" color="green" /> : null
+                                            <ActivityIndicator animating={true} style={[styles.absolute, styles.marginRight20, { top: 10, right: 10 }, { marginTop: -10 }]} size="small" color="green" /> : null
                                 )}
                                 <Item stackedLabel>
                                     <Input
@@ -390,7 +390,7 @@ class BasicFormElement extends PureComponent {
                                 {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ?
                                     <TouchableHighlight
                                         style={[styles.absolute, { top: 10, right: 10 }]}
-                                        onPress={this.goToQRCode}
+                                        onPress={(this.props.item.editable) ? this.goToQRCode : null}
                                     >
                                         <View>
                                             <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable).color} />

@@ -15,8 +15,8 @@ import {
     UNSEEN,
 } from '../../lib/AttributeConstants'
 
-import {jobMasterService} from '../classes/JobMaster'
-import _ from 'lodash'
+import { jobMasterService } from '../classes/JobMaster'
+import isEmpty from 'lodash/isEmpty'
 
 class SummaryAndPieChart {
 
@@ -26,7 +26,7 @@ class SummaryAndPieChart {
     async getAllStatusIdsCount(jobMasterList) {
         const { allStatusMap, noNextStatusMap } = await jobStatusService.getStatusIdsForAllStatusCategory() // get all status list
         const allPendingSuccessFailIds = Object.keys(allStatusMap)
-        let jobMasterIdList = (_.isEmpty(jobMasterList)) ? await jobMasterService.getJobMasterIdList() : jobMasterList
+        let jobMasterIdList = (isEmpty(jobMasterList)) ? await jobMasterService.getJobMasterIdList() : jobMasterList
         const transactionList = this.getTransactionsForPieChartAndSummary(allPendingSuccessFailIds, jobMasterIdList) // get all transactions for selected jobMAster list
         const allTransactionOnTodaysDate = (transactionList.length) ? this.isTodaysDateTransactions(transactionList, noNextStatusMap) : [] // get transactions on today's date
         return this.setAllCounts(allTransactionOnTodaysDate, allStatusMap)
@@ -54,9 +54,9 @@ class SummaryAndPieChart {
     */
 
     setAllJobMasterSummary(jobMasterList, jobStatusList, jobSummaryList, allPendingSuccessFailIds, noNextStatusMap) {
-        let jobMasterIdMap = {} , jobMasterSummaryList = {}
+        let jobMasterIdMap = {}, jobMasterSummaryList = {}
         jobMasterList.forEach(id => {
-            jobMasterSummaryList[id.id] = { id: id.id, code: id.identifier, cashCollected : 0, cashCollectedByCard : 0, cashPayment : 0,  identifierColor: id.identifierColor, title: id.title, count: 0, 1: { count: 0, list: [] }, 2: { count: 0, list: [] }, 3: { count: 0, list: [] } }
+            jobMasterSummaryList[id.id] = { id: id.id, code: id.identifier, cashCollected: 0, cashCollectedByCard: 0, cashPayment: 0, identifierColor: id.identifierColor, title: id.title, count: 0, 1: { count: 0, list: [] }, 2: { count: 0, list: [] }, 3: { count: 0, list: [] } }
         }) // map of jobMasterId and jobMaster Summary details Dto
         const jobTransactions = this.getTransactionsForPieChartAndSummary(allPendingSuccessFailIds, Object.keys(jobMasterSummaryList)) // get transactions for summary
         const jobStatusIdCountMap = this.createJobStatusCountMap(jobTransactions, noNextStatusMap, jobSummaryList, jobMasterSummaryList) // get jobStatus and count map
@@ -136,12 +136,12 @@ class SummaryAndPieChart {
 
     createJobStatusCountMap(jobTransactions, noNextStatusMap, jobSummaryList, jobMasterSummaryList) {
         let jobStatusIdMap = {}
-        const moneyTypeCollectionTypeMap = { 'Collection-Cash' : 'cashCollected', 'Collection-SOD' : 'cashCollectedByCard', 'Refund' : 'cashPayment'   }
+        const moneyTypeCollectionTypeMap = { 'Collection-Cash': 'cashCollected', 'Collection-SOD': 'cashCollectedByCard', 'Refund': 'cashPayment' }
         const todayDate = moment().format('YYYY-MM-DD')
         jobTransactions.forEach(item => {
             if (moment(todayDate).isSame(moment(item.lastUpdatedAtServer).format('YYYY-MM-DD')) || !noNextStatusMap[item.jobStatusId]) { // check for today's date transaction and
-                if(item.moneyTransactionType && item.actualAmount > 0){ // check for moneyTransactionType and actualAmount
-                    jobMasterSummaryList[item.jobMasterId][moneyTypeCollectionTypeMap[item.moneyTransactionType]] += item.actualAmount   
+                if (item.moneyTransactionType && item.actualAmount > 0) { // check for moneyTransactionType and actualAmount
+                    jobMasterSummaryList[item.jobMasterId][moneyTypeCollectionTypeMap[item.moneyTransactionType]] += item.actualAmount
                 }
                 jobStatusIdMap[item.jobStatusId] = (jobStatusIdMap[item.jobStatusId]) ? jobStatusIdMap[item.jobStatusId] + 1 : 1
             }
@@ -179,8 +179,8 @@ class SummaryAndPieChart {
     getAllRunSheetSummary() {
         let setRunsheetSummary = []
         let runsheetQuery = 'isClosed = false'
-        const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
-        runSheetData.forEach(item => setRunsheetSummary.push([item.runsheetNumber, item.successCount, item.pendingCount, item.failCount, item.cashCollected]))
+        const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery, true, 'startDate', false, true)
+        runSheetData.forEach(item => setRunsheetSummary.push([item.runsheetNumber, item.successCount, item.pendingCount, item.failCount, item.cashCollected, item.cashCollectedByCard]))
         return setRunsheetSummary;
     }
 

@@ -14,6 +14,7 @@ import {
     BACKUP_ALREADY_EXIST,
     DOMAIN_URL,
     JOB_SUMMARY,
+    FIELD_ATTRIBUTE
 } from '../../lib/constants'
 import { userEventLogService } from './UserEvent'
 import { jobSummaryService } from './JobSummary'
@@ -128,6 +129,8 @@ class Backup {
      */
     async  _getSyncDataFromDb(transactionList, dateTime) {
         if (!transactionList) throw new Error(TRANSACTIONLIST_IS_MISSING)
+        const fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
+
         var BACKUP_JSON = {};
         let fieldDataList = [],
             jobList = [],
@@ -135,14 +138,14 @@ class Backup {
             transactionLogs = [],
             trackLogs = []
         let fieldDataQuery = transactionList.map(transaction => 'jobTransactionId = ' + transaction.id).join(' OR ')
-        fieldDataList = syncZipService.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA);
+        fieldDataList = syncZipService.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA, dateTime);
         let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table
         jobList = syncZipService.getDataFromRealmDB(jobIdQuery, TABLE_JOB);
         serverSmsLogs = syncZipService.getDataFromRealmDB(null, TABLE_SERVER_SMS_LOG);
         let transactionLogsQuery = transactionList.map(jobTransaction => 'transactionId = ' + jobTransaction.id).join(' OR ')
         transactionLogs = syncZipService.getDataFromRealmDB(transactionLogsQuery, TABLE_TRANSACTION_LOGS);
         trackLogs = syncZipService.getDataFromRealmDB(null, TABLE_TRACK_LOGS);
-        await syncZipService.moveImageFilesToSync(fieldDataList, PATH_BACKUP_TEMP)
+        await syncZipService.moveImageFilesToSync(fieldDataList, PATH_BACKUP_TEMP, fieldAttributesList.value)
         BACKUP_JSON.fieldData = fieldDataList
         BACKUP_JSON.job = jobList
         BACKUP_JSON.jobTransaction = transactionList

@@ -12,7 +12,7 @@ import { PATH_CUSTOMER_IMAGES, QC_IMAGE } from '../../lib/AttributeConstants'
 import { OPEN_CAMERA } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import ImageCropPicker from 'react-native-image-crop-picker';
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 
 var PATH_COMPRESS_IMAGE = '/compressImages';
 
@@ -34,7 +34,8 @@ export function saveImage(result, fieldAttributeMaster, formLayoutState, calledF
                     showToastAndAddUserExceptionLog(311, error.message, 'danger', 1)
                 });
             } else {
-                dispatch(saveImageInFormLayout(result.uri, fieldAttributeMaster, formLayoutState, calledFromArray, rowId, jobTransaction))
+                const iosImageData = (result.base64) ? result.base64 : (result.data) ? result.data : result.uri
+                dispatch(saveImageInFormLayout(iosImageData, fieldAttributeMaster, formLayoutState, calledFromArray, rowId, jobTransaction))
             }
         } catch (error) {
             dispatch(setState(SET_CAMERA_LOADER, false))
@@ -96,7 +97,7 @@ export function setCameraInitialView(item) {
         try {
             dispatch(setState(SET_CAMERA_LOADER_INITIAL_SET_UP))
             let validation = null, data = null
-            if (!_.isEmpty(item.validation)) {
+            if (!isEmpty(item.validation)) {
                 validation = await signatureService.getValidations(item.validation, item.attributeTypeId)
             }
             if (item.value && item.value != '' && item.value != OPEN_CAMERA) {
@@ -122,18 +123,20 @@ export function setInitialState() {
     }
 }
 
-export function cropImage(uri, setImage) {
+export function cropImage(path, setImage) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_CAMERA_LOADER, true))
             ImageCropPicker.openCropper({
-                path: uri,
+                path,
                 width: 300,
                 height: 300,
                 freeStyleCropEnabled: true,
+                includeBase64: (Platform.OS === 'android') ? false : true
+
             }).then((image) => {
-                if (image.path) {
-                    setImage(image.path);
+                if (image) {
+                    (Platform.OS === 'android') ? setImage(image.path) : setImage(image.path, image.data)
                     dispatch(setState(SET_CAMERA_LOADER, false))
                 }
             }).catch(e => {

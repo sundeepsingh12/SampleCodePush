@@ -114,7 +114,6 @@ class CashTendering extends PureComponent {
 
     showHeaderView() {
         return (
-            <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }]}>
                 <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                     <Body>
                         <View
@@ -131,7 +130,6 @@ class CashTendering extends PureComponent {
                         </View>
                     </Body>
                 </Header>
-            </SafeAreaView>
         )
     }
 
@@ -161,7 +159,7 @@ class CashTendering extends PureComponent {
                     {this._checkIfCashCollectOrReturn()}
                     {this.showFlatList()}
                     <SafeAreaView style={[styles.bgWhite]}>
-                        <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
+                        <Footer style={[style.footer, styles.column, styles.padding10]}>
                             {totalAmountInCashTendering}
                             <Button success full onPress={() => (this.props.isReceive) ? this._onSavePress() : this._onSavePressReturn()}>
                                 <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
@@ -174,6 +172,9 @@ class CashTendering extends PureComponent {
     }
 }
 const style = StyleSheet.create({
+    footer:{
+        height:'auto'
+    },
     header: {
         borderBottomWidth: 0,
         height: 'auto',

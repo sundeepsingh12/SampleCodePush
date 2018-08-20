@@ -124,7 +124,7 @@ class SaveActivated extends PureComponent {
     }
 
     navigateToFormLayout = (statusId, statusName) => {
-        let cloneJobTransaction = _.cloneDeep(this.props.navigation.state.params.jobTransaction)
+        let cloneJobTransaction = JSON.parse(JSON.stringify(this.props.navigation.state.params.jobTransaction)) 
         let lastIndex = parseInt(_.findLastKey(this.props.recurringData))
         let userHubId = cloneJobTransaction.referenceNumber.split('/')
         if (!lastIndex) {
@@ -140,6 +140,7 @@ class SaveActivated extends PureComponent {
             statusName,
             jobMasterId: this.props.navigation.state.params.jobMasterId,
             navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
+            saveActivated:true
         })
     }
 
@@ -303,8 +304,7 @@ class SaveActivated extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                        <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
+                        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                             <Body>
                                 <View
                                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -320,7 +320,6 @@ class SaveActivated extends PureComponent {
                                 </View>
                             </Body>
                         </Header>
-                    </SafeAreaView>
 
                     <Content style={[styles.flex1, styles.bgLightGray]}>
                         {(this.props.checkTransactionSaveActivated && this.props.checkTransactionSaveActivated != TRANSACTION_SUCCESSFUL && this.props.checkTransactionSaveActivated != DELETE_DRAFT) ?this.showCheckTransactionAlert() :this.draftModal()}
@@ -416,7 +415,7 @@ const style = StyleSheet.create({
         paddingRight: 15
     },
     footer: {
-        height: 'auto',
+        height:'auto',
         backgroundColor: '#ffffff',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',
@@ -432,7 +431,5 @@ const style = StyleSheet.create({
     },
 
 });
-/**
- * Connect the properties
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(SaveActivated)

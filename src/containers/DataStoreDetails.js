@@ -115,7 +115,7 @@ class DataStoreDetails extends PureComponent {
                 <StyleProvider style={getTheme(platform)}>
                     <Container>
                         <SafeAreaView>
-                            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])} >
+                            <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]} >
                                 <Body>
                                     <View
                                         style={[styles.row, styles.width100]}>
