@@ -761,9 +761,11 @@ class Sync {
     let transactionToBeSynced = await keyValueDBService.getValueFromStore(schemaName);
     let originalTransactionsToBeSynced = transactionToBeSynced ? transactionToBeSynced.value : {}
     for (let index in transactionIdsSynced) {
-      if (allowedTransactionIds[originalTransactionsToBeSynced[index].id] && moment(originalTransactionsToBeSynced[index].syncTime).isBefore(moment(date).format('YYYY-MM-DD HH:mm:ss')) || (moment(originalTransactionsToBeSynced[index].syncTime).isSame(moment(date).format('YYYY-MM-DD HH:mm:ss')))) {
+      if (moment(originalTransactionsToBeSynced[index].syncTime).isBefore(moment(date).format('YYYY-MM-DD HH:mm:ss')) || (moment(originalTransactionsToBeSynced[index].syncTime).isSame(moment(date).format('YYYY-MM-DD HH:mm:ss')))) {
+       if(_.isEmpty(allowedTransactionIds) || allowedTransactionIds[originalTransactionsToBeSynced[index].id]){
         delete originalTransactionsToBeSynced[index]
       }
+    }
     }
     if (originalTransactionsToBeSynced && _.size(originalTransactionsToBeSynced) > 0) {
       await keyValueDBService.validateAndSaveData(schemaName, originalTransactionsToBeSynced);

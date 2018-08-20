@@ -163,40 +163,28 @@ class SyncZip {
             serverSmsLogs = this.getDataFromRealmDB(null, TABLE_SERVER_SMS_LOG);
             return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog };
         }
-        let fieldDataQuery, jobTransactionQuery, jobQuery, transactionLogQuery,allowedTransactionIdList = {},counter = 0,firstIndex
-
-        //Prepare logs.json for 150 job transactions at a time
-            if(_.size(transactionIdList) >= 150){
+        let fieldDataQuery, jobTransactionQuery, jobQuery, transactionLogQuery,allowedTransactionIdList = {},counter = 0
                 for(let index in transactionIdList){
                     if(counter == 0){
-                        firstIndex = index
+                        fieldDataQuery = `jobTransactionId = ${transactionIdList[index].id}`;
+                        jobTransactionQuery = `id = ${transactionIdList[index].id}`;
+                        jobQuery = `id = ${transactionIdList[index].jobId}`;
+                        transactionLogQuery = `transactionId = ${transactionIdList[index].id}`;
                     }
+                      //Prepare logs.json for 150 job transactions at a time
                     else if(counter == 150){
                         break
+                    }
+                    else{
+                        fieldDataQuery += ` OR jobTransactionId = ${transactionIdList[index].id}`;
+                        jobTransactionQuery += ` OR id = ${transactionIdList[index].id}`;
+                        jobQuery += ` OR id = ${transactionIdList[index].jobId}`;
+                        transactionLogQuery += ` OR transactionId = ${transactionIdList[index].id}`;
                     }
                     allowedTransactionIdList[index] = transactionIdList[index]
                     counter++
                 }
-            }
-            //Run old logic
-            else{
-                allowedTransactionIdList = transactionIdList
-                firstIndex = Object.keys(allowedTransactionIdList)[0];
-            }
-        
-        for (let index in allowedTransactionIdList) {
-            if (index == firstIndex) {
-                fieldDataQuery = `jobTransactionId = ${allowedTransactionIdList[index].id}`;
-                jobTransactionQuery = `id = ${allowedTransactionIdList[index].id}`;
-                jobQuery = `id = ${allowedTransactionIdList[index].jobId}`;
-                transactionLogQuery = `transactionId = ${allowedTransactionIdList[index].id}`;
-            } else {
-                fieldDataQuery += ` OR jobTransactionId = ${allowedTransactionIdList[index].id}`;
-                jobTransactionQuery += ` OR id = ${allowedTransactionIdList[index].id}`;
-                jobQuery += ` OR id = ${allowedTransactionIdList[index].jobId}`;
-                transactionLogQuery += ` OR transactionId = ${allowedTransactionIdList[index].id}`;
-            }
-        }
+          
         fieldDataList = this.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA, lastSyncTime);
         transactionList = this.getDataFromRealmDB(jobTransactionQuery, TABLE_JOB_TRANSACTION);
         jobList = this.getDataFromRealmDB(jobQuery, TABLE_JOB);
