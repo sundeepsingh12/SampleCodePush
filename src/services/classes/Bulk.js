@@ -37,7 +37,7 @@ class Bulk {
         queryDTO.jobQuery = bulkParamas.pageObject.groupId ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = "${bulkParamas.pageObject.groupId}"` : jobMaster.enableMultipartAssignment ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = null` : `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]}`;
         let jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO)
         const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id');
-        return idJobTransactionCustomizationListMap;
+        return {idJobTransactionCustomizationListMap,statusList:jobTransactionCustomizationListParametersDTO.statusList};
     }
 
     /**
