@@ -22,6 +22,7 @@ module.exports = {
     //Common Error Strings
     JOB_STATUS_MISSING: 'Job status missing in store',
     TYPE_HERE: 'Type here...',
+    OF: ' of ',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -472,7 +473,7 @@ module.exports = {
     CHECKLIST: 'CHECKLIST',
     FAIL: 'Fail',
     PASS: 'Pass',
-    SELECT_REASON: 'Select Reason',
+    SELECT_REASON: 'SELECT REASON',
     TAKE_A_PICTURE: 'Take a picture',
     REMARKS: 'Remarks',
 }

@@ -47,6 +47,9 @@ import QrCodeScanner from './QrCodeScanner'
 import MenuStack from '../modules/navigators/MenuStackNavigator'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import QCAttribute from './QCAttribute'
+import QCReason from './QCReason'
+import QCImageAndRemarks from './QCImageAndRemarks'
+import QCSummary from './QCSummary'
 
 MenuStack.navigationOptions = ({ navigation }) => {
   let tabBarVisible = true;
@@ -198,6 +201,18 @@ const HomeStack = createStackNavigator({
   },
   QCAttribute: {
     screen: QCAttribute,
+  },
+  QCReasonScreen: {
+    screen: QCReason
+  },
+  QCImageAndRemarksScreen: {
+    screen: QCImageAndRemarks
+  },
+  QCSummaryScreen: {
+    screen: QCSummary,
+    navigationOptions: {
+      gesturesEnabled: false
+    }
   }
 })
 
@@ -266,7 +281,7 @@ const Tabs = {
 
 const tabBar = (props) => {
   const color = require('../themes/FeStyle').default.primaryColor;
-  let newProps = {...props, activeTintColor: color}
+  let newProps = { ...props, activeTintColor: color }
   return <BottomTabBar {...newProps} />
 }
 
@@ -307,7 +322,7 @@ const HomeTab = createBottomTabNavigator({
   SyncScreen: Tabs.SyncScreen,
   Menu: Tabs.Menu,
 },
-  {...tabStyle,     tabBarComponent: tabBar,}
+  { ...tabStyle, tabBarComponent: tabBar, }
 );
 const HomeErpTab = createBottomTabNavigator({
   Home: Tabs.Home,
@@ -315,7 +330,7 @@ const HomeErpTab = createBottomTabNavigator({
   ErpSyncScreen: Tabs.ErpSyncScreen,
   Menu: Tabs.Menu
 },
-  {...tabStyle,     tabBarComponent: tabBar,},
+  { ...tabStyle, tabBarComponent: tabBar, },
 );
 
 export { HomeTab, HomeErpTab };

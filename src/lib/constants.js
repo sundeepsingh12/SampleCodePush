@@ -335,6 +335,10 @@ module.exports = keyMirror({
     SequenceRunsheetList: null,
     UnsyncBackupUpload: null,
     BluetoothListing: null,
+    QCAttribute: null,
+    QCReasonScreen: null,
+    QCImageAndRemarksScreen: null,
+    QCSummaryScreen: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -570,12 +574,14 @@ module.exports = keyMirror({
     SET_QC_INITIAL_PARAMETERS: null,
     SET_QC_ARRAY: null,
     SET_QC_MODAL_VIEW: null,
-    SET_QC_MODAL_LOADING: null,
-    SET_QC_MODAL_VIEW_PARAMETERS: null,
-    SET_QC_MODAL_IMAGE: null,
-    SET_QC_MODAL_REASON: null,
-    SET_QC_MODAL_REMARKS: null
-
+    SET_QC_MODAL_REMARKS: null,
+    SET_QC_REASON: null,
+    SET_QC_REASON_LOADING: null,
+    SET_QC_PASS_FAIl: null,
+    SET_QC_IMAGE: null,
+    SET_QC_REMARKS: null,
+    SET_QC_IMAGE_REMARKS_LOADING: null,
+    SET_QC_IMAGE_REMARKS_DATA: null
 })
 
 

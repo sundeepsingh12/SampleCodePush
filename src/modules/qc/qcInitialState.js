@@ -6,12 +6,13 @@ var InitialState = Record({
     qcLoading: false,
     qcAttributeMaster: null,
     qcDataArray: null,
-    qcModal: false,
-    qcModalLoading: false,
+    qcReasonLoading: false,
     qcReasonData: null,
     qcPassFailResult: null,
     qcImageData: null,
-    qcRemarksData: null
+    qcRemarksData: '',
+    qcImageURLDataArray: null,
+    qcImageAndRemarksLoading: false
 })
 
 export default InitialState

@@ -21,7 +21,8 @@ import {
     CAMERA,
     CAMERA_HIGH,
     CAMERA_MEDIUM,
-    RADIOBUTTON
+    RADIOBUTTON,
+    QC_ARRAY
 } from '../lib/AttributeConstants'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -48,6 +49,7 @@ class FormLayoutActivityComponent extends PureComponent {
             case CAMERA_HIGH:
             case CAMERA_MEDIUM:
             case CAMERA: return <MaterialIcons name='photo-camera' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
+            case QC_ARRAY: return <Icon name='md-checkbox-outline' style={[styles.fontXxl, styles.padding5, { color: this.getComponentIconStyle(this.props.item.editable).color }]} />
             default: return <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
         }
     }

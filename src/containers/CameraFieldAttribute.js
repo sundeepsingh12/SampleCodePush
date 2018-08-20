@@ -175,10 +175,6 @@ class CameraFieldAttribute extends PureComponent {
 
     onCrossPress = () => {
         if (this.state.imageData == null) {
-            if (this.props.navigation.state.params.currentElement.attributeTypeId == QC_IMAGE) {
-                this.props.actions.saveQCImageData(this.props.navigation.state.params.currentElement)
-                return;
-            }
             this.props.navigation.goBack();
         }
         else {

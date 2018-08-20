@@ -1,6 +1,6 @@
 import { keyValueDBService } from '../KeyValueDBService.js'
 import { transientStatusAndSaveActivatedService } from '../TransientStatusAndSaveActivatedService.js'
-import { AFTER, OBJECT, STRING, TEXT, DECIMAL, SCAN_OR_TEXT, QR_SCAN, NUMBER } from '../../../lib/AttributeConstants'
+import { AFTER, OBJECT, STRING, TEXT, DECIMAL, SCAN_OR_TEXT, QR_SCAN, NUMBER, QC_IMAGE, QC_REMARK, QC_PASS_FAIL, OPTION_CHECKBOX_ARRAY } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
 import { SaveActivated, Transient, CheckoutDetails, TabScreen, SHOULD_RELOAD_START, BACKUP_ALREADY_EXIST, TABLE_FIELD_DATA } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
@@ -35,7 +35,7 @@ class FormLayout {
         if (!fieldAttributesMappedToStatus) {
             return []
         }
-        let fieldAttributeMap = {}, arrayMainObject = {} //map for root field attributes
+        let fieldAttributeMap = {}, arrayMainObject = {}; //map for root field attributes
         if (fieldAttributeMasterIdFromArray) {
             arrayMainObject = fieldAttributes.filter(fieldAttributeObject => (fieldAttributeObject.parentId == fieldAttributeMasterIdFromArray && fieldAttributeObject.attributeTypeId == OBJECT))
         }
@@ -147,7 +147,7 @@ class FormLayout {
      * @param  positionId 
      */
     getFieldAttributeObject(fieldAttribute, validationArray, positionId) {
-        const { label, subLabel, helpText, key, required, hidden, attributeTypeId, dataStoreAttributeId, dataStoreMasterId, externalDataStoreMasterUrl, dataStoreFilterMapping } = fieldAttribute
+        const { label, subLabel, helpText, key, required, hidden, attributeTypeId, dataStoreAttributeId, dataStoreMasterId, externalDataStoreMasterUrl, dataStoreFilterMapping, jobAttributeMasterId } = fieldAttribute
         return {
             label,
             subLabel,
@@ -167,7 +167,8 @@ class FormLayout {
             dataStoreMasterId,
             dataStoreAttributeId,
             externalDataStoreMasterUrl,
-            dataStoreFilterMapping
+            dataStoreFilterMapping,
+            jobAttributeMasterId
         };
     }
 
@@ -233,6 +234,9 @@ class FormLayout {
             throw new Error('formElement is missing')
         }
         for (let currentObject in formElement) {
+            if (formElement[currentObject].attributeTypeId == QC_IMAGE || formElement[currentObject].attributeTypeId == QC_REMARK || formElement[currentObject].attributeTypeId == OPTION_CHECKBOX_ARRAY || formElement[currentObject].attributeTypeId == QC_PASS_FAIL) {
+                continue;
+            }
             let afterValidationResult = fieldValidationService.fieldValidations(formElement[currentObject], formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
             let uniqueValidationResult = this.checkUniqueValidation(formElement[currentObject])
             if (uniqueValidationResult) {

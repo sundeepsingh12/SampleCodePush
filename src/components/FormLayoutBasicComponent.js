@@ -62,7 +62,7 @@ import {
     QC_VALUE,
 } from '../lib/AttributeConstants'
 
-import { CameraAttribute, Payment, SET_MODAL_FIELD_ATTRIBUTE } from '../lib/constants'
+import { CameraAttribute, Payment, SET_MODAL_FIELD_ATTRIBUTE, QCAttribute } from '../lib/constants'
 import { OPTIONAL, SELECTED } from '../lib/ContainerConstants'
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'
@@ -144,7 +144,7 @@ class BasicFormElement extends PureComponent {
                 break
             }
             case QC_ARRAY: {
-                screenName = 'QCAttribute'
+                screenName = QCAttribute
                 break
             }
             default: {

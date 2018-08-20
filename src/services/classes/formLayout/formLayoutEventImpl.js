@@ -27,13 +27,13 @@ export default class FormLayoutEventImpl {
      * @param {*fieldAttribute value} value 
      */
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds) {
-        let isAllAttributeHidden = true //this is a check if there are all hidden attribute or not
+        let isAllAttributeHidden = true; //this is a check if there are all hidden attribute or not
         if (attributeMasterId && formLayoutObject[attributeMasterId]) {
             this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
         }
-        isSaveDisabled = false
+        isSaveDisabled = false;
         for (var ids in sequenceWiseSortedFieldAttributesMasterIds) {
-            value = formLayoutObject[sequenceWiseSortedFieldAttributesMasterIds[ids]]
+            value = formLayoutObject[sequenceWiseSortedFieldAttributesMasterIds[ids]];
             if (sequenceWiseSortedFieldAttributesMasterIds[ids] != attributeMasterId || event == NEXT_FOCUS) {
                 value.focus = false
             }

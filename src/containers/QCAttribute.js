@@ -3,7 +3,7 @@
 import React, { PureComponent } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Dimensions, Image, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import { Container, Content, Footer, FooterTab, Input, Button, Item, CheckBox, StyleProvider, Icon } from 'native-base';
+import { Container, Content, Footer, FooterTab, Button, StyleProvider, Icon } from 'native-base';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle';
@@ -14,16 +14,18 @@ import { connect } from 'react-redux';
 import TitleHeader from '../components/TitleHeader';
 import Carousel from 'react-native-snap-carousel';
 import Loader from '../components/Loader';
-import { PASS, FAIL, CHECKLIST } from '../lib/ContainerConstants'
-import { SET_QC_MODAL_VIEW } from '../lib/constants'
-import QCModal from './QCModal'
+import { PASS, FAIL, CHECKLIST, OF } from '../lib/ContainerConstants';
+import { QCReasonScreen } from '../lib/constants';
+// import QCModal from './QCModal';
+import isEmpty from 'lodash/isEmpty';
 
 function mapStateToProps(state) {
     return {
         qcLoading: state.qc.qcLoading,
         qcAttributeMaster: state.qc.qcAttributeMaster,
         qcDataArray: state.qc.qcDataArray,
-        qcModal: state.qc.qcModal
+        qcModal: state.qc.qcModal,
+        qcImageURLDataArray: state.qc.qcImageURLDataArray
     }
 }
 
@@ -47,6 +49,13 @@ const SLIDER_1_FIRST_ITEM = 0;
 
 class QCAttribute extends PureComponent {
 
+    constructor(props) {
+        super(props)
+        this.state = {
+            imageURLIndex: 1
+        }
+    }
+
     static navigationOptions = ({ navigation }) => {
         return { header: <TitleHeader pageName={navigation.state.params.currentElement.label} goBack={navigation.goBack} /> }
     }
@@ -55,16 +64,15 @@ class QCAttribute extends PureComponent {
         this.props.actions.getQcData({ currentElement: this.props.navigation.state.params.currentElement, formLayoutState: this.props.navigation.state.params.formLayoutState, jobTransaction: this.props.navigation.state.params.jobTransaction })
     }
 
-    renderItem() {
+    renderItem({ item, index }) {
         return (
             <View>
                 {/* images for carousel */}
                 <View style={[styles.relative, styles.alignCenter, styles.justifyCenter, { height: 200 }]}>
                     <Image
-                        style={{ resizeMode: 'contain', width: '100%', height: '100%', marginLeft: -20 }}
-                        source={{ uri: 'https://wallpaperbrowse.com/media/images/3848765-wallpaper-images-download.jpg' }}
+                        style={{ resizeMode: 'contain', width: '100%', height: '100%', marginLeft: -20, marginRight: 20 }}
+                        source={{ uri: item }}
                     />
-
                 </View>
             </View>)
     }
@@ -73,7 +81,7 @@ class QCAttribute extends PureComponent {
         return (
             <Carousel
                 ref={(c) => { }}
-                data={['a', 'b', 'c']}
+                data={this.props.qcImageURLDataArray}
                 renderItem={this.renderItem}
                 sliderWidth={sliderWidth}
                 itemWidth={itemWidth}
@@ -82,7 +90,7 @@ class QCAttribute extends PureComponent {
                 inactiveSlideOpacity={0.7}
                 enableMomentum={false}
                 loop={false}
-                onSnapToItem={(index) => console.log('on snap', index)}
+                onSnapToItem={(index) => this.setState({ imageURLIndex: index + 1 })}
             />
         )
     }
@@ -122,51 +130,32 @@ class QCAttribute extends PureComponent {
         )
     }
 
-    passFailAction(isEventPass) {
-        if (this.props.qcAttributeMaster.qcImageValidation) {
-            this.props.actions.getQCPassFailParamaters(this.props.qcDataArray, this.props.qcAttributeMaster, isEventPass ? PASS : FAIL, this.props.navigation.state.params.jobTransaction);
-        } else if (isEventPass) {
-            if (this.props.qcAttributeMaster.qcPassRemarksValidation) {
-                let failList = this.props.qcDataArray.filter(qcObject => !qcObject.qcResult)
-                if (failList.length > 0) {
-                    this.props.actions.getQCPassFailParamaters(this.props.qcDataArray, this.props.qcAttributeMaster, PASS, this.props.navigation.state.params.jobTransaction);
-                } else {
-                    console.log('navigate to summary');
-                }
-            }
-        } else {
-            if (this.props.qcAttributeMaster.qcFailReasonsValidation) {
-                this.props.actions.getQCPassFailParamaters(this.props.qcDataArray, this.props.qcAttributeMaster, FAIL, this.props.navigation.state.params.jobTransaction);
-            } else {
-                console.log('navigate to summary');
-            }
-        }
-    }
-
     render() {
-        console.log('qc attribute render', this.props)
         if (this.props.qcLoading) {
             return <Loader />
         }
-        if (_.isEmpty(this.props.qcDataArray)) {
+        if (isEmpty(this.props.qcDataArray)) {
             return <View></View>
         }
-        // let flatlistData = _.sortBy(this.props.qcDataArray, function (object) { return object.qcSequence })
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    {(this.props.qcModal) ? <QCModal qcDataArray={this.props.qcDataArray} qcAttributeMaster={this.props.qcAttributeMaster} qcPassFail={this.props.qcModal} jobTransaction={this.props.navigation.state.params.jobTransaction} /> : null}
+                    {/* {(this.props.qcModal) ? <QCModal qcDataArray={this.props.qcDataArray} qcAttributeMaster={this.props.qcAttributeMaster} qcPassFail={this.props.qcModal} jobTransaction={this.props.navigation.state.params.jobTransaction} /> : null} */}
                     <Content style={[styles.flex1, styles.bgWhite, styles.padding10]}>
                         <View>
-                            <View style={[styles.relative]}>
-                                {this.renderCrouselView()}
-                                <Text style={[styles.absolute, styles.paddingHorizontal5, styles.fontWhite, styles.fontDefault, { bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,.4)', borderTopLeftRadius: 5 }]}>
-                                    1 of 4
-                                </Text>
-                            </View>
+                            {
+                                isEmpty(this.props.qcImageURLDataArray) ? null : <View style={[styles.relative]}>
+                                    {this.renderCrouselView()}
+                                    <View style={[styles.absolute, styles.paddingHorizontal10, styles.paddingVertical5, { bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,.4)', borderTopLeftRadius: 5 }]}>
+                                        <Text style={[styles.fontWhite, styles.fontLg]}>
+                                            {this.state.imageURLIndex} {OF} {this.props.qcImageURLDataArray.length}
+                                        </Text>
+                                    </View>
+                                </View>
+                            }
                             <View>
                                 <View style={[styles.marginTop10]}>
-                                    <Text>{CHECKLIST}</Text>
+                                    <Text>{this.props.qcAttributeMaster.label}</Text>
                                 </View>
                                 <FlatList
                                     data={this.props.qcDataArray}
@@ -179,16 +168,11 @@ class QCAttribute extends PureComponent {
                     <SafeAreaView style={[styles.bgWhite]}>
                         <Footer style={[styles.footer]}>
                             <FooterTab style={[styles.padding10]}>
-                                <Button danger full
-                                    onPress={() => this.passFailAction(false)}
-                                    disabled={false}>
-                                    <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcFailButtonTextValidation ? this.props.qcAttributeMaster.qcFailButtonTextValidation : FAIL}</Text>
+                                <Button danger full onPress={() => this.props.actions.saveQCDataAndNavigate(false, { qcDataArray: this.props.qcDataArray, qcAttributeMaster: this.props.qcAttributeMaster }, { jobTransaction: this.props.navigation.state.params.jobTransaction, formLayoutState: this.props.navigation.state.params.formLayoutState })}>
+                                    <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcValidationMap && this.props.qcAttributeMaster.qcValidationMap.qcFailButtonTextValidation ? this.props.qcAttributeMaster.qcValidationMap.qcFailButtonTextValidation : FAIL}</Text>
                                 </Button>
-                                <Button success full
-                                    onPress={() => this.passFailAction(true)}
-                                    style={[styles.marginLeft10]}
-                                    disabled={false}>
-                                    <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcPassButtonTextValidation ? this.props.qcAttributeMaster.qcPassButtonTextValidation : PASS}</Text>
+                                <Button success full onPress={() => this.props.actions.saveQCDataAndNavigate(true, { qcDataArray: this.props.qcDataArray, qcAttributeMaster: this.props.qcAttributeMaster }, { jobTransaction: this.props.navigation.state.params.jobTransaction, formLayoutState: this.props.navigation.state.params.formLayoutState })} style={[styles.marginLeft10]}>
+                                    <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcValidationMap && this.props.qcAttributeMaster.qcValidationMap.qcPassButtonTextValidation ? this.props.qcAttributeMaster.qcValidationMap.qcPassButtonTextValidation : PASS}</Text>
                                 </Button>
                             </FooterTab>
                         </Footer>
@@ -200,27 +184,6 @@ class QCAttribute extends PureComponent {
 }
 
 const style = StyleSheet.create({
-
-    paymentCard: {
-        width: '49%',
-        paddingVertical: 15,
-        paddingHorizontal: 10,
-        borderWidth: 1,
-        marginBottom: 5,
-        justifyContent: 'space-between'
-    },
-    paymentList: {
-        borderBottomColor: '#ECECEC',
-        borderBottomWidth: 1,
-        paddingVertical: 15,
-        width: '100%',
-        justifyContent: 'space-between'
-    },
-    footer: {
-        height: 'auto',
-        borderTopWidth: 1,
-        borderTopColor: '#f3f3f3'
-    },
     iconContainer: {
         paddingRight: 20,
         justifyContent: 'center',
