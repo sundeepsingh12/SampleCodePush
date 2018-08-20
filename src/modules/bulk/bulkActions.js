@@ -33,9 +33,10 @@ export function getBulkJobTransactions(bulkParams) {
             let cloneBulkParams = JSON.parse(JSON.stringify(bulkParams))
             cloneBulkParams.pageObject.additionalParams = JSON.parse(cloneBulkParams.pageObject.additionalParams)
             cloneBulkParams.pageObject.jobMasterIds = JSON.parse(cloneBulkParams.pageObject.jobMasterIds)
-            const bulkTransactions = await bulkService.getJobListingForBulk(cloneBulkParams);
-            const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
-            const currentStatus = jobStatusService.getJobStatusForJobStatusId(statusList ? statusList.value : null, cloneBulkParams.pageObject.additionalParams.statusId)
+            const data = await bulkService.getJobListingForBulk(cloneBulkParams);
+            const bulkTransactions = data.idJobTransactionCustomizationListMap
+            const statusList = data.statusList
+            const currentStatus = jobStatusService.getJobStatusForJobStatusId(statusList ? statusList : null, cloneBulkParams.pageObject.additionalParams.statusId)
             let selectAll = cloneBulkParams.pageObject.additionalParams.selectAll ? true : false
             if (cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf && (cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.lineOneEnabled || cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.lineTwoEnabled || cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.circleLineOneEnabled || cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.circleLineTwoEnabled)) {
                 selectAll = false
@@ -143,8 +144,8 @@ export function setSearchedItem(searchValue, bulkTransactions, searchSelectionOn
 export function toggleMultipleTransactions(jobTransactionList, allTransactions, selectedItems, pageObject, checkAlertView) {
     return function (dispatch) {
         try {
-            const bulkTransactions = JSON.parse(JSON.stringify(allTransactions))
-             const cloneSelectedItems = JSON.parse(JSON.stringify(selectedItems))
+            let bulkTransactions = JSON.parse(JSON.stringify(allTransactions))
+            let cloneSelectedItems = JSON.parse(JSON.stringify(selectedItems))
             let clonePageObject = JSON.parse(JSON.stringify(pageObject))
             let bulkJobSimilarityConfig = bulkService.getBulkJobSimilarityConfig(clonePageObject)
             let numberOfEnabledItems = 0, isTransactionSelected = false
