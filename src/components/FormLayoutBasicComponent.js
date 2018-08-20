@@ -378,7 +378,7 @@ class BasicFormElement extends PureComponent {
                                 {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ?
                                     <TouchableHighlight
                                         style={[styles.absolute, { top: 10, right: 10 }]}
-                                        onPress={this.goToQRCode}
+                                        onPress={(this.props.item.editable) ? this.goToQRCode : null}
                                     >
                                         <View>
                                             <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable).color} />
