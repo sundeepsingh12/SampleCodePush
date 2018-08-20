@@ -20,10 +20,6 @@ module.exports = {
       {
         name: 'QA',
         url: 'https://qa.fareye.co'
-      },
-      {
-        name: 'Local',
-        url: 'http://192.168.43.60:8080'
       }
     ],
     port: 8083,
