@@ -13,7 +13,7 @@ Job.schema = {
   properties: {
     id: 'int',
     referenceNo: 'string',
-    hubId: 'int',
+    hubId: 'int?',
     cityId: 'int',
     jobMasterId: 'int',
     companyId: 'int',
