@@ -198,10 +198,9 @@ class BulkListing extends PureComponent {
       <StyleProvider style={getTheme(platform)}>
         <Container>
           <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-            <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-              <Body>
+            <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                 <View
-                  style={[styles.row, styles.width100, styles.justifySpaceBetween,]}>
+                  style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                   <TouchableOpacity style={[styles.headerLeft, styles.paddingTop10]} onPress={() => {
                     this.props.navigation.goBack(null)
                   }}>
@@ -220,8 +219,7 @@ class BulkListing extends PureComponent {
                   <View />
                 </View>
                 {this.searchBarView()}
-              </Body>
-            </Header>
+            </View>
           </SafeAreaView>
           {alertView}
           <FlatList
