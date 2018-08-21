@@ -19,6 +19,7 @@ import { SET_PAYMENT_CHANGED_PARAMETERS, SET_SPLIT_PAYMENT, SplitPayment } from 
 import { AMOUNT_TO_BE_COLLECTED, YES, NO, SPLIT_PAYMENT, SELECT_PAYMENT_METHOD, SELECT_PAYMENT_METHOD_TO_SPLIT, ENTER_SPLIT_DETAILS, SAVE } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
 import { navigate } from '../modules/navigators/NavigationService';
+import size from 'lodash/size'
 
 function mapStateToProps(state) {
     return {
@@ -139,6 +140,9 @@ class Payment extends PureComponent {
     }
 
     getPaymentModeSelectedResult(moneyTransactionModeId) {
+        if((size(this.props.paymentModeList.otherPaymentModeList) == 1) || (size(this.props.paymentModeList.endPaymentModeList) == 1) ){
+            return true
+        }
         if (!this.props.selectedPaymentMode) {
             return false
         }
@@ -148,7 +152,7 @@ class Payment extends PureComponent {
         return ((this.props.selectedPaymentMode.otherPaymentModeList && this.props.selectedPaymentMode.otherPaymentModeList[moneyTransactionModeId]) || this.props.selectedPaymentMode.cardPaymentMode == moneyTransactionModeId)
     }
 
-    paymentItemView = (actualAmount, id, moneyTransactionModeId, selectedPaymentMode, transactionNumber, type, disabled) => {
+    paymentItemView = (id, moneyTransactionModeId,disabled) => {
         let paymentSelectedResult = this.getPaymentModeSelectedResult(moneyTransactionModeId)
         return (
             <TouchableOpacity key={id}
@@ -179,7 +183,7 @@ class Payment extends PureComponent {
                 continue
             }
             paymentModeView.push(
-                this.paymentItemView(this.props.actualAmount, paymentModeList.otherPaymentModeList[index].id, paymentModeList.otherPaymentModeList[index].moneyTransactionModeId, this.props.selectedPaymentMode, null, null, false)
+                this.paymentItemView( paymentModeList.otherPaymentModeList[index].id, paymentModeList.otherPaymentModeList[index].moneyTransactionModeId, false)
             )
         }
         for (let index in paymentModeList.endPaymentModeList) {
@@ -190,12 +194,12 @@ class Payment extends PureComponent {
             if (paymentModeList.endPaymentModeList[index].moneyTransactionModeId == NET_BANKING.id) {
                 for (let type = 97; type < 100; type++) {
                     paymentModeView.push(
-                        this.paymentItemView(this.props.actualAmount, type, type, this.props.selectedPaymentMode, null, type, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
+                        this.paymentItemView( type, type,cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
                     )
                 }
             } else if(paymentModeList.endPaymentModeList[index].moneyTransactionModeId != MOSAMBEE.id || Platform.OS != 'ios'){
                 paymentModeView.push(
-                    this.paymentItemView(this.props.actualAmount, paymentModeList.endPaymentModeList[index].id, paymentModeList.endPaymentModeList[index].moneyTransactionModeId, this.props.selectedPaymentMode, null, null, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
+                    this.paymentItemView( paymentModeList.endPaymentModeList[index].id, paymentModeList.endPaymentModeList[index].moneyTransactionModeId, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
                 )
             }
         }

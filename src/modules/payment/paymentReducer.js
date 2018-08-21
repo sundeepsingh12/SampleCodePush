@@ -39,6 +39,7 @@ export default function paymentReducer(state = initialState, action) {
         .set('paymentModeList', action.payload.paymentModeList)
         .set('splitPaymentMode', action.payload.splitPaymentMode)
         .set('jobTransactionIdAmountMap', action.payload.jobTransactionIdAmountMap)
+        .set('isSaveButtonDisabled',action.payload.isSaveButtonDisabled)
     }
 
     case SET_PAYMENT_CHANGED_PARAMETERS: {

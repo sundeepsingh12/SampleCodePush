@@ -36,6 +36,7 @@ import {
 } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 import { CashTenderingService } from '../../services/classes/CashTenderingServices'
+import size from 'lodash/size'
 
 
 /**
@@ -59,6 +60,7 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
             if (!parseFloat(paymentParameters.actualAmount) && jobTransaction.length) {
                 throw new Error(INVALID_CONFIGURATION)
             }
+
             dispatch(setState(
                 SET_PAYMENT_INITIAL_PARAMETERS,
                 {
@@ -70,7 +72,9 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
                     originalAmount: Math.round((parseFloat(paymentParameters.originalAmount)) * 100) / 100,
                     paymentModeList: paymentParameters.paymentModeList,
                     splitPaymentMode: paymentParameters.splitPaymentMode ? NO : null,
-                    jobTransactionIdAmountMap: paymentParameters.jobTransactionIdAmountMap
+                    jobTransactionIdAmountMap: paymentParameters.jobTransactionIdAmountMap,
+                    isSaveButtonDisabled:size(paymentParameters.paymentModeList.endPaymentModeList) > 1 || size(paymentParameters.paymentModeList.otherPaymentModeList) > 1
+
                 }
             ))
         } catch (error) {
