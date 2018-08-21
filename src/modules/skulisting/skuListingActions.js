@@ -85,8 +85,8 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
                     if (Platform.OS == 'android') {
                         ImageStore.getBase64ForTag(value.uri, (base64Data) => {
                             dispatch(saveImageForSku(base64Data, skuListItems, navigation, jobId, rowItem))
-                        }, (reason) => {
-                            console.log(reason)
+                        }, (error) => {
+                            console.log(error)
                         })
                     }
                     else {
