@@ -68,7 +68,6 @@ export function performBatchSave(...tableNamesVsDataList) {
         // Create counter block from imei number used for encryption
         let counterBlock = Array.from(imeiNumber).slice(0, 8)
         tableNamesVsDataList.forEach(record => {
-            try {
                 if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
                     if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
                         for (let data in record.value) {
@@ -79,8 +78,6 @@ export function performBatchSave(...tableNamesVsDataList) {
                         record.value.forEach(data => realm.create(record.tableName, data, true))
                     }
                 }
-            } catch (error) {
-            }
         })
     })
 }
