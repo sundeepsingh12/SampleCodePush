@@ -86,6 +86,9 @@ class DataStoreFilterService {
         if (!jobAttributes || !jobAttributes.value) {
             throw new Error(JOBATTRIBUTES_MISSING)
         }
+        if (!dataStoreFilterReverseMap) {
+            dataStoreFilterReverseMap = {}
+        }
         let cloneDataStoreFilterReverseMap = JSON.parse(JSON.stringify(dataStoreFilterReverseMap))
         let dataStoreAttributeIdtoValueMap = {}
         let dataStoreFilterList = JSON.parse(currentElement.dataStoreFilterMapping)
