@@ -140,7 +140,7 @@ class Payment extends PureComponent {
     }
 
     getPaymentModeSelectedResult(moneyTransactionModeId) {
-        if((size(this.props.paymentModeList.otherPaymentModeList) == 1) || (size(this.props.paymentModeList.endPaymentModeList) == 1) ){
+        if((size(this.props.paymentModeList.otherPaymentModeList) == 1 && size(this.props.paymentModeList.endPaymentModeList) == 0) || (size(this.props.paymentModeList.endPaymentModeList) == 1 && size(this.props.paymentModeList.otherPaymentModeList) == 0) ){
             return true
         }
         if (!this.props.selectedPaymentMode) {

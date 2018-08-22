@@ -56,9 +56,18 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
             const modulesCustomizationList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
             const paymentParameters = paymentService.getPaymentParameters(jobTransaction, fieldAttributeMasterId, jobMasterMoneyTransactionModesList.value, fieldAttributeMasterList.value, formData, jobStatusId, fieldAttributeMasterValidationList.value, modulesCustomizationList.value)
             let isAmountEditable = paymentParameters.amountEditableObject ? true : parseFloat(paymentParameters.actualAmount) ? false : true
+            let selectedPaymentMode = 0
             //In case of bulk actual amount should not be null
             if (!parseFloat(paymentParameters.actualAmount) && jobTransaction.length) {
                 throw new Error(INVALID_CONFIGURATION)
+            }
+
+            //In case of single payment mode,set selected mode in payment state as soon as payment container is mounted
+            if(size(paymentParameters.paymentModeList.endPaymentModeList) == 0 && size(paymentParameters.paymentModeList.otherPaymentModeList) == 1){
+                selectedPaymentMode = paymentParameters.paymentModeList.otherPaymentModeList[0].moneyTransactionModeId
+            }
+            else if(size(paymentParameters.paymentModeList.otherPaymentModeList) == 0 && size(paymentParameters.paymentModeList.endPaymentModeList) == 1 ){
+                selectedPaymentMode = paymentParameters.paymentModeList.endPaymentModeList[0].moneyTransactionModeId
             }
 
             dispatch(setState(
@@ -73,7 +82,8 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
                     paymentModeList: paymentParameters.paymentModeList,
                     splitPaymentMode: paymentParameters.splitPaymentMode ? NO : null,
                     jobTransactionIdAmountMap: paymentParameters.jobTransactionIdAmountMap,
-                    isSaveButtonDisabled:size(paymentParameters.paymentModeList.endPaymentModeList) > 1 || size(paymentParameters.paymentModeList.otherPaymentModeList) > 1
+                    selectedPaymentMode,
+                    isSaveButtonDisabled:!(paymentParameters.actualAmount && ((size(paymentParameters.paymentModeList.endPaymentModeList) == 1 && size(paymentParameters.paymentModeList.otherPaymentModeList) == 0)  || (size(paymentParameters.paymentModeList.otherPaymentModeList) == 1 && size(paymentParameters.paymentModeList.endPaymentModeList) == 0)))
 
                 }
             ))
