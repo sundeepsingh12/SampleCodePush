@@ -62,6 +62,8 @@
 	<string>Motion updates increase battery efficiency by intelligently toggling location-services when device is detected to be moving</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Fareye would like access to your photo gallery</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Fareye needs access to bluetooth for printing</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Andale Mono.ttf</string>
