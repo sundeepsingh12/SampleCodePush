@@ -19,7 +19,7 @@ import AesCtr from '../services/classes/AesCtr'
 import userExceptionLogs from './schema/userExceptionLogsDB'
 import messageInteracion from './schema/MessageInteractionSchema'
 import negativeCommunicationLog from './schema/NegativeCommunicationLogs'
-const schemaVersion = 50;
+const schemaVersion = 53;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs, messageInteracion, negativeCommunicationLog];
 
 let realm = new Realm({
@@ -68,7 +68,6 @@ export function performBatchSave(...tableNamesVsDataList) {
         // Create counter block from imei number used for encryption
         let counterBlock = Array.from(imeiNumber).slice(0, 8)
         tableNamesVsDataList.forEach(record => {
-            try {
                 if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
                     if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
                         for (let data in record.value) {
@@ -79,8 +78,6 @@ export function performBatchSave(...tableNamesVsDataList) {
                         record.value.forEach(data => realm.create(record.tableName, data, true))
                     }
                 }
-            } catch (error) {
-            }
         })
     })
 }
@@ -143,7 +140,7 @@ export function updateTableRecordOnProperty(tableName, property, valueList, newV
     });
 }
 
-export function getRecordListOnQuery(tableName, query, isSorted, sortProperty, reverse = false) {
+export function getRecordListOnQuery(tableName, query, isSorted, sortProperty, isRealmObjectRequired, reverse = false) {
     let records
     if (query) {
         records = realm.objects(tableName).filtered(query)
@@ -153,7 +150,7 @@ export function getRecordListOnQuery(tableName, query, isSorted, sortProperty, r
     if (isSorted && sortProperty) {
         records = records.sorted(`${sortProperty}`, reverse)
     }
-    if (tableName == TABLE_FIELD_DATA || tableName == TABLE_JOB_DATA) {
+    if (!isRealmObjectRequired && (tableName == TABLE_FIELD_DATA || tableName == TABLE_JOB_DATA)) {
         let imeiNumber = DeviceInfo.getUniqueID()
         let recordList = []
         for (let index in records) {

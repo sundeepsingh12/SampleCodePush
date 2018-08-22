@@ -21,6 +21,8 @@ module.exports = {
     ERROR: 'Error',
     //Common Error Strings
     JOB_STATUS_MISSING: 'Job status missing in store',
+    TYPE_HERE: 'Type here...',
+    OF: ' of ',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -397,13 +399,13 @@ module.exports = {
     ENTER_OTP_SENT_TO_CUSTOMER: 'Enter OTP Sent to Customer',
     RESEND_OTP: 'Resend OTP',
     ENTER_REGISTERED: 'Enter Registered ',
-    ENTER_CUSTOMER:'Enter Customer’s',
+    ENTER_CUSTOMER: 'Enter Customer’s',
     TOTAL_AMOUNT_FOR_WALLET: 'Total Amount',
     TRANSACTION_CONFIRMATION: 'Transaction Confirmation',
     TRANSACTION_IS_IN_PENDING_WANT_TO_CANCEL_IT: 'Transaction is still pending, are you sure you want to cancel transaction?',
     SURE_WANT_TO_SEND_SMS_AGAIN: 'Are you sure you want to send the link via SMS again?',
     NET_BANKING: 'Pay by Link',
-    CUSTOMER_APPROVAL:'Customer Approval',
+    CUSTOMER_APPROVAL: 'Customer Approval',
     LINK_IS_SENT_TO_CUSTOMER_ASK_TO_INTIATE_PAYMENT: 'A link has been sent via SMS to the Customer to complete payment. Ask Customer to initiate payment.',
     YES_SEND: 'Yes, Send',
     SEND_SMS: 'Send SMS',
@@ -480,4 +482,12 @@ module.exports = {
     CALL_PERSONAL: 'CALL_PERSONAL',
     SMS_OFFICIAL: 'SMS_OFFICIAL',
     SMS_PERSONAL: 'SMS_PERSONAL',
+
+    //QC Constants
+    CHECKLIST: 'CHECKLIST',
+    FAIL: 'Fail',
+    PASS: 'Pass',
+    SELECT_REASON: 'SELECT REASON',
+    TAKE_A_PICTURE: 'Take a picture',
+    REMARKS: 'Remarks',
 }

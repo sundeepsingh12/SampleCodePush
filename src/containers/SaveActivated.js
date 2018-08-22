@@ -141,7 +141,8 @@ class SaveActivated extends PureComponent {
             statusName,
             jobMasterId: this.props.navigation.state.params.jobMasterId,
             navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
-            saveActivatedParcelCount: (saveActivatedParcelCount > 0) ? saveActivatedParcelCount : null
+            saveActivatedParcelCount: (saveActivatedParcelCount > 0) ? saveActivatedParcelCount : null,
+            saveActivated: true
         })
     }
 
@@ -433,6 +434,7 @@ const style = StyleSheet.create({
         paddingRight: 15
     },
     footer: {
+        height: 'auto',
         backgroundColor: '#ffffff',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',

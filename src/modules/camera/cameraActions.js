@@ -5,9 +5,10 @@ import moment from 'moment'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions';
+import { saveQCImageData } from '../qc/qcActions'
 import CompressImage from 'react-native-compress-image';
 import { ImageStore, Platform } from 'react-native';
-import { PATH_CUSTOMER_IMAGES } from '../../lib/AttributeConstants'
+import { PATH_CUSTOMER_IMAGES, QC_IMAGE } from '../../lib/AttributeConstants'
 import { OPEN_CAMERA } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import ImageCropPicker from 'react-native-image-crop-picker';
@@ -15,14 +16,14 @@ import isEmpty from 'lodash/isEmpty'
 
 var PATH_COMPRESS_IMAGE = '/compressImages';
 
-export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction) {
+export function saveImage(result, fieldAttributeMaster, formLayoutState, calledFromArray, rowId, jobTransaction) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_CAMERA_LOADER, true))
             if (Platform.OS == 'android') {
                 CompressImage.createCompressedImage(result.uri, PATH_COMPRESS_IMAGE).then((resizedImage) => {
                     ImageStore.getBase64ForTag(resizedImage.uri, (base64Data) => {
-                        dispatch(saveImageInFormLayout(base64Data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction))
+                        dispatch(saveImageInFormLayout(base64Data, fieldAttributeMaster, formLayoutState, calledFromArray, rowId, jobTransaction))
                         RNFS.unlink(resizedImage.path)
                     }, (reason) => {
                         dispatch(setState(SET_CAMERA_LOADER, false))
@@ -33,8 +34,8 @@ export function saveImage(result, fieldAttributeMasterId, formLayoutState, calle
                     showToastAndAddUserExceptionLog(311, error.message, 'danger', 1)
                 });
             } else {
-                const iosImageData = (result.base64) ? result.base64 : (result.data) ? result.data :  result.uri
-                dispatch(saveImageInFormLayout(iosImageData, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction))
+                const iosImageData = (result.base64) ? result.base64 : (result.data) ? result.data : result.uri
+                dispatch(saveImageInFormLayout(iosImageData, fieldAttributeMaster, formLayoutState, calledFromArray, rowId, jobTransaction))
             }
         } catch (error) {
             dispatch(setState(SET_CAMERA_LOADER, false))
@@ -74,14 +75,16 @@ export function getImageData(value) {
 //     }
 // }
 
-export function saveImageInFormLayout(data, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction) {
+export function saveImageInFormLayout(data, fieldAttributeMaster, formLayoutState, calledFromArray, rowId, jobTransaction) {
     return async function (dispatch) {
         try {
-            const value = await signatureService.saveFile(data, moment(), true)
-            if (calledFromArray) {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState))
+            const value = await signatureService.saveFile(data, moment(), true);
+            if (fieldAttributeMaster.attributeTypeId == QC_IMAGE) {
+                dispatch(saveQCImageData(fieldAttributeMaster, value));
+            } else if (calledFromArray) {
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMaster.fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState))
             } else {
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMaster.fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(312, error.message, 'danger', 1)
@@ -129,11 +132,11 @@ export function cropImage(path, setImage) {
                 width: 300,
                 height: 300,
                 freeStyleCropEnabled: true,
-                includeBase64:(Platform.OS==='android')?false:true
+                includeBase64: (Platform.OS === 'android') ? false : true
 
             }).then((image) => {
                 if (image) {
-                    (Platform.OS==='android')?setImage(image.path):setImage(image.path,image.data)
+                    (Platform.OS === 'android') ? setImage(image.path) : setImage(image.path, image.data)
                     dispatch(setState(SET_CAMERA_LOADER, false))
                 }
             }).catch(e => {

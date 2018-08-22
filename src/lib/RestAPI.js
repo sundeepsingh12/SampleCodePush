@@ -184,7 +184,7 @@ class RestAPI {
     });
   }
 
-  async uploadZipFile(path, fileName, currenDate, syncStoreDTO,isEncryptionSuccessful) {
+  async uploadZipFile(path, fileName, currenDate, syncStoreDTO,isEncryptionSuccessful,allowedTransactionIds) {
     // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
     const baseUrl = (isEncryptionSuccessful) ?  CONFIG.API.POST_ZIP_ENCRYPTED_API : CONFIG.API.UPLOAD_DATA_API
     var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
@@ -205,7 +205,7 @@ class RestAPI {
             await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
           }
           if (syncStoreDTO) {
-            await sync.deleteSpecificTransactionFromStoreList(syncStoreDTO.transactionIdToBeSynced, PENDING_SYNC_TRANSACTION_IDS, currenDate)
+            await sync.deleteSpecificTransactionFromStoreList(syncStoreDTO.transactionIdToBeSynced, PENDING_SYNC_TRANSACTION_IDS, currenDate,allowedTransactionIds)
           }
         }
         else if (message != 'success') {

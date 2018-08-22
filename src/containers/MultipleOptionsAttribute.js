@@ -57,6 +57,7 @@ class MultipleOptionsAttribute extends PureComponent {
         let fieldAttributeView = null, checkForIcon = false
         if (this.props.currentElement.attributeTypeId == CHECKBOX) {
             fieldAttributeView = <CheckBox
+                style={{ marginLeft: 2 }}
                 checked={item.selected}
                 color={styles.primaryColor}
                 onPress={() => {

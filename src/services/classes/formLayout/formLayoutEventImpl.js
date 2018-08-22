@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import sha256 from 'sha256';
-import { AFTER, AMOUNT, BEFORE, DATA_STORE, EXTERNAL_DATA_STORE, FAIL, GET, MONEY_COLLECT, NPS_FEEDBACK, PENDING, RE_ATTEMPT_DATE, SEQUENCE_COUNT, SEQUENCE_ID, SEQUENCE_ID_UNAVAILABLE, SIGNATURE_AND_FEEDBACK, SKU_ARRAY, SUCCESS, TOKEN_MISSING } from '../../../lib/AttributeConstants';
+import { AFTER, AMOUNT, BEFORE, DATA_STORE, EXTERNAL_DATA_STORE, FAIL, GET, MONEY_COLLECT, NPS_FEEDBACK, PENDING, RE_ATTEMPT_DATE, SEQUENCE_COUNT, SEQUENCE_ID, SEQUENCE_ID_UNAVAILABLE, SIGNATURE_AND_FEEDBACK, SKU_ARRAY, SUCCESS, TOKEN_MISSING, QC_IMAGE, QC_PASS_FAIL, QC_REMARK, OPTION_CHECKBOX_ARRAY } from '../../../lib/AttributeConstants';
 import RestAPIFactory from '../../../lib/RestAPIFactory';
 import CONFIG from '../../../lib/config';
 import { CUSTOM_NAMING, DEVICE_IMEI, HUB, JOB_MASTER, JOB_STATUS, JOB_SUMMARY, LAST_JOB_COMPLETED_TIME, NEXT_FOCUS, PENDING_SYNC_TRANSACTION_IDS, PREVIOUSLY_TRAVELLED_DISTANCE, TABLE_FIELD_DATA, TABLE_JOB, TABLE_JOB_TRANSACTION, TABLE_RUNSHEET, TABLE_TRANSACTION_LOGS, TRACK_BATTERY, TRANSACTION_TIME_SPENT, USER, USER_SUMMARY } from '../../../lib/constants';
@@ -27,17 +27,17 @@ export default class FormLayoutEventImpl {
      * @param {*fieldAttribute value} value 
      */
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds) {
-        let isAllAttributeHidden = true //this is a check if there are all hidden attribute or not
+        let isAllAttributeHidden = true; //this is a check if there are all hidden attribute or not
         if (attributeMasterId && formLayoutObject[attributeMasterId]) {
             this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
         }
-        isSaveDisabled = false
+        isSaveDisabled = false;
         for (var ids in sequenceWiseSortedFieldAttributesMasterIds) {
-            value = formLayoutObject[sequenceWiseSortedFieldAttributesMasterIds[ids]]
+            value = formLayoutObject[sequenceWiseSortedFieldAttributesMasterIds[ids]];
             if (sequenceWiseSortedFieldAttributesMasterIds[ids] != attributeMasterId || event == NEXT_FOCUS) {
                 value.focus = false
             }
-            if (value.displayValue || value.displayValue === 0) {
+            if (value.displayValue || value.displayValue === 0 || value.attributeTypeId == QC_IMAGE || value.attributeTypeId == QC_PASS_FAIL || value.attributeTypeId == QC_REMARK || value.attributeTypeId == OPTION_CHECKBOX_ARRAY) {
                 continue
             }
             if (!value.hidden) {//if any visible attribute present then set isAllAttributeHidden to false

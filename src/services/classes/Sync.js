@@ -37,6 +37,7 @@ import RNFS from 'react-native-fs'
 import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
 import { communicationLogsService } from './CommunicationLogs'
 import { liveJobService } from './LiveJobService';
+
 class Sync {
 
   async createAndUploadZip(syncStoreDTO, currentDate) {
@@ -48,8 +49,8 @@ class Sync {
     if (!token) {
       throw new Error('Token Missing')
     }
-    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful } = await syncZipService.createZip(syncStoreDTO)
-    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO, isEncryptionSuccessful)
+    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful,allowedTransactionIds } = await syncZipService.createZip(syncStoreDTO)
+    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO, isEncryptionSuccessful,allowedTransactionIds)
     await communicationLogsService.updateLastCallSmsTimeAndNegativeCommunicationLogsDb(lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
     return responseBody
@@ -725,7 +726,6 @@ class Sync {
       FCM.cancelAllLocalNotifications()
       FCM.removeAllDeliveredNotifications()
       const topic = `FE_${userObject.value.id}`
-      FCM.unsubscribeFromTopic(topic);
       const url = CONFIG.API.FCM_TOKEN_DEREGISTRATION + '?topic=' + topic
       RestAPIFactory(token.value).serviceCall(null, url, 'POST')
     } catch (error) {
@@ -756,13 +756,15 @@ class Sync {
    * @param {*} schemaName
    * @param {*} date
    */
-  async deleteSpecificTransactionFromStoreList(transactionIdsSynced, schemaName, date) {
+  async deleteSpecificTransactionFromStoreList(transactionIdsSynced, schemaName, date,allowedTransactionIds) {
     let transactionToBeSynced = await keyValueDBService.getValueFromStore(schemaName);
     let originalTransactionsToBeSynced = transactionToBeSynced ? transactionToBeSynced.value : {}
     for (let index in transactionIdsSynced) {
       if (moment(originalTransactionsToBeSynced[index].syncTime).isBefore(moment(date).format('YYYY-MM-DD HH:mm:ss')) || (moment(originalTransactionsToBeSynced[index].syncTime).isSame(moment(date).format('YYYY-MM-DD HH:mm:ss')))) {
+       if(_.isEmpty(allowedTransactionIds) || allowedTransactionIds[originalTransactionsToBeSynced[index].id]){
         delete originalTransactionsToBeSynced[index]
       }
+    }
     }
     if (originalTransactionsToBeSynced && _.size(originalTransactionsToBeSynced) > 0) {
       await keyValueDBService.validateAndSaveData(schemaName, originalTransactionsToBeSynced);
@@ -771,6 +773,5 @@ class Sync {
     }
   }
 }
-
 
 export let sync = new Sync()

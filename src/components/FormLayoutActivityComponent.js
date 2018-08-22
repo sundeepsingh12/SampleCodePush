@@ -1,12 +1,7 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    TouchableHighlight,
-} from 'react-native'
-import {  Icon} from 'native-base'
+import { StyleSheet, View, Text, TouchableHighlight } from 'react-native'
+import { Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 import {
     ARRAY,
@@ -26,7 +21,8 @@ import {
     CAMERA,
     CAMERA_HIGH,
     CAMERA_MEDIUM,
-    RADIOBUTTON
+    RADIOBUTTON,
+    QC_ARRAY
 } from '../lib/AttributeConstants'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -53,12 +49,13 @@ class FormLayoutActivityComponent extends PureComponent {
             case CAMERA_HIGH:
             case CAMERA_MEDIUM:
             case CAMERA: return <MaterialIcons name='photo-camera' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
+            case QC_ARRAY: return <Icon name='md-checkbox-outline' style={[styles.fontXxl, styles.padding5, { color: this.getComponentIconStyle(this.props.item.editable).color }]} />
             default: return <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
         }
     }
 
     getComponentLabelStyle(focus, editable) {
-        return focus ? {color : styles.fontPrimaryColor} : editable ? styles.fontBlack : styles.fontLowGray
+        return focus ? { color: styles.fontPrimaryColor } : editable ? styles.fontBlack : styles.fontLowGray
     }
 
     getComponentSubLabelStyle(editable) {
@@ -77,7 +74,7 @@ class FormLayoutActivityComponent extends PureComponent {
         const icon = this.getIcon(this.props.item.attributeTypeId)
         return (
             <TouchableHighlight disabled={!this.props.item.editable} onPress={() => this.props.press(this.props.item)}>
-                <View style={[style.formCard, this.props.item.focus ? {borderLeftColor : styles.borderLeft4Color, borderLeftWidth: 4} : null]}>
+                <View style={[style.formCard, this.props.item.focus ? { borderLeftColor: styles.borderLeft4Color, borderLeftWidth: 4 } : null]}>
 
                     <View style={style.formCardDetail}>
                         <View>
