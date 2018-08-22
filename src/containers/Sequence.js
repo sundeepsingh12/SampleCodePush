@@ -315,10 +315,8 @@ class Sequence extends PureComponent {
               <View style={[style.headerRight]}>
               </View>
             </View>
-            <View>
             {!_.isEmpty(this.props.sequenceList) && !this.props.isSequenceScreenLoading ? 
             <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />: null}
-            </View> 
         </View>
         </SafeAreaView>
     )
@@ -362,7 +360,7 @@ class Sequence extends PureComponent {
                 sortRowStyle={style.sortableListStyle}
                 renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(row)} />} />
               <SafeAreaView>
-                <Footer style={{ height: 70 }}>
+                <Footer style={[style.footer]}>
                   <FooterTab style={[styles.padding10]}>
                     {buttonView}
                   </FooterTab>
@@ -442,6 +440,9 @@ const style = StyleSheet.create({
     shadowOffset: { width: 3, height: 4, },
     shadowColor: '#d3d3d3',
     shadowOpacity: .5,
+  },
+  footer:{
+    height:'auto'
   }
 });
 

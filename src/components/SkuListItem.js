@@ -155,7 +155,7 @@ class SkuListItem extends PureComponent {
             if (originalQuantityValue <= 1) {
                 quantitySelector =
                     <View style={[styles.paddingTop20]}>
-                        <CheckBox color={styles.bgPrimaryColor} style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value, this.props.title)} />
+                        <CheckBox color={styles.bgPrimaryColor}  checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value, this.props.title)} />
                     </View>
             }
             else if (originalQuantityValue > 1) {
