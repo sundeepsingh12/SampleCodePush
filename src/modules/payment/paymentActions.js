@@ -69,7 +69,6 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
             else if(size(paymentParameters.paymentModeList.otherPaymentModeList) == 0 && size(paymentParameters.paymentModeList.endPaymentModeList) == 1 ){
                 selectedPaymentMode = paymentParameters.paymentModeList.endPaymentModeList[0].moneyTransactionModeId
             }
-
             dispatch(setState(
                 SET_PAYMENT_INITIAL_PARAMETERS,
                 {
@@ -83,7 +82,7 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
                     splitPaymentMode: paymentParameters.splitPaymentMode ? NO : null,
                     jobTransactionIdAmountMap: paymentParameters.jobTransactionIdAmountMap,
                     selectedPaymentMode,
-                    isSaveButtonDisabled:!(paymentParameters.actualAmount && ((size(paymentParameters.paymentModeList.endPaymentModeList) == 1 && size(paymentParameters.paymentModeList.otherPaymentModeList) == 0)  || (size(paymentParameters.paymentModeList.otherPaymentModeList) == 1 && size(paymentParameters.paymentModeList.endPaymentModeList) == 0)))
+                    isSaveButtonDisabled:!(parseFloat(paymentParameters.actualAmount) && ((size(paymentParameters.paymentModeList.endPaymentModeList) == 1 && size(paymentParameters.paymentModeList.otherPaymentModeList) == 0)  || (size(paymentParameters.paymentModeList.otherPaymentModeList) == 1 && size(paymentParameters.paymentModeList.endPaymentModeList) == 0)))
 
                 }
             ))
