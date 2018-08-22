@@ -663,7 +663,8 @@ class Sync {
       body: message,
       priority: "high",
       sound: "default",
-      show_in_foreground: true
+      show_in_foreground: true,
+      wake_screen:true //works for Android only
     });
   }
 

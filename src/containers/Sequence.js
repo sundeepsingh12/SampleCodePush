@@ -359,13 +359,11 @@ class Sequence extends PureComponent {
                 activeOpacity={1}
                 sortRowStyle={style.sortableListStyle}
                 renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(row)} />} />
-              <SafeAreaView>
                 <Footer style={[style.footer]}>
                   <FooterTab style={[styles.padding10]}>
                     {buttonView}
                   </FooterTab>
                 </Footer>
-              </SafeAreaView>
             </View>
             : this.viewForNoJobPresent()}
         </Container>
