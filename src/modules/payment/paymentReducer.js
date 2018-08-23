@@ -39,10 +39,13 @@ export default function paymentReducer(state = initialState, action) {
         .set('paymentModeList', action.payload.paymentModeList)
         .set('splitPaymentMode', action.payload.splitPaymentMode)
         .set('jobTransactionIdAmountMap', action.payload.jobTransactionIdAmountMap)
+        .set('isSaveButtonDisabled',action.payload.isSaveButtonDisabled)
+        .set('selectedPaymentMode',action.payload.selectedPaymentMode)
     }
 
     case SET_PAYMENT_CHANGED_PARAMETERS: {
-      const { actualAmount, transactionNumber } = action.payload
+    
+      let { actualAmount, transactionNumber } = action.payload
       let minValue = state.minValue
       let maxValue = state.maxValue
       let isSaveButtonDisabled, paymentError

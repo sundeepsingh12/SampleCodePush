@@ -305,8 +305,7 @@ class Sequence extends PureComponent {
       <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
         <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
             <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-              <TouchableOpacity style={[style.headerLeft]}
-                onPress={this.goBack}>
+              <TouchableOpacity style={[style.headerLeft]} onPress={this.goBack}>
                 <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
               </TouchableOpacity>
               <View style={[style.headerBody]}>
