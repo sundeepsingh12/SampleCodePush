@@ -18,6 +18,7 @@ import RNFetchBlob from 'react-native-fetch-blob'
 import { keyValueDBService } from '../services/classes/KeyValueDBService.js'
 import { PENDING_SYNC_TRANSACTION_IDS, LAST_SYNC_WITH_SERVER, DOMAIN_URL } from './constants'
 import { sync } from '../services/classes/Sync'
+import { fieldDataService } from '../services/classes/FieldData'
 const fetch = require('react-native-cancelable-fetch');
 
 class RestAPI {
@@ -184,7 +185,7 @@ class RestAPI {
     });
   }
 
-  async uploadZipFile(path, fileName, currenDate, syncStoreDTO,isEncryptionSuccessful,allowedTransactionIds) {
+  async uploadZipFile(path, fileName, currenDate, syncStoreDTO,isEncryptionSuccessful,syncDataDTO) {
     // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
     const baseUrl = (isEncryptionSuccessful) ?  CONFIG.API.POST_ZIP_ENCRYPTED_API : CONFIG.API.UPLOAD_DATA_API
     var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
@@ -204,8 +205,13 @@ class RestAPI {
           if (currenDate) {
             await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
           }
+       
           if (syncStoreDTO) {
-            await sync.deleteSpecificTransactionFromStoreList(syncStoreDTO.transactionIdToBeSynced, PENDING_SYNC_TRANSACTION_IDS, currenDate,allowedTransactionIds)
+            await sync.deleteSpecificTransactionFromStoreList(syncStoreDTO.transactionIdToBeSynced, PENDING_SYNC_TRANSACTION_IDS, currenDate,syncDataDTO ? syncDataDTO.allowedTransactionIdList:{})
+          
+          }
+          if(syncDataDTO){
+            await fieldDataService.updateSyncFlag(syncDataDTO.fieldDataIdList)
           }
         }
         else if (message != 'success') {

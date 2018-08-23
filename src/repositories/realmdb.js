@@ -19,7 +19,7 @@ import AesCtr from '../services/classes/AesCtr'
 import userExceptionLogs from './schema/userExceptionLogsDB'
 import messageInteracion from './schema/MessageInteractionSchema'
 import negativeCommunicationLog from './schema/NegativeCommunicationLogs'
-const schemaVersion = 53;
+const schemaVersion = 54;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs, messageInteracion, negativeCommunicationLog];
 
 let realm = new Realm({
@@ -63,11 +63,11 @@ export function saveList(tableName, array) {
  * @param {*} tableNamesVsDataList 
  */
 export function performBatchSave(...tableNamesVsDataList) {
-    return realm.write(() => {
-        let imeiNumber = DeviceInfo.getUniqueID()
-        // Create counter block from imei number used for encryption
-        let counterBlock = Array.from(imeiNumber).slice(0, 8)
-        tableNamesVsDataList.forEach(record => {
+        return realm.write(() => {
+            let imeiNumber = DeviceInfo.getUniqueID()
+            // Create counter block from imei number used for encryption
+            let counterBlock = Array.from(imeiNumber).slice(0, 8)
+            tableNamesVsDataList.forEach(record => {
                 if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
                     if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
                         for (let data in record.value) {
@@ -78,8 +78,10 @@ export function performBatchSave(...tableNamesVsDataList) {
                         record.value.forEach(data => realm.create(record.tableName, data, true))
                     }
                 }
+            })
         })
-    })
+   
+    
 }
 /**
  * 
@@ -201,4 +203,12 @@ export function deleteRecordList(tableName, valueList, property) {
     realm.write(() => {
         realm.delete(filteredRecords)
     });
+}
+
+//This is called when sync upload returns 200       
+export function updateFieldDataSyncFlag(fieldDataIdList) {
+    let fieldDataWithSyncFlag1 = realm.objects(TABLE_FIELD_DATA).filtered(fieldDataIdList.map(value => `id = ${value}`).join(' OR '))
+    realm.write(() => {
+        fieldDataWithSyncFlag1.forEach(fieldDataObject => fieldDataObject.syncFlag = 2)
+    })
 }

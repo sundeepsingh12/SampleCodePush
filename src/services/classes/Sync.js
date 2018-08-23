@@ -49,8 +49,8 @@ class Sync {
     if (!token) {
       throw new Error('Token Missing')
     }
-    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful,allowedTransactionIds } = await syncZipService.createZip(syncStoreDTO)
-    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO, isEncryptionSuccessful,allowedTransactionIds)
+    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful,syncDataDTO } = await syncZipService.createZip(syncStoreDTO)
+    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO, isEncryptionSuccessful,syncDataDTO)
     await communicationLogsService.updateLastCallSmsTimeAndNegativeCommunicationLogsDb(lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
     return responseBody
