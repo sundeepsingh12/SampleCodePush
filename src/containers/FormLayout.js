@@ -87,9 +87,9 @@ class FormLayout extends PureComponent {
   componentDidMount() {
     this.props.navigation.setParams({ backForTransient: this._goBack });
     if (!this.props.navigation.state.params.isDraftRestore) {
-      let {statusId,statusName} = this.props.navigation.state.params
-      const statusData = {statusId,statusName}
-      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,statusData)
+      let { statusId, statusName } = this.props.navigation.state.params
+      const statusData = { statusId, statusName }
+      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId, statusData)
       if (this.props.navigation.state.params.jobTransaction.length || this.props.navigation.state.params.editableFormLayoutState || this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
         this.props.actions.setState(SET_UPDATE_DRAFT, false)
       }
@@ -98,6 +98,9 @@ class FormLayout extends PureComponent {
     this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
       BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
     );
+    if (this.props.navigation.state.params.saveActivatedParcelCount) {
+      this.props.navigation.setParams({ statusName: this.props.navigation.state.params.statusName + '(' + this.props.navigation.state.params.saveActivatedParcelCount + ')' });
+    }
   }
 
   componentWillUnmount() {
@@ -183,7 +186,8 @@ class FormLayout extends PureComponent {
       fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
       noFieldAttributeMappedWithStatus: this.props.noFieldAttributeMappedWithStatus,
       jobAndFieldAttributesList: this.props.jobAndFieldAttributesList,
-      sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds
+      sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds,
+      dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap,
     }
 
     let taskListScreenDetails = {
@@ -233,7 +237,7 @@ class FormLayout extends PureComponent {
     return view
   }
 
-  getFooterView(transient,saveActivated) {
+  getFooterView(transient, saveActivated) {
     return (
       <SafeAreaView style={[styles.bgWhite]}>
         <Footer style={[style.footer]}>
@@ -241,7 +245,7 @@ class FormLayout extends PureComponent {
             <Button success full
               onPress={() => this.saveJobTransaction()}
               disabled={this.props.isSaveDisabled}>
-              <Text style={[styles.fontLg, styles.fontWhite]}>{!isEmpty(this.props.paymentAtEnd) ? (this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : (saveActivated || transient)?'Continue':this.props.statusName) : (saveActivated || transient) ? 'Continue' : this.props.statusName}</Text>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{!isEmpty(this.props.paymentAtEnd) ? (this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : (saveActivated || transient) ? 'Continue' : this.props.statusName) : (saveActivated || transient) ? 'Continue' : this.props.statusName}</Text>
             </Button>
           </FooterTab>
         </Footer>
@@ -262,34 +266,34 @@ class FormLayout extends PureComponent {
     }
   }
 
-  _renderFormData(){
-    let formData  = []
-    for(let id in this.props.sequenceWiseFieldAttributeMasterIds){
+  _renderFormData() {
+    let formData = []
+    for (let id in this.props.sequenceWiseFieldAttributeMasterIds) {
       formData.push(this.props.formElement[this.props.sequenceWiseFieldAttributeMasterIds[id]])
     }
     return formData
   }
 
-  renderFormLayoutView(){
+  renderFormLayoutView() {
     return (
       <View style={[styles.flex1, styles.bgWhite]}>
-      <View style={[styles.paddingTop10, styles.paddingBottom10]}>
-        <FlatList
-          data={this._renderFormData()}
-          extraData={this.state}
-          renderItem={(item) => this.renderData(item)} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
-          keyExtractor={this._keyExtractor}>
-        </FlatList>
+        <View style={[styles.paddingTop10, styles.paddingBottom10]}>
+          <FlatList
+            data={this._renderFormData()}
+            extraData={this.state}
+            renderItem={(item) => this.renderData(item)} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
+            keyExtractor={this._keyExtractor}>
+          </FlatList>
+        </View>
       </View>
-    </View>
     )
   }
 
   render() {
-    const { saveActivated,transient } = this.props.navigation.state.params
+    const { saveActivated, transient } = this.props.navigation.state.params
     const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
     let emptyFieldAttributeForStatusView = this.emptyFieldAttributeForStatusView()
-    const footerView = this.getFooterView(transient,saveActivated)
+    const footerView = this.getFooterView(transient, saveActivated)
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
@@ -309,7 +313,7 @@ class FormLayout extends PureComponent {
       formView = <KeyboardAvoidingView style={[{ flex: 1 }, styles.bgWhite]} behavior="padding">
         {invalidFormAlert}
         {emptyFieldAttributeForStatusView}
-       {this.renderFormLayoutView()}
+        {this.renderFormLayoutView()}
         {footerView}
       </KeyboardAvoidingView >
     } else {
