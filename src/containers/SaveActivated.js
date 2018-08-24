@@ -14,7 +14,7 @@ import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
 import { FormLayout, Discard, Keep, Checkout, SHOW_DISCARD_ALERT, SET_SAVE_ACTIVATED_DRAFT, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE, SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED } from '../lib/constants'
-import { Yes_Checkout, Total, NO} from '../lib/AttributeConstants'
+import { Yes_Checkout, Total, NO } from '../lib/AttributeConstants'
 import { Discard_these_jobs, Do_you_want_to_checkout, EDIT, TRANSACTION_SUCCESSFUL, DELETE_DRAFT } from '../lib/ContainerConstants'
 import DraftModal from '../components/DraftModal'
 import _ from 'lodash'
@@ -65,7 +65,7 @@ class SaveActivated extends PureComponent {
     }
 
     static navigationOptions = ({ navigation }) => {
-        return { header: null,gesturesEnabled:false }
+        return { header: null, gesturesEnabled: false }
     }
 
     componentDidUpdate() {
@@ -124,7 +124,7 @@ class SaveActivated extends PureComponent {
     }
 
     navigateToFormLayout = (statusId, statusName) => {
-        let cloneJobTransaction = JSON.parse(JSON.stringify(this.props.navigation.state.params.jobTransaction)) 
+        let cloneJobTransaction = JSON.parse(JSON.stringify(this.props.navigation.state.params.jobTransaction))
         let lastIndex = parseInt(_.findLastKey(this.props.recurringData))
         let userHubId = cloneJobTransaction.referenceNumber.split('/')
         if (!lastIndex) {
@@ -132,6 +132,7 @@ class SaveActivated extends PureComponent {
         }
         cloneJobTransaction.jobId = cloneJobTransaction.id = --lastIndex
         cloneJobTransaction.referenceNumber = userHubId[0] + '/' + userHubId[1] + '/' + moment().valueOf()
+        let saveActivatedParcelCount = _.size(this.props.recurringData)
         push(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: cloneJobTransaction.id,
@@ -140,7 +141,8 @@ class SaveActivated extends PureComponent {
             statusName,
             jobMasterId: this.props.navigation.state.params.jobMasterId,
             navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
-            saveActivated:true
+            saveActivatedParcelCount: (saveActivatedParcelCount > 0) ? saveActivatedParcelCount : null,
+            saveActivated: true
         })
     }
 
@@ -190,18 +192,7 @@ class SaveActivated extends PureComponent {
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.flexBasis10]}
                         onPress={() => {
-                            this.props.actions.deleteItem(
-                                item.id,
-                                this.props.recurringData,
-                                this.props.commonData, {
-                                    navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
-                                    jobTransaction: this.props.navigation.state.params.jobTransaction,
-                                    contactData: this.props.navigation.state.params.contactData,
-                                    currentStatus: this.props.navigation.state.params.currentStatus,
-                                    jobMasterId: this.props.navigation.state.params.jobMasterId
-                                },
-                                this.props.headerTitle
-                            )
+                            this.showDeleteAlert(item)
                         }}>
                         <Icon name="md-trash" style={[styles.fontXl, styles.fontDarkGray, styles.alignSelfCenter]} />
                     </TouchableOpacity>
@@ -210,12 +201,38 @@ class SaveActivated extends PureComponent {
         )
     }
 
+    showDeleteAlert(item) {
+        Alert.alert(
+            'Do you want to delete item?',
+            '',
+            [
+                { text: NO, style: 'cancel' },
+                {
+                    text: 'Yes', onPress: () => {
+                        this.props.actions.deleteItem(
+                            item.id,
+                            this.props.recurringData,
+                            this.props.commonData, {
+                                navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
+                                jobTransaction: this.props.navigation.state.params.jobTransaction,
+                                contactData: this.props.navigation.state.params.contactData,
+                                currentStatus: this.props.navigation.state.params.currentStatus,
+                                jobMasterId: this.props.navigation.state.params.jobMasterId
+                            },
+                            this.props.headerTitle
+                        )
+                    }
+                },
+            ],
+        )
+    }
+
     showAlert() {
         Alert.alert(
             Do_you_want_to_checkout,
             '',
             [
-                { text: NO,  style: 'cancel'},
+                { text: NO, style: 'cancel' },
                 { text: Yes_Checkout, onPress: () => this.checkout() },
             ],
         )
@@ -276,10 +293,10 @@ class SaveActivated extends PureComponent {
         this.props.actions.restoreDraft(this.props.draftStatusInfo, this.props.navigation.state.params.contactData, this.props.recurringData, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.navigationFormLayoutStates)
     }
 
-    showCheckTransactionAlert(){
-        return <TransactionAlert checkTransactionAlert={this.props.checkTransactionSaveActivated} onCancelPress={() => this.props.actions.redirectToFormLayout({id : this.props.draftStatusInfo.statusId, name: this.props.draftStatusInfo.statusName} , -1, this.props.draftStatusInfo.jobMasterId, true, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED)} 
-                              onOkPress = {() => this.props.actions.checkForPaymentAtEnd(this.props.draftStatusInfo, null, null, null, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE)}      onRequestClose={() => this.props.actions.setState(SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED)} />
-      }
+    showCheckTransactionAlert() {
+        return <TransactionAlert checkTransactionAlert={this.props.checkTransactionSaveActivated} onCancelPress={() => this.props.actions.redirectToFormLayout({ id: this.props.draftStatusInfo.statusId, name: this.props.draftStatusInfo.statusName }, -1, this.props.draftStatusInfo.jobMasterId, true, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED)}
+            onOkPress={() => this.props.actions.checkForPaymentAtEnd(this.props.draftStatusInfo, null, null, null, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE)} onRequestClose={() => this.props.actions.setState(SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED)} />
+    }
     draftModal() {
         if (!_.isEmpty(this.props.draftStatusInfo)) {
             return <DraftModal draftStatusInfo={this.props.draftStatusInfo} onOkPress={this.draftOkPress} onCancelPress={() => this.props.actions.setState(SET_SAVE_ACTIVATED_DRAFT, {})} onRequestClose={() => this.props.actions.setState(SET_SAVE_ACTIVATED_DRAFT, {})} />
@@ -304,25 +321,25 @@ class SaveActivated extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-                            <Body>
-                                <View
-                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this._goBack() }}>
-                                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                    </TouchableOpacity>
-                                    <View style={[style.headerBody]}>
-                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.navigation.state.params.currentStatus) ? this.props.navigation.state.params.currentStatus.name : 'Save Activated'}</Text>
-                                    </View>
-                                    <View style={[style.headerRight]}>
-                                    </View>
-                                    <View />
+                    <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+                        <Body>
+                            <View
+                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this._goBack() }}>
+                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                </TouchableOpacity>
+                                <View style={[style.headerBody]}>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.navigation.state.params.currentStatus) ? this.props.navigation.state.params.currentStatus.name : 'Save Activated'}</Text>
                                 </View>
-                            </Body>
-                        </Header>
+                                <View style={[style.headerRight]}>
+                                </View>
+                                <View />
+                            </View>
+                        </Body>
+                    </Header>
 
                     <Content style={[styles.flex1, styles.bgLightGray]}>
-                        {(this.props.checkTransactionSaveActivated && this.props.checkTransactionSaveActivated != TRANSACTION_SUCCESSFUL && this.props.checkTransactionSaveActivated != DELETE_DRAFT) ?this.showCheckTransactionAlert() :this.draftModal()}
+                        {(this.props.checkTransactionSaveActivated && this.props.checkTransactionSaveActivated != TRANSACTION_SUCCESSFUL && this.props.checkTransactionSaveActivated != DELETE_DRAFT) ? this.showCheckTransactionAlert() : this.draftModal()}
                         {/*Senders Details*/}
                         <View style={[styles.bgWhite]}>
                             <List>
@@ -363,26 +380,28 @@ class SaveActivated extends PureComponent {
                             keyExtractor={this._keyExtractor}>
                         </FlatList>
                     </Content>
-                    <SafeAreaView style={{ backgroundColor: '#ffffff' }}>
-                        <Footer style={[style.footer]}>
-                            {renderIf(this.props.isSignOffVisible, <FooterTab style={[styles.paddingLeft10, styles.paddingRight5, styles.bgLightGray, styles.marginLeft10]}>
-                                <Button onPress={() => {
-                                    this.signOff(
-                                        this.props.navigation.state.params.currentStatus.nextStatusList[0].id,
-                                    )
-                                }}>
-                                    <Text style={[{ color: styles.fontPrimaryColor }, styles.fontDefault]}>Signature</Text>
-                                </Button>
-                            </FooterTab>)}
-                            <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
-                                <Button style={[styles.bgSuccess]} onPress={() => {
-                                    this.showAlert()
-                                }}>
-                                    <Text style={[styles.fontWhite, styles.fontDefault]}>{Checkout}</Text>
-                                </Button>
-                            </FooterTab>
-                        </Footer>
-                    </SafeAreaView>
+                    {renderIf(_.size(this.props.recurringData) > 0,
+                        <SafeAreaView style={{ backgroundColor: '#ffffff' }}>
+                            <Footer style={[style.footer]}>
+                                {renderIf(this.props.isSignOffVisible, <FooterTab style={[styles.paddingLeft10, styles.paddingRight5, styles.bgLightGray, styles.marginLeft10]}>
+                                    <Button onPress={() => {
+                                        this.signOff(
+                                            this.props.navigation.state.params.currentStatus.nextStatusList[0].id,
+                                        )
+                                    }}>
+                                        <Text style={[{ color: styles.fontPrimaryColor }, styles.fontDefault]}>Signature</Text>
+                                    </Button>
+                                </FooterTab>)}
+                                <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
+                                    <Button style={[styles.bgSuccess]} onPress={() => {
+                                        this.showAlert()
+                                    }}>
+                                        <Text style={[styles.fontWhite, styles.fontDefault]}>{Checkout}</Text>
+                                    </Button>
+                                </FooterTab>
+                            </Footer>
+                        </SafeAreaView>
+                    )}
                 </Container>
             </StyleProvider>
 
@@ -415,7 +434,7 @@ const style = StyleSheet.create({
         paddingRight: 15
     },
     footer: {
-        height:'auto',
+        height: 'auto',
         backgroundColor: '#ffffff',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',
