@@ -139,8 +139,7 @@ class Backup {
                 transactionLogs = [],
                 trackLogs = []
             let fieldDataQuery = transactionList.map(transaction => 'jobTransactionId = ' + transaction.id).join(' OR ')
-            let fieldDataDto = syncZipService.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA);
-            fieldDataList = fieldDataDto.fieldDataList
+            fieldDataList = syncZipService.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA);
             let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table
             jobList = syncZipService.getDataFromRealmDB(jobIdQuery, TABLE_JOB);
             serverSmsLogs = syncZipService.getDataFromRealmDB(null, TABLE_SERVER_SMS_LOG);

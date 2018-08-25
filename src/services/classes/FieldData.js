@@ -133,8 +133,8 @@ class FieldData {
         }
     }
 
-    updateSyncFlag(fieldDataIdList) {
-        realm.updateFieldDataSyncFlag(fieldDataIdList)
+    updateSyncFlag(jobTransactionIdList) {
+        realm.updateFieldDataSyncFlag(jobTransactionIdList)
     }
 
 }

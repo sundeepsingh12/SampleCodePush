@@ -86,7 +86,7 @@ export function uploadBackupFile(index, filesMap) {
             if (!token) {
                 throw new Error(TOKEN_MISSING)
             }
-            let responseBody = await RestAPIFactory(token.value).uploadZipFile(filesMap[index].path, filesMap[index].name, null, null, (index < 0) ? true : false) // Method to upload zip file.
+            let responseBody = await RestAPIFactory(token.value).uploadZipFile(filesMap[index].path, filesMap[index].name, null, (index < 0) ? true : false) // Method to upload zip file.
             if (responseBody && responseBody.split(",")[0] == 'success') {
                 dispatch(setState(SET_BACKUP_VIEW, 2))
                 if (index < 0) {

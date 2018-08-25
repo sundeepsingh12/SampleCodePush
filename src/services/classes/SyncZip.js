@@ -180,18 +180,16 @@ class SyncZip {
                         jobQuery += ` OR id = ${transactionIdList[index].jobId}`;
                         transactionLogQuery += ` OR transactionId = ${transactionIdList[index].id}`;
                     }
-                    allowedTransactionIdList[index] = transactionIdList[index]
+                    allowedTransactionIdList[index]= transactionIdList[index].id
                     counter++
                 }
-       const  fieldDataDto = this.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA);
-       fieldDataList = fieldDataDto.fieldDataList
+        fieldDataList = this.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA);
         transactionList = this.getDataFromRealmDB(jobTransactionQuery, TABLE_JOB_TRANSACTION);
         jobList = this.getDataFromRealmDB(jobQuery, TABLE_JOB);
         serverSmsLogs = this.getDataFromRealmDB(fieldDataQuery, TABLE_SERVER_SMS_LOG);
         transactionLogs = this.getDataFromRealmDB(transactionLogQuery, TABLE_TRANSACTION_LOGS);
        syncDataDTO = {
-            allowedTransactionIdList,
-            fieldDataIdList:fieldDataDto.fieldDataIdList
+            allowedTransactionIdList
         }
         return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog,syncDataDTO }
     }
@@ -228,18 +226,16 @@ class SyncZip {
         let data = realm.getRecordListOnQuery(table, query);
         // send id as 0 in case of field data
         if (table == TABLE_FIELD_DATA) {
-            let fieldDataList = [],fieldDataIdList=[]
+            let fieldDataList = []
             for (let index in data) {
                 let fieldData = { ...data[index] }
-                let fieldDataClone = {...fieldData}
                 if (fieldData.syncFlag == 1) {
-                    fieldDataIdList.push(fieldDataClone.id)
                     fieldData.id = 0
                     fieldDataList.push(_.omit(fieldData, ['syncFlag']))
                    
                 }
             }
-            return {fieldDataList,fieldDataIdList}
+            return fieldDataList
         } else {
             return data.map(x => Object.assign({}, x));
         }
