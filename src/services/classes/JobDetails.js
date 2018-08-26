@@ -22,7 +22,9 @@ import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
     JOB_ATTRIBUTE_STATUS,
-    FIELD_ATTRIBUTE_STATUS
+    FIELD_ATTRIBUTE_STATUS,
+    CUSTOMER_CARE,
+    SMS_TEMPLATE
 } from '../../lib/constants'
 import { keyValueDBService } from './KeyValueDBService'
 import { geoFencingService } from './GeoFencingService'
@@ -181,8 +183,8 @@ class JobDetails {
      */
 
     checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId) {
-        const jobMasterIdWithEnableResequence = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true)
-        const statusMap = statusList.value.filter((status) => status.tabId == tabId && status.code !== UNSEEN)
+        const jobMasterIdWithEnableResequence = jobMasterList.filter((obj) => obj.enableResequenceRestriction == true)
+        const statusMap = statusList.filter((status) => status.tabId == tabId && status.code !== UNSEEN)
         const firstEnableSequenceTransaction = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
         return !(!_.isEmpty(firstEnableSequenceTransaction) && firstEnableSequenceTransaction.id != jobTransactionId && seqSelected >= firstEnableSequenceTransaction.seqSelected) ? false : "Please finish previous items first"
     }
@@ -196,8 +198,8 @@ class JobDetails {
      */
 
     checkOutForDelivery(jobMasterList, statusList) {
-        const jobMasterIdListWithDelivery = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id) // jobMaster Id list with out for delivery
-        const mapOfUnseenStatusWithJobMaster = jobStatusService.getjobMasterIdStatusIdMap(jobMasterIdListWithDelivery, UNSEEN, statusList.value)
+        const jobMasterIdListWithDelivery = jobMasterList.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id) // jobMaster Id list with out for delivery
+        const mapOfUnseenStatusWithJobMaster = jobStatusService.getjobMasterIdStatusIdMap(jobMasterIdListWithDelivery, UNSEEN, statusList)
         const unseenTransactions = jobTransactionService.getJobTransactionsForStatusIds(Object.values(mapOfUnseenStatusWithJobMaster))
         return !(unseenTransactions && unseenTransactions.length > 0) ? false : "Please Scan all Parcels First"
     }
@@ -259,7 +261,7 @@ class JobDetails {
         let transactionLog = await formLayoutEventsInterface._updateTransactionLogs([jobTransaction], previousStatus[0], jobTransaction.jobStatusId, jobTransaction.jobMasterId, user, lastTrackLog) // update transaction log on revert
         let runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction.jobStatusId, previousStatus[3], [jobTransaction]) // update runSheet Summary on revert
         let updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction, previousStatus) // update jobTransaction on revert
-        await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.jobTransactionDTO) // add jobTransaction to sync list
+        await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.jobTransactionDTO, jobTransaction.jobMasterId, true) // add jobTransaction to sync list
         realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog) // update jobTransaction, job, runSheet, transactionLog Db in batch
         await draftService.deleteDraftFromDb(jobTransaction)
     }
@@ -289,7 +291,18 @@ class JobDetails {
         const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
         const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
         const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
-        return { statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, fieldAttributeStatusList, jobAttributeStatusList }
+        const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
+        const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
+        return {
+            customerCareList: customerCareList ? customerCareList.value : customerCareList,
+            jobAttributeMasterList: jobAttributeMasterList ? jobAttributeMasterList.value : jobAttributeMasterList,
+            jobAttributeStatusList: jobAttributeStatusList ? jobAttributeStatusList.value : jobAttributeStatusList,
+            jobMasterList: jobMasterList ? jobMasterList.value : jobMasterList,
+            fieldAttributeMasterList : fieldAttributeMasterList ? fieldAttributeMasterList.value : fieldAttributeMasterList,
+            smsTemplateList: smsTemplateList ? smsTemplateList.value : smsTemplateList,
+            statusList: statusList ? statusList.value : statusList,
+            fieldAttributeStatusList: fieldAttributeStatusList ? fieldAttributeStatusList.value : fieldAttributeStatusList,
+        }
     }
 }
 

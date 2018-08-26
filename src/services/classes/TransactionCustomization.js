@@ -23,8 +23,11 @@ import {
     FIELD_ATTRIBUTE_STATUS,
     FIELD_ATTRIBUTE_VALIDATION,
     FIELD_ATTRIBUTE_VALIDATION_CONDITION,
-    DEVICE_SIM
+    DEVICE_SIM,
+    UPDATE_JOBMASTERID_JOBID_MAP
 } from '../../lib/constants'
+import { jobTransactionService } from './JobTransaction'
+import _ from 'lodash'
 
 class TransactionCustomization {
 
@@ -61,6 +64,29 @@ class TransactionCustomization {
             tabList: tabList ? tabList.value : tabList,
             customNaming: customNaming ? customNaming.value : customNaming
         }
+    }
+
+
+    async fetchUpdatedTransactionList(jobIdMap, jobTransactionCustomizationList) {
+        const jobTransactionCustomizationListParametersDTO = await this.getJobListingParameters();
+        let queryDTO = {}, jobIdList = {};
+        if (!_.isEmpty(jobIdMap)) {
+            jobIdMap.forEach(element => {
+                jobIdList = Object.assign(jobIdList, element)
+            });
+            jobIdList = Object.values(jobIdList)
+        }
+        queryDTO.jobTransactionQuery = jobIdList && jobIdList.length ? `(${jobIdList.map(jobId => 'jobId = ' + jobId).join(' OR ')})` : null
+        let jobTransactionList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO, true);
+        await keyValueDBService.deleteValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+        for (let jobId in jobIdList) {
+            if (!jobTransactionList[jobIdList[jobId]] && jobTransactionCustomizationList[jobIdList[jobId]]) {
+                delete jobTransactionCustomizationList[jobIdList[jobId]]
+            } else if(jobTransactionList[jobIdList[jobId]]){
+                jobTransactionCustomizationList[jobIdList[jobId]] = jobTransactionList[jobIdList[jobId]]
+            }
+        }
+        return _.isEmpty(jobIdMap) ? jobTransactionList : jobTransactionCustomizationList
     }
 
 

@@ -21,7 +21,8 @@ function mapStateToProps(state) {
   return {
     jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
     isRefreshing: state.listing.isRefreshing,
-    selectedDate: state.taskList.selectedDate
+    selectedDate: state.taskList.selectedDate,
+    updatedTransactionListIds: state.listing.updatedTransactionListIds
   }
 }
 
@@ -37,19 +38,36 @@ class TaskListScreen extends PureComponent {
     if (_.isEmpty(this.props.jobTransactionCustomizationList)) {
       this.props.actions.fetchJobs()
     }
-  } 
+  }
+  
+  componentDidUpdate(){
+    if(this.props.isRefreshing != 'UPDATING_DATA' && !_.isEmpty(this.props.updatedTransactionListIds) && this.checkForJobMasterIdsOfUpdatedJobs(this.props.updatedTransactionListIds)){
+      this.props.actions.fetchJobs(Object.values(this.props.updatedTransactionListIds), this.props.jobTransactionCustomizationList)
+    }
+  }
+
+  checkForJobMasterIdsOfUpdatedJobs(updatedTransactionListIds){
+    let updatedJobMasterIdsList = Object.keys(updatedTransactionListIds)
+    let jobMasterMap = _.mapKeys(JSON.parse(this.props.pageObject.jobMasterIds));
+    for(let jobMaster in updatedJobMasterIdsList){
+      if(jobMasterMap[updatedJobMasterIdsList[jobMaster]]){
+        return true
+      }
+    }
+    return false
+  }
 
   componentWillUnmount(){
     this.props.actions.setState(LISTING_SEARCH_VALUE,{})
   }
 
   navigateToScene = (item) => {
-    let countOfGroup = this.props.jobTransactionCustomizationList.filter(jobTransaction => jobTransaction.groupId == item.groupId).length;
+    let setGroupId = item.groupId == 'nullGroup' ||  Object.values(this.props.jobTransactionCustomizationList).filter(jobTransaction => jobTransaction.groupId == item.groupId).length < 2 ? null : item.groupId;
     navigate(JobDetailsV2,
       {
         jobSwipableDetails: item.jobSwipableDetails,
         jobTransaction: item,
-        groupId: item.groupId == 'nullGroup' || countOfGroup < 2 ? null : item.groupId,
+        groupId: setGroupId,
         pageObjectAdditionalParams: this.props.pageObject.additionalParams
       })
     this.props.actions.setState(LISTING_SEARCH_VALUE, {})
@@ -113,7 +131,7 @@ class TaskListScreen extends PureComponent {
   }
 
   getTransactionView(jobMasterMap) {
-    let tabJobTransactionList = {}, jobTransactionList = this.renderJobTransactionView(this.props.jobTransactionCustomizationList), searchEqualTransactionList = [];
+    let tabJobTransactionList = {}, jobTransactionList = this.renderJobTransactionView(Object.values(this.props.jobTransactionCustomizationList)), searchEqualTransactionList = [];
     for (let index in jobTransactionList) {
       if (!jobMasterMap[jobTransactionList[index].jobMasterId] || !this.checkTransactionForSearchText(jobTransactionList[index], searchEqualTransactionList) || !this.props.statusIdList.includes(jobTransactionList[index].statusId)) {
         continue;

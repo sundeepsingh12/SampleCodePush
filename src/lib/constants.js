@@ -146,6 +146,7 @@ module.exports = keyMirror({
     JOB_DETAILS_FETCHING_END: null,
     IS_MISMATCHING_LOCATION: null,
     RESET_STATE_FOR_JOBDETAIL: null,
+    SET_UPDATED_TRANSACTION_LIST_IDS: null,
     SHOW_DROPDOWN: null,
     SET_JOBDETAILS_DRAFT_INFO: null,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL: null,
@@ -251,6 +252,7 @@ module.exports = keyMirror({
     LAST_CALL_AND_SMS_TIME: null,
     LONG_CODE_SIM_VERIFICATION: null,
     ENCRYPTION_KEY: null,
+    UPDATE_JOBMASTERID_JOBID_MAP: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,

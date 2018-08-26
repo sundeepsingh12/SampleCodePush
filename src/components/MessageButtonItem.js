@@ -12,7 +12,7 @@ import { Button, Icon, ActionSheet } from 'native-base'
 export default class MessageButtonItem extends PureComponent {
     chatButtonPressed = () => {
         if (this.props.jobSwipableDetails.contactData.length > 1) {
-          let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
+          let contactData = this.props.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
           contactData.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
           ActionSheet.show(
             {

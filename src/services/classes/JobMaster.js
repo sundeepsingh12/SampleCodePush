@@ -288,11 +288,11 @@ class JobMaster {
    * @param {*} serverTime 
    */
   matchServerTimeWithMobileTime(serverTime) {
-    const serverTimeInMillis = moment(serverTime, 'YYYY-MM-DD HH:mm:ss')
+    const currentTimeInMillis = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+    const serverTimeInMillis = moment.utc(serverTime).format('YYYY-MM-DD HH:mm:ss')
     if (!serverTimeInMillis.isValid()) {
       throw new Error("Server time format incorrect")
     }
-    const currentTimeInMillis = moment()
     let diffIntime = Math.abs(moment(currentTimeInMillis).diff(serverTimeInMillis, 'minutes'))
     if (diffIntime > 15) {
       throw new Error(TIME_ERROR_MESSAGE)

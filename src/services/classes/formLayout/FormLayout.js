@@ -2,7 +2,7 @@ import { keyValueDBService } from '../KeyValueDBService.js'
 import { transientStatusAndSaveActivatedService } from '../TransientStatusAndSaveActivatedService.js'
 import { AFTER, OBJECT, STRING, TEXT, DECIMAL, SCAN_OR_TEXT, QR_SCAN, NUMBER, QC_IMAGE, QC_REMARK, QC_PASS_FAIL, OPTION_CHECKBOX_ARRAY } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
-import { SaveActivated, Transient, CheckoutDetails, TabScreen, SHOULD_RELOAD_START, BACKUP_ALREADY_EXIST, TABLE_FIELD_DATA } from '../../../lib/constants'
+import { SaveActivated, Transient, CheckoutDetails, TabScreen, SHOULD_RELOAD_START, BACKUP_ALREADY_EXIST, TABLE_FIELD_DATA, TABLE_JOB_TRANSACTION } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
 import { fieldValidationService } from '../FieldValidation'
@@ -215,7 +215,7 @@ class FormLayout {
                 formLayoutObject = this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
             let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction, formLayoutState.jobAndFieldAttributesList)
-            await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
+            await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList, jobMasterId, formLayoutState.jobTransactionId > 0)
             //if (!jobTransaction.length) { //Delete draft only if not bulk
             draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
             //}

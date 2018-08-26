@@ -12,6 +12,7 @@ import { jobStatusService } from '../JobStatus';
 import { keyValueDBService } from '../KeyValueDBService.js';
 import { communicationLogsService } from '../CommunicationLogs'
 import { runSheetService } from '../RunSheet';
+import { jobTransactionService } from '../JobTransaction'
 import { Platform } from 'react-native'
 
 export default class FormLayoutEventImpl {
@@ -836,9 +837,12 @@ export default class FormLayoutEventImpl {
      * syncList is a list which is to be synced with the server
      * @param {*} jobTransactionMap 
      */
-    async addToSyncList(jobTransactionMap) {
+    async addToSyncList(jobTransactionMap, jobMasterId, isPositiveTransactionId) {
         if (!jobTransactionMap || _.size(jobTransactionMap) == 0) {
             return
+        }
+        if(isPositiveTransactionId){
+            await jobTransactionService.updatedTransactionListIds(jobTransactionMap, jobMasterId)
         }
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
         let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? {} : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values

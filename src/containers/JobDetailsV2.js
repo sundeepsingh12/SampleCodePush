@@ -61,19 +61,17 @@ import SyncLoader from '../components/SyncLoader'
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { navigate } from '../modules/navigators/NavigationService';
-import MessageButtonItem from '../components/MessageButtonItem'
+import MessagingCallingSmsButtonView from '../components/MessagingCallingSmsButtonView'
+import UpdatingDataModal from '../components/UpdatingDataModal'
 
 function mapStateToProps(state) {
   return {
-    addressList: state.jobDetails.addressList,
-    customerCareList: state.jobDetails.customerCareList,
     currentStatus: state.jobDetails.currentStatus,
     fieldDataList: state.jobDetails.fieldDataList,
     jobDetailsLoading: state.jobDetails.jobDetailsLoading,
     jobDataList: state.jobDetails.jobDataList,
     jobTransaction: state.jobDetails.jobTransaction,
     messageList: state.jobDetails.messageList,
-    smsTemplateList: state.jobDetails.smsTemplateList,
     errorMessage: state.jobDetails.errorMessage,
     statusList: state.jobDetails.statusList,
     statusRevertList: state.jobDetails.statusRevertList,
@@ -82,7 +80,8 @@ function mapStateToProps(state) {
     isShowDropdown: state.jobDetails.isShowDropdown,
     jobExpiryTime: state.jobDetails.jobExpiryTime,
     syncLoading: state.jobDetails.syncLoading,
-    checkTransactionStatus: state.jobDetails.checkTransactionStatus
+    checkTransactionStatus: state.jobDetails.checkTransactionStatus,
+    updatedTransactionListIds: state.listing.updatedTransactionListIds,
   }
 }
 
@@ -99,17 +98,17 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key)
+    this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key, true)
   }
 
   componentWillUnmount() {
     if (this.props.errorMessage || !_.isEmpty(this.props.draftStatusInfo)) {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
-    // reset dropdown state only when required
     if (this.props.checkTransactionStatus) {
       this.props.actions.setState(SET_CHECK_TRANSACTION_STATUS, null)
     }
+    // reset dropdown state only when required
     if (this.props.isShowDropdown) {
       this.props.actions.setState(SHOW_DROPDOWN, null)
     }
@@ -118,11 +117,16 @@ class JobDetailsV2 extends PureComponent {
   navigateToDataStoreDetails = (navigationParam) => {
     navigate(DataStoreDetails, navigationParam)
   }
-  
+
   navigateToCameraDetails = (navigationParam) => {
     navigate(ImageDetailsView, navigationParam)
   }
 
+  componentDidUpdate() {
+    if (!this.props.jobDetailsLoading && this.props.jobTransaction && !_.isEmpty(this.props.updatedTransactionListIds) && this.props.updatedTransactionListIds[this.props.jobTransaction.jobId]) {
+      this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key, 'UPDATING_JOBDATA')
+    }
+  }
   statusDataItem(statusList, index, minIndexDropDown) {
     if ((index < minIndexDropDown) || (this.props.isShowDropdown)) {
       return (
@@ -203,7 +207,7 @@ class JobDetailsV2 extends PureComponent {
 
   _onGoToNextStatus = () => {
     this.props.actions.checkForInternetAndStartSyncAndNavigateToFormLayout({
-      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+      contactData: this.props.jobTransaction.jobSwipableDetails.contactData,
       jobTransactionId: this.props.jobTransaction.id,
       jobTransaction: this.props.jobTransaction,
       statusId: this.props.statusList.id,
@@ -231,7 +235,7 @@ class JobDetailsV2 extends PureComponent {
     }
     else {
       const FormLayoutObject = {
-        contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+        contactData: this.props.jobTransaction.jobSwipableDetails.contactData,
         jobTransaction,
         statusList,
         pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
@@ -243,115 +247,6 @@ class JobDetailsV2 extends PureComponent {
 
   sendMessageToContact = (contact, smsTemplate) => {
     this.props.actions.setSmsBodyAndSendMessage(contact, smsTemplate, this.props.jobTransaction, this.props.jobDataList, this.props.fieldDataList)
-  }
-
-  callButtonPressed = () => {
-    if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
-      return
-    if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
-      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
-      contactData.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
-      ActionSheet.show(
-        {
-          options: contactData,
-          cancelButtonIndex: contactData.length - 1,
-          title: SELECT_NUMBER_FOR_CALL
-        },
-        buttonIndex => {
-          if (buttonIndex != contactData.length - 1 && buttonIndex >= 0) {
-            this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[buttonIndex])
-          }
-        }
-      )
-    }
-    else {
-      Alert.alert(CONFIRMATION + this.props.navigation.state.params.jobSwipableDetails.contactData[0], CALL_CONFIRM,
-        [{ text: CANCEL, onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-        { text: OK, onPress: () => this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[0]) },],
-        { cancelable: false })
-    }
-  }
-
-  callContact = (contact) => {
-    Communications.phonecall(contact, false)
-  }
-
-  customerCareButtonPressed = () => {
-    let customerCareTitles = this.props.navigation.state.params.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
-    customerCareTitles.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
-    ActionSheet.show(
-      {
-        options: customerCareTitles,
-        cancelButtonIndex: customerCareTitles.length - 1,
-        title: SELECT_NUMBER_FOR_CALL
-      },
-      buttonIndex => {
-        if (buttonIndex != customerCareTitles.length - 1 && buttonIndex >= 0) {
-          this.callContact(this.props.navigation.state.params.jobSwipableDetails.customerCareData[buttonIndex].mobileNumber)
-        }
-      }
-    )
-  }
-
-  navigationButtonPressed = () => {
-    const addressDatas = this.props.navigation.state.params.jobSwipableDetails.addressData
-    const latitude = this.props.navigation.state.params.jobTransaction.jobLatitude
-    const longitude = this.props.navigation.state.params.jobTransaction.jobLongitude
-    let data
-
-    if (latitude && longitude) {
-      data = {
-        source: {},
-        destination: {
-          latitude,
-          longitude
-        },
-      }
-      getDirections(data)
-    }
-    else {
-      let addressArray = []
-      Object.values(addressDatas).forEach(object => {
-        addressArray.push({ text: Object.values(object).join(), icon: "md-arrow-dropright", iconColor: "#000000" })
-      })
-      addressArray.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
-      if (_.size(addressArray) > 2) {
-        ActionSheet.show(
-          {
-            options: addressArray,
-            cancelButtonIndex: addressArray.length - 1,
-            title: SELECT_ADDRESS_NAVIGATION
-          },
-          buttonIndex => {
-            if (buttonIndex != addressArray.length - 1 && buttonIndex >= 0) {
-              data = {
-                source: {},
-                destination: {},
-                params: [
-                  {
-                    key: 'q',
-                    value: addressArray[buttonIndex].text
-                  }
-                ]
-              }
-              getDirections(data)
-            }
-          }
-        )
-      } else {
-        data = {
-          source: {},
-          destination: {},
-          params: [
-            {
-              key: 'q',
-              value: addressArray[0].text
-            }
-          ]
-        }
-        getDirections(data)
-      }
-    }
   }
 
   alertForStatusRevert(statusData) {
@@ -404,7 +299,7 @@ class JobDetailsV2 extends PureComponent {
       }
     )
   }
- 
+
   showDraftAlert() {
     return <DraftModal draftStatusInfo={this.props.draftStatusInfo} onOkPress={() => this._goToFormLayoutWithDraft()} onCancelPress={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} onRequestClose={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} />
   }
@@ -574,34 +469,13 @@ class JobDetailsV2 extends PureComponent {
   }
 
   showFooterView() {
-    return (
-        <Footer style={[style.footer]}>
-          {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0 && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
-            <FooterTab>
-            <MessageButtonItem sendMessageToContact = {this.sendMessageToContact} jobSwipableDetails = {this.props.navigation.state.params.jobSwipableDetails}/>
-            </FooterTab>
-          )}
-          {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
-            <FooterTab>
-              <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
-                <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
-              </Button>
-            </FooterTab>
-          )}
-          {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) || (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
-            <FooterTab>
-              <Button full onPress={this.navigationButtonPressed}>
-                <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
-              </Button>
-            </FooterTab>)}
-          {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
-            <FooterTab>
-              <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
-                <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
-              </Button>
-            </FooterTab>)}
+    if (!_.isEmpty(this.props.jobTransaction)) {
+      return (
+        <Footer style={style.footer}>
+          <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} />
         </Footer>
-    )
+      )
+    }
   }
 
   etaUpdateTimer() {
@@ -644,7 +518,7 @@ class JobDetailsV2 extends PureComponent {
 
   _goToFormLayoutWithoutDraft = () => {
     this.props.actions.deleteDraftAndNavigateToFormLayout({
-      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+      contactData: this.props.jobTransaction.jobSwipableDetails.contactData,
       jobTransactionId: this.props.jobTransaction.id,
       jobTransaction: this.props.jobTransaction,
       statusId: this.props.draftStatusInfo.statusId,
@@ -658,7 +532,7 @@ class JobDetailsV2 extends PureComponent {
 
   _goToFormLayoutWithDraft = () => {
     this.props.actions.restoreDraftAndNavigateToFormLayout(
-      this.props.navigation.state.params.jobSwipableDetails.contactData,
+      this.props.jobTransaction.jobSwipableDetails.contactData,
       this.props.jobTransaction,
       this.props.draftStatusInfo,
       null,
@@ -686,15 +560,16 @@ class JobDetailsV2 extends PureComponent {
   }
 
   detailsContainerView() {
+    const updatedViewAlert = (this.props.jobDetailsLoading == 'UPDATING_JOBDATA') ? <Loader/> : null//<UpdatingDataModal reference = {this.refs} data={this.props.jobDetailsLoading} /> : null
     const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
     const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgLightGray]}>
-        
-          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal = {this.onCancelPress}/> : null}
+          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal={this.onCancelPress} /> : null}
           {draftAlert}
           {mismatchAlert}
+          {updatedViewAlert}
           {this.showHeaderView()}
           {this.showContentView()}
           {this.showFooterView()}
@@ -703,9 +578,27 @@ class JobDetailsV2 extends PureComponent {
     )
   }
 
+  deletedTransactionView() {
+    return (
+      <StyleProvider style={getTheme(platform)}>
+        <Container style={[styles.bgWhite]}>
+          {this.showHeaderView()}
+          <View style={[styles.justifyCenter, styles.alignCenter, styles.column, styles.flex1]}>
+            <MaterialIcons name={'delete-forever'} style={[styles.fontDarkGray, styles.fontXl]} />
+            <Text style={[{ paddingLeft: 94, paddingRight: 94 }, styles.fontCenter, styles.fontDarkGray, styles.marginTop10]}>This task was deleted from the server</Text>
+          </View>
+
+        </Container>
+      </StyleProvider>
+    )
+  }
+
   render() {
-    if (this.props.jobDetailsLoading) {
+    if (this.props.jobDetailsLoading == true) {
       return <Loader />
+    }
+    if (this.props.jobTransaction && this.props.jobTransaction.deleteFlag) {
+      return this.deletedTransactionView()
     }
     return this.renderView(this.props.checkTransactionStatus)
   }

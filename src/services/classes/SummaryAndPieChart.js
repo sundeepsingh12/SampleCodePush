@@ -82,7 +82,7 @@ class SummaryAndPieChart {
         let jobMasterQuery = jobMasterIdList.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ') // query for selected jobMaster
         statusQuery = statusQuery && statusQuery.trim() !== '' ? `deleteFlag != 1 AND (${statusQuery})` : 'deleteFlag != 1'
         statusQuery = runSheetIdListQuery && runSheetIdListQuery.trim() !== '' ? `(${statusQuery}) AND (${runSheetIdListQuery})` : statusQuery
-        statusQuery = jobMasterQuery && jobMasterQuery.trim() !== '' ? `(${statusQuery}) AND (${jobMasterQuery})` : statusQuery
+        statusQuery = jobMasterQuery  ? `(${statusQuery}) AND (${jobMasterQuery})` : statusQuery
         const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, statusQuery)
         return transactionList
     }

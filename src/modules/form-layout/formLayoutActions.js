@@ -19,7 +19,10 @@ import {
     SYNC_RUNNING_AND_TRANSACTION_SAVING,
     SET_LANDING_TAB,
     FormLayout,
-    CLEAR_FORM_LAYOUT_WITH_LOADER
+    CLEAR_FORM_LAYOUT_WITH_LOADER,
+    SET_UPDATE_DRAFT,
+    SET_UPDATED_TRANSACTION_LIST_IDS,
+    UPDATE_JOBMASTERID_JOBID_MAP
 } from '../../lib/constants'
 
 import {
@@ -41,7 +44,6 @@ import { dataStoreService } from '../../services/classes/DataStoreService'
 import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT,OK } from '../../lib/ContainerConstants'
 import moment from 'moment'
 import { Toast } from 'native-base'
-import { fetchJobs } from '../taskList/taskListActions';
 
 
 export function getSortedRootFieldAttributes(statusData, jobTransactionId, jobTransaction) {
@@ -189,12 +191,14 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         let landingTabId = JSON.parse(taskListScreenDetails.pageObjectAdditionalParams).landingTabAfterJobCompletion ? jobStatusService.getTabIdOnStatusId(statusList.value, cloneFormLayoutState.statusId) : null
                         dispatch(setState(SET_LANDING_TAB, { landingTabId }))
                         dispatch(pieChartCount())
+                        let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+                        if(updatedJobTransactionList && !_.isEmpty(updatedJobTransactionList.value)){
+                          dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS,updatedJobTransactionList.value))
+                        }
                         navDispatch(NavigationActions.navigate({ routeName: TabScreen }))
-                        dispatch(fetchJobs())
                     } else if (routeName == TabScreen) {
                         navDispatch(StackActions.popToTop());
                         dispatch(pieChartCount())
-                        dispatch(fetchJobs())
                     } else if (routeName == Transient) {
                         //When single status is present in transient case navigate to form layout directly
                         if (_.size(routeParam.currentStatus.nextStatusList) == 1) {
@@ -282,6 +286,22 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, jobT
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1011, error.message, 'danger', 1)
+        }
+    }
+}
+
+export function viewForUpdatedDataAndDeleteDraft(jobTransactionId) {
+    return async function (dispatch) {
+        try {
+
+            dispatch(setState(IS_LOADING, true))
+             if(jobTransactionId){
+            draftService.deleteDraftFromDb({id :jobTransactionId}, null)
+             }
+            dispatch(setState(SET_UPDATE_DRAFT, 'UPDATED_DATA'))
+            
+        } catch (error) {
+            showToastAndAddUserExceptionLog(1015, error.message, 'danger', 1)
         }
     }
 }

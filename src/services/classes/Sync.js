@@ -26,7 +26,8 @@ import {
   LAST_SYNC_WITH_SERVER,
   PAGES,
   TABLE_MESSAGE_INTERACTION,
-  USER_SUMMARY
+  USER_SUMMARY,
+  UPDATE_JOBMASTERID_JOBID_MAP
 } from '../../lib/constants'
 import { FAREYE_UPDATES, PAGE_OUTSCAN, PATH_TEMP } from '../../lib/AttributeConstants'
 import { pages } from './Pages'
@@ -138,7 +139,7 @@ class Sync {
    * 
    */
   async processTdcResponse(tdcContentArray, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
-    let tdcContentObject, jobMasterIds, messageIdDto = [], jobIdToLiveJobMap = {}
+    let tdcContentObject, jobMasterIds, messageIdDto = [], jobIdToLiveJobMap = {}, updatedJobTransactionList = {}
     if (isLiveJob && _.size(tdcContentArray) > 0) {
       jobIdToLiveJobMap = liveJobService.getAllLiveJobs()
     }
@@ -152,12 +153,14 @@ class Sync {
         contentQuery.jobTransactions = (contentQuery.jobTransactions) ? allJobsToTransaction.concat(contentQuery.jobTransactions) : allJobsToTransaction
       }
       const queryType = tdcContentObject.type
+      let updatedJobMasterIdsJobIdsMap = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+      updatedJobTransactionList = updatedJobMasterIdsJobIdsMap && !_.isEmpty(updatedJobMasterIdsJobIdsMap.value) ? updatedJobMasterIdsJobIdsMap.value : {}
       if (queryType == 'insert') {
         jobMasterIds = await this.saveDataFromServerInDB(contentQuery, isLiveJob, jobIdToLiveJobMap)
       } else if (queryType == 'update') {
-        jobMasterIds = await this.insertOrUpdateDataInDb(contentQuery)
+        jobMasterIds= await this.insertOrUpdateDataInDb(contentQuery, updatedJobTransactionList)
       } else if (queryType == 'updateStatus') {
-        jobMasterIds = await this.updateDataInDB(contentQuery)
+        jobMasterIds = await this.updateDataInDB(contentQuery, updatedJobTransactionList)
       } else if (queryType == 'delete') {
         jobMasterIds = `${JOBS_DELETED}`
         const jobIds = contentQuery.job.map(jobObject => jobObject.id)
@@ -184,6 +187,7 @@ class Sync {
         messageIdDto = messageIdDto.concat(this.saveMessagesInDb(tdcContentObject))
       }
     }
+    keyValueDBService.validateAndSaveData(UPDATE_JOBMASTERID_JOBID_MAP, updatedJobTransactionList)
     return { jobMasterIds, messageIdDto }
   }
 
@@ -327,13 +331,18 @@ class Sync {
    * 
    * @param {*} contentQuery 
    */
-  async updateDataInDB(contentQuery) {
+  async updateDataInDB(contentQuery, updatedJobTransactionList) {
     /*TODO Current logic of deleting field data and job data is wrong.
     It will be wrong if same contentArray has field data length of one job but not of another job then the field data of 
     both jobs would be deleted and insert but at insert field data of one job will be found resulting in deletion of
     field data of 2nd job.Same goes for job data
     */
-    const jobIds = contentQuery.job.map(jobObject => jobObject.id)
+   const jobIds = []
+   contentQuery.job.forEach(jobObject => {
+     updatedJobTransactionList[jobObject.jobMasterId] = _.isEmpty(updatedJobTransactionList[jobObject.jobMasterId]) ? {} : updatedJobTransactionList[jobObject.jobMasterId]
+     updatedJobTransactionList[jobObject.jobMasterId][jobObject.id] =  jobObject.id
+     jobIds.push(jobObject.id)
+   })
     let { jobTransactionsIds, newJobTransactionsIds } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions)
     let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
     const jobDatas = {
@@ -363,8 +372,13 @@ class Sync {
     return jobMasterIds
   }
 
-  async insertOrUpdateDataInDb(contentQuery) {
-    const jobIds = contentQuery.job.map(jobObject => jobObject.id)
+  async insertOrUpdateDataInDb(contentQuery, updatedJobTransactionList) {
+    const jobIds = []
+    contentQuery.job.forEach(jobObject => {
+      updatedJobTransactionList[jobObject.jobMasterId] = _.isEmpty(updatedJobTransactionList[jobObject.jobMasterId]) ? {} : updatedJobTransactionList[jobObject.jobMasterId]
+      updatedJobTransactionList[jobObject.jobMasterId][jobObject.id] =  jobObject.id
+      jobIds.push(jobObject.id)
+    })
     let { jobTransactionsIds, newJobTransactionsIds, negativeJobTransactions } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions)
     let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
     const jobDatas = {

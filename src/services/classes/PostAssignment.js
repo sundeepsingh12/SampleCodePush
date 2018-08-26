@@ -102,7 +102,7 @@ class PostAssignment {
             value: transactionList,
         }
         realm.performBatchSave(jobTransactionTableDTO, runSheet)
-        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionDTOMap)
+        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionDTOMap, jobMaster.id, true)
     }
 
     /**

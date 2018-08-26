@@ -16,7 +16,6 @@ import Loader from '../components/Loader'
 import { SET_POST_ASSIGNMENT_ERROR } from '../lib/constants'
 import { FORCE_ASSIGNED, POST_SEARCH_PLACEHOLDER, OK, DISMISS } from '../lib/ContainerConstants'
 import * as homeActions from '../modules/home/homeActions'
-import * as taskListActions from '../modules/taskList/taskListActions'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 function mapStateToProps(state) {
@@ -32,7 +31,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...postAssignmentActions, ...globalActions, ...homeActions, ...taskListActions }, dispatch)
+        actions: bindActionCreators({ ...postAssignmentActions, ...globalActions, ...homeActions }, dispatch)
     }
 }
 
@@ -167,7 +166,6 @@ class PostAssignmentScanner extends PureComponent {
 
     componentWillUnmount() {
         this.props.actions.pieChartCount()
-        this.props.actions.fetchJobs()
         this.keyboardDidHideListener.remove();
         this.keyboardDidShowListener.remove();
     }
