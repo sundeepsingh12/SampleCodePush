@@ -115,12 +115,13 @@ class Backup {
      * @param {*} dateTime 
      */
     async getJsonData(dateTime) {
-        let statusIdForDeliveredCode = await jobStatusService.getNonDeliveredStatusIds() // get all job status for code DELIVERED.
-        if (!statusIdForDeliveredCode) return
-        let transactionQuery = statusIdForDeliveredCode.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-        let transactionList = syncZipService.getDataFromRealmDB(transactionQuery, TABLE_JOB_TRANSACTION);
-        let json = await this._getSyncDataFromDb(transactionList, dateTime)
-        return json
+            let statusIdForDeliveredCode = await jobStatusService.getNonDeliveredStatusIds() // get all job status for code DELIVERED.
+            if (!statusIdForDeliveredCode) return
+            let transactionQuery = statusIdForDeliveredCode.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+            let transactionList = syncZipService.getDataFromRealmDB(transactionQuery, TABLE_JOB_TRANSACTION);
+            let json = await this._getSyncDataFromDb(transactionList, dateTime)
+            return json
+        
     }
     /** This will get sync data from DB.
      * 
@@ -128,40 +129,42 @@ class Backup {
      * @param {*} dateTime 
      */
     async  _getSyncDataFromDb(transactionList, dateTime) {
-        if (!transactionList) throw new Error(TRANSACTIONLIST_IS_MISSING)
-        const fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
-
-        var BACKUP_JSON = {};
-        let fieldDataList = [],
-            jobList = [],
-            serverSmsLogs = [],
-            transactionLogs = [],
-            trackLogs = []
-        let fieldDataQuery = transactionList.map(transaction => 'jobTransactionId = ' + transaction.id).join(' OR ')
-        fieldDataList = syncZipService.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA, dateTime);
-        let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table
-        jobList = syncZipService.getDataFromRealmDB(jobIdQuery, TABLE_JOB);
-        serverSmsLogs = syncZipService.getDataFromRealmDB(null, TABLE_SERVER_SMS_LOG);
-        let transactionLogsQuery = transactionList.map(jobTransaction => 'transactionId = ' + jobTransaction.id).join(' OR ')
-        transactionLogs = syncZipService.getDataFromRealmDB(transactionLogsQuery, TABLE_TRANSACTION_LOGS);
-        trackLogs = syncZipService.getDataFromRealmDB(null, TABLE_TRACK_LOGS);
-        await syncZipService.moveImageFilesToSync(fieldDataList, PATH_BACKUP_TEMP, fieldAttributesList.value)
-        BACKUP_JSON.fieldData = fieldDataList
-        BACKUP_JSON.job = jobList
-        BACKUP_JSON.jobTransaction = transactionList
-        const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
-        const jobSummaryListValue = alljobSummaryList ? alljobSummaryList.value : null
-        let jobSummary = jobSummaryService.getJobSummaryListForSync(jobSummaryListValue, dateTime)
-        BACKUP_JSON.jobSummary = jobSummary || {}
-        BACKUP_JSON.trackLog = trackLogs
-        BACKUP_JSON.userCommunicationLog = [];
-        BACKUP_JSON.userEventsLog = await userEventLogService.getUserEventLog(dateTime)
-        BACKUP_JSON.userExceptionLog = [];
-        BACKUP_JSON.transactionLog = transactionLogs;
-        let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
-        BACKUP_JSON.userSummary = (userSummary && userSummary.value) ? userSummary.value : {}
-        BACKUP_JSON.serverSmsLog = serverSmsLogs
-        return JSON.stringify(BACKUP_JSON)
+            if (!transactionList) throw new Error(TRANSACTIONLIST_IS_MISSING)
+            const fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
+    
+            var BACKUP_JSON = {};
+            let fieldDataList = [],
+                jobList = [],
+                serverSmsLogs = [],
+                transactionLogs = [],
+                trackLogs = []
+            let fieldDataQuery = transactionList.map(transaction => 'jobTransactionId = ' + transaction.id).join(' OR ')
+            fieldDataList = syncZipService.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA);
+            let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table
+            jobList = syncZipService.getDataFromRealmDB(jobIdQuery, TABLE_JOB);
+            serverSmsLogs = syncZipService.getDataFromRealmDB(null, TABLE_SERVER_SMS_LOG);
+            let transactionLogsQuery = transactionList.map(jobTransaction => 'transactionId = ' + jobTransaction.id).join(' OR ')
+            transactionLogs = syncZipService.getDataFromRealmDB(transactionLogsQuery, TABLE_TRANSACTION_LOGS);
+            trackLogs = syncZipService.getDataFromRealmDB(null, TABLE_TRACK_LOGS);
+            await syncZipService.moveImageFilesToSync(fieldDataList, PATH_BACKUP_TEMP, fieldAttributesList.value)
+            BACKUP_JSON.fieldData = fieldDataList
+            BACKUP_JSON.job = jobList
+            BACKUP_JSON.jobTransaction = transactionList
+            const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
+            const jobSummaryListValue = alljobSummaryList ? alljobSummaryList.value : null
+            let jobSummary = jobSummaryService.getJobSummaryListForSync(jobSummaryListValue, dateTime)
+            BACKUP_JSON.jobSummary = jobSummary || {}
+            BACKUP_JSON.trackLog = trackLogs
+            BACKUP_JSON.userCommunicationLog = [];
+            BACKUP_JSON.userEventsLog = await userEventLogService.getUserEventLog(dateTime)
+            BACKUP_JSON.userExceptionLog = [];
+            BACKUP_JSON.transactionLog = transactionLogs;
+            let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+            BACKUP_JSON.userSummary = (userSummary && userSummary.value) ? userSummary.value : {}
+            BACKUP_JSON.serverSmsLog = serverSmsLogs
+            return JSON.stringify(BACKUP_JSON)
+       
+       
     }
     /** This method fetches backup files list
      * 
