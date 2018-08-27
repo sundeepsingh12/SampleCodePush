@@ -17,7 +17,7 @@ FieldData.schema = {
     positionId: 'int',
     value: 'string?',
     attributeTypeId: 'int?',
-    dateTime: 'string?',
-    key: 'string?'
+    key: 'string?',
+    syncFlag: { type: 'int',default:0,optional:true}
   }
 }

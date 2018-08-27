@@ -49,8 +49,8 @@ class Sync {
     if (!token) {
       throw new Error('Token Missing')
     }
-    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful,allowedTransactionIds } = await syncZipService.createZip(syncStoreDTO)
-    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, syncStoreDTO, isEncryptionSuccessful,allowedTransactionIds)
+    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful,syncDataDTO } = await syncZipService.createZip(syncStoreDTO)
+    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, isEncryptionSuccessful,syncDataDTO)
     await communicationLogsService.updateLastCallSmsTimeAndNegativeCommunicationLogsDb(lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
     return responseBody
@@ -607,7 +607,7 @@ class Sync {
           if (!isLiveJob) {
             await this.deleteDataFromServer(successSyncIds, messageIdDTOs, jobMasterIdJobStatusIdTransactionIdDtoObject.transactionIdDtos, jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries)
             if (postOrderList) {
-              await this.deleteSpecificTransactionFromStoreList(postOrderList.value, POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS, moment().format('YYYY-MM-DD HH:mm:ss'))
+              await this.deleteSpecificTransactionFromStoreList(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS, moment().format('YYYY-MM-DD HH:mm:ss'),postOrderList.value)
             }
           }
           realm.saveList(TABLE_JOB_TRANSACTION, jobMasterIdJobStatusIdTransactionIdDtoObject.updatedTransactonsList)
@@ -753,19 +753,17 @@ class Sync {
   /**
    * This function deletes transaction list from schema that has been synced successfully with server.
    * This handles cases when api response comes late and other transactions are added in schema.
-   * @param {*} transactionIdsSynced
+   * @param {*} allowedTransactionIds
    * @param {*} schemaName
    * @param {*} date
    */
-  async deleteSpecificTransactionFromStoreList(transactionIdsSynced, schemaName, date,allowedTransactionIds) {
+  async deleteSpecificTransactionFromStoreList(schemaName, date,allowedTransactionIds = {}) {
     let transactionToBeSynced = await keyValueDBService.getValueFromStore(schemaName);
     let originalTransactionsToBeSynced = transactionToBeSynced ? transactionToBeSynced.value : {}
-    for (let index in transactionIdsSynced) {
+    for (let index in allowedTransactionIds) {
       if (moment(originalTransactionsToBeSynced[index].syncTime).isBefore(moment(date).format('YYYY-MM-DD HH:mm:ss')) || (moment(originalTransactionsToBeSynced[index].syncTime).isSame(moment(date).format('YYYY-MM-DD HH:mm:ss')))) {
-       if(_.isEmpty(allowedTransactionIds) || allowedTransactionIds[originalTransactionsToBeSynced[index].id]){
         delete originalTransactionsToBeSynced[index]
       }
-    }
     }
     if (originalTransactionsToBeSynced && _.size(originalTransactionsToBeSynced) > 0) {
       await keyValueDBService.validateAndSaveData(schemaName, originalTransactionsToBeSynced);

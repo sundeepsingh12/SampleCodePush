@@ -154,7 +154,7 @@ export default class FormLayoutEventImpl {
         let { callAndSmsLogs, jobDataList } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogsAndJobDataList(jobTransactionList, jobAndFieldAttributesList, jobMasterId) : { callAndSmsLogs: null, jobDataList: [] }
 
         if (jobTransactionList && jobTransactionList.length) { //Case of bulk
-            fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionList, currentTime)
+            fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionList)
             dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
             jobIdToJobTransactionMap = _.mapKeys(dbObjects.jobTransaction, 'jobId')
             let jobTransactionIdToCallCountMap = await communicationLogsService.getTrackCallCount(callAndSmsLogs, jobDataList, fieldData.value, jobIdToJobTransactionMap)
@@ -163,7 +163,7 @@ export default class FormLayoutEventImpl {
         }
         else {
             jobTransactionId = await this.changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList)//In case of new job change jobTransactionId
-            fieldData = this._saveFieldData(formLayoutObject, jobTransactionId, null, currentTime)
+            fieldData = this._saveFieldData(formLayoutObject, jobTransactionId, null)
             dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
             jobIdToJobTransactionMap[jobTransactionList.jobId] = jobTransactionList
             let jobTransactionIdToCallCountMap = await communicationLogsService.getTrackCallCount(callAndSmsLogs, jobDataList, fieldData.value, jobIdToJobTransactionMap)
@@ -384,7 +384,7 @@ export default class FormLayoutEventImpl {
      * and returns an object containing fieldDataArrayinue
      * 
      */
-    _saveFieldData(formLayoutObject, jobTransactionId, isBulk, currentTime) {
+    _saveFieldData(formLayoutObject, jobTransactionId, isBulk) {
         let currentFieldDataObject = {} // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
         currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA, null, true, 'id').length
         let fieldDataArray = []
@@ -425,10 +425,10 @@ export default class FormLayoutEventImpl {
                     value.childDataList = value.childDataList[jobTransactionId].childDataList
                 }
             }
-            let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId, currentTime)
+            let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId)
             fieldDataArray.push(fieldDataObject)
             if (value.childDataList && value.childDataList.length > 0) {
-                currentFieldDataObject.currentFieldDataId = this._recursivelyFindChildData(value.childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId, currentTime);
+                currentFieldDataObject.currentFieldDataId = this._recursivelyFindChildData(value.childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId);
             }
         }
         return {
@@ -441,22 +441,22 @@ export default class FormLayoutEventImpl {
             amountMap
         }
     }
-    _saveFieldDataForSkuArrayInBulk(fieldData, jobTransactionId, lastId, currentTime) {
+    _saveFieldDataForSkuArrayInBulk(fieldData, jobTransactionId, lastId) {
         let skuArrayFieldData = []
         let currentFieldDataObject = {}
         currentFieldDataObject.currentFieldDataId = lastId
-        skuArrayFieldData.push(this._convertFormLayoutToFieldData(fieldData, jobTransactionId, ++currentFieldDataObject.currentFieldDataId, currentTime))
+        skuArrayFieldData.push(this._convertFormLayoutToFieldData(fieldData, jobTransactionId, ++currentFieldDataObject.currentFieldDataId))
         if (fieldData.childDataList) {
-            currentFieldDataObject.currentFieldDataId = this._recursivelyFindChildData(fieldData.childDataList[jobTransactionId].childDataList, skuArrayFieldData, currentFieldDataObject, jobTransactionId, currentTime);
+            currentFieldDataObject.currentFieldDataId = this._recursivelyFindChildData(fieldData.childDataList[jobTransactionId].childDataList, skuArrayFieldData, currentFieldDataObject, jobTransactionId);
         }
         return {
             skuArrayFieldData, currentFieldDataObject
         }
     }
 
-    _saveFieldDataForBulk(formLayoutObject, jobTransactionList, currentTime) {
+    _saveFieldDataForBulk(formLayoutObject, jobTransactionList) {
         let fieldDataArray = []
-        const fieldData = this._saveFieldData(formLayoutObject, jobTransactionList[0].jobTransactionId, true, currentTime)//Get Field Data for first jobTransaction 
+        const fieldData = this._saveFieldData(formLayoutObject, jobTransactionList[0].jobTransactionId, true)//Get Field Data for first jobTransaction 
         let jobTransactionIdAmountMap = fieldData.moneyCollectObject ? fieldData.moneyCollectObject.jobTransactionIdAmountMap ? fieldData.moneyCollectObject.jobTransactionIdAmountMap : {} : {}
         fieldData.amountMap = fieldData.moneyCollectObject ? fieldData.moneyCollectObject.jobTransactionIdAmountMap ? fieldData.moneyCollectObject.jobTransactionIdAmountMap : fieldData.amountMap : fieldData.amountMap
         fieldDataArray.push(...fieldData.value)
@@ -464,13 +464,13 @@ export default class FormLayoutEventImpl {
         let moneyCollectFieldData = []
         let skuArrayFieldData = []
         if (fieldData.moneyCollectObject) {
-            moneyCollectFieldData.push(this._convertFormLayoutToFieldData(fieldData.moneyCollectObject, jobTransactionList[0].jobTransactionId, ++lastId, currentTime))
-            let moneyCollectFieldDataObject = this.setMoneyCollectFieldDataForBulk(fieldData.moneyCollectObject.childDataList, jobTransactionList[0], lastId, jobTransactionIdAmountMap, currentTime)
+            moneyCollectFieldData.push(this._convertFormLayoutToFieldData(fieldData.moneyCollectObject, jobTransactionList[0].jobTransactionId, ++lastId))
+            let moneyCollectFieldDataObject = this.setMoneyCollectFieldDataForBulk(fieldData.moneyCollectObject.childDataList, jobTransactionList[0], lastId, jobTransactionIdAmountMap)
             moneyCollectFieldData = moneyCollectFieldData.concat(moneyCollectFieldDataObject.fieldDataArray)
             lastId = moneyCollectFieldDataObject.lastId
         }
         if (fieldData.skuArrayObject) {
-            let { skuArrayFieldData, currentFieldDataObject } = this._saveFieldDataForSkuArrayInBulk(fieldData.skuArrayObject, jobTransactionList[0].jobTransactionId, ++lastId, currentTime)
+            let { skuArrayFieldData, currentFieldDataObject } = this._saveFieldDataForSkuArrayInBulk(fieldData.skuArrayObject, jobTransactionList[0].jobTransactionId, ++lastId)
             lastId = currentFieldDataObject.currentFieldDataId
             fieldDataArray = fieldDataArray.concat(skuArrayFieldData)
         }
@@ -480,17 +480,16 @@ export default class FormLayoutEventImpl {
         for (let i = 1; i < jobTransactionList.length; i++) {
             moneyCollectFieldData = skuArrayFieldData = []
             if (fieldData.moneyCollectObject) {
-                moneyCollectFieldData.push(this._convertFormLayoutToFieldData(fieldData.moneyCollectObject, jobTransactionList[i].jobTransactionId, ++lastId, currentTime))
-                let moneyCollectFieldDataObject = this.setMoneyCollectFieldDataForBulk(fieldData.moneyCollectObject.childDataList, jobTransactionList[i], lastId, jobTransactionIdAmountMap, currentTime)
+                moneyCollectFieldData.push(this._convertFormLayoutToFieldData(fieldData.moneyCollectObject, jobTransactionList[i].jobTransactionId, ++lastId))
+                let moneyCollectFieldDataObject = this.setMoneyCollectFieldDataForBulk(fieldData.moneyCollectObject.childDataList, jobTransactionList[i], lastId, jobTransactionIdAmountMap)
                 moneyCollectFieldData = moneyCollectFieldData.concat(moneyCollectFieldDataObject.fieldDataArray)
                 lastId = moneyCollectFieldDataObject.lastId
             }
             if (fieldData.skuArrayObject) {
-                let { skuArrayFieldData, currentFieldDataObject } = this._saveFieldDataForSkuArrayInBulk(fieldData.skuArrayObject, jobTransactionList[i].jobTransactionId, ++lastId, currentTime)
+                let { skuArrayFieldData, currentFieldDataObject } = this._saveFieldDataForSkuArrayInBulk(fieldData.skuArrayObject, jobTransactionList[i].jobTransactionId, ++lastId)
                 lastId = currentFieldDataObject.currentFieldDataId
                 fieldDataArray = fieldDataArray.concat(skuArrayFieldData)
             }
-            let fieldDataForJobTransaction = []
             fieldData.value.forEach(fieldDataObject => {
                 let newObject = { ...fieldDataObject }
                 newObject.jobTransactionId = jobTransactionList[i].jobTransactionId
@@ -508,25 +507,25 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    setMoneyCollectFieldDataForBulk(childDataList, jobTransaction, lastId, jobTransactionIdAmountMap, currentTime) {
+    setMoneyCollectFieldDataForBulk(childDataList, jobTransaction, lastId, jobTransactionIdAmountMap) {
         let fieldDataArray = []
         for (let index in childDataList) {
             if (childDataList[index].attributeTypeId == 25) {
                 childDataList[index].value = jobTransactionIdAmountMap[jobTransaction.jobTransactionId] ? jobTransactionIdAmountMap[jobTransaction.jobTransactionId].originalAmount ? jobTransactionIdAmountMap[jobTransaction.jobTransactionId].originalAmount : 0 : 0
-                fieldDataArray.push(this._convertFormLayoutToFieldData(childDataList[index], jobTransaction.jobTransactionId, ++lastId, currentTime))
+                fieldDataArray.push(this._convertFormLayoutToFieldData(childDataList[index], jobTransaction.jobTransactionId, ++lastId))
             } else if (childDataList[index].attributeTypeId == 26) {
                 childDataList[index].value = jobTransactionIdAmountMap[jobTransaction.jobTransactionId] ? jobTransactionIdAmountMap[jobTransaction.jobTransactionId].actualAmount ? jobTransactionIdAmountMap[jobTransaction.jobTransactionId].actualAmount : 0 : 0
-                fieldDataArray.push(this._convertFormLayoutToFieldData(childDataList[index], jobTransaction.jobTransactionId, ++lastId, currentTime))
+                fieldDataArray.push(this._convertFormLayoutToFieldData(childDataList[index], jobTransaction.jobTransactionId, ++lastId))
             } else if (childDataList[index].childDataList) {
-                fieldDataArray.push(this._convertFormLayoutToFieldData(childDataList[index], jobTransaction.jobTransactionId, ++lastId, currentTime))
-                let fieldDataObject = this.setMoneyCollectFieldDataForBulk(childDataList[index].childDataList, jobTransaction, lastId, jobTransactionIdAmountMap, currentTime)
+                fieldDataArray.push(this._convertFormLayoutToFieldData(childDataList[index], jobTransaction.jobTransactionId, ++lastId))
+                let fieldDataObject = this.setMoneyCollectFieldDataForBulk(childDataList[index].childDataList, jobTransaction, lastId, jobTransactionIdAmountMap)
                 fieldDataArray = fieldDataArray.concat(fieldDataObject.fieldDataArray)
                 lastId = fieldDataObject.lastId
             } else if (childDataList[index].key.toLocaleLowerCase() == AMOUNT) {
                 childDataList[index].value = jobTransactionIdAmountMap[jobTransaction.jobTransactionId] ? jobTransactionIdAmountMap[jobTransaction.jobTransactionId].actualAmount ? jobTransactionIdAmountMap[jobTransaction.jobTransactionId].actualAmount : 0 : 0
-                fieldDataArray.push(this._convertFormLayoutToFieldData(childDataList[index], jobTransaction.jobTransactionId, ++lastId, currentTime))
+                fieldDataArray.push(this._convertFormLayoutToFieldData(childDataList[index], jobTransaction.jobTransactionId, ++lastId))
             } else {
-                fieldDataArray.push(this._convertFormLayoutToFieldData(childDataList[index], jobTransaction.jobTransactionId, ++lastId, currentTime))
+                fieldDataArray.push(this._convertFormLayoutToFieldData(childDataList[index], jobTransaction.jobTransactionId, ++lastId))
             }
         }
         return {
@@ -544,23 +543,24 @@ export default class FormLayoutEventImpl {
      * @param {*currentFieldDataObject} currentFieldDataObject 
      * @param {*jobTransactionId} jobTransactionId 
      */
-    _recursivelyFindChildData(childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId, currentTime) {
+    
+     _recursivelyFindChildData(childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId) {
         for (let i = 0; i <= childDataList.length; i++) {
             let childObject = childDataList[i]
             if (!childObject) {
                 return currentFieldDataObject.currentFieldDataId
             }
-            let fieldDataObject = this._convertFormLayoutToFieldData(childObject, jobTransactionId, ++currentFieldDataObject.currentFieldDataId, currentTime);
+            let fieldDataObject = this._convertFormLayoutToFieldData(childObject, jobTransactionId, ++currentFieldDataObject.currentFieldDataId);
             fieldDataArray.push(fieldDataObject)
             if (!childObject.childDataList || childObject.childDataList.length == 0) {
                 continue
             } else {
-                this._recursivelyFindChildData(childObject.childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId, currentTime)
+                this._recursivelyFindChildData(childObject.childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId)
             }
         }
     }
 
-    _convertFormLayoutToFieldData(formLayoutObject, jobTransactionId, id, currentTime) {
+    _convertFormLayoutToFieldData(formLayoutObject, jobTransactionId, id) {
         return {
             id,
             value: formLayoutObject.value != undefined && formLayoutObject.value != null ? '' + formLayoutObject.value : null, // to make value as string
@@ -570,7 +570,7 @@ export default class FormLayoutEventImpl {
             fieldAttributeMasterId: formLayoutObject.fieldAttributeMasterId,
             attributeTypeId: formLayoutObject.attributeTypeId,
             key: formLayoutObject.key,
-            dateTime: currentTime + '',
+            syncFlag:1
         }
     }
 
