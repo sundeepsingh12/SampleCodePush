@@ -80,12 +80,16 @@ class FormLayout extends PureComponent {
       this.props.actions.setState(ERROR_MESSAGE, '')
     }null
     let transactionList = this.props.navigation.state.params.jobTransaction  && !isEmpty(this.props.updatedTransactionListIds) ? this.props.jobTransactionId ? [this.props.navigation.state.params.jobTransaction] : this.props.navigation.state.params.jobTransaction : null
-    if( transactionList && this.checkForUpdatedTransactionList(transactionList, this.props.updatedTransactionListIds)){
+    if( transactionList && this.checkForUpdatedTransactionList(transactionList, Object.values(this.props.updatedTransactionListIds))){
        this.props.actions.viewForUpdatedDataAndDeleteDraft(this.props.jobTransactionId)
   }
   }
 
-  checkForUpdatedTransactionList(transactionList, updatedTransactionListIds){
+  checkForUpdatedTransactionList(transactionList, updatedIdsMap){
+    let updatedTransactionListIds = {}
+    updatedIdsMap.forEach(element => {
+      updatedTransactionListIds = Object.assign(updatedTransactionListIds, element)
+    });
     for(let item in transactionList){
       if(updatedTransactionListIds[transactionList[item].jobId]){
         return true

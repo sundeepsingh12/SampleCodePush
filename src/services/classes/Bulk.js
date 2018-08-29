@@ -36,7 +36,7 @@ class Bulk {
         queryDTO.jobTransactionQuery = `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND jobStatusId = ${bulkParamas.pageObject.additionalParams.statusId} AND jobId > 0`;
         queryDTO.jobQuery = bulkParamas.pageObject.groupId ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = "${bulkParamas.pageObject.groupId}"` : jobMaster.enableMultipartAssignment ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = null` : `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]}`;
         let jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO)
-        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id');
+        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'jobId');
         return {idJobTransactionCustomizationListMap,statusList:jobTransactionCustomizationListParametersDTO.statusList};
     }
 
@@ -53,37 +53,43 @@ class Bulk {
      *      errorMessage : string
      * }
      */
-    performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, selectedItems, pageObject) {
+    performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, selectedTransactionLength, pageObject) {
         let searchText = _.toLower(searchValue)
-        let isSearchFound = false
+        let isSearchFound = false, bulkTransactionLength = 0
         let errorMessage = '', numberOfEnabledItems
         let clonePageObject = JSON.parse(JSON.stringify(pageObject))
         let bulkJobSimilarityConfig = this.getBulkJobSimilarityConfig(clonePageObject)
         let isTransactionSelected = false
         for (let key in bulkTransactions) {
-            if (_.isEqual(_.toLower(bulkTransactions[key].referenceNumber), searchText) || _.isEqual(_.toLower(bulkTransactions[key].runsheetNo), searchText)) { // If search text is equal to reference number or runsheet number.Search on reference or runsheet can toggle multiple transactions
+            if(bulkTransactions[key].statusId != clonePageObject.additionalParams.statusId){
+                continue
+            }
+            bulkTransactionLength++;
+            if  (_.isEqual(_.toLower(bulkTransactions[key].referenceNumber), searchText) || _.isEqual(_.toLower(bulkTransactions[key].runsheetNo), searchText)) { // If search text is equal to reference number or runsheet number.Search on reference or runsheet can toggle multiple transactions
                 if (bulkJobSimilarityConfig && isSearchFound) {
                     errorMessage = INVALID_SCAN
                     break
                 }
                 if (bulkJobSimilarityConfig) {
-                    numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedItems)
+                    numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedTransactionLength)
                 }
                 isTransactionSelected = (bulkTransactions[key].isChecked) ? bulkTransactions[key].referenceNumber : null
-                isSearchFound = this.toggleTransaction(bulkTransactions, key, isSearchFound, selectedItems)
-            } else if (searchSelectionOnLine1Line2 && this.checkForPresenceInDisplayText(searchText, bulkTransactions[key], idToSeparatorMap)) { // If search on line1 and line2 is allowed and search text is present in line1 or line2
-                if (isSearchFound) { // Search on lin1 or line2 cannot toggle multiple transactions
+                isSearchFound = this.toggleTransaction(bulkTransactions, key, isSearchFound)
+                selectedTransactionLength = (isSearchFound) ? selectedTransactionLength + 1 : selectedTransactionLength - 1
+            } else if(searchSelectionOnLine1Line2 && this.checkForPresenceInDisplayText(searchText, bulkTransactions[key], idToSeparatorMap)) { // If search on line1 and line2 is allowed and search text is present in line1 or line2
+                if(isSearchFound) { // Search on lin1 or line2 cannot toggle multiple transactions
                     errorMessage = INVALID_SCAN
                     break
                 }
                 if (bulkJobSimilarityConfig) {
-                    numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedItems)
+                    numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedTransactionLength)
                 }
                 isTransactionSelected = (bulkTransactions[key].isChecked) ? bulkTransactions[key].referenceNumber : null
-                isSearchFound = this.toggleTransaction(bulkTransactions, key, isSearchFound, selectedItems)
+                isSearchFound = this.toggleTransaction(bulkTransactions, key, isSearchFound)
+                selectedTransactionLength = (isSearchFound) ? selectedTransactionLength + 1 : selectedTransactionLength - 1
             }
         }
-        let { displayText, selectAll } = this.getDisplayTextAndSelectAll(bulkJobSimilarityConfig, selectedItems, numberOfEnabledItems, bulkTransactions, clonePageObject)
+        let { displayText, selectAll } = this.getDisplayTextAndSelectAll(bulkJobSimilarityConfig, selectedTransactionLength, numberOfEnabledItems, bulkTransactionLength, clonePageObject)
         if (!isSearchFound) { // If transaction not found
             return { errorMessage: INVALID_SCAN }
         } else {
@@ -91,10 +97,9 @@ class Bulk {
         }
     }
 
-    toggleTransaction(bulkTransactions, key, isSearchFound, selectedItems) {
-        if (!bulkTransactions[bulkTransactions[key].id].disabled) {
+    toggleTransaction(bulkTransactions, key, isSearchFound) {
+        if (!bulkTransactions[key].disabled) { 
             bulkTransactions[key].isChecked = !bulkTransactions[key].isChecked
-            bulkTransactions[key].isChecked ? selectedItems[key] = this.getSelectedTransactionObject(bulkTransactions[key]) : delete selectedItems[key]
             isSearchFound = true
         }
         return isSearchFound
@@ -193,13 +198,13 @@ class Bulk {
         return differentDataPresent
     }
 
-    setEnabledTransactions(bulkTransactions, currentTransaction, bulkJobSimilarityConfig, selectedItems) {
+    setEnabledTransactions(bulkTransactions, currentTransaction, bulkJobSimilarityConfig, selectedTransactionLength) {
         let numberOfEnabledItems = 0
         for (let index in bulkTransactions) {
-            if (_.size(selectedItems) == 0) {
+            if (selectedTransactionLength == 0) {
                 let differentDataPresent = this.checkForSimilarityBulk(bulkTransactions[index], currentTransaction, bulkJobSimilarityConfig)
                 bulkTransactions[index].disabled = differentDataPresent
-            } else if (selectedItems[currentTransaction.id] && _.size(selectedItems) == 1) {
+            } else if (bulkTransactions[currentTransaction.jobId].isChecked && !bulkTransactions[currentTransaction.jobId].disabled && selectedTransactionLength == 1) {
                 bulkTransactions[index].disabled = false
             }
             if (!bulkTransactions[index].disabled) {
@@ -208,6 +213,17 @@ class Bulk {
         }
         return numberOfEnabledItems
     }
+
+    checkForJobMasterIdsOfUpdatedJobs(updatedTransactionListIds, jobMasterId, statusId){
+        let updatedJobMasterStatusIdsList = updatedTransactionListIds[jobMasterId] ? Object.values(updatedTransactionListIds[jobMasterId]) : {}
+        for(let item in updatedJobMasterStatusIdsList){
+          if(updatedJobMasterStatusIdsList[item].jobStatusId == statusId){
+            return true
+          }
+        }
+        return false
+      }
+
 
     getBulkJobSimilarityConfig(clonePageObject) {
         clonePageObject.additionalParams = JSON.parse(clonePageObject.additionalParams)
@@ -219,17 +235,17 @@ class Bulk {
         }
     }
 
-    getDisplayTextAndSelectAll(bulkJobSimilarityConfig, cloneSelectedItems, numberOfEnabledItems, bulkTransactions, clonePageObject) {
+    getDisplayTextAndSelectAll(bulkJobSimilarityConfig, selectedTransactionLength, numberOfEnabledItems, bulkTransactionLength, clonePageObject) {
         let displayText, selectAll = clonePageObject.additionalParams.selectAll
         if (bulkJobSimilarityConfig) {
-            displayText = _.size(cloneSelectedItems) == numberOfEnabledItems ? SELECT_NONE : SELECT_ALL
+            displayText = selectedTransactionLength == numberOfEnabledItems ? SELECT_NONE : SELECT_ALL
         } else {
-            displayText = _.size(cloneSelectedItems) == _.size(bulkTransactions) ? SELECT_NONE : SELECT_ALL
+            displayText = selectedTransactionLength == bulkTransactionLength ? SELECT_NONE : SELECT_ALL
         }
         if (!clonePageObject.additionalParams.selectAll) {
             selectAll = false
         } else if (bulkJobSimilarityConfig) {
-            selectAll = (_.size(cloneSelectedItems) > 0) ? true : false
+            selectAll = (selectedTransactionLength > 0) ? true : false
         }
         return { displayText, selectAll }
     }

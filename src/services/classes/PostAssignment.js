@@ -79,6 +79,7 @@ class PostAssignment {
         let jobTransaction = { ...transaction }
         let transactionDTO = {
             id: jobTransaction.id,
+            jobStatusId: pendingStatus.id,
             referenceNumber: jobTransaction.referenceNumber,
             jobId: jobTransaction.jobId,
             syncTime: moment().format('YYYY-MM-DD HH:mm:ss')
@@ -102,7 +103,7 @@ class PostAssignment {
             value: transactionList,
         }
         realm.performBatchSave(jobTransactionTableDTO, runSheet)
-        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionDTOMap, jobMaster.id, true)
+        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionDTOMap, jobMaster.id)
     }
 
     /**

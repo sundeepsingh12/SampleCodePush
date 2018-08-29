@@ -35,13 +35,14 @@ function mapDispatchToProps(dispatch) {
 class TaskListScreen extends PureComponent {
 
   componentDidMount() {
-    if (_.isEmpty(this.props.jobTransactionCustomizationList)) {
-      this.props.actions.fetchJobs()
+    if (_.isEmpty(this.props.jobTransactionCustomizationList) || !_.isEmpty(this.props.updatedTransactionListIds) && this.checkForJobMasterIdsOfUpdatedJobs(this.props.updatedTransactionListIds)) {
+      let jobIdList = !_.isEmpty(this.props.jobTransactionCustomizationList) ? Object.values(this.props.updatedTransactionListIds) : null
+      this.props.actions.fetchJobs(jobIdList, this.props.jobTransactionCustomizationList)
     }
   }
   
   componentDidUpdate(){
-    if(this.props.isRefreshing != 'UPDATING_DATA' && !_.isEmpty(this.props.updatedTransactionListIds) && this.checkForJobMasterIdsOfUpdatedJobs(this.props.updatedTransactionListIds)){
+    if(!this.props.isRefreshing && !_.isEmpty(this.props.updatedTransactionListIds) && this.checkForJobMasterIdsOfUpdatedJobs(this.props.updatedTransactionListIds)){
       this.props.actions.fetchJobs(Object.values(this.props.updatedTransactionListIds), this.props.jobTransactionCustomizationList)
     }
   }
@@ -131,7 +132,7 @@ class TaskListScreen extends PureComponent {
   }
 
   getTransactionView(jobMasterMap) {
-    let tabJobTransactionList = {}, jobTransactionList = this.renderJobTransactionView(Object.values(this.props.jobTransactionCustomizationList)), searchEqualTransactionList = [];
+    let tabJobTransactionList = {}, jobTransactionList = this.renderJobTransactionView(this.props.jobTransactionCustomizationList, jobMasterMap), searchEqualTransactionList = [];
     for (let index in jobTransactionList) {
       if (!jobMasterMap[jobTransactionList[index].jobMasterId] || !this.checkTransactionForSearchText(jobTransactionList[index], searchEqualTransactionList) || !this.props.statusIdList.includes(jobTransactionList[index].statusId)) {
         continue;
@@ -230,7 +231,17 @@ class TaskListScreen extends PureComponent {
     )
   }
 
-  renderJobTransactionView(jobTransactionList) {
+  renderJobTransactionView(jobTransactionCustomizationList, jobMasterMap) {
+    let jobTransactionList = {}
+    if (!_.isEmpty(jobTransactionCustomizationList)) {
+      for(let transactionMap in jobTransactionCustomizationList){
+        if(jobMasterMap[transactionMap]){
+          jobTransactionList = Object.assign(jobTransactionList, jobTransactionCustomizationList[transactionMap])
+        }
+      }
+   }
+   
+   jobTransactionList = Object.values(jobTransactionList)
     return jobTransactionList.sort(function (transaction1, transaction2) {
       return transaction2.jobPriority - transaction1.jobPriority || transaction1.seqSelected - transaction2.seqSelected
     })

@@ -42,6 +42,7 @@ var InitialState = Record({
         dataStoreFilterReverseMap: {},
         fieldAttributeMasterParentIdMap: {},
         noFieldAttributeMappedWithStatus: false,
+        modalFieldAttributeMasterId: null,
         arrayReverseDataStoreFilterMap: {}, // used in array when it has DSF or DataStore as child attribute and they also have mapping with other DSF
         jobAndFieldAttributesList: {}
 })

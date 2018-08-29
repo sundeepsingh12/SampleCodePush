@@ -123,7 +123,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentDidUpdate() {
-    if (!this.props.jobDetailsLoading && this.props.jobTransaction && !_.isEmpty(this.props.updatedTransactionListIds) && this.props.updatedTransactionListIds[this.props.jobTransaction.jobId]) {
+    if (this.props.jobDetailsLoading != 'UPDATING_JOBDATA' && this.props.jobTransaction && !_.isEmpty(this.props.updatedTransactionListIds) && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId] && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId][this.props.jobTransaction.jobId]) {
       this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key, 'UPDATING_JOBDATA')
     }
   }

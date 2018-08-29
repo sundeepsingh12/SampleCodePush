@@ -10,7 +10,7 @@ import { messageService } from '../../services/classes/MessageService'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import CONFIG from '../../lib/config'
 import { fetchJobs } from '../taskList/taskListActions'
-export function getAllMessages() {
+export function getAllMessages(jobTransactionCustomizationList, ) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_MESSAGE_LOADER, true))

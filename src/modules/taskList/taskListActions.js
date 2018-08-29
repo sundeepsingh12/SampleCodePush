@@ -36,7 +36,7 @@ export function fetchTabs() {
 export function fetchJobs(jobIdMap, jobTransactionCustomizationList) {
   return async function (dispatch) {
     try {
-      dispatch(setState(JOB_LISTING_START, jobIdMap ? 'UPDATING_DATA' : true));
+      dispatch(setState(JOB_LISTING_START));
       jobTransactionCustomizationList = await transactionCustomizationService.fetchUpdatedTransactionList(jobIdMap, jobTransactionCustomizationList);
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }));
     } catch (error) {

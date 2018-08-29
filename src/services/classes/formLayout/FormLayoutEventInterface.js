@@ -25,8 +25,8 @@ class FormLayoutEventsInterface extends FormLayoutEventImpl {
         return this.saveData(formElement, jobTransactionId, statusId, jobMasterId, jobTransactionList, jobAndFieldAttributesList)
     }
 
-    addTransactionsToSyncList(jobTransactionList, jobMasterId, isPositiveTransactionId) {
-        return this.addToSyncList(jobTransactionList, jobMasterId, isPositiveTransactionId)
+    addTransactionsToSyncList(jobTransactionList, jobMasterId) {
+        return this.addToSyncList(jobTransactionList, jobMasterId)
     }
 
     getSequenceData(sequenceMasterId) {

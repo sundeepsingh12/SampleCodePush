@@ -138,8 +138,8 @@ class Sync {
    * 
    * 
    */
-  async processTdcResponse(tdcContentArray, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
-    let tdcContentObject, jobMasterIds, messageIdDto = [], jobIdToLiveJobMap = {}, updatedJobTransactionList = {}
+  async processTdcResponse(tdcContentArray, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap, updatedJobTransactionList) {
+    let tdcContentObject, jobMasterIds, messageIdDto = [], jobIdToLiveJobMap = {}
     if (isLiveJob && _.size(tdcContentArray) > 0) {
       jobIdToLiveJobMap = liveJobService.getAllLiveJobs()
     }
@@ -153,15 +153,14 @@ class Sync {
         contentQuery.jobTransactions = (contentQuery.jobTransactions) ? allJobsToTransaction.concat(contentQuery.jobTransactions) : allJobsToTransaction
       }
       const queryType = tdcContentObject.type
-      let updatedJobMasterIdsJobIdsMap = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
-      updatedJobTransactionList = updatedJobMasterIdsJobIdsMap && !_.isEmpty(updatedJobMasterIdsJobIdsMap.value) ? updatedJobMasterIdsJobIdsMap.value : {}
       if (queryType == 'insert') {
-        jobMasterIds = await this.saveDataFromServerInDB(contentQuery, isLiveJob, jobIdToLiveJobMap)
+        jobMasterIds = await this.saveDataFromServerInDB(contentQuery, updatedJobTransactionList, isLiveJob, jobIdToLiveJobMap)
       } else if (queryType == 'update') {
         jobMasterIds= await this.insertOrUpdateDataInDb(contentQuery, updatedJobTransactionList)
       } else if (queryType == 'updateStatus') {
         jobMasterIds = await this.updateDataInDB(contentQuery, updatedJobTransactionList)
-      } else if (queryType == 'delete') {
+      } 
+      else if (queryType == 'delete') {
         jobMasterIds = `${JOBS_DELETED}`
         const jobIds = contentQuery.job.map(jobObject => jobObject.id)
         const deleteJobTransactions = {
@@ -187,7 +186,6 @@ class Sync {
         messageIdDto = messageIdDto.concat(this.saveMessagesInDb(tdcContentObject))
       }
     }
-    keyValueDBService.validateAndSaveData(UPDATE_JOBMASTERID_JOBID_MAP, updatedJobTransactionList)
     return { jobMasterIds, messageIdDto }
   }
 
@@ -265,8 +263,14 @@ class Sync {
   }
 
 
-  async saveDataFromServerInDB(contentQuery, isLiveJob, jobIdToLiveJobMap) {
-    const jobIds = contentQuery.job.map(jobObject => jobObject.id)
+  async saveDataFromServerInDB(contentQuery, updatedJobTransactionList, isLiveJob, jobIdToLiveJobMap) {
+    const jobIds = []
+    console.logs("contentQuery",contentQuery)
+    contentQuery.job.forEach(jobObject => {
+      updatedJobTransactionList[jobObject.jobMasterId] = _.isEmpty(updatedJobTransactionList[jobObject.jobMasterId]) ? {} : updatedJobTransactionList[jobObject.jobMasterId]
+      updatedJobTransactionList[jobObject.jobMasterId][jobObject.id] =  {jobMasterId: jobObject.jobMasterId, jobStatusId : jobObject.lastTransactionStatusId}
+      jobIds.push(jobObject.id)
+    })    
     const existingJobDatas = {
       tableName: TABLE_JOB_DATA,
       valueList: jobIds,
@@ -337,13 +341,8 @@ class Sync {
     both jobs would be deleted and insert but at insert field data of one job will be found resulting in deletion of
     field data of 2nd job.Same goes for job data
     */
-   const jobIds = []
-   contentQuery.job.forEach(jobObject => {
-     updatedJobTransactionList[jobObject.jobMasterId] = _.isEmpty(updatedJobTransactionList[jobObject.jobMasterId]) ? {} : updatedJobTransactionList[jobObject.jobMasterId]
-     updatedJobTransactionList[jobObject.jobMasterId][jobObject.id] =  jobObject.id
-     jobIds.push(jobObject.id)
-   })
-    let { jobTransactionsIds, newJobTransactionsIds } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions)
+   const jobIds = contentQuery.job.map(jobObject => jobObject.id)
+    let { jobTransactionsIds, newJobTransactionsIds } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions, updatedJobTransactionList)
     let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
     const jobDatas = {
       tableName: TABLE_JOB_DATA,
@@ -368,18 +367,13 @@ class Sync {
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
     realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, jobFieldData)
-    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
+    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery, updatedJobTransactionList)
     return jobMasterIds
   }
 
   async insertOrUpdateDataInDb(contentQuery, updatedJobTransactionList) {
-    const jobIds = []
-    contentQuery.job.forEach(jobObject => {
-      updatedJobTransactionList[jobObject.jobMasterId] = _.isEmpty(updatedJobTransactionList[jobObject.jobMasterId]) ? {} : updatedJobTransactionList[jobObject.jobMasterId]
-      updatedJobTransactionList[jobObject.jobMasterId][jobObject.id] =  jobObject.id
-      jobIds.push(jobObject.id)
-    })
-    let { jobTransactionsIds, newJobTransactionsIds, negativeJobTransactions } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions)
+    const jobIds = contentQuery.job.map(jobObject => jobObject.id)
+    let { jobTransactionsIds, newJobTransactionsIds, negativeJobTransactions } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions, updatedJobTransactionList)
     let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
     const jobDatas = {
       tableName: TABLE_JOB_DATA,
@@ -413,7 +407,7 @@ class Sync {
     //check update to _.empty
     contentQuery.jobTransactions = (jobTransactionsIds.length > 0) ? this.getTransactionForUpdateQuery(contentQuery.jobTransactions, jobTransactionsIds) : []
     contentQuery.job = (jobIds.length > 0) ? this.getJobForUpdateQuery(contentQuery.job, jobIds) : []
-    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
+    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery, updatedJobTransactionList)
     return jobMasterIds
   }
 
@@ -591,7 +585,9 @@ class Sync {
     const pagesList = await keyValueDBService.getValueFromStore(PAGES)
     let outScanModuleJobMasterIds = pages.getJobMasterIdListForScreenTypeId(pagesList.value, PAGE_OUTSCAN)
     const unseenStatusIds = !_.isEmpty(outScanModuleJobMasterIds) ? jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(syncStoreDTO.statusList, outScanModuleJobMasterIds, UNSEEN) : jobStatusService.getAllIdsForCode(syncStoreDTO.statusList, UNSEEN)
-    let jobMasterTitleList = []
+    let jobMasterTitleList = [], updatedJobTransactionList = {}
+    let updatedJobMasterIdsJobIdsMap = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+    updatedJobTransactionList = updatedJobMasterIdsJobIdsMap && !_.isEmpty(updatedJobMasterIdsJobIdsMap.value) ? updatedJobMasterIdsJobIdsMap.value : {}
     let { user } = syncStoreDTO
     while (!isLastPageReached) {
       const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob, erpPull)
@@ -603,7 +599,7 @@ class Sync {
           jobMasterMapWithAssignOrderToHubEnabled = jobMasterService.getJobMasterMapWithAssignOrderToHub(syncStoreDTO.jobMasterList)
           jobMasterIdJobStatusIdOfPendingCodeMap = jobStatusService.getStatusIdForJobMasterIdFilteredOnCodeMap(syncStoreDTO.statusList, PENDING)
           jobStatusIdJobSummaryMap = jobSummaryService.getJobStatusIdJobSummaryMap(syncStoreDTO.jobSummaryList)
-          jobMasterIdsAndNumberOfMessages = await this.processTdcResponse(json.content, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap)
+          jobMasterIdsAndNumberOfMessages = await this.processTdcResponse(json.content, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap, updatedJobTransactionList)
         } else {
           isLastPageReached = true
         }
@@ -616,7 +612,7 @@ class Sync {
           const postOrderList = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
 
           const unseenTransactions = postOrderList && _.size(postOrderList.value) > 0 ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
-          const jobMasterIdJobStatusIdTransactionIdDtoObject = jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap)
+          const jobMasterIdJobStatusIdTransactionIdDtoObject = jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap, updatedJobTransactionList)
           const messageIdDTOs = jobMasterIdsAndNumberOfMessages && jobMasterIdsAndNumberOfMessages.messageIdDto ? jobMasterIdsAndNumberOfMessages.messageIdDto : []
           if (!isLiveJob) {
             await this.deleteDataFromServer(successSyncIds, messageIdDTOs, jobMasterIdJobStatusIdTransactionIdDtoObject.transactionIdDtos, jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries)
@@ -654,6 +650,7 @@ class Sync {
       this.showMessageNotification(jobMasterIdsAndNumberOfMessages.messageIdDto.length)
     }
     if (isJobsPresent) {
+      keyValueDBService.validateAndSaveData(UPDATE_JOBMASTERID_JOBID_MAP, updatedJobTransactionList)
       await runSheetService.updateRunSheetUserAndJobSummary()
     }
     return isJobsPresent
@@ -700,13 +697,15 @@ class Sync {
     return timeDifference
   }
 
-  getJobTransactionAndNewJobTransactionIds(jobTransactionList) {
+  getJobTransactionAndNewJobTransactionIds(jobTransactionList, updatedJobTransactionList) {
     let jobTransactionsIds = [], newJobTransactionsIds = [], negativeJobTransactions = []
     for (let jobTransaction in jobTransactionList) {
       jobTransactionsIds.push(jobTransactionList[jobTransaction].id)
       if (jobTransactionList[jobTransaction].negativeJobTransactionId < 0) {
         newJobTransactionsIds.push(jobTransactionList[jobTransaction].negativeJobTransactionId)
         negativeJobTransactions.push(jobTransactionList[jobTransaction])
+        updatedJobTransactionList[jobTransactionList[jobTransaction].jobMasterId] = _.isEmpty(updatedJobTransactionList[jobTransactionList[jobTransaction].jobMasterId]) ? {} : updatedJobTransactionList[jobTransactionList[jobTransaction].jobMasterId]
+        updatedJobTransactionList[jobTransactionList[jobTransaction].jobMasterId][jobTransactionList[jobTransaction].negativeJobTransactionId] =  {jobMasterId: jobTransactionList[jobTransaction].jobMasterId, jobStatusId : jobTransactionList[jobTransaction].jobStatusId} 
       }
     }
     return {

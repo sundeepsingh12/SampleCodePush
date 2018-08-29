@@ -261,7 +261,7 @@ class JobDetails {
         let transactionLog = await formLayoutEventsInterface._updateTransactionLogs([jobTransaction], previousStatus[0], jobTransaction.jobStatusId, jobTransaction.jobMasterId, user, lastTrackLog) // update transaction log on revert
         let runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction.jobStatusId, previousStatus[3], [jobTransaction]) // update runSheet Summary on revert
         let updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction, previousStatus) // update jobTransaction on revert
-        await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.jobTransactionDTO, jobTransaction.jobMasterId, true) // add jobTransaction to sync list
+        await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.jobTransactionDTO, jobTransaction.jobMasterId) // add jobTransaction to sync list
         realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog) // update jobTransaction, job, runSheet, transactionLog Db in batch
         await draftService.deleteDraftFromDb(jobTransaction)
     }

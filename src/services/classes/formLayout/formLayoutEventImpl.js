@@ -649,6 +649,7 @@ export default class FormLayoutEventImpl {
             id: jobTransaction.id,
             referenceNumber: jobTransaction.referenceNumber,
             jobId: jobTransaction.jobId,
+            jobStatusId: jobTransaction.jobStatusId,
             syncTime
         }
         return {
@@ -685,6 +686,7 @@ export default class FormLayoutEventImpl {
                 id: jobTransaction.id,
                 referenceNumber: jobTransaction.referenceNumber,
                 jobId: jobTransaction.jobId,
+                jobStatusId: jobTransaction.jobStatusId,
                 syncTime
             }
         }
@@ -837,13 +839,11 @@ export default class FormLayoutEventImpl {
      * syncList is a list which is to be synced with the server
      * @param {*} jobTransactionMap 
      */
-    async addToSyncList(jobTransactionMap, jobMasterId, isPositiveTransactionId) {
+    async addToSyncList(jobTransactionMap, jobMasterId) {
         if (!jobTransactionMap || _.size(jobTransactionMap) == 0) {
             return
         }
-        if(isPositiveTransactionId){
-            await jobTransactionService.updatedTransactionListIds(jobTransactionMap, jobMasterId)
-        }
+        await jobTransactionService.updatedTransactionListIds(jobTransactionMap, jobMasterId)
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
         let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? {} : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
         let totalTransactionsToSync = { ...transactionsToSync, ...jobTransactionMap }
