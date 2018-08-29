@@ -290,21 +290,27 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, jobT
     }
 }
 
-export function viewForUpdatedDataAndDeleteDraft(jobTransactionId) {
+export function deleteDraftForTransactions(jobTransaction, updatedTransactionListIds) {
     return async function (dispatch) {
         try {
-
-            dispatch(setState(IS_LOADING, true))
-             if(jobTransactionId){
-            draftService.deleteDraftFromDb({id :jobTransactionId}, null)
-             }
-            dispatch(setState(SET_UPDATE_DRAFT, 'UPDATED_DATA'))
-            
+            dispatch(setState(IS_LOADING,true))
+            let transactionForDeletingDraft = []
+            for(let item in jobTransaction){
+               if(updatedTransactionListIds[jobTransaction[item].jobId]){
+                transactionForDeletingDraft.push({jobTransactionId : jobTransaction[item].id})
+               }
+            }
+            if(transactionForDeletingDraft.length){
+                draftService.deleteDraftFromDb(transactionForDeletingDraft) 
+            }
+            dispatch(setState(IS_LOADING,false))    
         } catch (error) {
             showToastAndAddUserExceptionLog(1015, error.message, 'danger', 1)
         }
     }
 }
+
+
 
 export function checkUniqueValidationThenSave(fieldAtrribute, formLayoutState, value, jobTransaction) {
     return async function (dispatch) {

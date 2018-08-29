@@ -231,7 +231,8 @@ class TaskListScreen extends PureComponent {
     )
   }
 
-  renderJobTransactionView(jobTransactionCustomizationList, jobMasterMap) {
+  renderJobTransactionView(jobTransactionArray, jobMasterMap) {
+    let jobTransactionCustomizationList = JSON.parse(JSON.stringify(jobTransactionArray))
     let jobTransactionList = {}
     if (!_.isEmpty(jobTransactionCustomizationList)) {
       for(let transactionMap in jobTransactionCustomizationList){

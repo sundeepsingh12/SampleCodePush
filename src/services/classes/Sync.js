@@ -265,7 +265,6 @@ class Sync {
 
   async saveDataFromServerInDB(contentQuery, updatedJobTransactionList, isLiveJob, jobIdToLiveJobMap) {
     const jobIds = []
-    console.logs("contentQuery",contentQuery)
     contentQuery.job.forEach(jobObject => {
       updatedJobTransactionList[jobObject.jobMasterId] = _.isEmpty(updatedJobTransactionList[jobObject.jobMasterId]) ? {} : updatedJobTransactionList[jobObject.jobMasterId]
       updatedJobTransactionList[jobObject.jobMasterId][jobObject.id] =  {jobMasterId: jobObject.jobMasterId, jobStatusId : jobObject.lastTransactionStatusId}

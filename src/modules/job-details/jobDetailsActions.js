@@ -170,12 +170,12 @@ export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditiona
             dispatch(setState(SET_LANDING_TAB, { landingTabId }))
             dispatch(performSyncService())
             dispatch(pieChartCount())
-            let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
-                        if(updatedJobTransactionList && !_.isEmpty(updatedJobTransactionList.value)){
-                          dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS,updatedJobTransactionList.value))
-            }
             navDispatch(StackActions.pop())
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
+            let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+            if(updatedJobTransactionList && !_.isEmpty(updatedJobTransactionList.value)){
+                dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS,updatedJobTransactionList.value))
+            }
         } catch (error) {
             showToastAndAddUserExceptionLog(1103, error.message, 'danger', 0)
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))

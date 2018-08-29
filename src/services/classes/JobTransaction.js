@@ -661,7 +661,7 @@ class JobTransaction {
         if (checkForSeenStatus) {
             jobStatusId = checkForSeenStatus
             lastUpdatedAtServer = moment().format('YYYY-MM-DD HH:mm:ss')
-            let jobTransactionList = await formLayoutEventsInterface.saveData([], jobTransactionId, checkForSeenStatus, jobMasterId, { jobId })
+            let jobTransactionList = await formLayoutEventsInterface.saveData([], jobTransactionId, checkForSeenStatus, jobMasterId, { jobId }, {jobAttributes : jobAttributeMasterList, fieldAttributes : fieldAttributeMasterList})
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList, jobMasterId)
         }
         // if (callingActivity == 'LiveJob') {

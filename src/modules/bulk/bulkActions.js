@@ -39,7 +39,7 @@ export function getBulkJobTransactions(bulkParams, jobTransactionList, updatedTr
             let jobTransactionCustomizationList = JSON.parse(JSON.stringify(jobTransactionList))
             cloneBulkParams.pageObject.additionalParams = JSON.parse(cloneBulkParams.pageObject.additionalParams)
             cloneBulkParams.pageObject.jobMasterIds = JSON.parse(cloneBulkParams.pageObject.jobMasterIds)
-            if (_.isEmpty(jobTransactionCustomizationList) || !_.isEmpty(updatedTransactionListIds) && bulkService.checkForJobMasterIdsOfUpdatedJobs(updatedTransactionListIds, cloneBulkParams.pageObject.jobMasterIds[0], cloneBulkParams.pageObject.additionalParams.statusId)) {
+            if (_.isEmpty(jobTransactionCustomizationList) || !_.isEmpty(updatedTransactionListIds) && !_.isEmpty(updatedTransactionListIds[cloneBulkParams.pageObject.jobMasterIds[0]]) && bulkService.checkForJobMasterIdsOfUpdatedJobs(updatedTransactionListIds[cloneBulkParams.pageObject.jobMasterIds[0]], cloneBulkParams.pageObject.additionalParams.statusId, jobTransactionCustomizationList[cloneBulkParams.pageObject.jobMasterIds[0]])) {
                 let jobIdList = !_.isEmpty(jobTransactionCustomizationList) ? Object.values(updatedTransactionListIds) : null
                 jobTransactionCustomizationList = await transactionCustomizationService.fetchUpdatedTransactionList(jobIdList, jobTransactionCustomizationList);
                 dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }));
@@ -48,7 +48,7 @@ export function getBulkJobTransactions(bulkParams, jobTransactionList, updatedTr
             const jobMaster = jobMasterList ? jobMasterList.value.filter(jobmaster => jobmaster.id == cloneBulkParams.pageObject.jobMasterIds[0])[0] : null
             const groupId = jobMaster.enableMultipartAssignment && cloneBulkParams.pageObject.groupId ? cloneBulkParams.pageObject.groupId : null
             const bulkTransactionMap =  _.pickBy(jobTransactionCustomizationList[cloneBulkParams.pageObject.jobMasterIds[0]], function(value, key) {
-                return value.statusId == cloneBulkParams.pageObject.additionalParams.statusId && value.jobId > 0 && value.groupId == groupId 
+                return (value.statusId == cloneBulkParams.pageObject.additionalParams.statusId && value.groupId == groupId && value.jobId > 0)
             })
             const statusListArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
             const currentStatus = jobStatusService.getJobStatusForJobStatusId(statusListArray && statusListArray.value ? statusListArray.value : null, cloneBulkParams.pageObject.additionalParams.statusId)
@@ -90,7 +90,7 @@ export function getBulkUpdatedJobTransactions(updatedTransactionListIds, jobTran
             jobTransactionCustomizationList = await transactionCustomizationService.fetchUpdatedTransactionList(Object.values(updatedTransactionListIds), jobTransactionCustomizationList);
             dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }));
             const bulkTransactionMap =  _.pickBy(jobTransactionCustomizationList[pageObject.jobMasterIds[0]], function(value, key) {
-                return value.statusId == pageObject.additionalParams.statusId && value.jobId > 0 && value.groupId == groupId
+                return value.statusId == pageObject.additionalParams.statusId && value.groupId == groupId && value.jobId > 0 
             })
             dispatch(setState(TOGGLE_JOB_TRANSACTION_LIST_ITEM, bulkTransactionMap))
         } catch (error) {

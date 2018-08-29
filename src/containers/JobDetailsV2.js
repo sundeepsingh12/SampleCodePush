@@ -15,11 +15,7 @@ import {
   UPDATE_GROUP,
   JOB_EXPIRED,
   DETAILS,
-  SELECT_NUMBER_FOR_CALL,
-  CONFIRMATION,
-  CALL_CONFIRM,
   YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE,
-  SELECT_ADDRESS_NAVIGATION,
   REVERT_STATUS,
   MORE,
   PAYMENT_SUCCESSFUL,
@@ -28,8 +24,7 @@ import {
 
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert, Image } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Right, Icon, StyleProvider, ListItem, Footer, FooterTab, ActionSheet, Toast } from 'native-base'
+import { Container, Content, Header, Button, Text, Right, Icon, StyleProvider, ListItem, Footer, FooterTab, ActionSheet, Toast, Spinner } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import Loader from '../components/Loader'
@@ -46,10 +41,7 @@ import {
   JOB_DETAILS_FETCHING_START,
   RESET_CHECK_TRANSACTION_AND_DRAFT,
 } from '../lib/constants'
-import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
-import Communications from 'react-native-communications'
-import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
@@ -58,11 +50,9 @@ import { startSyncAndNavigateToContainer } from '../modules/home/homeActions'
 import DraftModal from '../components/DraftModal'
 import Line1Line2View from '../components/Line1Line2View'
 import SyncLoader from '../components/SyncLoader'
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { navigate } from '../modules/navigators/NavigationService';
 import MessagingCallingSmsButtonView from '../components/MessagingCallingSmsButtonView'
-import UpdatingDataModal from '../components/UpdatingDataModal'
 
 function mapStateToProps(state) {
   return {
@@ -559,17 +549,29 @@ class JobDetailsV2 extends PureComponent {
     this.props.actions.setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false)
   }
 
+  updatingLoaderView(){
+    return(
+      <StyleProvider style={getTheme(platform)}>
+        <Container style={[styles.bgLightGray, styles.alignCenter, styles.justifyCenter]}>
+          <Spinner color={styles.bgPrimaryColor} size={'small'} />
+          <Text style={[{color : '#000'}]}>Updating Data...</Text>
+      </Container>
+      </StyleProvider>
+    )
+  }
+
   detailsContainerView() {
-    const updatedViewAlert = (this.props.jobDetailsLoading == 'UPDATING_JOBDATA') ? <Loader/> : null//<UpdatingDataModal reference = {this.refs} data={this.props.jobDetailsLoading} /> : null
     const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
     const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
+    if((this.props.jobDetailsLoading == 'UPDATING_JOBDATA')){
+      return this.updatingLoaderView()
+    }
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgLightGray]}>
           {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal={this.onCancelPress} /> : null}
           {draftAlert}
           {mismatchAlert}
-          {updatedViewAlert}
           {this.showHeaderView()}
           {this.showContentView()}
           {this.showFooterView()}

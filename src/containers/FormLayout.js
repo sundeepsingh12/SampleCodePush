@@ -19,8 +19,6 @@ import { ALERT, INVALID_FORM_ALERT, OK } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
 import { navigate, navDispatch } from '../modules/navigators/NavigationService'
 import isEmpty from 'lodash/isEmpty'
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { NavigationActions, StackActions } from 'react-navigation'
 
 
 function mapStateToProps(state) {
@@ -63,6 +61,9 @@ class FormLayout extends PureComponent {
 
   constructor(props) {
     super(props);
+    this.state = {
+      updatingData : false
+    }
     this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
       BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
     );
@@ -78,18 +79,14 @@ class FormLayout extends PureComponent {
         duration: 10000
       })
       this.props.actions.setState(ERROR_MESSAGE, '')
-    }null
+    }
     let transactionList = this.props.navigation.state.params.jobTransaction  && !isEmpty(this.props.updatedTransactionListIds) ? this.props.jobTransactionId ? [this.props.navigation.state.params.jobTransaction] : this.props.navigation.state.params.jobTransaction : null
-    if( transactionList && this.checkForUpdatedTransactionList(transactionList, Object.values(this.props.updatedTransactionListIds))){
-       this.props.actions.viewForUpdatedDataAndDeleteDraft(this.props.jobTransactionId)
-  }
+    if( transactionList && this.checkForUpdatedTransactionList(transactionList, this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId])){
+      this.setState({updatingData : true})
+    }
   }
 
-  checkForUpdatedTransactionList(transactionList, updatedIdsMap){
-    let updatedTransactionListIds = {}
-    updatedIdsMap.forEach(element => {
-      updatedTransactionListIds = Object.assign(updatedTransactionListIds, element)
-    });
+  checkForUpdatedTransactionList(transactionList, updatedTransactionListIds){
     for(let item in transactionList){
       if(updatedTransactionListIds[transactionList[item].jobId]){
         return true
@@ -99,7 +96,7 @@ class FormLayout extends PureComponent {
   }
 
   headerView(){
-    if(this.props.updateDraft != 'UPDATED_DATA'){
+    if(!this.state.updatingData){
       return <TitleHeader pageName={this.props.navigation.state.params.statusName} goBack={this.props.navigation.state.params.backForTransient} />
     }
   }
@@ -124,6 +121,8 @@ class FormLayout extends PureComponent {
   }
 
   resetBackToUpdatedView() {
+    this.props.actions.deleteDraftForTransactions(this.props.jobTransaction, this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId])
+    this.setState({updatingData : false})
     this.props.navigation.pop(1)
   }
 
@@ -335,7 +334,7 @@ class FormLayout extends PureComponent {
     const footerView = this.getFooterView(transient,saveActivated)
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
-    if(this.props.updateDraft == 'UPDATED_DATA') return this.deletedTransactionView()
+    if(this.state.updatingData){ return this.deletedTransactionView() }
     if (this.props.formElement && this.props.formElement.length == 0) {
       <SafeAreaView style={[styles.bgWhite]}>   
             {this.headerView()}
