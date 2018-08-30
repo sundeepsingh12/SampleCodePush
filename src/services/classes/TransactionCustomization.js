@@ -90,7 +90,6 @@ class TransactionCustomization {
                 transactionForDeletingDraft.push({jobTransactionId : jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId].id})
             }
         }
-        // console.logs("transactionForDeletingDraft",transactionForDeletingDraft)
         if(transactionForDeletingDraft && transactionForDeletingDraft.length){
             draftService.deleteDraftFromDb(transactionForDeletingDraft)
         }

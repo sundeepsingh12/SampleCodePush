@@ -42,6 +42,7 @@ function mapStateToProps(state) {
     currentSequenceListItemSeleceted: state.sequence.currentSequenceListItemSeleceted,
     jobMasterSeperatorMap: state.sequence.jobMasterSeperatorMap,
     backEnabledFromAppNavigator: state.sequence.backEnabledFromAppNavigator,
+    jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
   }
 }
 
@@ -77,7 +78,7 @@ class Sequence extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.actions.prepareListForSequenceModule(this.props.navigation.state.params.runsheetNumber, this.props.navigation.state.params.jobMasterIds)
+    this.props.actions.prepareListForSequenceModule(this.props.navigation.state.params.runsheetNumber, this.props.navigation.state.params.jobMasterIds,  this.props.jobTransactionCustomizationList)
     this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
       BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
     );
@@ -224,7 +225,7 @@ class Sequence extends PureComponent {
     !_.isEmpty(this.props.transactionsWithChangedSeqeunceMap) ? this.showWarningForBack() : this.clearStateAndGoBack()
   }
 
-  /**
+  /**j
    * Set modal visible for an item which is clicked and close modal when required
    * @param {*} item 
    */
@@ -315,10 +316,8 @@ class Sequence extends PureComponent {
               <View style={[style.headerRight]}>
               </View>
             </View>
-            <View>
             {!_.isEmpty(this.props.sequenceList) && !this.props.isSequenceScreenLoading ? 
             <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />: null}
-            </View> 
         </View>
         </SafeAreaView>
     )

@@ -20,7 +20,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import moment from 'moment'
 import { navigate } from '../modules/navigators/NavigationService';
 import BulkUnselectJobAlert from '../components/BulkUnselectJobAlert'
-import { fetchJobs } from '../modules/taskList/taskListActions'
 function mapStateToProps(state) {
   return {
     jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
@@ -42,7 +41,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...bulkActions, ...globalActions, fetchJobs }, dispatch)
+    actions: bindActionCreators({ ...bulkActions, ...globalActions }, dispatch)
   }
 }
 
