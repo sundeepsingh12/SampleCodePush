@@ -48,6 +48,9 @@ import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActi
 import { userSummaryService } from './UserSummary'
 
 import { cryptoService } from './Crypto'
+let DateTime = require('../../wrapper/DateTime')
+import { Platform } from 'react-native'
+
 class JobMaster {
   /**
    *## This will Download Job Master from server
@@ -287,18 +290,34 @@ class JobMaster {
    * 
    * @param {*} serverTime 
    */
-  matchServerTimeWithMobileTime(serverTime) {
-    const serverTimeInMillis = moment(serverTime, 'YYYY-MM-DD HH:mm:ss')
-    if (!serverTimeInMillis.isValid()) {
-      throw new Error("Server time format incorrect")
+  async matchServerTimeWithMobileTime(serverTime) {
+
+    //Writing a bridge as currently there is a bug in RN for get current date in some android phones as JSCore is not native to Android,This might get fixed in RN 0.57
+    //Refer https://github.com/facebook/react-native/issues/15819
+    //https://github.com/facebook/react-native/issues/15830
+
+    let  currentDateFormatted,serverTimeFormatted
+    if (Platform.OS === 'ios') {
+      serverTimeFormatted = moment(serverTime, 'YYYY-MM-DD HH:mm:ss')
+      if (!serverTimeFormatted.isValid()) {
+        throw new Error("Server time format incorrect")
+      }
+      currentDateFormatted = moment(moment())
+    } else {
+      serverTimeFormatted = moment.utc(serverTime, 'YYYY-MM-DD HH:mm:ss')
+      if (!serverTimeFormatted.isValid()) {
+        throw new Error("Server time format incorrect")
+      }
+      let currentDate = await DateTime.getTimeInMilliseconds()
+      currentDateFormatted = moment.utc(currentDate, 'YYYY-MM-DD HH:mm:ss')
     }
-    const currentTimeInMillis = moment()
-    let diffIntime = Math.abs(moment(currentTimeInMillis).diff(serverTimeInMillis, 'minutes'))
+
+    let diffIntime = Math.abs(serverTimeFormatted.diff(currentDateFormatted, 'minutes'))
     if (diffIntime > 15) {
       throw new Error(TIME_ERROR_MESSAGE)
     }
     return true
-  }
+    }
 
   getJobMasterTitleListFromIds(jobMasterIdList, jobMasterList) {
     let jobMasterTitleList = []
