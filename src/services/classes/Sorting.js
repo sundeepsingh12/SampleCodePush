@@ -54,20 +54,18 @@ class Sorting {
 */
 
   setSortingData(jsonData) {
-    let sortingList = {}, id = 0,label = [];
+    let sortingList = {}, id = 0, label = [];
     if (jsonData.jobTransaction) {
-      label = ['', 'Name', 'Employee Code', 'Sequence Number', 'Address']
-      sortingList[id] = (jsonData.jobTransaction.referenceNumber) ? { id, value: jsonData.jobTransaction.referenceNumber, label: label[id++] } : { id: id++, value: NA }
+      label = ['', 'Name', 'Employee Code', 'Sequence Number', 'Address'];
+      sortingList[id] = (jsonData.jobTransaction.referenceNumber) ? { id, value: jsonData.jobTransaction.referenceNumber, label: label[id++] } : { id: id++, value: NA };
       sortingList[id] = (jsonData.firstName != null && jsonData.lastName != null) ? { id, value: jsonData.firstName.toUpperCase() + ' ' + jsonData.lastName.toUpperCase(), label: label[id++] } : { id: id++, value: NA };
-      sortingList[id] = (jsonData.empHubCode) && (jsonData.empCode) ? { id, value: jsonData.empCode + '/' + jsonData.empHubCode, label: label[id++] } : (jsonData.empCode) ?
-        { id, value: jsonData.empCode, label: label[id++] } : { id: id++, value: NA }
-      sortingList[id] = (jsonData.jobsInRunsheet) && (jsonData.jobTransaction.seqSelected) ? { id, value: jsonData.jobTransaction.seqSelected + '/' + jsonData.jobsInRunsheet, label: label[id++] } :
-        (jsonData.jobTransaction.seqSelected) ? { id, value: jsonData.jobTransaction.seqSelected, label: label[id++] } : { id: id++, value: NA };
-      sortingList[id] = (jsonData.addressData) ? { id, value: jsonData.addressData, label: label[id++] } : { id: id++, value: NA }
+      sortingList[id] = (jsonData.empHubCode) && (jsonData.empCode) ? { id, value: jsonData.empCode + '/' + jsonData.empHubCode, label: label[id++] } : (jsonData.empCode) ? { id, value: jsonData.empCode, label: label[id++] } : { id: id++, value: NA };
+      sortingList[id] = (jsonData.jobsInRunsheet) && (jsonData.jobTransaction.seqSelected) ? { id, value: jsonData.jobTransaction.seqSelected + '/' + jsonData.jobsInRunsheet, label: label[id++] } : (jsonData.jobTransaction.seqSelected) ? { id, value: jsonData.jobTransaction.seqSelected, label: label[id++] } : { id: id++, value: NA };
+      sortingList[id] = (jsonData.addressData) ? { id, value: jsonData.addressData, label: label[id++] } : { id: id++, value: NA };
     } else {
-      throw new Error(FAILURE_SORTING)
+      throw new Error(FAILURE_SORTING);
     }
-    return sortingList
+    return sortingList;
   }
 
 

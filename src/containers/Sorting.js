@@ -12,13 +12,16 @@ import * as sortingActions from '../modules/sorting/sortingActions'
 import * as globalActions from '../modules/global/globalActions'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Input,  Body, Icon, StyleProvider, Toast } from 'native-base'
+import { Container, Content, Header, Button, Text, Input, Body, Icon, StyleProvider, Toast, ActionSheet } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import { SORTING_SEARCH_VALUE, QrCodeScanner, DEFAULT_ERROR_MESSAGE_IN_SORTING, SORTING_ITEM_DETAILS } from '../lib/constants'
-import { SORTING, SEARCH_INFO, POST_SEARCH_PLACEHOLDER, OK } from '../lib/ContainerConstants'
+import { SORTING_SEARCH_VALUE, QrCodeScanner, DEFAULT_ERROR_MESSAGE_IN_SORTING, SORTING_INITIAL_STATE, BluetoothListing } from '../lib/constants'
+import { SORTING, SEARCH_INFO, POST_SEARCH_PLACEHOLDER, OK, STOP, DEPOT, SEARCH_RESULT } from '../lib/ContainerConstants'
+import BluetoothSerial from 'react-native-bluetooth-serial';
+import BluetoothSorting from '../components/BluetoothSorting';
+import { navigate } from '../modules/navigators/NavigationService';
+import { EscPos } from 'escpos-xml';
 
 function mapStateToProps(state) {
     return {
@@ -26,6 +29,7 @@ function mapStateToProps(state) {
         sortingDetails: state.sorting.sortingDetails,
         loaderRunning: state.sorting.loaderRunning,
         errorMessage: state.sorting.errorMessage,
+        isBluetoothConnected: state.sorting.isBluetoothConnected
     }
 }
 function mapDispatchToProps(dispatch) {
@@ -57,8 +61,8 @@ class SortingListing extends PureComponent {
         return (
             <View style={[style.card, styles.row, styles.paddingTop15, styles.paddingBottom10]}>
                 <Text>
-                    Search Result:
-            </Text>
+                    {SEARCH_RESULT}
+                </Text>
             </View>
         )
     }
@@ -75,14 +79,38 @@ class SortingListing extends PureComponent {
         )
     }
 
+    async printSortingData() {
+        let data = {
+            feName: this.props.sortingDetails[1].value,
+            sequenceNumber: `${STOP}   :  ` + this.props.sortingDetails[3].value,
+            hub: `${DEPOT}   :  ` + this.props.sortingDetails[2].value.split('/')[1].toLocaleUpperCase()
+        }
+        let sortingXmlData = `
+        <?xml version="1.0" encoding="UTF-8"?>
+        <document>
+        <line-feed />
+        <align mode="center">
+            <text-line size="1:0">{{feName}}</text-line>
+            <line-feed />
+            <text-line size="1:0">{{sequenceNumber}}</text-line>
+            <line-feed />
+            <text-line size="1:0">{{hub}}</text-line>
+            <line-feed />
+        </align>
+        </document>
+        `
+        const buffer = EscPos.getBufferFromTemplate(sortingXmlData, data);
+        await BluetoothSerial.write(this.props.sortingDetails[0].value, 150);
+        await BluetoothSerial.write(buffer, 0);
+    }
+
     render() {
+        this.printSortingData()
         return (
             <View style={[styles.bgWhite]}>
                 {this.showSearchResultTitle()}
-
                 <View style={style.resultCard}>
                     {this.showQrCodeLogo()}
-
                     <View style={style.resultCardDetail}>
                         <View style={{ borderBottomWidth: 1, borderBottomColor: '#f3f3f3', marginBottom: 10, paddingBottom: 10 }}>
                             <Text style={[styles.fontDefault]}>
@@ -105,11 +133,9 @@ class SortingListing extends PureComponent {
 
 class Sorting extends PureComponent {
 
-    // componentDidmount() {
-    //     if (!_.isUndefined(this.props.navigation.state.params)) {
-    //         this._searchForReferenceValue(_.trim(this.props.navigation.state.params.data))
-    //     }
-    // }
+    static navigationOptions = () => {
+        return { header: null };
+    }
 
     componentDidUpdate() {
         if (_.size(this.props.errorMessage)) {
@@ -125,7 +151,7 @@ class Sorting extends PureComponent {
     }
 
     componentWillUnmount() {
-        this.props.actions.setState(SORTING_ITEM_DETAILS, {})
+        this.props.actions.setState(SORTING_INITIAL_STATE, {})
     }
 
     _setDefaultErrorMessage = () => {
@@ -155,7 +181,7 @@ class Sorting extends PureComponent {
 
     showReferenceNoInputView() {
         return (
-            <View style={[styles.relative, { width: '85%', height: 33 }]}>
+            <View style={[styles.relative, { width: '85%', height: 33, zIndex: 1 }]}>
                 <Input
                     value={this.props.searchRefereneceValue.value}
                     onChangeText={this._onChangeReferenceValue}
@@ -186,35 +212,54 @@ class Sorting extends PureComponent {
                 <View style={[style.headerBody]}>
                     <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{headerView}</Text>
                 </View>
-                <View style={[style.headerRight]}>
-                </View>
+                <TouchableOpacity style={[style.headerRight]} onPress={() => { this.showOptionMenu() }}>
+                    {this.props.isBluetoothConnected ?
+                        <Icon name="ios-more" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                        : null}
+                </TouchableOpacity>
             </View>
         )
     }
 
+    showOptionMenu() {
+        let optionMenu = ['BluetoothSetup', 'Cancel']
+        ActionSheet.show(
+            {
+                options: optionMenu,
+                cancelButtonIndex: optionMenu.length - 1,
+                title: 'Select'
+            },
+            buttonIndex => {
+                if (buttonIndex != optionMenu.length - 1 && buttonIndex >= 0) {
+                    navigate(BluetoothListing)
+                }
+            }
+        )
+    }
+
     render() {
-        const renderView = this._renderContent()
+        const renderView = this._renderContent();
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
-                        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-                            <Body>
-                                {this.showTitleAndBackArrow()}
-
+                    <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+                        <Body>
+                            {this.showTitleAndBackArrow()}
+                            {this.props.isBluetoothConnected ?
                                 <View style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10, styles.paddingBottom10]}>
                                     {this.showReferenceNoInputView()}
-
                                     <TouchableOpacity style={[{ width: '15%' }, styles.marginLeft15]} onPress={() => this.props.navigation.navigate(QrCodeScanner, { returnData: this._searchForReferenceValue.bind(this) })} >
                                         <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={styles.fontWhite.color} />
                                     </TouchableOpacity>
                                 </View>
-                            </Body>
-                        </Header>
-                    </SafeAreaView>
-                    <Content style={[styles.flex1, styles.bgLightGray]}>
-                        {renderView}
-                    </Content>
+                                : null}
+                        </Body>
+                    </Header>
+                    {this.props.isBluetoothConnected ?
+                        <Content style={[styles.flex1, styles.bgLightGray]}>
+                            {renderView}
+                        </Content> : <BluetoothSorting />
+                    }
                 </Container>
             </StyleProvider>
         )

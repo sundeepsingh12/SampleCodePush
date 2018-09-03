@@ -415,5 +415,10 @@ module.exports = {
 
     //Mobile Login SMS Constans
     SHOW_LONG_CODE_IOS_SCREEN: 'SHOW_LONG_CODE_IOS_SCREEN',
-    SHOW_LONG_CODE_COMPLETE_SCREEN: 'SHOW_LONG_CODE_COMPLETE_SCREEN'
+    SHOW_LONG_CODE_COMPLETE_SCREEN: 'SHOW_LONG_CODE_COMPLETE_SCREEN',
+
+    //Bluetooth Sorting 
+    NO_DEVICE_CONNECTED: 'No Device Connected',
+    TURN_BLUETOOTH_ON_MESSAGE: 'Turn your bluetooth ON to pair with the device',
+    FIND_DEVICES: 'Find Devices'
 }
