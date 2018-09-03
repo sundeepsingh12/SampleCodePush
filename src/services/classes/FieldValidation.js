@@ -169,15 +169,14 @@ class FieldValidation {
      * @param {*} jobTransaction 
      */
     parseKey(key, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
-        //TODO cross status validations and other child validations working on parent like mode type of money collect
         if (key.startsWith('F[')) {
             let id = this.splitKey(key, false)
             let fieldAttributeMasterId = parseInt(id)
             fieldAttributeMasterId = fieldAttributeMasterId != NaN ? fieldAttributeMasterId : id
             if (!formElement[fieldAttributeMasterId] && !fieldAttributeMasterParentIdMap[fieldAttributeMasterId]) {
                 let fieldDataQuery = `jobTransactionId = ${jobTransaction.id} AND fieldAttributeMasterId = ${fieldAttributeMasterId}`;
-                let fielData = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery);
-                return fielData[0] ? fielData[0].value : null;
+                let fieldData = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery);
+                return fieldData[0] ? fieldData[0].value : null;
             } else if (!formElement[fieldAttributeMasterId] && fieldAttributeMasterParentIdMap) {
                 return (this.getChildFieldAttribute(fieldAttributeMasterId, formElement, fieldAttributeMasterParentIdMap))
             } else if (formElement[fieldAttributeMasterId] && (formElement[fieldAttributeMasterId].displayValue == ARRAY_SAROJ_FAREYE || formElement[fieldAttributeMasterId].displayValue == OBJECT_SAROJ_FAREYE)) {
