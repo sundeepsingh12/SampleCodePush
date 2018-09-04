@@ -192,10 +192,10 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         dispatch(setState(SET_LANDING_TAB, { landingTabId }))
                         dispatch(pieChartCount())
                         let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
-                        if (updatedJobTransactionList && !_.isEmpty(updatedJobTransactionList.value)) {
-                            dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
-                        }
                         navDispatch(NavigationActions.navigate({ routeName: TabScreen }))
+                        if (updatedJobTransactionList && !_.isEmpty(updatedJobTransactionList.value)) {
+                            setTimeout(() => { dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))}, 1000);
+                        }
                     } else if (routeName == TabScreen) {
                         navDispatch(StackActions.popToTop());
                         dispatch(pieChartCount())
