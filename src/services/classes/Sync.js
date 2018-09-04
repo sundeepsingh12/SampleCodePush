@@ -600,8 +600,7 @@ class Sync {
         if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
           isJobsPresent = true
           const postOrderList = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
-
-          const unseenTransactions = postOrderList && _.size(postOrderList.value) > 0 ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
+          const unseenTransactions = postOrderList && _.size(postOrderList.value) > 0 ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : (_.size(unseenStatusIds) > 0) ? jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds) : []
           const jobMasterIdJobStatusIdTransactionIdDtoObject = jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap)
           const messageIdDTOs = jobMasterIdsAndNumberOfMessages && jobMasterIdsAndNumberOfMessages.messageIdDto ? jobMasterIdsAndNumberOfMessages.messageIdDto : []
           if (!isLiveJob) {
