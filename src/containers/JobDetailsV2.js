@@ -42,7 +42,7 @@ import {
   RESET_CHECK_TRANSACTION_AND_DRAFT,
 } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { restoreDraftAndNavigateToFormLayout } from '../modules/form-layout/formLayoutActions'
@@ -92,7 +92,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentWillUnmount() {
-    if (this.props.errorMessage || !_.isEmpty(this.props.draftStatusInfo)) {
+    if (this.props.errorMessage || !isEmpty(this.props.draftStatusInfo)) {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
     if (this.props.checkTransactionStatus) {
@@ -113,7 +113,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentDidUpdate() {
-    if (this.props.jobDetailsLoading != 'UPDATING_JOBDATA' && this.props.jobTransaction && !_.isEmpty(this.props.updatedTransactionListIds) && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId] && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId][this.props.jobTransaction.jobId]) {
+    if (this.props.jobDetailsLoading != 'UPDATING_JOBDATA' && this.props.jobTransaction && !isEmpty(this.props.updatedTransactionListIds) && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId] && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId][this.props.jobTransaction.jobId]) {
       this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key, 'UPDATING_JOBDATA')
     }
   }
@@ -406,7 +406,7 @@ class JobDetailsV2 extends PureComponent {
     )
   }
   showMessages() {
-    if (!_.isEmpty(this.props.messageList)) {
+    if (!isEmpty(this.props.messageList)) {
       return (
         <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
           <ExpandableHeader
@@ -459,7 +459,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   showFooterView() {
-    if (!_.isEmpty(this.props.jobTransaction)) {
+    if (!isEmpty(this.props.jobTransaction)) {
       return (
         <Footer style={style.footer}>
           <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} />
@@ -549,21 +549,21 @@ class JobDetailsV2 extends PureComponent {
     this.props.actions.setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false)
   }
 
-  updatingLoaderView(){
-    return(
+  updatingLoaderView() {
+    return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgLightGray, styles.alignCenter, styles.justifyCenter]}>
           <Spinner color={styles.bgPrimaryColor} size={'small'} />
-          <Text style={[{color : '#000'}]}>Updating Data...</Text>
-      </Container>
+          <Text style={[{ color: '#000' }]}>Updating Data...</Text>
+        </Container>
       </StyleProvider>
     )
   }
 
   detailsContainerView() {
-    const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
+    const draftAlert = (!isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
     const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
-    if((this.props.jobDetailsLoading == 'UPDATING_JOBDATA')){
+    if ((this.props.jobDetailsLoading == 'UPDATING_JOBDATA')) {
       return this.updatingLoaderView()
     }
     return (

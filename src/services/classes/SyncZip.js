@@ -38,8 +38,8 @@ class SyncZip {
         var SYNC_RESULTS = {};
         let lastSyncTime = syncStoreDTO.lastSyncWithServer
       
-        let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced, lastSyncTime);
-        const allowedTransactionIds = realmDbData.allowedTransactionIdList
+        let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced);
+        const syncDataDTO = realmDbData.syncDataDTO
         SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
         SYNC_RESULTS.job = realmDbData.jobList;
         SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
@@ -76,9 +76,8 @@ class SyncZip {
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
-        return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds,isEncryptionSuccessful,allowedTransactionIds }
-        //Deleting TEMP folder location
-        // RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
+        return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds,isEncryptionSuccessful,syncDataDTO }
+       
     }
 
     updateUserSummary(statusList, jobMasterList, userSummary) {
@@ -154,14 +153,14 @@ class SyncZip {
             trackLogs
      * }
      */
-    getDataToBeSyncedFromDB(transactionIdList, lastSyncTime) {
+    getDataToBeSyncedFromDB(transactionIdList) {
         let userExceptionLog = this.getDataFromRealmDB(null, USER_EXCEPTION_LOGS)
         let runSheetSummary = this.getDataFromRealmDB(null, TABLE_RUNSHEET);
         let trackLogs = this.getDataFromRealmDB(null, TABLE_TRACK_LOGS);
-        let transactionList = [], fieldDataList = [], jobList = [], serverSmsLogs = [], transactionLogs = [];
+        let transactionList = [], fieldDataList = [], jobList = [], serverSmsLogs = [], transactionLogs = [],syncDataDTO ;
         if (!transactionIdList) {
             serverSmsLogs = this.getDataFromRealmDB(null, TABLE_SERVER_SMS_LOG);
-            return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog };
+            return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog,syncDataDTO };
         }
         let fieldDataQuery, jobTransactionQuery, jobQuery, transactionLogQuery,allowedTransactionIdList = {},counter = 0
                 for(let index in transactionIdList){
@@ -181,16 +180,18 @@ class SyncZip {
                         jobQuery += ` OR id = ${transactionIdList[index].jobId}`;
                         transactionLogQuery += ` OR transactionId = ${transactionIdList[index].id}`;
                     }
-                    allowedTransactionIdList[index] = transactionIdList[index]
+                    allowedTransactionIdList[index]= transactionIdList[index].id
                     counter++
                 }
-          
-        fieldDataList = this.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA, lastSyncTime);
+        fieldDataList = this.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA);
         transactionList = this.getDataFromRealmDB(jobTransactionQuery, TABLE_JOB_TRANSACTION);
         jobList = this.getDataFromRealmDB(jobQuery, TABLE_JOB);
         serverSmsLogs = this.getDataFromRealmDB(fieldDataQuery, TABLE_SERVER_SMS_LOG);
         transactionLogs = this.getDataFromRealmDB(transactionLogQuery, TABLE_TRANSACTION_LOGS);
-        return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog,allowedTransactionIdList }
+       syncDataDTO = {
+            allowedTransactionIdList
+        }
+        return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog,syncDataDTO }
     }
 
     /**
@@ -221,16 +222,17 @@ class SyncZip {
         }
     }
 
-    getDataFromRealmDB(query, table, lastSyncTime) {
+    getDataFromRealmDB(query, table) {
         let data = realm.getRecordListOnQuery(table, query);
         // send id as 0 in case of field data
         if (table == TABLE_FIELD_DATA) {
             let fieldDataList = []
             for (let index in data) {
                 let fieldData = { ...data[index] }
-                if (moment(fieldData.dateTime).isAfter(lastSyncTime)) {
+                if (fieldData.syncFlag == 1) {
                     fieldData.id = 0
-                    fieldDataList.push(_.omit(fieldData, ['dateTime']))
+                    fieldDataList.push(_.omit(fieldData, ['syncFlag']))
+                   
                 }
             }
             return fieldDataList

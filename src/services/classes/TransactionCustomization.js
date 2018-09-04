@@ -72,12 +72,10 @@ class TransactionCustomization {
         const jobTransactionCustomizationListParametersDTO = await this.getJobListingParameters();
         let queryDTO = {}, jobIdList = {}, transactionForDeletingDraft = [];
         if (!_.isEmpty(jobIdMap)) {
-            jobIdMap.forEach(element => {
-                jobIdList = Object.assign(jobIdList, element)
-            });
+            jobIdMap.forEach(element => { jobIdList = Object.assign(jobIdList, element) });
         }
-        queryDTO.jobTransactionQuery = jobIdList && jobIdList.length ? `(${jobIdList.map(jobId => 'jobId = ' + jobId).join(' OR ')})` : null
-        let jobTransactionList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO, true);
+        queryDTO.jobTransactionQuery = !_.isEmpty(jobIdList) ? `(${jobIdList.map(jobId => 'jobId = ' + jobId).join(' OR ')})` : null
+        let jobTransactionList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO);
         await keyValueDBService.deleteValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
         for (let jobId in jobIdList) {
             if (jobTransactionList[jobIdList[jobId].jobMasterId] && !jobTransactionList[jobIdList[jobId].jobMasterId][jobId] && jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] && jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId]) {
@@ -85,8 +83,6 @@ class TransactionCustomization {
             } else if(jobTransactionList[jobIdList[jobId].jobMasterId] && jobTransactionList[jobIdList[jobId].jobMasterId][jobId]){
                 jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] = jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] ? jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] : {}
                 jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId] = jobTransactionList[jobIdList[jobId].jobMasterId][jobId]
-            }
-            if(jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] && jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId]){
                 transactionForDeletingDraft.push({jobTransactionId : jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId].id})
             }
         }

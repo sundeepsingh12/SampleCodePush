@@ -13,7 +13,15 @@ import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import JobListItem from '../components/JobListItem'
-import _ from 'lodash'
+import isEqual from 'lodash/isEqual'
+import some from 'lodash/some'
+import includes from 'lodash/includes'
+import toLower from 'lodash/toLower'
+import sortBy from 'lodash/sortBy'
+import isEmpty from 'lodash/isEmpty'
+
+
+
 import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED, NO_JOBS_PRESENT, TOTAL_COUNT } from '../lib/ContainerConstants'
 import { FormLayout, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner, SET_BULK_TRANSACTION_PARAMETERS, SET_BULK_PARAMS_FOR_SELECTED_DATA, SET_BULK_CHECK_ALERT_VIEW } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -54,7 +62,7 @@ class BulkListing extends PureComponent {
   }
 
   renderData = (item, bulkTransactionLength, selectedTransactionLength) => {
-    if (_.isEmpty(item.jobExpiryData.value) || moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(item.jobExpiryData.value)) {
+    if (isEmpty(item.jobExpiryData.value) || moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(item.jobExpiryData.value)) {
       return (
         <JobListItem data={item}
           onPressItem={() => this.onClickRowItem(item, bulkTransactionLength, selectedTransactionLength)}
@@ -84,11 +92,10 @@ class BulkListing extends PureComponent {
   }
 
   componentDidUpdate() {
-    let pageObject = JSON.parse(JSON.stringify(this.props.navigation.state.params.pageObject))
-    pageObject.additionalParams = JSON.parse(pageObject.additionalParams)
-    pageObject.jobMasterIds = JSON.parse(pageObject.jobMasterIds)
-    if (!this.props.isLoaderRunning && !_.isEmpty(this.props.updatedTransactionListIds) && this.checkForJobMasterIdsOfUpdatedJobs(this.props.updatedTransactionListIds, pageObject.additionalParams.statusId, pageObject.jobMasterIds[0])) {
-      this.props.actions.getBulkUpdatedJobTransactions(Object.values(this.props.updatedTransactionListIds), this.props.jobTransactionCustomizationList, pageObject)
+    let additionalParams = JSON.parse(this.props.navigation.state.params.pageObject.additionalParams)
+    let jobMasterIds = JSON.parse(this.props.navigation.state.params.pageObject.jobMasterIds)
+    if (!this.props.isLoaderRunning && !isEmpty(this.props.updatedTransactionListIds) && this.checkForJobMasterIdsOfUpdatedJobs(this.props.updatedTransactionListIds, additionalParams.statusId, jobMasterIds[0])) {
+      this.props.actions.getBulkUpdatedJobTransactions(this.props.updatedTransactionListIds, this.props.jobTransactionCustomizationList, additionalParams.statusId, jobMasterIds[0],  this.props.navigation.state.params.pageObject.groupId)
     }
     if (this.props.errorToastMessage && this.props.errorToastMessage != '') {
       Toast.show({
@@ -163,13 +170,13 @@ class BulkListing extends PureComponent {
       if (bulkTransactions[item].isChecked && !bulkTransactions[item].disabled) {
         selectedTransactionLength++
       }
-      if ((_.isEmpty(searchText))) {
+      if ((isEmpty(searchText))) {
         jobTransactionArray.push(bulkTransactions[item])
-      } else if (_.some(values, (data) => _.includes(_.toLower(data), _.toLower(searchText)))) {
+      } else if (some(values, (data) => includes(toLower(data), toLower(searchText)))) {
         jobTransactionArray.push(bulkTransactions[item])
       }
     }
-    jobTransactionArray = _.sortBy(jobTransactionArray, ['disabled'])
+    jobTransactionArray = sortBy(jobTransactionArray, ['disabled'])
     return { jobTransactionArray, selectedTransactionLength }
   }
 
@@ -222,10 +229,9 @@ class BulkListing extends PureComponent {
       <StyleProvider style={getTheme(platform)}>
         <Container>
           <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-            <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-              <Body>
+            <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                 <View
-                  style={[styles.row, styles.width100, styles.justifySpaceBetween,]}>
+                  style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                   <TouchableOpacity style={[styles.headerLeft, styles.paddingTop10]} onPress={() => {
                     this.props.navigation.goBack(null)
                   }}>
@@ -244,8 +250,7 @@ class BulkListing extends PureComponent {
                   <View />
                 </View>
                 {this.searchBarView(selectedTransactionLength)}
-              </Body>
-            </Header>
+            </View>
           </SafeAreaView>
           {alertView}
           <FlatList
@@ -269,7 +274,7 @@ class BulkListing extends PureComponent {
                   }) : this.goToFormLayout(nextStatusNames[0].id, nextStatusNames[0].text, nextStatusNames[0].transient, nextStatusNames[0].saveActivated)
                 }}
                 success full
-                disabled={selectedTransactionLength == 0 || (this.props.navigation.state.params.pageObject.groupId && !_.isEqual(jobTransactionArray.length, selectedTransactionLength))}
+                disabled={selectedTransactionLength == 0 || (this.props.navigation.state.params.pageObject.groupId && !isEqual(jobTransactionArray.length, selectedTransactionLength))}
               >
                 <Text style={[styles.fontLg, styles.fontWhite]}>{UPDATE_ALL_SELECTED}</Text>
               </Button>
@@ -313,7 +318,7 @@ class BulkListing extends PureComponent {
       return <Loader />
     }
     else {
-      if (_.isEmpty(this.props.selectedItems)) {
+      if (isEmpty(this.props.selectedItems)) {
         return (
           this.getBulkEmptyView()
         )

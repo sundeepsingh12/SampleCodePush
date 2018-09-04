@@ -182,10 +182,10 @@ class JobTransaction {
      *                                      }
      *                                  ]
      */
-    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO, calledFromJobListing) {
+    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO) {
         let jobTransactionDTO = {};
         let jobTransactionCustomizationListParametersMaps = this.prepareMapsForTransactionCustomizationList(jobTransactionCustomizationListParametersDTO);
-        let runsheetObject = runSheetService.prepareJobTransactionQueryOnBasisOfRunsheet(calledFromJobListing ? jobTransactionCustomizationListParametersDTO.customNaming.enableFutureDateRunsheet : null);
+        let runsheetObject = runSheetService.prepareJobTransactionQueryOnBasisOfRunsheet(jobTransactionCustomizationListParametersDTO.customNaming.enableFutureDateRunsheet);
         let jobTransactionQuery = runsheetObject.jobTransactionQuery;
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1';
         jobTransactionQuery = queryDTO && queryDTO.jobTransactionQuery && queryDTO.jobTransactionQuery.trim() !== '' ? `${jobTransactionQuery} AND ${queryDTO.jobTransactionQuery}` : jobTransactionQuery;

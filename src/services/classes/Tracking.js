@@ -281,7 +281,8 @@ class Tracking {
             body: message,
             priority: "high",
             show_in_foreground: true,
-            sound: "default"
+            sound: "default",
+            wake_screen:true
         });
         this.updateUserEvent(geofence, message, eventId)// update user event with appropriate eventId
     }

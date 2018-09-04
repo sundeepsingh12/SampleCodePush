@@ -49,6 +49,11 @@ class InitialSetup extends PureComponent {
         this.props.actions.invalidateUserSession(true, false, message)
     }
 
+    //Do not combine this method with invalidateSession as 'invalidateSession' does not work when production mode is off
+    invalidateSessionWhenCancelPressed = () =>{
+        this.props.actions.invalidateUserSession(true, false)
+    }
+
     retry = () => {
         this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
     }
@@ -146,10 +151,10 @@ class InitialSetup extends PureComponent {
                         <Text style={[feStyle.fontCenter, feStyle.fontDanger]}>{this.props.error}</Text>
                     </View>
                     {(this.props.error != 'Logging out') ? <View style={[feStyle.row, feStyle.marginTop30, feStyle.alignCenter, feStyle.justifyCenter]}>
-                        <Button onPress={this.invalidateSession} rounded danger style={{ marginLeft: 10, marginRight: 10, }}>
+                        <Button onPress={this.invalidateSessionWhenCancelPressed} rounded danger style={{ marginLeft: 10, marginRight: 10 }}>
                             <Text style={{ color: '#ffffff' }}>{CANCEL}</Text>
                         </Button>
-                        <Button onPress={this.retry} rounded success style={{ marginLeft: 10, marginRight: 10, }}>
+                        <Button onPress={this.retry} rounded success style={{ marginLeft: 10, marginRight: 10 }}>
                             <Text style={{ color: '#ffffff' }}>{RETRY}</Text>
                         </Button>
                     </View> : null}

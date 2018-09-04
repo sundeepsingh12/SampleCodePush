@@ -133,6 +133,10 @@ class FieldData {
         }
     }
 
+    updateSyncFlag(jobTransactionIdList) {
+        realm.updateFieldDataSyncFlag(jobTransactionIdList)
+    }
+
 }
 
 export let fieldDataService = new FieldData()

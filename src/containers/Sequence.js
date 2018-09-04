@@ -306,8 +306,7 @@ class Sequence extends PureComponent {
       <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
         <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
             <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-              <TouchableOpacity style={[style.headerLeft]}
-                onPress={this.goBack}>
+              <TouchableOpacity style={[style.headerLeft]} onPress={this.goBack}>
                 <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
               </TouchableOpacity>
               <View style={[style.headerBody]}>
@@ -360,13 +359,11 @@ class Sequence extends PureComponent {
                 activeOpacity={1}
                 sortRowStyle={style.sortableListStyle}
                 renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(row)} />} />
-              <SafeAreaView>
-                <Footer style={{ height: 70 }}>
+                <Footer style={[style.footer]}>
                   <FooterTab style={[styles.padding10]}>
                     {buttonView}
                   </FooterTab>
                 </Footer>
-              </SafeAreaView>
             </View>
             : this.viewForNoJobPresent()}
         </Container>
@@ -441,6 +438,9 @@ const style = StyleSheet.create({
     shadowOffset: { width: 3, height: 4, },
     shadowColor: '#d3d3d3',
     shadowOpacity: .5,
+  },
+  footer:{
+    height:'auto'
   }
 });
 
