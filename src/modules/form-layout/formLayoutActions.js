@@ -41,7 +41,7 @@ import _ from 'lodash'
 import { performSyncService, pieChartCount } from '../home/homeActions'
 import { draftService } from '../../services/classes/DraftService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
-import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT,OK } from '../../lib/ContainerConstants'
+import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT, OK } from '../../lib/ContainerConstants'
 import moment from 'moment'
 import { Toast } from 'native-base'
 
@@ -50,13 +50,13 @@ export function getSortedRootFieldAttributes(statusData, jobTransactionId, jobTr
     return async function (dispatch) {
         try {
             dispatch(setState(CLEAR_FORM_LAYOUT_WITH_LOADER))
-            let sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusData.statusId, null, jobTransaction,latestPositionId)
+            let sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusData.statusId, null, jobTransaction, latestPositionId)
             let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
             sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds);
             dispatch(setState(SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT, {
-                statusId:statusData.statusId,
-                statusName:statusData.statusName,
+                statusId: statusData.statusId,
+                statusName: statusData.statusName,
                 jobTransactionId,
                 latestPositionId,
                 fieldAttributeMasterParentIdMap,
@@ -192,8 +192,8 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         dispatch(setState(SET_LANDING_TAB, { landingTabId }))
                         dispatch(pieChartCount())
                         let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
-                        if(updatedJobTransactionList && !_.isEmpty(updatedJobTransactionList.value)){
-                          dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS,updatedJobTransactionList.value))
+                        if (updatedJobTransactionList && !_.isEmpty(updatedJobTransactionList.value)) {
+                            dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
                         }
                         navDispatch(NavigationActions.navigate({ routeName: TabScreen }))
                     } else if (routeName == TabScreen) {
@@ -215,8 +215,8 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                                 jobTransaction: jobTransaction,
                                 statusId: currentStatus.nextStatusList[0].id,
                                 statusName: currentStatus.nextStatusList[0].name,
-                                saveActivated:currentStatus.nextStatusList[0].saveActivated,
-                                transient:currentStatus.nextStatusList[0].transient,
+                                saveActivated: currentStatus.nextStatusList[0].saveActivated,
+                                transient: currentStatus.nextStatusList[0].transient,
                                 jobMasterId: jobMasterId,
                                 navigationFormLayoutStates: cloneTransientFormLayoutMap,
                                 latestPositionId: formLayoutState.latestPositionId,
@@ -275,14 +275,14 @@ export function fieldValidations(currentElement, formLayoutState, timeOfExecutio
     }
 }
 
-export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, jobTransactionId, jobTransaction, latestPositionId,statusData) {
+export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, jobTransactionId, jobTransaction, latestPositionId, statusData) {
     return async function (dispatch) {
         try {
             if (editableFormLayoutState) {
-                dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName:statusData.statusName }))
+                dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName: statusData.statusName }))
             }
             else {
-                dispatch(getSortedRootFieldAttributes(statusData, jobTransactionId, jobTransaction,latestPositionId))
+                dispatch(getSortedRootFieldAttributes(statusData, jobTransactionId, jobTransaction, latestPositionId))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1011, error.message, 'danger', 1)
@@ -293,17 +293,21 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, jobT
 export function deleteDraftForTransactions(jobTransaction, updatedTransactionListIds) {
     return async function (dispatch) {
         try {
-            dispatch(setState(IS_LOADING,true))
+            dispatch(setState(IS_LOADING, true))
             let transactionForDeletingDraft = []
-            for(let item in jobTransaction){
-               if(updatedTransactionListIds[jobTransaction[item].jobId]){
-                transactionForDeletingDraft.push({jobTransactionId : jobTransaction[item].id})
-               }
+            if (jobTransaction && jobTransaction.length) {
+                for (let item in jobTransaction) {
+                    if (updatedTransactionListIds[jobTransaction[item].jobId]) {
+                        transactionForDeletingDraft.push({ jobTransactionId: jobTransaction[item].jobTransactionId })
+                    }
+                }
+            } else if (updatedTransactionListIds[jobTransaction.jobId]) {
+                transactionForDeletingDraft.push({ jobTransactionId: jobTransaction.id })
             }
-            if(transactionForDeletingDraft.length){
-                draftService.deleteDraftFromDb(transactionForDeletingDraft) 
+            if (transactionForDeletingDraft.length) {
+                draftService.deleteDraftFromDb(transactionForDeletingDraft)
             }
-            dispatch(setState(IS_LOADING,false))    
+            dispatch(setState(IS_LOADING, false))
         } catch (error) {
             showToastAndAddUserExceptionLog(1015, error.message, 'danger', 1)
         }
@@ -358,7 +362,7 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
             }
             //Change this approach when Job Detail is refactored
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-            const nextJobStatus  = jobStatusService.getJobStatusForJobStatusId(statusList.value,draftRestored.formLayoutState.statusId)
+            const nextJobStatus = jobStatusService.getJobStatusForJobStatusId(statusList.value, draftRestored.formLayoutState.statusId)
             navigate('FormLayout', {
                 contactData,
                 jobTransactionId: jobTransaction.id,
@@ -370,8 +374,8 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                 isDraftRestore: true,
                 pageObjectAdditionalParams,
                 jobDetailsScreenKey,
-                transient:nextJobStatus.transient,
-                saveActivated:nextJobStatus.saveActivated
+                transient: nextJobStatus.transient,
+                saveActivated: nextJobStatus.saveActivated
             })
         } catch (error) {
             showToastAndAddUserExceptionLog(1013, error.message, 'danger', 1)

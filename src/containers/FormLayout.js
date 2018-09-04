@@ -62,7 +62,7 @@ class FormLayout extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      updatingData : false
+      updatingData : null
     }
     this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
       BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
@@ -82,7 +82,7 @@ class FormLayout extends PureComponent {
     }
     let transactionList = this.props.navigation.state.params.jobTransaction  && !isEmpty(this.props.updatedTransactionListIds) &&  !isEmpty(this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId]) ? this.props.jobTransactionId ? [this.props.navigation.state.params.jobTransaction] : this.props.navigation.state.params.jobTransaction : null
     if( transactionList && this.checkForUpdatedTransactionList(transactionList, this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId])){
-      this.setState({updatingData : true})
+      this.setState({updatingData : this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId]})
     }
   }
 
@@ -121,9 +121,9 @@ class FormLayout extends PureComponent {
   }
 
   resetBackToUpdatedView() {
-    this.props.actions.deleteDraftForTransactions(this.props.jobTransaction, this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId])
-    this.setState({updatingData : false})
-    this.props.navigation.pop(1)
+    this.props.actions.deleteDraftForTransactions(this.props.navigation.state.params.jobTransaction, this.state.updatingData)
+    this.setState({updatingData : null})
+    this.props.navigation.goBack(null)
   }
 
   componentDidMount() {
