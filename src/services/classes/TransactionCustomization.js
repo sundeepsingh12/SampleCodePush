@@ -70,11 +70,21 @@ class TransactionCustomization {
 
     async fetchUpdatedTransactionList(jobIdMap, jobTransactionCustomizationList) {
         const jobTransactionCustomizationListParametersDTO = await this.getJobListingParameters();
-        let queryDTO = {}, jobIdList = {}, transactionForDeletingDraft = [];
-        if (!_.isEmpty(jobIdMap)) {
-            jobIdMap.forEach(element => { jobIdList = Object.assign(jobIdList, element) });
+        let queryDTO = {}, jobIdList = {}, transactionForDeletingDraft = [], jobTransactionQuery = '';
+        let firstindex = true;
+        for(let jobMasterId in jobIdMap){
+            for(let jobId in jobIdMap[jobMasterId]){
+                if(firstindex) {
+                    jobTransactionQuery = jobTransactionQuery + 'jobId = ' + jobId;
+                    firstindex = false;
+                } else {
+                    jobTransactionQuery = jobTransactionQuery + ' OR jobId = ' + jobId 
+                }
+                jobIdList[jobId] = jobIdMap[jobMasterId][jobId]
+            }
         }
-        queryDTO.jobTransactionQuery = !_.isEmpty(jobIdList) ? `(${jobIdList.map(jobId => 'jobId = ' + jobId).join(' OR ')})` : null
+        queryDTO.jobTransactionQuery = _.size(jobTransactionQuery) ?  jobTransactionQuery : null
+        console.logs("queryDTO.jobTransactionQuery",jobIdList,queryDTO.jobTransactionQuery)
         let jobTransactionList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO);
         await keyValueDBService.deleteValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
         for (let jobId in jobIdList) {

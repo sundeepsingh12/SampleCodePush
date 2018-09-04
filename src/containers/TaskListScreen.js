@@ -45,13 +45,13 @@ class TaskListScreen extends PureComponent {
     if (isEmpty(this.props.jobTransactionCustomizationList)) {
       this.props.actions.fetchJobs()
     } else if (!isEmpty(this.props.updatedTransactionListIds) && this.checkForJobMasterIdsOfUpdatedJobs(this.props.updatedTransactionListIds)) {
-      this.props.actions.fetchJobs(Object.values(this.props.updatedTransactionListIds), this.props.jobTransactionCustomizationList)
+      this.props.actions.fetchJobs(this.props.updatedTransactionListIds, this.props.jobTransactionCustomizationList)
     }
   }
 
   componentDidUpdate() {
     if (!this.props.isRefreshing && !isEmpty(this.props.updatedTransactionListIds) && this.checkForJobMasterIdsOfUpdatedJobs(this.props.updatedTransactionListIds)) {
-      this.props.actions.fetchJobs(Object.values(this.props.updatedTransactionListIds), this.props.jobTransactionCustomizationList)
+      this.props.actions.fetchJobs(this.props.updatedTransactionListIds, this.props.jobTransactionCustomizationList)
     }
   }
 
