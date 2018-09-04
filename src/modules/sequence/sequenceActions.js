@@ -13,7 +13,8 @@ import {
     SEQUENCE_LIST_ITEM_DRAGGED,
     SET_SEQUENCE_LIST_ITEM,
     CUSTOMIZATION_LIST_MAP,
-    SequenceRunsheetList
+    SequenceRunsheetList,
+    JOB_LISTING_END
 } from '../../lib/constants'
 import {
     DUPLICATE_SEQUENCE_MESSAGE,
@@ -27,6 +28,8 @@ import CONFIG from '../../lib/config'
 import _ from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions';
 import { navigate } from '../navigators/NavigationService';
+import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
+import { jobTransactionService } from '../../services/classes/JobTransaction'
 
 /**
  * @param {*} runsheetNumber 
@@ -34,18 +37,22 @@ import { navigate } from '../navigators/NavigationService';
  * This method prepare jobTransaction list for given runsheet and jobMasterIds
  * and check if there is duplicate sequence number present or not
  */
-export function prepareListForSequenceModule(runsheetNumber, jobMasterIds) {
+export function prepareListForSequenceModule(runsheetNumber, jobMasterIds, jobTransactionList) {
     return async function (dispatch) {
         try {
             //Set loader
-            dispatch(setState(SEQUENCE_LIST_FETCHING_START))
+            dispatch(setState(SEQUENCE_LIST_FETCHING_START,1))
             const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
             //create seperator map so that if sequence is changed and routing sequence number
             //is enabled then we can change text for line1, line2, circle1, circle2
             const jobMasterSeperatorMap = sequenceService.createSeperatorMap(jobMasterIdCustomizationMap)
-
             //get jobTransaction List with given runsheet number and jobMasterIds
-            const sequenceList = await sequenceService.getSequenceList(runsheetNumber, JSON.parse(jobMasterIds))
+            let jobTransactionCustomizationList = JSON.parse(JSON.stringify(jobTransactionList))
+            if (_.isEmpty(jobTransactionCustomizationList)) {
+                jobTransactionCustomizationList = await transactionCustomizationService.fetchUpdatedTransactionList(null, jobTransactionCustomizationList);
+                dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }));
+            }
+            const sequenceList = await sequenceService.getSequenceList(runsheetNumber, JSON.parse(jobMasterIds), jobTransactionCustomizationList)
             // case of Auto-Sequencing :- check for duplicate sequence if present then add those transactions whose sequence is changed to a temprorary map i.e. transactionsWithChangedSeqeunceMap
             const { isDuplicateSequenceFound, sequenceArray, transactionsWithChangedSeqeunceMap } = await sequenceService.checkForAutoSequencing(sequenceList, jobMasterSeperatorMap)
             dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, {
@@ -164,7 +171,7 @@ export function saveSequencedJobTransactions(transactionsWithChangedSeqeunceMap)
             dispatch(setState(SEQUENCE_LIST_FETCHING_START))
             //update jobTransaction in DB and set start module so as if it get open it will reload
             await sequenceService.updateJobTrasaction(transactionsWithChangedSeqeunceMap)
-            dispatch(fetchJobs())
+            await jobTransactionService.updatedTransactionListIds(transactionsWithChangedSeqeunceMap)
             dispatch(setState(CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP, SAVE_SUCCESSFUL))//clear transactionsWithChangedSeqeunceMap to empty
         } catch (error) {
             showToastAndAddUserExceptionLog(2605, error.message, null, 0)

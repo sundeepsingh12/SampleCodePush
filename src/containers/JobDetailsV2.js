@@ -15,11 +15,7 @@ import {
   UPDATE_GROUP,
   JOB_EXPIRED,
   DETAILS,
-  SELECT_NUMBER_FOR_CALL,
-  CONFIRMATION,
-  CALL_CONFIRM,
   YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE,
-  SELECT_ADDRESS_NAVIGATION,
   REVERT_STATUS,
   MORE,
   PAYMENT_SUCCESSFUL,
@@ -28,8 +24,7 @@ import {
 
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert, Image } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Right, Icon, StyleProvider, ListItem, Footer, FooterTab, ActionSheet, Toast } from 'native-base'
+import { Container, Content, Header, Button, Text, Right, Icon, StyleProvider, ListItem, Footer, FooterTab, ActionSheet, Toast, Spinner } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import Loader from '../components/Loader'
@@ -46,11 +41,8 @@ import {
   JOB_DETAILS_FETCHING_START,
   RESET_CHECK_TRANSACTION_AND_DRAFT,
 } from '../lib/constants'
-import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
-import Communications from 'react-native-communications'
-import getDirections from 'react-native-google-maps-directions'
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { restoreDraftAndNavigateToFormLayout } from '../modules/form-layout/formLayoutActions'
@@ -58,22 +50,18 @@ import { startSyncAndNavigateToContainer } from '../modules/home/homeActions'
 import DraftModal from '../components/DraftModal'
 import Line1Line2View from '../components/Line1Line2View'
 import SyncLoader from '../components/SyncLoader'
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { navigate } from '../modules/navigators/NavigationService';
-import MessageButtonItem from '../components/MessageButtonItem'
+import MessagingCallingSmsButtonView from '../components/MessagingCallingSmsButtonView'
 
 function mapStateToProps(state) {
   return {
-    addressList: state.jobDetails.addressList,
-    customerCareList: state.jobDetails.customerCareList,
     currentStatus: state.jobDetails.currentStatus,
     fieldDataList: state.jobDetails.fieldDataList,
     jobDetailsLoading: state.jobDetails.jobDetailsLoading,
     jobDataList: state.jobDetails.jobDataList,
     jobTransaction: state.jobDetails.jobTransaction,
     messageList: state.jobDetails.messageList,
-    smsTemplateList: state.jobDetails.smsTemplateList,
     errorMessage: state.jobDetails.errorMessage,
     statusList: state.jobDetails.statusList,
     statusRevertList: state.jobDetails.statusRevertList,
@@ -82,7 +70,8 @@ function mapStateToProps(state) {
     isShowDropdown: state.jobDetails.isShowDropdown,
     jobExpiryTime: state.jobDetails.jobExpiryTime,
     syncLoading: state.jobDetails.syncLoading,
-    checkTransactionStatus: state.jobDetails.checkTransactionStatus
+    checkTransactionStatus: state.jobDetails.checkTransactionStatus,
+    updatedTransactionListIds: state.listing.updatedTransactionListIds,
   }
 }
 
@@ -99,17 +88,17 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key)
+    this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key, true)
   }
 
   componentWillUnmount() {
-    if (this.props.errorMessage || !_.isEmpty(this.props.draftStatusInfo)) {
+    if (this.props.errorMessage || !isEmpty(this.props.draftStatusInfo)) {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
-    // reset dropdown state only when required
     if (this.props.checkTransactionStatus) {
       this.props.actions.setState(SET_CHECK_TRANSACTION_STATUS, null)
     }
+    // reset dropdown state only when required
     if (this.props.isShowDropdown) {
       this.props.actions.setState(SHOW_DROPDOWN, null)
     }
@@ -118,11 +107,16 @@ class JobDetailsV2 extends PureComponent {
   navigateToDataStoreDetails = (navigationParam) => {
     navigate(DataStoreDetails, navigationParam)
   }
-  
+
   navigateToCameraDetails = (navigationParam) => {
     navigate(ImageDetailsView, navigationParam)
   }
 
+  componentDidUpdate() {
+    if (this.props.jobDetailsLoading != 'UPDATING_JOBDATA' && this.props.jobTransaction && !isEmpty(this.props.updatedTransactionListIds) && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId] && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId][this.props.jobTransaction.jobId]) {
+      this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key, 'UPDATING_JOBDATA')
+    }
+  }
   statusDataItem(statusList, index, minIndexDropDown) {
     if ((index < minIndexDropDown) || (this.props.isShowDropdown)) {
       return (
@@ -203,7 +197,7 @@ class JobDetailsV2 extends PureComponent {
 
   _onGoToNextStatus = () => {
     this.props.actions.checkForInternetAndStartSyncAndNavigateToFormLayout({
-      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+      contactData: this.props.jobTransaction.jobSwipableDetails.contactData,
       jobTransactionId: this.props.jobTransaction.id,
       jobTransaction: this.props.jobTransaction,
       statusId: this.props.statusList.id,
@@ -231,7 +225,7 @@ class JobDetailsV2 extends PureComponent {
     }
     else {
       const FormLayoutObject = {
-        contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+        contactData: this.props.jobTransaction.jobSwipableDetails.contactData,
         jobTransaction,
         statusList,
         pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
@@ -243,115 +237,6 @@ class JobDetailsV2 extends PureComponent {
 
   sendMessageToContact = (contact, smsTemplate) => {
     this.props.actions.setSmsBodyAndSendMessage(contact, smsTemplate, this.props.jobTransaction, this.props.jobDataList, this.props.fieldDataList)
-  }
-
-  callButtonPressed = () => {
-    if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
-      return
-    if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
-      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
-      contactData.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
-      ActionSheet.show(
-        {
-          options: contactData,
-          cancelButtonIndex: contactData.length - 1,
-          title: SELECT_NUMBER_FOR_CALL
-        },
-        buttonIndex => {
-          if (buttonIndex != contactData.length - 1 && buttonIndex >= 0) {
-            this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[buttonIndex])
-          }
-        }
-      )
-    }
-    else {
-      Alert.alert(CONFIRMATION + this.props.navigation.state.params.jobSwipableDetails.contactData[0], CALL_CONFIRM,
-        [{ text: CANCEL, onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-        { text: OK, onPress: () => this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[0]) },],
-        { cancelable: false })
-    }
-  }
-
-  callContact = (contact) => {
-    Communications.phonecall(contact, false)
-  }
-
-  customerCareButtonPressed = () => {
-    let customerCareTitles = this.props.navigation.state.params.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
-    customerCareTitles.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
-    ActionSheet.show(
-      {
-        options: customerCareTitles,
-        cancelButtonIndex: customerCareTitles.length - 1,
-        title: SELECT_NUMBER_FOR_CALL
-      },
-      buttonIndex => {
-        if (buttonIndex != customerCareTitles.length - 1 && buttonIndex >= 0) {
-          this.callContact(this.props.navigation.state.params.jobSwipableDetails.customerCareData[buttonIndex].mobileNumber)
-        }
-      }
-    )
-  }
-
-  navigationButtonPressed = () => {
-    const addressDatas = this.props.navigation.state.params.jobSwipableDetails.addressData
-    const latitude = this.props.navigation.state.params.jobTransaction.jobLatitude
-    const longitude = this.props.navigation.state.params.jobTransaction.jobLongitude
-    let data
-
-    if (latitude && longitude) {
-      data = {
-        source: {},
-        destination: {
-          latitude,
-          longitude
-        },
-      }
-      getDirections(data)
-    }
-    else {
-      let addressArray = []
-      Object.values(addressDatas).forEach(object => {
-        addressArray.push({ text: Object.values(object).join(), icon: "md-arrow-dropright", iconColor: "#000000" })
-      })
-      addressArray.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
-      if (_.size(addressArray) > 2) {
-        ActionSheet.show(
-          {
-            options: addressArray,
-            cancelButtonIndex: addressArray.length - 1,
-            title: SELECT_ADDRESS_NAVIGATION
-          },
-          buttonIndex => {
-            if (buttonIndex != addressArray.length - 1 && buttonIndex >= 0) {
-              data = {
-                source: {},
-                destination: {},
-                params: [
-                  {
-                    key: 'q',
-                    value: addressArray[buttonIndex].text
-                  }
-                ]
-              }
-              getDirections(data)
-            }
-          }
-        )
-      } else {
-        data = {
-          source: {},
-          destination: {},
-          params: [
-            {
-              key: 'q',
-              value: addressArray[0].text
-            }
-          ]
-        }
-        getDirections(data)
-      }
-    }
   }
 
   alertForStatusRevert(statusData) {
@@ -404,7 +289,7 @@ class JobDetailsV2 extends PureComponent {
       }
     )
   }
- 
+
   showDraftAlert() {
     return <DraftModal draftStatusInfo={this.props.draftStatusInfo} onOkPress={() => this._goToFormLayoutWithDraft()} onCancelPress={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} onRequestClose={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} />
   }
@@ -424,22 +309,6 @@ class JobDetailsV2 extends PureComponent {
       <View style={[style.seqCircle, { backgroundColor: this.props.navigation.state.params.jobTransaction.identifierColor }]}>
         <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
           {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
-        </Text>
-      </View>
-    )
-  }
-  showTransactionView() {
-    return (
-      <View>
-        <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-          {this.props.navigation.state.params.jobTransaction.line1}
-        </Text>
-        <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-          {this.props.navigation.state.params.jobTransaction.line2}
-        </Text>
-        <Text
-          style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-          {this.props.navigation.state.params.jobTransaction.circleLine1}
         </Text>
       </View>
     )
@@ -521,7 +390,7 @@ class JobDetailsV2 extends PureComponent {
     )
   }
   showMessages() {
-    if (!_.isEmpty(this.props.messageList)) {
+    if (!isEmpty(this.props.messageList)) {
       return (
         <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
           <ExpandableHeader
@@ -574,34 +443,13 @@ class JobDetailsV2 extends PureComponent {
   }
 
   showFooterView() {
-    return (
-        <Footer style={[style.footer]}>
-          {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0 && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
-            <FooterTab>
-            <MessageButtonItem sendMessageToContact = {this.sendMessageToContact} jobSwipableDetails = {this.props.navigation.state.params.jobSwipableDetails}/>
-            </FooterTab>
-          )}
-          {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
-            <FooterTab>
-              <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
-                <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
-              </Button>
-            </FooterTab>
-          )}
-          {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) || (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
-            <FooterTab>
-              <Button full onPress={this.navigationButtonPressed}>
-                <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
-              </Button>
-            </FooterTab>)}
-          {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
-            <FooterTab>
-              <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
-                <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
-              </Button>
-            </FooterTab>)}
+    if (!isEmpty(this.props.jobTransaction)) {
+      return (
+        <Footer style={style.footer}>
+          <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} />
         </Footer>
-    )
+      )
+    }
   }
 
   etaUpdateTimer() {
@@ -644,7 +492,7 @@ class JobDetailsV2 extends PureComponent {
 
   _goToFormLayoutWithoutDraft = () => {
     this.props.actions.deleteDraftAndNavigateToFormLayout({
-      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+      contactData: this.props.jobTransaction.jobSwipableDetails.contactData,
       jobTransactionId: this.props.jobTransaction.id,
       jobTransaction: this.props.jobTransaction,
       statusId: this.props.draftStatusInfo.statusId,
@@ -658,7 +506,7 @@ class JobDetailsV2 extends PureComponent {
 
   _goToFormLayoutWithDraft = () => {
     this.props.actions.restoreDraftAndNavigateToFormLayout(
-      this.props.navigation.state.params.jobSwipableDetails.contactData,
+      this.props.jobTransaction.jobSwipableDetails.contactData,
       this.props.jobTransaction,
       this.props.draftStatusInfo,
       null,
@@ -685,14 +533,27 @@ class JobDetailsV2 extends PureComponent {
     this.props.actions.setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false)
   }
 
+  updatingLoaderView() {
+    return (
+      <StyleProvider style={getTheme(platform)}>
+        <Container style={[styles.bgLightGray, styles.alignCenter, styles.justifyCenter]}>
+          <Spinner color={styles.bgPrimaryColor} size={'small'} />
+          <Text style={[{ color: '#000' }]}>Updating Data...</Text>
+        </Container>
+      </StyleProvider>
+    )
+  }
+
   detailsContainerView() {
-    const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
+    const draftAlert = (!isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && this.props.checkTransactionStatus == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
     const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
+    if ((this.props.jobDetailsLoading == 'UPDATING_JOBDATA')) {
+      return this.updatingLoaderView()
+    }
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgLightGray]}>
-        
-          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal = {this.onCancelPress}/> : null}
+          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal={this.onCancelPress} /> : null}
           {draftAlert}
           {mismatchAlert}
           {this.showHeaderView()}
@@ -703,9 +564,27 @@ class JobDetailsV2 extends PureComponent {
     )
   }
 
+  deletedTransactionView() {
+    return (
+      <StyleProvider style={getTheme(platform)}>
+        <Container style={[styles.bgWhite]}>
+          {this.showHeaderView()}
+          <View style={[styles.justifyCenter, styles.alignCenter, styles.column, styles.flex1]}>
+            <MaterialIcons name={'delete-forever'} style={[styles.fontDarkGray, styles.fontXl]} />
+            <Text style={[{ paddingLeft: 94, paddingRight: 94 }, styles.fontCenter, styles.fontDarkGray, styles.marginTop10]}>This task was deleted from the server</Text>
+          </View>
+
+        </Container>
+      </StyleProvider>
+    )
+  }
+
   render() {
-    if (this.props.jobDetailsLoading) {
+    if (this.props.jobDetailsLoading == true) {
       return <Loader />
+    }
+    if (this.props.jobTransaction && this.props.jobTransaction.deleteFlag) {
+      return this.deletedTransactionView()
     }
     return this.renderView(this.props.checkTransactionStatus)
   }

@@ -14,7 +14,8 @@ import {
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
     SET_CHECK_TRANSACTION_STATUS,
     RESET_CHECK_TRANSACTION_AND_DRAFT,
-    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT,
+    SET_UPDATED_TRANSACTION_LIST_IDS
 } from '../../lib/constants'
 
 
@@ -23,7 +24,7 @@ export default function jobDetailsReducer(state = initialState, action) {
 
     switch (action.type) {
         case JOB_DETAILS_FETCHING_START:
-            return state.set('jobDetailsLoading', true)
+            return state.set('jobDetailsLoading', action.payload)
 
         case IS_MISMATCHING_LOCATION:
             return state.set('statusList', action.payload)
@@ -59,6 +60,7 @@ export default function jobDetailsReducer(state = initialState, action) {
 
         case SHOW_DROPDOWN:
             return state.set('isShowDropdown', action.payload)
+
 
         case RESET_CHECK_TRANSACTION_AND_DRAFT:
             return state.set('isShowDropdown', {})

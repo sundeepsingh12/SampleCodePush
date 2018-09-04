@@ -9,9 +9,8 @@ import { setState, showToastAndAddUserExceptionLog } from '..//global/globalActi
 import { performSyncService, pieChartCount } from '../home/homeActions'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { MosambeeWalletPaymentServices } from '../../services/payment/MosambeeWalletPayment'
-import { fetchJobs } from '../taskList/taskListActions'
 import { paymentService } from '../../services/payment/Payment'
-import { OK,TRANSACTION_SUCCESSFUL, ERROR } from '../../lib/ContainerConstants'
+import { OK, TRANSACTION_SUCCESSFUL, ERROR } from '../../lib/ContainerConstants'
 import { saveJobTransaction } from '../form-layout/formLayoutActions'
 import { Toast } from 'native-base'
 import { jobDataService } from '../../services/classes/JobData'
@@ -31,14 +30,17 @@ import {
     SET_LANDING_TAB,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
     SET_CHECK_TRANSACTION_STATUS,
-    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT,
+    SET_UPDATED_TRANSACTION_LIST_IDS,
+    UPDATE_JOBMASTERID_JOBID_MAP
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService';
 import _ from 'lodash'
 
-export function startFetchingJobDetails() {
+export function startFetchingJobDetails(payload) {
     return {
         type: JOB_DETAILS_FETCHING_START,
+        payload
     }
 }
 
@@ -62,21 +64,23 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
     }
 }
 
-export function getJobDetails(params, key) {
+export function getJobDetails(params, key, payload) {
     return async function (dispatch) {
         try {
-            dispatch(startFetchingJobDetails())
+            dispatch(startFetchingJobDetails(payload))
             const jobTransactionId = params.jobTransaction.id
-            const { statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, fieldAttributeStatusList, jobAttributeStatusList } = await jobDetailsService.getJobDetailsParameters()
-            const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, statusList.value)
-            if (details.checkForSeenStatus) dispatch(performSyncService())
+            const { statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, fieldAttributeStatusList, jobAttributeStatusList, customerCareList, smsTemplateList } = await jobDetailsService.getJobDetailsParameters()
+            const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, statusList, null, customerCareList, smsTemplateList)
+            if (details.checkForSeenStatus) {
+                dispatch(performSyncService())
+            }
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(details.jobTransactionDisplay.jobMasterId)
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery,
                 jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId, details.currentStatus.actionOnStatus) : false
             const jobExpiryData = (!errorMessage && details.jobDataObject.dataMap[JOB_EXPIRY_TIME]) ? (Object.values(details.jobDataObject.dataMap[JOB_EXPIRY_TIME])[0]) : null
             const jobExpiryTime = jobExpiryData && jobExpiryData.data ? jobExpiryData.data.value : null
-            const parentStatusList = (jobMaster[0].isStatusRevert) && !_.isEqual(_.toLower(details.currentStatus.code), 'seen') ? await jobDetailsService.getParentStatusList(statusList.value, details.currentStatus, jobTransactionId) : []
-            const draftStatusInfo = draftService.getDraftForState(details.jobTransactionDisplay, null)
+            const parentStatusList = (jobMaster[0].isStatusRevert) && !_.isEqual(_.toLower(details.currentStatus.code), 'seen') ? await jobDetailsService.getParentStatusList(statusList, details.currentStatus, jobTransactionId) : []
+            const draftStatusInfo = (payload != 'UPDATING_JOBDATA') ? draftService.getDraftForState(details.jobTransactionDisplay, null) : null
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
             if (draftStatusInfo) {
                 await dispatch(checkForPaymentAtEnd(draftStatusInfo, details.jobTransactionDisplay, params, key, SET_CHECK_TRANSACTION_STATUS))
@@ -168,9 +172,12 @@ export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditiona
             dispatch(setState(SET_LANDING_TAB, { landingTabId }))
             dispatch(performSyncService())
             dispatch(pieChartCount())
-            dispatch(fetchJobs())
             navDispatch(StackActions.pop())
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
+            let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+            if (updatedJobTransactionList && !_.isEmpty(updatedJobTransactionList.value)) {
+                dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
+            }
         } catch (error) {
             showToastAndAddUserExceptionLog(1103, error.message, 'danger', 0)
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
@@ -189,7 +196,7 @@ export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditiona
 export function checkForLocationMismatch(data, currentStatusCategory) {
     return async function (dispatch) {
         try {
-            const FormLayoutData = { contactData: data.contactData, jobTransactionId: data.jobTransaction.id, jobTransaction: data.jobTransaction, statusId: data.statusList.id, statusName: data.statusList.name, jobMasterId: data.jobTransaction.jobMasterId, pageObjectAdditionalParams: data.pageObjectAdditionalParams, jobDetailsScreenKey: data.jobDetailsScreenKey,transient:data.statusList.transient,saveActivated:data.statusList.saveActivated }
+            const FormLayoutData = { contactData: data.contactData, jobTransactionId: data.jobTransaction.id, jobTransaction: data.jobTransaction, statusId: data.statusList.id, statusName: data.statusList.name, jobMasterId: data.jobTransaction.jobMasterId, pageObjectAdditionalParams: data.pageObjectAdditionalParams, jobDetailsScreenKey: data.jobDetailsScreenKey, transient: data.statusList.transient, saveActivated: data.statusList.saveActivated }
             const nextStatusCategory = data.statusList.statusCategory
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(FormLayoutData.jobMasterId)
             const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
@@ -213,7 +220,9 @@ export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutDa
                 let message = await dispatch(performSyncService())
                 if (message === true) {
                     dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))
-                    if (!_.isEmpty(FormLayoutData)) navigate('FormLayout', FormLayoutData)
+                    if (!_.isEmpty(FormLayoutData)) {
+                        navigate('FormLayout', FormLayoutData)
+                    }
                 } else {
                     dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT, 'error'))
                 }

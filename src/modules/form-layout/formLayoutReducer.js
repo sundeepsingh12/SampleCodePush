@@ -125,6 +125,8 @@ export default function formLayoutReducer(state = initialState, action) {
 
         case SET_UPDATE_DRAFT: {
             return state.set('updateDraft', action.payload)
+                        .set('isLoading', false)
+
         }
 
         case SET_FORM_TO_INVALID: {

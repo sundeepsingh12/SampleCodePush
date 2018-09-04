@@ -19,7 +19,8 @@ var InitialState = Record({
     idToSeparatorMap: {},
     errorToastMessage: '',
     nextStatusList: [],
-    checkAlertView: false
+    checkAlertView: false,
+    updatedBulkTransactionIds: []
 })
 
 export default InitialState

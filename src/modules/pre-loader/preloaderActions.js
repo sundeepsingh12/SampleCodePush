@@ -446,7 +446,6 @@ export function validateOtp(otpNumber) {
       dispatch(setState(OTP_VALIDATION_FAILURE, error.message))
     }
   }
-
 }
 
 export function checkForUnsyncTransactionAndLogout(calledFromAutoLogout) {

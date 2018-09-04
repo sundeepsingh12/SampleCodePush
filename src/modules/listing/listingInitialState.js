@@ -4,7 +4,8 @@ const { Record } = require('immutable')
 
 var InitialState = Record({
     jobTransactionCustomizationList: [],
-    isRefreshing: false
+    isRefreshing: false,
+    updatedTransactionListIds: []
 })
 
 export default InitialState

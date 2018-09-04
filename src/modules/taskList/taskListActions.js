@@ -3,7 +3,7 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
 import { setState } from '../global/globalActions'
-import { JOB_LISTING_START, JOB_LISTING_END, JOB_STATUS, SET_TABS_LIST, CUSTOM_NAMING, TAB, SHOULD_RELOAD_START, TABS_LOADING, JOB_ATTRIBUTE, USER, FIELD_ATTRIBUTE, TABLE_FIELD_DATA } from '../../lib/constants'
+import { JOB_LISTING_START, JOB_LISTING_END, JOB_STATUS, SET_TABS_LIST, CUSTOM_NAMING, TAB, UPDATE_JOBMASTERID_JOBID_MAP, TABS_LOADING, JOB_ATTRIBUTE, USER, FIELD_ATTRIBUTE, TABLE_FIELD_DATA } from '../../lib/constants'
 import _ from 'lodash'
 import { jobStatusService } from '../../services/classes/JobStatus';
 import { fieldDataService } from '../../services/classes/FieldData'
@@ -33,16 +33,11 @@ export function fetchTabs() {
 /**
  * This function fetches jobTransaction from db and set jobTransactionCustomizationListDTO in state
  */
-export function fetchJobs() {
+export function fetchJobs(jobIdMap, jobTransactionCustomizationList) {
   return async function (dispatch) {
     try {
       dispatch(setState(JOB_LISTING_START));
-      const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters();
-      // Fetch jobIdGroupIdMap in case of multi part assignment
-      // let jobIdGroupIdMap = jobTransactionService.getJobIdGroupIdMap(jobTransactionCustomizationListParametersDTO.jobMasterList)
-      // Fetch future enable runsheet and selected Date for calender
-      // dispatch(setState(SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE, { enableFutureDateRunsheet, selectedDate }))
-      let jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO);
+      jobTransactionCustomizationList = await transactionCustomizationService.fetchUpdatedTransactionList(jobIdMap, jobTransactionCustomizationList);
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }));
     } catch (error) {
       //TODO handle UI
@@ -51,25 +46,6 @@ export function fetchJobs() {
   }
 }
 
-/**
- * 
- * @param {*} jobTransactionCustomizationList 
- *  This action will fetch jobs if SHOULD_RELOAD_START is true in store or if jobTransactionCustomizationList is empty
- */
-export function shouldFetchJobsOrNot(jobTransactionCustomizationList, pageObject) {
-  return async function (dispatch) {
-    try {
-      let shouldFetchJobs = await keyValueDBService.getValueFromStore(SHOULD_RELOAD_START)
-      if ((shouldFetchJobs && shouldFetchJobs.value) || _.isEmpty(jobTransactionCustomizationList)) {
-        dispatch(fetchJobs())
-      }
-      // Sets SHOULD_RELOAD_START to false so jobs are not fetched unnecessesarily 
-      await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(false))
-    } catch (error) {
-      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList: [] }))
-    }
-  }
-}
 
 export function setSmsTemplateList(contact, smsTemplatedata, item) {
   return async function (dispatch) {

@@ -23,8 +23,12 @@ import {
     FIELD_ATTRIBUTE_STATUS,
     FIELD_ATTRIBUTE_VALIDATION,
     FIELD_ATTRIBUTE_VALIDATION_CONDITION,
-    DEVICE_SIM
+    DEVICE_SIM,
+    UPDATE_JOBMASTERID_JOBID_MAP
 } from '../../lib/constants'
+import { jobTransactionService } from './JobTransaction'
+import { draftService } from './DraftService'
+import _ from 'lodash'
 
 class TransactionCustomization {
 
@@ -61,6 +65,40 @@ class TransactionCustomization {
             tabList: tabList ? tabList.value : tabList,
             customNaming: customNaming ? customNaming.value : customNaming
         }
+    }
+
+
+    async fetchUpdatedTransactionList(jobIdMap, jobTransactionCustomizationList) {
+        const jobTransactionCustomizationListParametersDTO = await this.getJobListingParameters();
+        let queryDTO = {}, jobIdList = {}, transactionForDeletingDraft = [], jobTransactionQuery = '';
+        let firstindex = true;
+        for(let jobMasterId in jobIdMap){
+            for(let jobId in jobIdMap[jobMasterId]){
+                if(firstindex) {
+                    jobTransactionQuery = jobTransactionQuery + 'jobId = ' + jobId;
+                    firstindex = false;
+                } else {
+                    jobTransactionQuery = jobTransactionQuery + ' OR jobId = ' + jobId 
+                }
+                jobIdList[jobId] = jobIdMap[jobMasterId][jobId]
+            }
+        }
+        queryDTO.jobTransactionQuery = _.size(jobTransactionQuery) ?  jobTransactionQuery : null
+        let jobTransactionList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO);
+        await keyValueDBService.deleteValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+        for (let jobId in jobIdList) {
+            if (jobTransactionList[jobIdList[jobId].jobMasterId] && !jobTransactionList[jobIdList[jobId].jobMasterId][jobId] && jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] && jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId]) {
+                delete jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId]
+            } else if(jobTransactionList[jobIdList[jobId].jobMasterId] && jobTransactionList[jobIdList[jobId].jobMasterId][jobId]){
+                jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] = jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] ? jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] : {}
+                jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId] = jobTransactionList[jobIdList[jobId].jobMasterId][jobId]
+                transactionForDeletingDraft.push({jobTransactionId : jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId].id})
+            }
+        }
+        if(transactionForDeletingDraft && transactionForDeletingDraft.length){
+            draftService.deleteDraftFromDb(transactionForDeletingDraft)
+        }
+        return _.isEmpty(jobIdMap) ? jobTransactionList : jobTransactionCustomizationList
     }
 
 

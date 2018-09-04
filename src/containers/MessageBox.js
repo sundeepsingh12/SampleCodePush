@@ -30,7 +30,7 @@ function mapStateToProps(state) {
         messageList: state.messageReducer.messageList,
         isLoading: state.messageReducer.isLoading,
         jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
-
+        
     }
 }
 
@@ -50,7 +50,7 @@ class MessageBox extends Component {
     }
 
     componentDidMount() {
-        this.props.actions.getAllMessages()
+        this.props.actions.getAllMessages(this.props.jobTransactionCustomizationList)
     }
 
 

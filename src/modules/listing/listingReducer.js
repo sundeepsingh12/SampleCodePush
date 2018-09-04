@@ -6,7 +6,8 @@ const initialState = new InitialState()
 import {
     JOB_LISTING_START,
     JOB_LISTING_END,
-    RESET_STATE
+    RESET_STATE,
+    SET_UPDATED_TRANSACTION_LIST_IDS
 } from '../../lib/constants'
 
 export default function listingReducer(state = initialState, action) {
@@ -17,6 +18,9 @@ export default function listingReducer(state = initialState, action) {
         case JOB_LISTING_END:
             return state.set('jobTransactionCustomizationList', action.payload.jobTransactionCustomizationList)
                 .set('isRefreshing', false)
+                .set('updatedTransactionListIds',[])
+        case SET_UPDATED_TRANSACTION_LIST_IDS:
+            return state.set('updatedTransactionListIds', action.payload)
         case RESET_STATE:
             return initialState
     }
