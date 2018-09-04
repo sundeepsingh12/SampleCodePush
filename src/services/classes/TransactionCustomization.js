@@ -84,7 +84,6 @@ class TransactionCustomization {
             }
         }
         queryDTO.jobTransactionQuery = _.size(jobTransactionQuery) ?  jobTransactionQuery : null
-        console.logs("queryDTO.jobTransactionQuery",jobIdList,queryDTO.jobTransactionQuery)
         let jobTransactionList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO);
         await keyValueDBService.deleteValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
         for (let jobId in jobIdList) {

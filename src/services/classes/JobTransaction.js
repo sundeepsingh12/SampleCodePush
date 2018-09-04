@@ -38,8 +38,6 @@ class JobTransaction {
      */
     getJobTransactionsForStatusIds(statusIds) {
         let query = statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-        console.logs("statusIds",statusIds)
-
         const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
         return transactionList
     }
@@ -786,7 +784,6 @@ class JobTransaction {
             mapJobMasterJobIdData[jobMasterId] = mapJobMasterJobIdData[jobMasterId] ? mapJobMasterJobIdData[jobMasterId] : {}
             mapJobMasterJobIdData[jobMasterId][data[item].jobId] = { jobMasterId, jobStatusId: data[item].jobStatusId ? data[item].jobStatusId : data[item].statusId }
         }
-        console.logs("data",data)
         keyValueDBService.validateAndSaveData(UPDATE_JOBMASTERID_JOBID_MAP, mapJobMasterJobIdData)
     }
 

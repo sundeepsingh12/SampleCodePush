@@ -171,7 +171,7 @@ class JobDetailsV2 extends PureComponent {
 
   renderStatusList(statusList) {
     let statusView = []
-    if (this.props.jobTransaction.id < 0 && this.props.jobTransaction.jobId < 0 && this.props.jobDataList.length < 1) {//In case of new job which is not synced with server do not show status button
+    if ((this.props.jobTransaction.id < 0  && this.props.jobTransaction.jobId < 0) || (this.props.jobTransaction.id < 0 && this.props.currentStatus.code != 'PENDING'))  {//In case of new job or assign order to hub which is not synced with server do not show status button
       return statusView
     }
     let groupId = this.props.navigation.state.params.groupId ? this.props.navigation.state.params.groupId : null
@@ -309,22 +309,6 @@ class JobDetailsV2 extends PureComponent {
       <View style={[style.seqCircle, { backgroundColor: this.props.navigation.state.params.jobTransaction.identifierColor }]}>
         <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
           {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
-        </Text>
-      </View>
-    )
-  }
-  showTransactionView() {
-    return (
-      <View>
-        <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-          {this.props.navigation.state.params.jobTransaction.line1}
-        </Text>
-        <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-          {this.props.navigation.state.params.jobTransaction.line2}
-        </Text>
-        <Text
-          style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-          {this.props.navigation.state.params.jobTransaction.circleLine1}
         </Text>
       </View>
     )

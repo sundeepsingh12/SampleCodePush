@@ -273,7 +273,6 @@ class Sync {
     contentQuery.job.forEach(jobObject => {
       updatedJobTransactionList[jobObject.jobMasterId] = _.isEmpty(updatedJobTransactionList[jobObject.jobMasterId]) ? {} : updatedJobTransactionList[jobObject.jobMasterId]
       updatedJobTransactionList[jobObject.jobMasterId][jobObject.id] =  {jobMasterId: jobObject.jobMasterId, jobStatusId : jobObject.lastTransactionStatusId}
-      console.logs("jobObject",jobObject, updatedJobTransactionList)
       jobIds.push(jobObject.id)
     })    
     const existingJobDatas = {
@@ -592,7 +591,6 @@ class Sync {
     const unseenStatusIds = !_.isEmpty(outScanModuleJobMasterIds) ? jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(syncStoreDTO.statusList, outScanModuleJobMasterIds, UNSEEN) : jobStatusService.getAllIdsForCode(syncStoreDTO.statusList, UNSEEN)
     let jobMasterTitleList = [], updatedJobTransactionList = {}
     let updatedJobMasterIdsJobIdsMap = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
-    console.logs("updatedJobMasterIdsJobIdsMap1",updatedJobMasterIdsJobIdsMap)
     updatedJobTransactionList = updatedJobMasterIdsJobIdsMap && !_.isEmpty(updatedJobMasterIdsJobIdsMap.value) ? updatedJobMasterIdsJobIdsMap.value : {}
     let { user } = syncStoreDTO
     while (!isLastPageReached) {
@@ -616,8 +614,7 @@ class Sync {
         if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
           isJobsPresent = true
           const postOrderList = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
-
-          const unseenTransactions = postOrderList && _.size(postOrderList.value) > 0 ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
+          const unseenTransactions = postOrderList && _.size(postOrderList.value) > 0 ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : (_.size(unseenStatusIds) > 0) ? jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds) : []
           const jobMasterIdJobStatusIdTransactionIdDtoObject = jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap, updatedJobTransactionList)
           const messageIdDTOs = jobMasterIdsAndNumberOfMessages && jobMasterIdsAndNumberOfMessages.messageIdDto ? jobMasterIdsAndNumberOfMessages.messageIdDto : []
           if (!isLiveJob) {
@@ -656,7 +653,6 @@ class Sync {
       this.showMessageNotification(jobMasterIdsAndNumberOfMessages.messageIdDto.length)
     }
     if (isJobsPresent) {
-      console.logs("updatedJobMasterIdsJobIdsMap2",updatedJobTransactionList)
       keyValueDBService.validateAndSaveData(UPDATE_JOBMASTERID_JOBID_MAP, updatedJobTransactionList)
       await runSheetService.updateRunSheetUserAndJobSummary()
     }

@@ -42,7 +42,7 @@ export function getBulkJobTransactions(bulkParams, jobTransactionList, updatedTr
             cloneBulkParams.pageObject.additionalParams = JSON.parse(cloneBulkParams.pageObject.additionalParams)
             cloneBulkParams.pageObject.jobMasterIds = JSON.parse(cloneBulkParams.pageObject.jobMasterIds)
             if (isEmpty(jobTransactionCustomizationList) || !isEmpty(updatedTransactionListIds) && !isEmpty(updatedTransactionListIds[cloneBulkParams.pageObject.jobMasterIds[0]]) && bulkService.checkForJobMasterIdsOfUpdatedJobs(updatedTransactionListIds[cloneBulkParams.pageObject.jobMasterIds[0]], cloneBulkParams.pageObject.additionalParams.statusId, jobTransactionCustomizationList[cloneBulkParams.pageObject.jobMasterIds[0]])) {
-                let jobIdList = !isEmpty(jobTransactionCustomizationList) ? Object.values(updatedTransactionListIds) : null
+                let jobIdList = !isEmpty(jobTransactionCustomizationList) ? updatedTransactionListIds : null
                 jobTransactionCustomizationList = await transactionCustomizationService.fetchUpdatedTransactionList(jobIdList, jobTransactionCustomizationList);
                 dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }));
             }
@@ -89,7 +89,7 @@ export function getBulkUpdatedJobTransactions(updatedTransactionListIds, jobTran
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobMaster = jobMasterList ? jobMasterList.value.filter(jobmaster => jobmaster.id == jobMasterId)[0] : {}
             const groupId = jobMaster && jobMaster.enableMultipartAssignment && groupIdValue ? groupIdValue : null
-            jobTransactionCustomizationList = await transactionCustomizationService.fetchUpdatedTransactionList(Object.values(updatedTransactionListIds), jobTransactionCustomizationList);
+            jobTransactionCustomizationList = await transactionCustomizationService.fetchUpdatedTransactionList(updatedTransactionListIds, jobTransactionCustomizationList);
             dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }));
             const bulkTransactionMap =  pickBy(jobTransactionCustomizationList[jobMasterId], function(value, key) {
                 return value.statusId == statusId && value.groupId == groupId && value.jobId > 0 

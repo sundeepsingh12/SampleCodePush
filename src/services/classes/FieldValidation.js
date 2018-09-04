@@ -1,6 +1,6 @@
 'use strict'
 import * as realm from '../../repositories/realmdb'
-import { TABLE_JOB_DATA } from '../../lib/constants'
+import { TABLE_JOB_DATA, TABLE_FIELD_DATA } from '../../lib/constants'
 import moment from 'moment'
 import { jobDataService } from './JobData'
 import { addServerSmsService } from './AddServerSms'
@@ -169,12 +169,15 @@ class FieldValidation {
      * @param {*} jobTransaction 
      */
     parseKey(key, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
-        //TODO cross status validations and other child validations working on parent like mode type of money collect
         if (key.startsWith('F[')) {
             let id = this.splitKey(key, false)
             let fieldAttributeMasterId = parseInt(id)
             fieldAttributeMasterId = fieldAttributeMasterId != NaN ? fieldAttributeMasterId : id
-            if (!formElement[fieldAttributeMasterId] && fieldAttributeMasterParentIdMap) {
+            if (!formElement[fieldAttributeMasterId] && !fieldAttributeMasterParentIdMap[fieldAttributeMasterId]) {
+                let fieldDataQuery = `jobTransactionId = ${jobTransaction.id} AND fieldAttributeMasterId = ${fieldAttributeMasterId}`;
+                let fieldData = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery);
+                return fieldData[0] ? fieldData[0].value : null;
+            } else if (!formElement[fieldAttributeMasterId] && fieldAttributeMasterParentIdMap) {
                 return (this.getChildFieldAttribute(fieldAttributeMasterId, formElement, fieldAttributeMasterParentIdMap))
             } else if (formElement[fieldAttributeMasterId] && (formElement[fieldAttributeMasterId].displayValue == ARRAY_SAROJ_FAREYE || formElement[fieldAttributeMasterId].displayValue == OBJECT_SAROJ_FAREYE)) {
                 let childList = this.getChildFieldDataValue(formElement[fieldAttributeMasterId].childDataList, fieldAttributeMasterId)
@@ -183,7 +186,7 @@ class FieldValidation {
             return formElement[fieldAttributeMasterId] ? formElement[fieldAttributeMasterId].displayValue : null
         } else if (key.startsWith('J[')) {
             let jobAttributeMasterId = this.splitKey(key, true)
-            let jobDataQuery = `jobId = ${jobTransaction.jobId} AND jobAttributeMasterId = ${jobAttributeMasterId} AND parentId = 0`
+            let jobDataQuery = `jobId = ${jobTransaction.jobId} AND jobAttributeMasterId = ${jobAttributeMasterId}`
             const jobData = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
             return jobData[0] ? jobData[0].value : null
         } else if (key.includes('_') && key.split('_')[0] == 'fixed') {
@@ -533,7 +536,7 @@ class FieldValidation {
         }
         let jobDataMap = jobDataService.getJobData(singleJobTransactionArray)[singleJobTransactionArray[0].jobId]
         let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAndFieldAttributesList, singleJobTransactionArray[0].jobMasterId)
-        alertMessage = addServerSmsService.checkForRecursiveData(alertMessage, '', jobDataMap, formElement, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap, fieldAndJobAttrMap.keyToJobAttributeMap, {value: jobAndFieldAttributesList.user})
+        alertMessage = addServerSmsService.checkForRecursiveData(alertMessage, '', jobDataMap, formElement, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap, fieldAndJobAttrMap.keyToJobAttributeMap, { value: jobAndFieldAttributesList.user })
         return alertMessage
     }
 
