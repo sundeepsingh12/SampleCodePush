@@ -1,3 +1,4 @@
+
 import keyMirror from 'keymirror'
 
 //keyMirror is a simple utility for creating an object with values equal to its keys.
@@ -476,11 +477,14 @@ module.exports = keyMirror({
     CLEAR_PASSWORD_TEXTINPUT: null,
     TOGGLE_SAVE_RESET_BUTTON: null,
     IS_PROFILE_LOADING: null,
+
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
     SORTING_LOADER: null,
     DEFAULT_ERROR_MESSAGE_IN_SORTING: null,
+    SET_SORTING_BLUETOOTH_CONNECTION: null,
+    SORTING_INITIAL_STATE: null,
 
     //Live Job actions
     SET_LIVE_JOB_LIST: null,
