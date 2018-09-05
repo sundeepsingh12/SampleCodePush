@@ -268,7 +268,7 @@ class Sync {
   }
 
 
-  async saveDataFromServerInDB(contentQuery, updatedJobTransactionList, isLiveJob, jobIdToLiveJobMap) {
+  async saveDataFromServerInDB(contentQuery, updatedJobTransactionList, isLiveJob, jobIdToLiveJobMap,isUpdateStatus = false) {
     const jobIds = []
     contentQuery.job.forEach(jobObject => {
       updatedJobTransactionList[jobObject.jobMasterId] = _.isEmpty(updatedJobTransactionList[jobObject.jobMasterId]) ? {} : updatedJobTransactionList[jobObject.jobMasterId]
@@ -306,7 +306,12 @@ class Sync {
 
     //Job data is deleted in insert query also,to handle multiple login case 
     //Ideally Id should be added server side in jobdata table
-    realm.deleteRecordsInBatch(existingJobDatas)
+
+    //Job data comes blank in case of 'updateStatus' query type
+    if(!isUpdateStatus){
+      realm.deleteRecordsInBatch(existingJobDatas)
+    }
+   
     realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
     let jobMasterIds = this.getJobMasterIds(contentQuery.job)
     if (isLiveJob) {
@@ -345,7 +350,7 @@ class Sync {
     both jobs would be deleted and insert but at insert field data of one job will be found resulting in deletion of
     field data of 2nd job.Same goes for job data
     */
-   const jobIds = contentQuery.job.map(jobObject => jobObject.id)
+   const jobIds = contentQuery.jobData.map(jobDataObject => jobDataObject.jobId)
     let { jobTransactionsIds, newJobTransactionsIds } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions, updatedJobTransactionList)
     let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
     const jobDatas = {
@@ -371,7 +376,7 @@ class Sync {
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
     realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, jobFieldData)
-    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery, updatedJobTransactionList)
+    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery, updatedJobTransactionList,null,null,true)
     return jobMasterIds
   }
 
