@@ -424,9 +424,6 @@ module.exports = {
     //TaskListScreen
     NO_NEXT_STATUS: 'No NextStatus Available',
 
-    //TabScreen
-    NO_TAB_PRESENT: 'No Tab Present',
-
     //Draft Modal
     DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',
 
