@@ -4,11 +4,8 @@ import { connect } from 'react-redux'
 import Loader from '../components/Loader'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Body, StyleProvider } from 'native-base';
+import { Container, Content, Header, Button, Text, Body } from 'native-base';
 import { AUTHENTICATING, DOWNLOADING, INTERNAL_ERROR, INTERNAL_SERVER_ERROR, NO_INTERNET, RE_SYNC, RETRY, SYNC_OK_TEXT, UNSYNCED_TASKS, UPLOADING, } from '../lib/ContainerConstants'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 
@@ -184,24 +181,24 @@ class SyncScreen extends PureComponent {
     const syncView = this.getSyncView()
     const transactionView = this.getTransactionView()
     return (
-        <Container>
-            <Header searchBar style={[styles.bgWhite, style.header]}>
-              <Body>
-                <View
-                  style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                  <View style={[style.headerBody]}>
-                    <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Sync</Text>
-                    <Text style={[styles.fontCenter, styles.fontBlack, styles.fontSm, styles.alignCenter]}>{this.props.lastSyncTime}</Text>
-                  </View>
-                  <View />
-                </View>
-              </Body>
-            </Header>
-          <Content style={[styles.bgLightGray]}>
-            {syncView}
-            {transactionView}
-          </Content>
-        </Container>
+      <Container>
+        <Header searchBar style={[styles.bgWhite, style.header]}>
+          <Body>
+            <View
+              style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+              <View style={[style.headerBody]}>
+                <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Sync</Text>
+                <Text style={[styles.fontCenter, styles.fontBlack, styles.fontSm, styles.alignCenter]}>{this.props.lastSyncTime}</Text>
+              </View>
+              <View />
+            </View>
+          </Body>
+        </Header>
+        <Content style={[styles.bgLightGray]}>
+          {syncView}
+          {transactionView}
+        </Content>
+      </Container>
 
     )
   }

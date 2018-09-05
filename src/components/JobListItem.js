@@ -3,13 +3,11 @@ import { StyleSheet, View, TouchableHighlight, Alert } from 'react-native'
 import styles from '../themes/FeStyle'
 
 import {
-  Button,
   Text,
   Icon,
   ActionSheet,
 } from 'native-base'
 import moment from 'moment'
-import renderIf from '../lib/renderIf'
 import {
   SELECT_NUMBER_FOR_CALL,
   OK,
@@ -21,126 +19,19 @@ import {
 import Communications from 'react-native-communications'
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
-import MessageButtonItem from './MessageButtonItem'
+import MessagingCallingSmsButtonView from './MessagingCallingSmsButtonView'
 
 export default class JobListItem extends PureComponent {
 
-  callButtonPressed = () => {
-    if (this.props.data.jobSwipableDetails.contactData.length > 1) {
-      let contactData = this.props.data.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
-      contactData.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
-      ActionSheet.show(
-        {
-          options: contactData,
-          cancelButtonIndex: contactData.length - 1,
-          title: SELECT_NUMBER_FOR_CALL
-        },
-        buttonIndex => {
-          if (buttonIndex != contactData.length - 1 && buttonIndex >= 0) {
-            this.callContact(this.props.data.jobSwipableDetails.contactData[buttonIndex])
-          }
-        }
-      )
-    }
-    else {
-      Alert.alert(CONFIRMATION + this.props.data.jobSwipableDetails.contactData[0], CALL_CONFIRM,
-        [{ text: CANCEL, onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-        { text: OK, onPress: () => this.callContact(this.props.data.jobSwipableDetails.contactData[0]) },],
-        { cancelable: false })
-    }
-  }
-
-  callContact = (contact) => {
-    Communications.phonecall(contact, false)
-  }
-
-  customerCareButtonPressed = () => {
-    let customerCareTitles = this.props.data.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
-    customerCareTitles.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
-    ActionSheet.show(
-      {
-        options: customerCareTitles,
-        cancelButtonIndex: customerCareTitles.length - 1,
-        title: SELECT_NUMBER_FOR_CALL
-      },
-      buttonIndex => {
-        if (buttonIndex != customerCareTitles.length - 1 && buttonIndex >= 0) {
-          this.callContact(this.props.data.jobSwipableDetails.customerCareData[buttonIndex].mobileNumber)
-        }
-      }
-    )
-  }
   constructor(props) {
     super(props)
     this.state = {
       timer: 0,
       counter: 0,
-  };
-}
-componentWillUnmount() {
-  clearInterval(this.state.timer);
-}
-
-  navigationButtonPressed = () => {
-    const addressDatas = this.props.data.jobSwipableDetails.addressData
-    const latitude = this.props.data.jobLatitude
-    const longitude = this.props.data.jobLongitude
-    let data
-
-    if (latitude && longitude) {
-      data = {
-        source: {},
-        destination: {
-          latitude,
-          longitude
-        },
-      }
-      getDirections(data)
-    }
-    else {
-      let addressArray = []
-      Object.values(addressDatas).forEach(object => {
-        addressArray.push({ text: Object.values(object).join(), icon: "md-arrow-dropright", iconColor: "#000000" })
-      })
-      addressArray.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
-      if (_.size(addressArray) > 2) {
-        ActionSheet.show(
-          {
-            options: addressArray,
-            cancelButtonIndex: addressArray.length - 1,
-            title: SELECT_ADDRESS_NAVIGATION
-          },
-          buttonIndex => {
-            if (buttonIndex != addressArray.length - 1 && buttonIndex >= 0) {
-              data = {
-                source: {},
-                destination: {},
-                params: [
-                  {
-                    key: 'q',
-                    value: addressArray[buttonIndex].text
-                  }
-                ]
-              }
-              getDirections(data)
-            }
-          }
-        )
-      } else {
-        data = {
-          source: {},
-          destination: {},
-          params: [
-            {
-              key: 'q',
-              value: addressArray[0].text
-            }
-          ]
-        }
-        getDirections(data)
-      }
-    }
+    };
+  }
+  componentWillUnmount() {
+    clearInterval(this.state.timer);
   }
 
   showJobMasterIdentifierAndCheckMark() {
@@ -150,26 +41,26 @@ componentWillUnmount() {
           {this.props.data.jobMasterIdentifier}
         </Text>
         {this.props.data.isChecked ? <View style={[styles.absolute, styles.bgSuccess, styles.justifyCenter, styles.alignCenter, style.selectedItemCircle]}>
-          <Icon name="ios-checkmark" style={[styles.bgTransparent, styles.fontWhite, {marginTop: -5}]} />
+          <Icon name="ios-checkmark" style={[styles.bgTransparent, styles.fontWhite, { marginTop: -5 }]} />
         </View> : null}
       </View>
     )
   }
-  componentDidMount(){
-    if(this.props.jobEndTime && !this.state.timer){
+  componentDidMount() {
+    if (this.props.jobEndTime && !this.state.timer) {
       let currentTime = moment()
       this.setState({ counter: moment.utc(moment(this.props.jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss") })
       let timer = setInterval(this.tick, 1000);
       this.setState({ timer });
     }
   }
-  tick = () => { 
+  tick = () => {
     let currentTime = moment()
-    if(moment(this.props.jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss")) <= 0){
-      this.setState({ counter: moment.utc(moment(currentTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss") }) 
+    if (moment(this.props.jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss")) <= 0) {
+      this.setState({ counter: moment.utc(moment(currentTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss") })
       clearInterval(this.state.timer);
-    }else{
-      this.setState({ counter: moment.utc(moment(this.props.jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss") }) 
+    } else {
+      this.setState({ counter: moment.utc(moment(this.props.jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss") })
     }
   }
 
@@ -272,30 +163,11 @@ componentWillUnmount() {
   }
 
   showActionButtonSection() {
-    return (
-      <View style={[styles.row, { marginLeft: -10 }]}>
-        {renderIf(this.props.data.jobSwipableDetails.contactData && this.props.data.jobSwipableDetails.contactData.length > 0 && this.props.data.jobSwipableDetails.smsTemplateData && this.props.data.jobSwipableDetails.smsTemplateData.length > 0,
-          <MessageButtonItem sendMessageToContact = {this.props.onChatButtonPressed} jobSwipableDetails = {this.props.data.jobSwipableDetails}/>
-        )}
-        {renderIf(this.props.data.jobSwipableDetails.contactData && this.props.data.jobSwipableDetails.contactData.length > 0 && this.props.showIconsInJobListing,
-          <Button transparent onPress={this.callButtonPressed}>
-            <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]}/>
-          </Button>
-        )}
-
-        {renderIf((!_.isEmpty(this.props.data.jobSwipableDetails.addressData) ||
-          (this.props.data.jobLatitude && this.props.data.jobLongitude)) && this.props.showIconsInJobListing,
-          <Button transparent onPress={this.navigationButtonPressed}>
-            <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
-          </Button>)}
-
-
-        {renderIf(this.props.data.jobSwipableDetails.customerCareData && this.props.data.jobSwipableDetails.customerCareData.length > 0 && this.props.showIconsInJobListing,
-          <Button transparent onPress={this.customerCareButtonPressed}>
-            <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
-          </Button>)}
-      </View>
-    )
+    if (this.props.data) {
+      return (
+        <MessagingCallingSmsButtonView sendMessageToContact={this.props.onChatButtonPressed} jobTransaction={this.props.data} />
+      )
+    }
   }
 }
 

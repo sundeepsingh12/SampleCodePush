@@ -13,12 +13,13 @@ import { connect } from 'react-redux'
 import BasicFormElement from '../components/FormLayoutBasicComponent.js'
 import Loader from '../components/Loader'
 import { NET_BANKING, NET_BANKING_LINK, NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, UPI, MOSAMBEE_WALLET, MOSAMBEE } from '../lib/AttributeConstants'
-import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_STATE } from '../lib/constants'
+import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_STATE, JobDetailsV2 } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
 import { ALERT, INVALID_FORM_ALERT, OK } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
-import { navigate } from '../modules/navigators/NavigationService'
+import { navigate, navDispatch } from '../modules/navigators/NavigationService'
 import isEmpty from 'lodash/isEmpty'
+
 
 function mapStateToProps(state) {
   return {
@@ -32,7 +33,6 @@ function mapStateToProps(state) {
     isLoading: state.formLayout.isLoading,
     errorMessage: state.formLayout.errorMessage,
     currentElement: state.formLayout.currentElement,
-    pieChart: state.home.pieChart,
     updateDraft: state.formLayout.updateDraft,
     isFormValid: state.formLayout.isFormValid,
     sequenceWiseFieldAttributeMasterIds: state.formLayout.sequenceWiseFieldAttributeMasterIds,
@@ -40,7 +40,8 @@ function mapStateToProps(state) {
     fieldAttributeMasterParentIdMap: state.formLayout.fieldAttributeMasterParentIdMap,
     noFieldAttributeMappedWithStatus: state.formLayout.noFieldAttributeMappedWithStatus,
     arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
-    jobAndFieldAttributesList: state.formLayout.jobAndFieldAttributesList
+    jobAndFieldAttributesList: state.formLayout.jobAndFieldAttributesList,
+    updatedTransactionListIds: state.listing.updatedTransactionListIds
   }
 }
 
@@ -55,11 +56,14 @@ class FormLayout extends PureComponent {
   _willBlurSubscription;
 
   static navigationOptions = ({ navigation, props }) => {
-    return { header: <TitleHeader pageName={navigation.state.params.statusName} goBack={navigation.state.params.backForTransient} /> }
+    return { header: null   }
   }
 
   constructor(props) {
     super(props);
+    this.state = {
+      updatingData : null
+    }
     this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
       BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
     );
@@ -76,13 +80,51 @@ class FormLayout extends PureComponent {
       })
       this.props.actions.setState(ERROR_MESSAGE, '')
     }
+    let transactionList = this.props.navigation.state.params.jobTransaction  && !isEmpty(this.props.updatedTransactionListIds) &&  !isEmpty(this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId]) ? this.props.jobTransactionId ? [this.props.navigation.state.params.jobTransaction] : this.props.navigation.state.params.jobTransaction : null
+    if( transactionList && this.checkForUpdatedTransactionList(transactionList, this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId])){
+      this.setState({updatingData : this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId]})
+    }
   }
 
-  // componentWillUnmount() {
-  //   if (this.props.noFieldAttributeMappedWithStatus) {
-  //     this.props.actions.setState(SET_NO_FIELD_ATTRIBUTE_MAPPED, false)
-  //   }
-  // }
+  checkForUpdatedTransactionList(transactionList, updatedTransactionListIds){
+    for(let item in transactionList){
+      if(updatedTransactionListIds[transactionList[item].jobId]){
+        return true
+      }
+    }
+    return false
+  }
+
+  headerView(){
+    if(!this.state.updatingData){
+      return <TitleHeader pageName={this.props.navigation.state.params.statusName} goBack={this.props.navigation.state.params.backForTransient} />
+    }
+  }
+
+  deletedTransactionView() {
+    return (
+      <StyleProvider style={getTheme(platform)}>
+        <Container style={[styles.bgWhite]}>
+          <View style={[styles.justifyCenter, styles.alignCenter, styles.column, styles.flex1]}>
+            <Text style={[{ paddingLeft: 70, paddingRight: 72 }, styles.fontCenter, styles.fontDarkGray, styles.marginTop10]}>Some changes were made from the server. Please go to the details page and start again.</Text>
+            <View style={[{ width: 100, marginTop : 50 }, styles.alignCenter, styles.justifyCenter]}>
+            <Button success
+              onPress={() => this.resetBackToUpdatedView()}>
+              <Text style={[styles.fontLg, styles.fontWhite]}>Refresh</Text>
+            </Button>
+            </View>
+          </View>
+
+        </Container>
+      </StyleProvider>
+    )
+  }
+
+  resetBackToUpdatedView() {
+    this.props.actions.deleteDraftForTransactions(this.props.navigation.state.params.jobTransaction, this.state.updatingData)
+    this.setState({updatingData : null})
+    this.props.navigation.goBack(null)
+  }
 
   componentDidMount() {
     this.props.navigation.setParams({ backForTransient: this._goBack });
@@ -296,8 +338,10 @@ class FormLayout extends PureComponent {
     const footerView = this.getFooterView(transient, saveActivated)
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
+    if(this.state.updatingData){ return this.deletedTransactionView() }
     if (this.props.formElement && this.props.formElement.length == 0) {
-      <SafeAreaView style={[styles.bgWhite]}>
+      <SafeAreaView style={[styles.bgWhite]}>   
+            {this.headerView()}
         <Footer style={[style.footer]}>
           <FooterTab style={[styles.padding10]}>
             <Button success full
@@ -311,6 +355,7 @@ class FormLayout extends PureComponent {
     }
     if (Platform.OS == 'ios') {
       formView = <KeyboardAvoidingView style={[{ flex: 1 }, styles.bgWhite]} behavior="padding">
+        {this.headerView()}
         {invalidFormAlert}
         {emptyFieldAttributeForStatusView}
         {this.renderFormLayoutView()}
@@ -318,6 +363,7 @@ class FormLayout extends PureComponent {
       </KeyboardAvoidingView >
     } else {
       formView = <Container>
+        {this.headerView()}
         {invalidFormAlert}
         {emptyFieldAttributeForStatusView}
         {this.renderFormLayoutView()}

@@ -1,27 +1,35 @@
 'use strict'
 import React, { PureComponent } from 'react';
-import {  View, SectionList, TouchableOpacity, Text } from 'react-native';
+import { View, SectionList, TouchableOpacity, Text } from 'react-native';
 import { Container, Content, List, Separator, Icon, Toast } from 'native-base';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as taskListActions from '../modules/taskList/taskListActions';
 import * as globalActions from '../modules/global/globalActions';
-import _ from 'lodash';
 import Loader from '../components/Loader';
 import styles from '../themes/FeStyle';
-import {  LISTING_SEARCH_VALUE, BulkListing, JobDetailsV2, TASKLIST_LOADER_FOR_SYNC} from '../lib/constants'
+import { LISTING_SEARCH_VALUE, JobDetailsV2, TASKLIST_LOADER_FOR_SYNC } from '../lib/constants'
 import JobListItem from '../components/JobListItem';
 import { NO_NEXT_STATUS, OK, ALL, NO_RESULT_FOUND } from '../lib/ContainerConstants';
 import moment from 'moment';
 import { navigate } from '../modules/navigators/NavigationService';
 import { startSyncAndNavigateToContainer } from '../modules/home/homeActions'
+import isEqual from 'lodash/isEqual'
+import some from 'lodash/some'
+import includes from 'lodash/includes'
+import toLower from 'lodash/toLower'
+import sortBy from 'lodash/sortBy'
+import isEmpty from 'lodash/isEmpty'
+import mapKeys from 'lodash/mapKeys'
+import trim from 'lodash/trim'
 
 
 function mapStateToProps(state) {
   return {
     jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
     isRefreshing: state.listing.isRefreshing,
-    selectedDate: state.taskList.selectedDate
+    selectedDate: state.taskList.selectedDate,
+    updatedTransactionListIds: state.listing.updatedTransactionListIds
   }
 }
 
@@ -34,22 +42,40 @@ function mapDispatchToProps(dispatch) {
 class TaskListScreen extends PureComponent {
 
   componentDidMount() {
-    if (_.isEmpty(this.props.jobTransactionCustomizationList)) {
+    if (isEmpty(this.props.jobTransactionCustomizationList)) {
       this.props.actions.fetchJobs()
+    } else if (!isEmpty(this.props.updatedTransactionListIds) && this.checkForJobMasterIdsOfUpdatedJobs(this.props.updatedTransactionListIds)) {
+      this.props.actions.fetchJobs(this.props.updatedTransactionListIds, this.props.jobTransactionCustomizationList)
     }
-  } 
-
-  componentWillUnmount(){
-    this.props.actions.setState(LISTING_SEARCH_VALUE,{})
   }
 
-  navigateToScene = (item) => {
-    let countOfGroup = this.props.jobTransactionCustomizationList.filter(jobTransaction => jobTransaction.groupId == item.groupId).length;
+  componentDidUpdate() {
+    if (!this.props.isRefreshing && !isEmpty(this.props.updatedTransactionListIds) && this.checkForJobMasterIdsOfUpdatedJobs(this.props.updatedTransactionListIds)) {
+      this.props.actions.fetchJobs(this.props.updatedTransactionListIds, this.props.jobTransactionCustomizationList)
+    }
+  }
+
+  checkForJobMasterIdsOfUpdatedJobs(updatedTransactionListIds) {
+    let updatedJobMasterIdsList = Object.keys(updatedTransactionListIds)
+    let jobMasterMap = mapKeys(JSON.parse(this.props.pageObject.jobMasterIds));
+    for (let jobMaster in updatedJobMasterIdsList) {
+      if (jobMasterMap[updatedJobMasterIdsList[jobMaster]]) {
+        return true
+      }
+    }
+    return false
+  }
+
+  componentWillUnmount() {
+    this.props.actions.setState(LISTING_SEARCH_VALUE, {})
+  }
+
+  navigateToScene = (item, groupId) => {
     navigate(JobDetailsV2,
       {
         jobSwipableDetails: item.jobSwipableDetails,
         jobTransaction: item,
-        groupId: item.groupId == 'nullGroup' || countOfGroup < 2 ? null : item.groupId,
+        groupId,
         pageObjectAdditionalParams: this.props.pageObject.additionalParams
       })
     this.props.actions.setState(LISTING_SEARCH_VALUE, {})
@@ -66,9 +92,9 @@ class TaskListScreen extends PureComponent {
     return (
       <JobListItem
         data={item}
-        onChatButtonPressed = {(contact, smsTemplatedata) => {this.props.actions.setSmsTemplateList(contact, smsTemplatedata, item)}}
+        onChatButtonPressed={(contact, smsTemplatedata) => { this.props.actions.setSmsTemplateList(contact, smsTemplatedata, item) }}
         showIconsInJobListing={true}
-        onPressItem={() => { this.navigateToScene(item) }}
+        onPressItem={() => { this.navigateToScene(item, item.groupId == 'nullGroup' || section.data.length < 2 ? null : item.groupId) }}
         lastId={lastId}
       />
     )
@@ -77,14 +103,14 @@ class TaskListScreen extends PureComponent {
   /**Navigate to bulk update when selecting a group of transactions
     *  
     */
-  updateTransactionForGroupId =(item) => {
+  updateTransactionForGroupId = (item) => {
     let jobTransaction = item.data[0];
     if (jobTransaction.isNextStatusPresent) {
-   this.props.actions.startSyncAndNavigateToContainer({
-          jobMasterIds: JSON.stringify([jobTransaction.jobMasterId]),
-          additionalParams: JSON.stringify({ statusId: jobTransaction.statusId }),
-          groupId: jobTransaction.groupId
-        
+      this.props.actions.startSyncAndNavigateToContainer({
+        jobMasterIds: JSON.stringify([jobTransaction.jobMasterId]),
+        additionalParams: JSON.stringify({ statusId: jobTransaction.statusId }),
+        groupId: jobTransaction.groupId
+
       }, true, TASKLIST_LOADER_FOR_SYNC)
     } else {
       Toast.show({
@@ -94,28 +120,28 @@ class TaskListScreen extends PureComponent {
   }
 
   checkTransactionForSearchText(jobTransaction, searchEqualTransactionList) {
-    let trimmedSearchText = _.trim(this.props.searchText.searchText);
-    if (!_.trim(trimmedSearchText)) {
+    let trimmedSearchText = trim(this.props.searchText.searchText);
+    if (!trim(trimmedSearchText)) {
       return true
     }
     let result = false;
-    let searchText = _.toLower(trimmedSearchText);
+    let searchText = toLower(trimmedSearchText);
     let values = [jobTransaction.referenceNumber, jobTransaction.runsheetNo, jobTransaction.line1, jobTransaction.line2, jobTransaction.circleLine1, jobTransaction.circleLine2];
-    if (!jobTransaction.isJobUnseen && _.isEqual(_.toLower(jobTransaction.referenceNumber), searchText) || _.isEqual(_.toLower(jobTransaction.runsheetNo), searchText)) {
+    if (!jobTransaction.isJobUnseen && isEqual(toLower(jobTransaction.referenceNumber), searchText) || isEqual(toLower(jobTransaction.runsheetNo), searchText)) {
       if (this.props.searchText.scanner) {
         searchEqualTransactionList.push(jobTransaction);
       }
       result = true;
-    } else if (_.some(values, (data) => _.includes(_.toLower(data), searchText))) {
+    } else if (some(values, (data) => includes(toLower(data), searchText))) {
       result = true;
     }
     return result;
   }
 
   getTransactionView(jobMasterMap) {
-    let tabJobTransactionList = {}, jobTransactionList = this.renderJobTransactionView(this.props.jobTransactionCustomizationList), searchEqualTransactionList = [];
+    let tabJobTransactionList = {}, jobTransactionList = !isEmpty(this.props.jobTransactionCustomizationList) ? this.renderJobTransactionView(this.props.jobTransactionCustomizationList, jobMasterMap) : [], searchEqualTransactionList = [];
     for (let index in jobTransactionList) {
-      if (!jobMasterMap[jobTransactionList[index].jobMasterId] || !this.checkTransactionForSearchText(jobTransactionList[index], searchEqualTransactionList) || !this.props.statusIdList.includes(jobTransactionList[index].statusId)) {
+      if (!this.checkTransactionForSearchText(jobTransactionList[index], searchEqualTransactionList) || !this.props.statusIdList.includes(jobTransactionList[index].statusId)) {
         continue;
       } else if (!this.props.isFutureRunsheetEnabled) {
         this.prepareJobTrasactionListStructureForViewForNormalCase(tabJobTransactionList, jobTransactionList[index]);
@@ -131,7 +157,7 @@ class TaskListScreen extends PureComponent {
     }
     if (this.props.searchText && this.props.searchText.scanner) {
       this.props.actions.setState(LISTING_SEARCH_VALUE, { searchText: this.props.searchText.searchText, scanner: false })
-      if (_.isEmpty(tabJobTransactionList) && searchEqualTransactionList.length != 1) {
+      if (isEmpty(tabJobTransactionList) && searchEqualTransactionList.length != 1) {
         Toast.show({
           text: NO_RESULT_FOUND,
           position: 'bottom',
@@ -141,9 +167,10 @@ class TaskListScreen extends PureComponent {
       }
     }
     if (searchEqualTransactionList.length == 1) {
-      this.navigateToScene(searchEqualTransactionList[0]);
+      let groupId = !searchEqualTransactionList[0].groupId || jobTransactionList.filter((transaction) => transaction.groupId == searchEqualTransactionList[0].groupId).length < 2 ? null : searchEqualTransactionList[0].groupId
+      this.navigateToScene(searchEqualTransactionList[0], groupId);
     }
-    let transactionListView = this.renderParticularTabJobTransactionList(tabJobTransactionList, this.props.isFutureRunsheetEnabled, false);
+    let transactionListView = this.renderParticularTabJobTransactionList(tabJobTransactionList, this.props.isFutureRunsheetEnabled);
     return transactionListView;
   }
 
@@ -182,17 +209,6 @@ class TaskListScreen extends PureComponent {
     }
   }
 
-  renderSectionList(sections) {
-    return (
-      <SectionList
-        sections={sections}
-        renderItem={({ item, index, section }) => this.renderData(item, index, section)}
-        renderSectionHeader={this.renderGroupSectionHeader}
-        keyExtractor={item => (item.id + '')}
-      />
-    )
-  }
-
   renderDataForBothRusheetAndGroup(item) {
     let sections = Object.values(item.data);
     return (
@@ -212,10 +228,15 @@ class TaskListScreen extends PureComponent {
     )
   }
 
-  renderJobTransactionView(jobTransactionList) {
-    return jobTransactionList.sort(function (transaction1, transaction2) {
-      return transaction2.jobPriority - transaction1.jobPriority || transaction1.seqSelected - transaction2.seqSelected
-    })
+  renderJobTransactionView(jobTransactionArray, jobMasterMap) {
+    let jobTransactionCustomizationList = JSON.parse(JSON.stringify(jobTransactionArray))
+    let jobTransactionList = {}
+    for (let transactionMap in jobTransactionCustomizationList) {
+      if (jobMasterMap[transactionMap]) {
+        jobTransactionList = Object.assign(jobTransactionList, jobTransactionCustomizationList[transactionMap])
+      }
+    }
+    return sortBy(jobTransactionList, function (option) { return option.jobPriority || option.seqSelected });
   }
 
   renderGroupSectionHeader = ({ section }) => {
@@ -239,7 +260,7 @@ class TaskListScreen extends PureComponent {
   }
 
   render() {
-    let jobMasterMap = _.mapKeys(JSON.parse(this.props.pageObject.jobMasterIds));
+    let jobMasterMap = mapKeys(JSON.parse(this.props.pageObject.jobMasterIds));
     let jobTransactionViewStructure = this.getTransactionView(jobMasterMap)
     if (this.props.isRefreshing) {
       return <Loader />

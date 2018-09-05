@@ -13,7 +13,7 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as taskListActions from '../modules/taskList/taskListActions'
 import * as globalActions from '../modules/global/globalActions'
-import { FILTER_REF_NO, ALL_TASKS, NO_TAB_PRESENT } from '../lib/ContainerConstants'
+import { FILTER_REF_NO, ALL_TASKS } from '../lib/ContainerConstants'
 import { IS_CALENDAR_VISIBLE, LISTING_SEARCH_VALUE, SET_LANDING_TAB, SET_SELECTED_DATE, TASKLIST_LOADER_FOR_SYNC } from '../lib/constants'
 import TaskListCalender from '../components/TaskListCalender'
 import TitleHeader from '../components/TitleHeader'
@@ -126,7 +126,7 @@ class TabScreen extends PureComponent {
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container>
-            <Text> {NO_TAB_PRESENT} </Text>
+            <View></View>
           </Container>
         </StyleProvider>
       )
@@ -139,7 +139,7 @@ class TabScreen extends PureComponent {
           <Container>
             <View style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]}>
               <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.fetchDataForScanner.bind(this)} />
-              {this.props.syncLoadingInTaskList ? <SyncLoader moduleLoading={this.props.syncLoadingInTaskList } cancelModal = {this.onCancelPress}/> : null}
+              {this.props.syncLoadingInTaskList ? <SyncLoader moduleLoading={this.props.syncLoadingInTaskList} cancelModal={this.onCancelPress} /> : null}
             </View>
             <Tabs
               tabBarBackgroundColor={styles.bgPrimaryColor}

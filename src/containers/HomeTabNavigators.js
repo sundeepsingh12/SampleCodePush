@@ -151,10 +151,6 @@ const HomeStack = createStackNavigator({
   },
   Sorting: {
     screen: Sorting,
-    navigationOptions: {
-      title: 'Sorting',
-      header: null,
-    }
   },
   Signature: {
     screen: Signature,
@@ -211,12 +207,15 @@ const HomeStack = createStackNavigator({
   QCImageAndRemarksScreen: {
     screen: QCImageAndRemarks
   },
+  BluetoothListing: {
+    screen: BluetoothListing
+  },
   QCSummaryScreen: {
     screen: QCSummary,
     navigationOptions: {
       gesturesEnabled: false
     }
-  }
+  },
 })
 
 HomeStack.navigationOptions = ({ navigation }) => {
