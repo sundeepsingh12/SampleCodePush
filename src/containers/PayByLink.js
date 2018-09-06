@@ -190,7 +190,7 @@ class PayByLink extends PureComponent {
                     </View>
                     <View>
                         <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 50, width: 120 }, styles.alignCenter, styles.justifyCenter, { marginTop: 153 }]}
-                            onPress={() => { this.props.actions.hitPayByLinkApiForPayment(this.props.customerContact, this.props.payByLinkConfigJSON, this.props.navigation.state.params.paymentAtEnd.modeTypeId) }}>
+                            onPress={() => { this.props.actions.hitPayByLinkApiForPayment(this.props.customerContact, this.props.payByLinkConfigJSON, this.props.navigation.state.params.paymentAtEnd.modeTypeId, this.props.navigation.state.params) }}>
                             <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}>{YES_SEND}</Text>
                         </Button>
                     </View>
@@ -265,7 +265,7 @@ class PayByLink extends PureComponent {
         return (
             <View>
                 <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, { height: 50, width: 150 }, styles.alignCenter, styles.justifyCenter, { marginTop: 183 }]}
-                    onPress={() => { this.props.actions.hitPayByLinkApiForPayment(this.props.customerContact, this.props.payByLinkConfigJSON, this.props.navigation.state.params.paymentAtEnd.modeTypeId) }}  >
+                    onPress={() => { this.props.actions.hitPayByLinkApiForPayment(this.props.customerContact, this.props.payByLinkConfigJSON, this.props.navigation.state.params.paymentAtEnd.modeTypeId, this.props.navigation.state.params) }}  >
                     <Text style={[{ color: '#FFFFFF', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}>{RESEND_SMS}</Text>
                 </Button>
             </View>
@@ -295,7 +295,7 @@ class PayByLink extends PureComponent {
                     <FooterTab style={[styles.padding10]}>
                         <Button success full
                             disabled={!size(trim(this.props.customerContact))}
-                            onPress={() => { this.props.actions.hitPayByLinkApiForPayment(this.props.customerContact, this.props.payByLinkConfigJSON, this.props.navigation.state.params.paymentAtEnd.modeTypeId) }}>
+                            onPress={() => { this.props.actions.hitPayByLinkApiForPayment(this.props.customerContact, this.props.payByLinkConfigJSON, this.props.navigation.state.params.paymentAtEnd.modeTypeId, this.props.navigation.state.params) }}>
                             <Text style={[styles.fontLg, styles.fontWhite]}>{SEND_SMS}</Text>
                         </Button>
                     </FooterTab>

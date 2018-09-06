@@ -79,9 +79,11 @@ class MosambeeWalletPayment {
         }
     }
     
-    updateDraftInMosambee(walletParameters, contactData, selectedWalletDetails, formLayoutState, jobMasterId, jobTransaction) {
+    updateDraftInMosambee(walletParameters, contactData, selectedWalletDetails, formLayoutState, jobMasterId, jobTransaction, modeTypeId, transactionType) {
         walletParameters.contactData = contactData
         walletParameters.selectedWalletDetails = selectedWalletDetails
+        walletParameters.modeTypeId = modeTypeId
+        walletParameters.transactionType = transactionType
         formLayoutState.paymentAtEnd.parameters = walletParameters
         draftService.saveDraftInDb(formLayoutState, jobMasterId, null, jobTransaction)
     }
@@ -112,7 +114,7 @@ class MosambeeWalletPayment {
         const checkSum = jsSha512.update(requestBody + walletParameters.apiPassword)
         const requestJSON = "{\"apiPassword\":" + "\"" + walletParameters.secretKey + "\"" + ",\"PayProMID\":" + "\"" + walletParameters.PayProMID + "\"" +
             ",\"comment\":" + "\"" + walletParameters.referenceNoActualAmountMap + "\"" + ",\"checksum\":" + "\"" + checkSum + "\"" + "}";
-        const responseMessage = await this.fetchDatafromWalletApi(walletParameters.partnerId, walletParameters.checkTransactionStatusURL, requestJSON, null, walletParameters.mosambeeUsername, transactionType)
+        const responseMessage = await this.fetchDatafromWalletApi(walletParameters.partnerId, walletParameters.checkTransactionStatusURL, requestJSON, null, walletParameters.mosambeeUsername, String(transactionType))
         return responseMessage
     }
 }
