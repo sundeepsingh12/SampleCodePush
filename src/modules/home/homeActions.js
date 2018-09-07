@@ -42,7 +42,8 @@ import {
   APP_THEME,
   JOB_ATTRIBUTE,
   SET_CALLER_ID_POPUP,
-  BluetoothListing
+  BluetoothListing,
+  JobDetailsV2
 } from '../../lib/constants'
 
 import {
@@ -113,6 +114,7 @@ import { jobDataService } from '../../services/classes/JobData'
 import { jobService } from '../../services/classes/Job'
 import { each, size, isNull } from 'lodash'
 import { AppState, Linking } from 'react-native'
+import { countDownTimerService } from '../../services/classes/CountDownTimerService'
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -391,7 +393,7 @@ export function startFCM() {
             alert: true
           });
         } catch (e) {
-          showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED+'\n'+e.message, 'danger', 1)
+          showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED + '\n' + e.message, 'danger', 1)
         }
         const userObject = await keyValueDBService.getValueFromStore(USER)
         const topic = `FE_${userObject.value.id}`
@@ -401,7 +403,7 @@ export function startFCM() {
           await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
 
         }, (error) => {
-        }).catch((error) => showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR+'\n'+error.message, 'danger', 1))
+        }).catch((error) => showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR + '\n' + error.message, 'danger', 1))
 
         if (Platform.OS === 'ios') {
           FCM.getAPNSToken().then(token => {
@@ -773,4 +775,16 @@ export function registerCallReceiver() {
     }
   }
 
+}
+export function handleCountDownTimerEvent(intentData) {
+  return async function (dispatch) {
+    try {
+      let jobTransaction = await countDownTimerService.navigateToJobDetailsAndScheduleAlarm(intentData)
+      if (jobTransaction) {
+        navigate(JobDetailsV2, { jobTransaction, jobSwipableDetails: {}, calledFromAlarm: true })
+      }
+    } catch (error) {
+      showToastAndAddUserExceptionLog(2713, error.message, 'danger', 1)
+    }
+  }
 }

@@ -27,7 +27,7 @@ import {
 } from '../lib/ContainerConstants'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Alert, Image } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Alert, Image, Vibration } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Content, Header, Button, Text, Right, Icon, StyleProvider, ListItem, Footer, FooterTab, ActionSheet, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
@@ -62,7 +62,8 @@ import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { navigate } from '../modules/navigators/NavigationService';
 import MessageButtonItem from '../components/MessageButtonItem'
-
+import Sound from 'react-native-sound';
+import BackgroundTimer from 'react-native-background-timer'
 function mapStateToProps(state) {
   return {
     addressList: state.jobDetails.addressList,
@@ -100,6 +101,33 @@ class JobDetailsV2 extends PureComponent {
 
   componentDidMount() {
     this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key)
+    if (this.props.navigation.state.params && this.props.navigation.state.params.calledFromAlarm) {
+      Vibration.vibrate([1000, 2000, 3000], true)
+      this.props.navigation.state.params.calledFromAlarm = false
+      Sound.setCategory('Playback');
+      this.alarm = new Sound('alarm_notification.mp3', Sound.MAIN_BUNDLE, (error) => {
+        if (error) {
+          console.log('failed to load the sound', error);
+          return;
+        }
+        // loaded successfully
+        this.alarm.play((success) => {
+          if (success) {
+            console.log('successfully finished playing');
+          } else {
+            console.log('playback failed due to audio decoding errors');
+            // reset the player to its uninitialized state (android only)
+            // this is the only option to recover after an error occured and use the player again
+            this.alarm.reset();
+          }
+        });
+        this.alarm.setNumberOfLoops(-1);
+      });
+      BackgroundTimer.setTimeout(() => {
+        Vibration.cancel()
+        this.alarm.stop()
+      }, 30000)
+    }
   }
 
   componentWillUnmount() {
@@ -113,12 +141,16 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.isShowDropdown) {
       this.props.actions.setState(SHOW_DROPDOWN, null)
     }
+    if (this.alarm) {
+      Vibration.cancel()
+      this.alarm.stop()
+    }
   }
 
   navigateToDataStoreDetails = (navigationParam) => {
     navigate(DataStoreDetails, navigationParam)
   }
-  
+
   navigateToCameraDetails = (navigationParam) => {
     navigate(ImageDetailsView, navigationParam)
   }
@@ -404,7 +436,7 @@ class JobDetailsV2 extends PureComponent {
       }
     )
   }
- 
+
   showDraftAlert() {
     return <DraftModal draftStatusInfo={this.props.draftStatusInfo} onOkPress={() => this._goToFormLayoutWithDraft()} onCancelPress={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} onRequestClose={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} />
   }
@@ -575,32 +607,32 @@ class JobDetailsV2 extends PureComponent {
 
   showFooterView() {
     return (
-        <Footer style={[style.footer]}>
-          {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0 && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
-            <FooterTab>
-            <MessageButtonItem sendMessageToContact = {this.sendMessageToContact} jobSwipableDetails = {this.props.navigation.state.params.jobSwipableDetails}/>
-            </FooterTab>
-          )}
-          {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
-            <FooterTab>
-              <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
-                <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
-              </Button>
-            </FooterTab>
-          )}
-          {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) || (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
-            <FooterTab>
-              <Button full onPress={this.navigationButtonPressed}>
-                <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
-              </Button>
-            </FooterTab>)}
-          {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
-            <FooterTab>
-              <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
-                <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
-              </Button>
-            </FooterTab>)}
-        </Footer>
+      <Footer style={[style.footer]}>
+        {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0 && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
+          <FooterTab>
+            <MessageButtonItem sendMessageToContact={this.sendMessageToContact} jobSwipableDetails={this.props.navigation.state.params.jobSwipableDetails} />
+          </FooterTab>
+        )}
+        {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
+          <FooterTab>
+            <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
+              <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+            </Button>
+          </FooterTab>
+        )}
+        {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) || (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
+          <FooterTab>
+            <Button full onPress={this.navigationButtonPressed}>
+              <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
+            </Button>
+          </FooterTab>)}
+        {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
+          <FooterTab>
+            <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
+              <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
+            </Button>
+          </FooterTab>)}
+      </Footer>
     )
   }
 
@@ -691,8 +723,8 @@ class JobDetailsV2 extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgLightGray]}>
-        
-          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal = {this.onCancelPress}/> : null}
+
+          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal={this.onCancelPress} /> : null}
           {draftAlert}
           {mismatchAlert}
           {this.showHeaderView()}

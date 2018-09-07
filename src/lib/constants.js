@@ -251,6 +251,7 @@ module.exports = keyMirror({
     LAST_CALL_AND_SMS_TIME: null,
     LONG_CODE_SIM_VERIFICATION: null,
     ENCRYPTION_KEY: null,
+    ALARM_JOB_TIMES: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,

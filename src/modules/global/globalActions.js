@@ -18,7 +18,8 @@ import {
   USER_EXCEPTION_LOGS,
   SYNC_RUNNING_AND_TRANSACTION_SAVING,
   LoginScreen,
-  IS_SHOW_MOBILE_OTP_SCREEN
+  IS_SHOW_MOBILE_OTP_SCREEN,
+  ALARM_JOB_TIMES
 } from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import CONFIG from '../../lib/config'
@@ -65,6 +66,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(USER_EXCEPTION_LOGS)
       await keyValueDBService.deleteValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING)
       await keyValueDBService.deleteValueFromStore('LOGGED_IN_ROUTE')
+      await keyValueDBService.deleteValueFromStore(ALARM_JOB_TIMES)
       await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0

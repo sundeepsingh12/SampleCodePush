@@ -68,16 +68,16 @@ export function performBatchSave(...tableNamesVsDataList) {
         // Create counter block from imei number used for encryption
         let counterBlock = Array.from(imeiNumber).slice(0, 8)
         tableNamesVsDataList.forEach(record => {
-                if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
-                    if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
-                        for (let data in record.value) {
-                            record.value[data].value = _encryptData(record.value[data].value, imeiNumber, counterBlock)
-                            realm.create(record.tableName, record.value[data], true)
-                        }
-                    } else {
-                        record.value.forEach(data => realm.create(record.tableName, data, true))
+            if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
+                if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
+                    for (let data in record.value) {
+                        record.value[data].value = _encryptData(record.value[data].value, imeiNumber, counterBlock)
+                        realm.create(record.tableName, record.value[data], true)
                     }
+                } else {
+                    record.value.forEach(data => realm.create(record.tableName, data, true))
                 }
+            }
         })
     })
 }
@@ -96,6 +96,9 @@ export function _encryptData(dataToEncrypt, encryptionKey, counterBlock) {
 }
 
 export function _decryptData(dataToDecrypt, decryptionKey) {
+    if (!decryptionKey) {
+        decryptionKey = DeviceInfo.getUniqueID()
+    }
     return AesCtr.decrypt(dataToDecrypt, decryptionKey, 256)
 }
 export function deleteRecords() {

@@ -3,7 +3,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, Platform, ActivityIndicator, SectionList, Modal, TouchableOpacity, FlatList, TouchableHighlight, Linking } from 'react-native'
+import { StyleSheet, View, Image, Platform, ActivityIndicator, SectionList, Modal, TouchableOpacity, FlatList, TouchableHighlight, Linking, DeviceEventEmitter } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import Loader from '../components/Loader'
 import PieChart from '../components/PieChart'
@@ -68,6 +68,12 @@ class Home extends PureComponent {
           this.navigate(url)
         }
       });
+      this.nativeEventListener = DeviceEventEmitter.addListener('SHOW_ALARM',
+        (e) => {
+          //console.log('e', e)
+          let data = JSON.parse(e[0])
+          this.props.actions.handleCountDownTimerEvent(data)
+        })
     } else {
       Linking.addEventListener('url', this.handleOpenURL);
     }
@@ -77,7 +83,7 @@ class Home extends PureComponent {
       this.navigate(event.url)
     }
   }
-  
+
   navigate(url) {
     this.props.actions.navigateToLiveJob(url)
   }
