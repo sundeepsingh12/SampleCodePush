@@ -30,7 +30,7 @@ var CryptoJS = require("crypto-js");
 
 class SyncZip {
 
-    async createZip(syncStoreDTO) {
+    async createZip(syncStoreDTO,isCalledFromLogout) {
         //Create FarEye folder if doesn't exist
         RNFS.mkdir(PATH);
         RNFS.mkdir(PATH_TEMP);
@@ -38,7 +38,7 @@ class SyncZip {
         var SYNC_RESULTS = {};
         let lastSyncTime = syncStoreDTO.lastSyncWithServer
       
-        let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced);
+        let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced,isCalledFromLogout);
         const syncDataDTO = realmDbData.syncDataDTO
         SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
         SYNC_RESULTS.job = realmDbData.jobList;
@@ -153,7 +153,7 @@ class SyncZip {
             trackLogs
      * }
      */
-    getDataToBeSyncedFromDB(transactionIdList) {
+    getDataToBeSyncedFromDB(transactionIdList,isCalledFromLogout) {
         let userExceptionLog = this.getDataFromRealmDB(null, USER_EXCEPTION_LOGS)
         let runSheetSummary = this.getDataFromRealmDB(null, TABLE_RUNSHEET);
         let trackLogs = this.getDataFromRealmDB(null, TABLE_TRACK_LOGS);
@@ -170,8 +170,8 @@ class SyncZip {
                         jobQuery = `id = ${transactionIdList[index].jobId}`;
                         transactionLogQuery = `transactionId = ${transactionIdList[index].id}`;
                     }
-                      //Prepare logs.json for 150 job transactions at a time
-                    else if(counter == 150){
+                      //Prepare logs.json for 100 job transactions at a time
+                    else if(!isCalledFromLogout && counter == 100){
                         break
                     }
                     else{

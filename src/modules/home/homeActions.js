@@ -434,7 +434,7 @@ export function startFCM() {
   }
 }
 
-export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogout, isLiveJob) {
+export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogout, isLiveJob,isCalledFromLogout = false) {
   return async function (dispatch) {
     let syncStoreDTO
     try {
@@ -461,7 +461,7 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
           unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
           syncStatus: 'Uploading'
         }))
-        const responseBody = await sync.createAndUploadZip(syncStoreDTO, currenDate)
+        const responseBody = await sync.createAndUploadZip(syncStoreDTO, currenDate,isCalledFromLogout)
         syncCount = parseInt(responseBody.split(",")[1])
       }
       isCalledFromHome = userData && userData.company && userData.company.customErpPullActivated ? false : isCalledFromHome
@@ -509,8 +509,11 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
         erpModalVisible: true,
         lastErpSyncTime: userData.lastERPSyncWithServer
       }))
-      //Now schedule sync service which will run regularly after 2 mins
-      await dispatch(syncService())
+      //Now schedule sync service which will run regularly after 2 mins,if sync is started from logout,then don't reschedule it
+      if(!isCalledFromLogout){
+        await dispatch(syncService())
+      }
+     
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
       if (isNull(serverReachable) || serverReachable.value == 2) {
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
