@@ -14,7 +14,10 @@ class LiveJobService {
     async getLiveJobList() {
         const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
         let jobTransactionCustomizationList = this.getLiveJobAndJobDataList(jobTransactionCustomizationListParametersDTO)
-        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id')
+        let idJobTransactionCustomizationListMap = {}
+        for (let index in jobTransactionCustomizationList) {
+            idJobTransactionCustomizationListMap = Object.assign(idJobTransactionCustomizationListMap, jobTransactionCustomizationList[index])
+        }
         const liveJobsWithValidTime = this.checkJobExpiry(idJobTransactionCustomizationListMap)
         return liveJobsWithValidTime
     }
