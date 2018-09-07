@@ -91,12 +91,15 @@ class DataStore extends PureComponent {
         let secondValue
         if (item.matchKey == item.uniqueKey || item.uniqueKey == _id) {
             for (let singleItem in item.dataStoreAttributeValueMap) {
+                if (singleItem == _id) {
+                    continue
+                }
                 if (item.dataStoreAttributeValueMap[singleItem] != firstValue) {
                     secondValue = item.dataStoreAttributeValueMap[singleItem]
                     break
                 }
             }
-        } else {
+        } else if (item.uniqueKey != _id) {
             secondValue = item.dataStoreAttributeValueMap[item.uniqueKey]
         }
         return {
@@ -115,9 +118,9 @@ class DataStore extends PureComponent {
                         {firstValue && <View style={[style.cardLeftTopRow]}>
                             <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10, styles.fontWeight500, styles.fontDefault]}>{firstValue}</Text>
                         </View>}
-                        {secondValue && <View style={[styles.row]}>
+                        {secondValue ? <View style={[styles.row]}>
                             <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10, styles.fontWeight400, styles.fontSm]}>{secondValue}</Text>
-                        </View>}
+                        </View> : null}
                     </View>
                 </TouchableOpacity>
             </Card>
