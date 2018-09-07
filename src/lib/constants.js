@@ -1,3 +1,4 @@
+
 import keyMirror from 'keymirror'
 
 //keyMirror is a simple utility for creating an object with values equal to its keys.
@@ -146,6 +147,7 @@ module.exports = keyMirror({
     JOB_DETAILS_FETCHING_END: null,
     IS_MISMATCHING_LOCATION: null,
     RESET_STATE_FOR_JOBDETAIL: null,
+    SET_UPDATED_TRANSACTION_LIST_IDS: null,
     SHOW_DROPDOWN: null,
     SET_JOBDETAILS_DRAFT_INFO: null,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL: null,
@@ -252,6 +254,7 @@ module.exports = keyMirror({
     LONG_CODE_SIM_VERIFICATION: null,
     ENCRYPTION_KEY: null,
     ALARM_JOB_TIMES: null,
+    UPDATE_JOBMASTERID_JOBID_MAP: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -461,6 +464,8 @@ module.exports = keyMirror({
     SET_BULK_TRANSACTION_PARAMETERS: null,
     SET_BULK_PARAMS_FOR_SELECTED_DATA: null,
     SET_BULK_CHECK_ALERT_VIEW: null,
+    SET_JOB_LISTING_TRANSACTIONS: null,
+    START_BULK_LOADER: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,
@@ -473,11 +478,14 @@ module.exports = keyMirror({
     CLEAR_PASSWORD_TEXTINPUT: null,
     TOGGLE_SAVE_RESET_BUTTON: null,
     IS_PROFILE_LOADING: null,
+
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
     SORTING_LOADER: null,
     DEFAULT_ERROR_MESSAGE_IN_SORTING: null,
+    SET_SORTING_BLUETOOTH_CONNECTION: null,
+    SORTING_INITIAL_STATE: null,
 
     //Live Job actions
     SET_LIVE_JOB_LIST: null,

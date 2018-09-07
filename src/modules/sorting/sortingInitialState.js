@@ -3,10 +3,11 @@
 import { Record } from 'immutable'
 
 var InitialState = Record({
-   searchRefereneceValue: '',
-   sortingDetails:{},
-   errorMessage: '',
-   loaderRunning: false,
+    searchRefereneceValue: '',
+    sortingDetails: {},
+    errorMessage: '',
+    loaderRunning: false,
+    isBluetoothConnected: false
 })
 
 export default InitialState 

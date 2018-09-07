@@ -19,7 +19,7 @@ import AesCtr from '../services/classes/AesCtr'
 import userExceptionLogs from './schema/userExceptionLogsDB'
 import messageInteracion from './schema/MessageInteractionSchema'
 import negativeCommunicationLog from './schema/NegativeCommunicationLogs'
-const schemaVersion = 53;
+const schemaVersion = 54;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs, messageInteracion, negativeCommunicationLog];
 
 let realm = new Realm({
@@ -63,23 +63,27 @@ export function saveList(tableName, array) {
  * @param {*} tableNamesVsDataList 
  */
 export function performBatchSave(...tableNamesVsDataList) {
-    return realm.write(() => {
-        let imeiNumber = DeviceInfo.getUniqueID()
-        // Create counter block from imei number used for encryption
-        let counterBlock = Array.from(imeiNumber).slice(0, 8)
-        tableNamesVsDataList.forEach(record => {
-            if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
-                if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
-                    for (let data in record.value) {
-                        record.value[data].value = _encryptData(record.value[data].value, imeiNumber, counterBlock)
-                        realm.create(record.tableName, record.value[data], true)
+        return realm.write(() => {
+            let imeiNumber = DeviceInfo.getUniqueID()
+            // Create counter block from imei number used for encryption
+            let counterBlock = Array.from(imeiNumber).slice(0, 8)
+            tableNamesVsDataList.forEach(record => {
+                if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
+                    if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
+                        for (let data in record.value) {
+                            record.value[data].value = _encryptData(record.value[data].value, imeiNumber, counterBlock)
+                            realm.create(record.tableName, record.value[data], true)
+                        }
+                    } else {
+                        record.value.forEach(data => realm.create(record.tableName, data, true))
                     }
                 } else {
                     record.value.forEach(data => realm.create(record.tableName, data, true))
                 }
-            }
+            })
         })
-    })
+   
+    
 }
 /**
  * 
@@ -204,4 +208,19 @@ export function deleteRecordList(tableName, valueList, property) {
     realm.write(() => {
         realm.delete(filteredRecords)
     });
+}
+
+//This is called when sync upload returns 200       
+export function updateFieldDataSyncFlag(jobTransactionIdList) {
+            let query = `syncFlag = 1 AND (`, counter = 0
+            for (let index in jobTransactionIdList) {
+                query += (counter++ == 0) ? `jobTransactionId = ${index}` : ` OR jobTransactionId = ${index}`
+            }
+            query += ')'
+            //Refer https://github.com/realm/realm-js/issues/690 (Use of snapshot)
+            let fieldDataWithSyncFlag1 = realm.objects(TABLE_FIELD_DATA).filtered(query).snapshot()
+            realm.write(() => {
+                fieldDataWithSyncFlag1.forEach(fieldData => fieldData.syncFlag = 2)
+            })
+   
 }

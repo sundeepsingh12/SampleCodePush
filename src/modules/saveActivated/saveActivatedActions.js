@@ -21,7 +21,6 @@ import {
 import _ from 'lodash'
 import { draftService } from '../../services/classes/DraftService'
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
-import { fetchJobs } from '../taskList/taskListActions';
 import { performSyncService, pieChartCount } from '../home/homeActions'
 import { checkForPaymentAtEnd } from '../job-details/jobDetailsActions'
 import { navigate } from '../navigators/NavigationService';
@@ -81,7 +80,6 @@ export function checkout(previousFormLayoutState, recurringData, jobMasterId, co
                 emailIdInFieldData,
                 contactNumberInFieldData
             })
-            dispatch(fetchJobs());
         } catch (error) {
             showToastAndAddUserExceptionLog(2002, error.message, 'danger', 1)
             dispatch(setState(LOADER_ACTIVE, false))

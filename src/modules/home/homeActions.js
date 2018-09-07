@@ -43,7 +43,9 @@ import {
   JOB_ATTRIBUTE,
   SET_CALLER_ID_POPUP,
   BluetoothListing,
-  JobDetailsV2
+  JobDetailsV2,
+  SET_UPDATED_TRANSACTION_LIST_IDS,
+  UPDATE_JOBMASTERID_JOBID_MAP
 } from '../../lib/constants'
 
 import {
@@ -89,7 +91,6 @@ import { sync } from '../../services/classes/Sync'
 import { Platform } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
-import { fetchJobs } from '../taskList/taskListActions'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import { logoutService } from '../../services/classes/Logout'
 import { authenticationService } from '../../services/classes/Authentication'
@@ -112,9 +113,10 @@ import CallDetectorManager from 'react-native-call-detection'
 import { jobAttributeMasterService } from '../../services/classes/JobAttributeMaster'
 import { jobDataService } from '../../services/classes/JobData'
 import { jobService } from '../../services/classes/Job'
-import { each, size, isNull } from 'lodash'
+import { each, size, isNull, isEmpty } from 'lodash'
 import { AppState, Linking } from 'react-native'
 import { countDownTimerService } from '../../services/classes/CountDownTimerService'
+
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -240,6 +242,10 @@ export function navigateToPage(pageObject, navigationProps) {
           navigate(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' })
           break;
         case PAGE_TABS:
+          let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+          if (updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)) {
+            dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
+          }
           navigate(TabScreen, { pageObject })
           break;
         default:
@@ -296,6 +302,10 @@ export function checkCustomErpPullActivated() {
 export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) {
   return async function (dispatch) {
     try {
+      let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+      if (updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)) {
+        dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
+      }
       if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
         dispatch(setState(syncLoader, true))
         let message = await dispatch(performSyncService())
@@ -490,9 +500,11 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
       }
       if (isJobsPresent) {
         dispatch(pieChartCount())
-        dispatch(fetchJobs())
+        let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+        if (updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)) {
+          dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
+        }
       }
-
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
         unsyncedTransactionList: [],
         syncStatus: 'OK',
@@ -635,7 +647,7 @@ export function uploadUnsyncFiles(backupFilesList) {
       }
       for (let backupFile of backupFilesList) {
         try {
-          let responseBody = await RestAPIFactory(token.value).uploadZipFile(backupFile.path, backupFile.name, null, null, true)
+          let responseBody = await RestAPIFactory(token.value).uploadZipFile(backupFile.path, backupFile.name, null, true)
           if (responseBody && responseBody.split(",")[0] == 'success') {
             await backupService.deleteBackupFile(null, null, backupFile.path)
             successCount++

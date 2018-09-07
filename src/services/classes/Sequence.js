@@ -45,18 +45,21 @@ class Sequence {
      * @param {*} jobMasterIds // job master ids whose jobs are visible in this module 
      * @returns jobTransactionCustomizationList // jobTransacion List
      */
-    async getSequenceList(runsheetNumber, jobMasterIds) {
+    async getSequenceList(runsheetNumber, jobMasterIds, jobTransactionList) {
         if (!runsheetNumber) {
             throw new Error(RUNSHEET_NUMBER_MISSING);
         }
-        //get all pending status Ids
-        const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING);
-        const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters();
-        //get all jobTransaction List whose status is pending, runsheet number is as given in argument and has lies within list of job master 
-        let queryDTO = {};
-        queryDTO.jobTransactionQuery = `(${jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')}) AND (${statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')}) AND runsheetNo = "${runsheetNumber}"`;
-        const jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO);
-        return jobTransactionCustomizationList;
+        let jobMasterMap = _.mapKeys(jobMasterIds);
+        let jobTransactionCustomizationList = {}
+        for(let jobMasterId in jobTransactionList){
+            if(jobMasterMap[jobMasterId]){
+                jobTransactionCustomizationList = Object.assign(jobTransactionCustomizationList, jobTransactionList[jobMasterId]) 
+            }
+        }
+        const sequenceMap =  _.pickBy(jobTransactionCustomizationList, function(value, key) {
+            return (value.runsheetNo == runsheetNumber)
+        })
+        return Object.values(sequenceMap);
     }
 
     /**
@@ -434,6 +437,16 @@ class Sequence {
             sequenceArray: _.values(cloneSequenceMap),
             transactionsWithChangedSeqeunceMap
         }
+    }
+
+
+    checkForJobMasterIdsOfUpdatedJobs(updatedTransactionListIds, jobMasterIdsList){
+        for(let jobMasterId in jobMasterIdsList){
+            if(!_.isEmpty(updatedTransactionListIds[jobMasterIdsList[jobMasterId]])){
+                return true
+            }
+        }
+        return false
     }
 
     /**

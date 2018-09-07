@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "crypto-js": "3.1.9-1",
+    "escpos-xml": "1.0.0",
     "immutable": "3.8.2",
     "jest-cli": "23.5.0",
     "js-sha512": "0.7.1",
@@ -54,7 +55,7 @@
     "react-native-zip-archive": "2.2.6",
     "react-navigation": "2.11.2",
     "react-redux": "5.0.7",
-    "realm": "2.14.2",
+    "realm": "2.15.3",
     "redux": "4.0.0",
     "redux-mock-store": "1.5.3",
     "redux-thunk": "2.3.0",

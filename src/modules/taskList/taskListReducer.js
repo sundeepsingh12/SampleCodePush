@@ -9,10 +9,10 @@ import {
   IS_CALENDAR_VISIBLE,
   LISTING_SEARCH_VALUE,
   RESET_STATE,
-  SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE,
   SET_LANDING_TAB,
   SET_SELECTED_DATE,
-  TASKLIST_LOADER_FOR_SYNC
+  TASKLIST_LOADER_FOR_SYNC,
+  TABS_LOADING
 } from '../../lib/constants'
 
 
@@ -30,6 +30,10 @@ export default function taskList(state = initialState, action) {
         .set('isFutureRunsheetEnabled', action.payload.isFutureRunsheetEnabled)
         .set('selectedDate', null)
         .set('searchText', {})
+
+    case TABS_LOADING: {
+      return state.set('tabsLoading', true)
+    }
 
     case JOB_DOWNLOADING_STATUS:
       return state.set('downloadingJobs', action.payload.isDownloadingjobs)

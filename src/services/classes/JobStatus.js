@@ -256,11 +256,11 @@ class JobStatus {
    * JobStatus
    */
   getJobStatusForJobStatusId(jobStatusList, jobStatusId) {
-    if (!jobStatusId) {
+    if (!jobStatusId || !jobStatusList) {
       return [];
     }
-    jobStatusList = jobStatusList ? jobStatusList : [];
-    return jobStatusList.filter(jobStatus => jobStatus.id == jobStatusId)[0];
+    jobStatusList = jobStatusList.filter(jobStatus => jobStatus.id == jobStatusId)
+    return jobStatusList.length ? jobStatusList[0] : []
   }
 
   getStatusIdForJobMasterIdFilteredOnCodeMap(statusList, statusCode) {

@@ -9,9 +9,10 @@ import {
     TABLE_JOB_DATA,
     TABLE_RUNSHEET,
     PENDING_SYNC_TRANSACTION_IDS,
+    UPDATE_JOBMASTERID_JOBID_MAP
 } from '../../lib/constants'
 
-import { SKU_ARRAY, SEQ_SELECTED, JOB_EXPIRY_TIME } from '../../lib/AttributeConstants'
+import { SKU_ARRAY, SEQ_SELECTED, JOB_EXPIRY_TIME, PINCODE, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, CONTACT_NUMBER } from '../../lib/AttributeConstants'
 import { ATTEMPT, SLOT, START, END, DISTANCE, HALT_DURATION, CALL_COUNT, CALL_DURATION, SMS, TIME_SPENT, SEQUENCE } from '../../lib/ContainerConstants'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
@@ -27,6 +28,7 @@ import moment from 'moment'
 import { formLayoutEventsInterface } from './formLayout/FormLayoutEventInterface'
 import { runSheetService } from './RunSheet';
 import { messageService } from '../../services/classes/MessageService'
+import Item from '../../../native-base-theme/components/Item';
 
 class JobTransaction {
 
@@ -70,7 +72,7 @@ class JobTransaction {
      * 
      * @param {*} unseenTransactions 
      */
-    getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap) {
+    getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap, updatedJobTransactionList) {
         let updatedJobStatusIdJobStatusMap = {}, updatedTransactonsList = [], jobMasterIdTransactionDtoMap = {};
         for (let transaction in unseenTransactions) {
             let unseenTransactionObject = { ...unseenTransactions[transaction] };
@@ -85,6 +87,8 @@ class JobTransaction {
             transactionIdDtoObject.transactionId = transactionIdDtoObject.transactionId + unseenTransactionObject.id;
             jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId] = transactionIdDtoObject;
             unseenTransactionObject.jobStatusId = jobMasterIdJobStatusIdOfPendingCodeMap[unseenTransactionObject.jobMasterId];
+            updatedJobTransactionList[unseenTransactionObject.jobMasterId] = _.isEmpty(updatedJobTransactionList[unseenTransactionObject.jobMasterId]) ? {} : updatedJobTransactionList[unseenTransactionObject.jobMasterId]
+            updatedJobTransactionList[unseenTransactionObject.jobMasterId][unseenTransactionObject.jobId] = { jobMasterId: unseenTransactionObject.jobMasterId, jobStatusId: unseenTransactionObject.jobStatusId }
             updatedTransactonsList.push(unseenTransactionObject);
             let updatedPendingJobSummary = updatedJobStatusIdJobStatusMap[transactionIdDtoObject.pendingStatusId] ? updatedJobStatusIdJobStatusMap[transactionIdDtoObject.pendingStatusId] : jobStatusIdJobSummaryMap[transactionIdDtoObject.pendingStatusId];
             let updatedUnseenJobSummary = jobStatusIdJobSummaryMap[transactionIdDtoObject.unSeenStatusId];
@@ -129,7 +133,7 @@ class JobTransaction {
             jobTransactionMap[id] = { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual, attemptCount, lastTransactionTimeOnMobile, jobEtaTime, jobCreatedAt, lastUpdatedAtServer };
             jobIdJobTransactionStatusIdMap[transaction.jobId] = transaction.jobStatusId
         }
-        return { jobTransactionMap, jobQuery, jobTransactionQuery, fieldDataQuery, jobIdJobTransactionStatusIdMap};
+        return { jobTransactionMap, jobQuery, jobTransactionQuery, fieldDataQuery, jobIdJobTransactionStatusIdMap };
     }
 
 
@@ -181,7 +185,7 @@ class JobTransaction {
     getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO) {
         let jobTransactionDTO = {};
         let jobTransactionCustomizationListParametersMaps = this.prepareMapsForTransactionCustomizationList(jobTransactionCustomizationListParametersDTO);
-        let runsheetObject = runSheetService.prepareJobTransactionQueryOnBasisOfRunsheet(queryDTO ? null : jobTransactionCustomizationListParametersDTO.customNaming.enableFutureDateRunsheet);
+        let runsheetObject = runSheetService.prepareJobTransactionQueryOnBasisOfRunsheet(jobTransactionCustomizationListParametersDTO.customNaming.enableFutureDateRunsheet);
         let jobTransactionQuery = runsheetObject.jobTransactionQuery;
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1';
         jobTransactionQuery = queryDTO && queryDTO.jobTransactionQuery && queryDTO.jobTransactionQuery.trim() !== '' ? `${jobTransactionQuery} AND ${queryDTO.jobTransactionQuery}` : jobTransactionQuery;
@@ -197,7 +201,7 @@ class JobTransaction {
         let jobMapAndJobDataQuery = jobService.getJobMapAndJobDataQuery(jobsList);
         jobTransactionDTO.jobMap = jobMapAndJobDataQuery.jobMap;
         jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobMapAndJobDataQuery.jobDataQuery);
-        jobTransactionDTO.jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap,jobTransactionCustomizationListParametersMaps.jobAttributeStatusMap,jobTransactionObject.jobIdJobTransactionStatusIdMap);
+        jobTransactionDTO.jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap, jobTransactionCustomizationListParametersMaps.jobAttributeStatusMap, jobTransactionObject.jobIdJobTransactionStatusIdMap);
         fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, jobTransactionObject.fieldDataQuery);
         jobTransactionDTO.fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList, true);
         let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionDTO, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobTransactionCustomizationListParametersMaps, runsheetObject.runsheetMap);
@@ -304,7 +308,7 @@ class JobTransaction {
      *                                   ]
      */
     prepareJobCustomizationList(jobTransactionDTO, jobMasterIdCustomizationMap, jobTransactionCustomizationListParametersMaps, runsheetMap) {
-        let jobTransactionCustomizationList = [];
+        let jobTransactionCustomizationList = {};
         for (var index in jobTransactionDTO.jobTransactionMap) {
             let jobTransaction = jobTransactionDTO.jobTransactionMap[index], jobId = jobTransaction.jobId, job = jobTransactionDTO.jobMap[jobId], jobMasterId = jobTransaction.jobMasterId, jobTransactionCustomization = {};
             if (!job) {
@@ -321,7 +325,8 @@ class JobTransaction {
             } else {
                 jobTransactionCustomization.line1 = jobTransactionCustomization.line2 = jobTransactionCustomization.circleLine1 = jobTransactionCustomization.circleLine2 = '';
             }
-            let jobSwipableDetails = this.setJobSwipableDetails(jobTransactionDTO.jobDataDetailsForListing, jobTransactionCustomizationListParametersMaps, jobTransaction, job);
+            let jobAttributeMap = jobTransactionCustomizationListParametersMaps.jobMasterIdJobAttributeStatusMap[jobTransaction.jobMasterId] ? jobTransactionCustomizationListParametersMaps.jobMasterIdJobAttributeStatusMap[jobTransaction.jobMasterId][jobTransaction.jobStatusId] : jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap
+            let jobSwipableDetails = this.setJobSwipableDetails(jobTransactionDTO.jobDataDetailsForListing, jobTransactionCustomizationListParametersMaps, jobAttributeMap, job);
             jobTransactionCustomization.id = jobTransaction.id;
             jobTransactionCustomization.runsheetId = jobTransaction.runsheetId;
             jobTransactionCustomization.jobMasterId = jobMasterId;
@@ -348,9 +353,10 @@ class JobTransaction {
             jobTransactionCustomization.jobEndTime = job.jobEndTime;
             jobTransactionCustomization.isNextStatusPresent = jobTransaction.jobStatusId ? jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList && jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList.length > 0 : null;
             jobTransactionCustomization.jobPriority = jobTransactionCustomizationListParametersMaps.jobMasterIdMap[jobMasterId].enableJobPriority ? job.jobPriority : 0;
-            jobTransactionCustomization.jobExpiryData = jobTransactionDTO.jobDataDetailsForListing.jobExpiryMap[jobId] ? jobTransactionDTO.jobDataDetailsForListing.jobExpiryMap[jobId] :{}
-            jobTransactionCustomization.isJobUnseen = jobTransactionCustomizationListParametersMaps.jobStatusObject.unseenStatusIdCodeMap[ jobTransaction.jobStatusId] ? true :false
-            jobTransactionCustomizationList.push(jobTransactionCustomization);
+            jobTransactionCustomization.jobExpiryData = jobTransactionDTO.jobDataDetailsForListing.jobExpiryMap[jobId] ? jobTransactionDTO.jobDataDetailsForListing.jobExpiryMap[jobId] : {}
+            jobTransactionCustomization.isJobUnseen = jobTransactionCustomizationListParametersMaps.jobStatusObject.unseenStatusIdCodeMap[jobTransaction.jobStatusId] ? true : false
+            jobTransactionCustomizationList[jobTransactionCustomization.jobMasterId] = jobTransactionCustomizationList[jobTransactionCustomization.jobMasterId] ? jobTransactionCustomizationList[jobTransactionCustomization.jobMasterId] : {}
+            jobTransactionCustomizationList[jobTransactionCustomization.jobMasterId][jobTransactionCustomization.jobId] = jobTransactionCustomization
         }
         return jobTransactionCustomizationList;
     }
@@ -497,8 +503,7 @@ class JobTransaction {
      *                          smsTemplateData : []
      *                      }
      */
-    setJobSwipableDetails(jobDataDetailsForListing, jobTransactionCustomizationListParametersMaps, jobTransaction, job) {
-        let jobAttributeMap = jobTransactionCustomizationListParametersMaps.jobMasterIdJobAttributeStatusMap[jobTransaction.jobMasterId] ? jobTransactionCustomizationListParametersMaps.jobMasterIdJobAttributeStatusMap[jobTransaction.jobMasterId][jobTransaction.jobStatusId] : jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap
+    setJobSwipableDetails(jobDataDetailsForListing, jobTransactionCustomizationListParametersMaps, jobAttributeMap, job) {
         let contactData = this.setContactDetails(jobDataDetailsForListing, jobAttributeMap, job)
         let addressData = this.setAddressDetails(jobDataDetailsForListing, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap, jobAttributeMap, job)
         let customerCareData = this.setCustomerCareDetails(jobTransactionCustomizationListParametersMaps.customerCareMap, job)
@@ -588,6 +593,30 @@ class JobTransaction {
         return smsTemplateListForJob
     }
 
+    prepareJobSwipableDetailsForDetails(dataMap, dataList, jobMasterId, customerCareList, smsTemplateList) {
+        let addressData = {}, contactData = []
+        if (!_.isEmpty(dataMap[CONTACT_NUMBER])) {
+            Object.values(dataMap[CONTACT_NUMBER]).forEach(item => {
+                if (item.data.value.length >= 6 && !(/(.)\\1+/.test(item.data.value))) {
+                    contactData.push(item.data.value)
+                }
+            })
+        }
+        let customerCareMap = customerCareService.getCustomerCareMap(customerCareList)
+        let smsTemplateMap = smsTemplateService.getSMSTemplateMap(smsTemplateList)
+        let customerCareData = customerCareMap[jobMasterId]
+        let smsTemplateData = !_.isEmpty(contactData) ? smsTemplateMap[jobMasterId] : []
+        if (!_.isEmpty(dataList)) {
+            Object.values(dataList).forEach((address) => {
+                if ([PINCODE, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK].includes(address.attributeTypeId)) {
+                    addressData[address.sequence] = addressData[address.sequence] ? addressData[address.sequence] : {}
+                    addressData[address.sequence][address.attributeTypeId] = address.data.value
+                }
+            })
+        }
+        return { contactData, addressData, customerCareData, smsTemplateData }
+    }
+
     /**
      * This function prepares transaction details for a particular transaction
      * @param {*} jobTransactionId 
@@ -612,10 +641,10 @@ class JobTransaction {
      *                              }
      * } 
      */
-    async prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, statusList, callingActivity) {
+    async prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, statusList, callingActivity, customerCareList, smsTemplateList) {
         let jobTransactionQuery = 'id = ' + jobTransactionId
         const jobTransaction = (callingActivity != 'LiveJob') ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery) : realm.getRecordListOnQuery(TABLE_JOB, jobTransactionQuery)
-        let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime, runsheetId, hubId, cityId, companyId, actualAmount, moneyTransactionType, startTime, endTime } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
+        let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime, runsheetId, hubId, cityId, companyId, actualAmount, moneyTransactionType, startTime, endTime, deleteFlag } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
         if (callingActivity == 'LiveJob') {
             jobMasterId = jobTransaction[0].jobMasterId
             jobStatusId = jobTransaction[0].status
@@ -632,8 +661,8 @@ class JobTransaction {
         if (checkForSeenStatus) {
             jobStatusId = checkForSeenStatus
             lastUpdatedAtServer = moment().format('YYYY-MM-DD HH:mm:ss')
-            let jobTransactionList = await formLayoutEventsInterface.saveData([], jobTransactionId, checkForSeenStatus, jobMasterId)
-            await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
+            let jobTransactionList = await formLayoutEventsInterface.saveData([], jobTransactionId, checkForSeenStatus, jobMasterId, { jobId }, { jobAttributes: jobAttributeMasterList, fieldAttributes: fieldAttributeMasterList })
+            await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList, jobMasterId)
         }
         // if (callingActivity == 'LiveJob') {
         //     jobMasterId = jobTransaction[0].jobMasterId
@@ -647,8 +676,9 @@ class JobTransaction {
         let fieldAttributeMap = fieldAttributeMasterMap[jobMasterId] ? fieldAttributeMasterMap[jobMasterId] : {}
         let jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap)
         let fieldDataObject = (callingActivity != 'LiveJob') ? fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId, fieldAttributeMap, fieldAttributeStatusMap) : {}
-        let jobTime
+        let jobTime, jobSwipableDetails
         if (callingActivity != 'LiveJob') {
+            jobSwipableDetails = this.prepareJobSwipableDetailsForDetails(jobDataObject.dataMap, jobDataObject.dataList, jobMasterId, customerCareList, smsTemplateList)
             let skuMap = fieldDataObject.dataMap[SKU_ARRAY]
             jobTime = jobDataObject.dataMap[JOB_EXPIRY_TIME]
             for (let index in skuMap) {
@@ -662,6 +692,8 @@ class JobTransaction {
         jobDataObject.dataList = Object.values(jobDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
         let messageList = messageService.getMessagesForParticularTransaction(jobTransactionId)
         if (callingActivity != 'LiveJob') {
+            const job = realm.getRecordListOnQuery(TABLE_JOB, 'id= ' + jobId)
+            let { latitude, longitude } = job[0]
             fieldDataObject.dataList = Object.values(fieldDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
             const jobTransactionDisplay = {
                 id: jobTransactionId,
@@ -682,6 +714,10 @@ class JobTransaction {
                 moneyTransactionType,
                 startTime,
                 endTime,
+                jobSwipableDetails,
+                jobLatitude: latitude,
+                jobLongitude: longitude,
+                deleteFlag
             }
             return {
                 currentStatus,
@@ -737,6 +773,18 @@ class JobTransaction {
             jobTransactionMap,
             pendingCount: unseenJobTransactionList.length
         }
+    }
+
+
+    async updatedTransactionListIds(data, jobMasterId) {
+        let updatedJobMasterIdsJobIdsMap = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+        let mapJobMasterJobIdData = updatedJobMasterIdsJobIdsMap && !_.isEmpty(updatedJobMasterIdsJobIdsMap.value) ? updatedJobMasterIdsJobIdsMap.value : {}
+        for (let item in data) {
+            jobMasterId = (jobMasterId) ? jobMasterId : data[item].jobMasterId
+            mapJobMasterJobIdData[jobMasterId] = mapJobMasterJobIdData[jobMasterId] ? mapJobMasterJobIdData[jobMasterId] : {}
+            mapJobMasterJobIdData[jobMasterId][data[item].jobId] = { jobMasterId, jobStatusId: data[item].jobStatusId ? data[item].jobStatusId : data[item].statusId }
+        }
+        keyValueDBService.validateAndSaveData(UPDATE_JOBMASTERID_JOBID_MAP, mapJobMasterJobIdData)
     }
 
     /**

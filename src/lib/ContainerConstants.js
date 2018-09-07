@@ -318,6 +318,9 @@ module.exports = {
     REF_UNAVAILABLE: 'Reference Number Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
     SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
+    STOP: 'Stop',
+    DEPOT: 'Depot',
+    SEARCH_RESULT: 'Search Result:',
 
     //Save Activated
     Do_you_want_to_checkout: 'Do you want to checkout?',
@@ -420,9 +423,6 @@ module.exports = {
 
     //TaskListScreen
     NO_NEXT_STATUS: 'No NextStatus Available',
-
-    //TabScreen
-    NO_TAB_PRESENT: 'No Tab Present',
 
     //Draft Modal
     DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',

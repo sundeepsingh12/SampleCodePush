@@ -42,6 +42,7 @@ function mapStateToProps(state) {
     currentSequenceListItemSeleceted: state.sequence.currentSequenceListItemSeleceted,
     jobMasterSeperatorMap: state.sequence.jobMasterSeperatorMap,
     backEnabledFromAppNavigator: state.sequence.backEnabledFromAppNavigator,
+    jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
   }
 }
 
@@ -77,7 +78,7 @@ class Sequence extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.actions.prepareListForSequenceModule(this.props.navigation.state.params.runsheetNumber, this.props.navigation.state.params.jobMasterIds)
+    this.props.actions.prepareListForSequenceModule(this.props.navigation.state.params.runsheetNumber, this.props.navigation.state.params.jobMasterIds,  this.props.jobTransactionCustomizationList)
     this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
       BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
     );
@@ -224,7 +225,7 @@ class Sequence extends PureComponent {
     !_.isEmpty(this.props.transactionsWithChangedSeqeunceMap) ? this.showWarningForBack() : this.clearStateAndGoBack()
   }
 
-  /**
+  /**j
    * Set modal visible for an item which is clicked and close modal when required
    * @param {*} item 
    */
@@ -305,8 +306,7 @@ class Sequence extends PureComponent {
       <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
         <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
             <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-              <TouchableOpacity style={[style.headerLeft]}
-                onPress={this.goBack}>
+              <TouchableOpacity style={[style.headerLeft]} onPress={this.goBack}>
                 <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
               </TouchableOpacity>
               <View style={[style.headerBody]}>
@@ -359,13 +359,11 @@ class Sequence extends PureComponent {
                 activeOpacity={1}
                 sortRowStyle={style.sortableListStyle}
                 renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(row)} />} />
-              <SafeAreaView>
                 <Footer style={[style.footer]}>
                   <FooterTab style={[styles.padding10]}>
                     {buttonView}
                   </FooterTab>
                 </Footer>
-              </SafeAreaView>
             </View>
             : this.viewForNoJobPresent()}
         </Container>

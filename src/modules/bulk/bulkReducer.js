@@ -14,7 +14,8 @@ import {
     SET_BULK_ERROR_MESSAGE,
     SET_BULK_TRANSACTION_PARAMETERS,
     SET_BULK_PARAMS_FOR_SELECTED_DATA,
-    SET_BULK_CHECK_ALERT_VIEW
+    SET_BULK_CHECK_ALERT_VIEW,
+    START_BULK_LOADER
 } from '../../lib/constants'
 
 import {
@@ -30,7 +31,6 @@ export default function bulkReducer(state = initialState, action) {
         case START_FETCHING_BULK_TRANSACTIONS: {
             return state.set('isLoaderRunning', true)
                 .set('isSelectAllVisible', false)
-                .set('bulkTransactionList', {})
                 .set('selectedItems', {})
                 .set('searchText', null)
                 .set('checkAlertView',false)
@@ -39,33 +39,34 @@ export default function bulkReducer(state = initialState, action) {
         case SET_BULK_PARAMS_FOR_SELECTED_DATA: {
             return state.set('wantUnselectJob', action.payload)
         }
-
+        case START_BULK_LOADER:{
+            return state.set('isLoaderRunning', true)
+        }
         case SET_BULK_CHECK_ALERT_VIEW: {
             return state.set('checkAlertView', action.payload)
         }
 
         case STOP_FETCHING_BULK_TRANSACTIONS:
             return state.set('isLoaderRunning', false)
-                .set('bulkTransactionList', action.payload.bulkTransactions)
                 .set('isSelectAllVisible', action.payload.selectAll)
+                .set('selectedItems',action.payload.bulkTransactionMap)
                 .set('isManualSelectionAllowed', action.payload.isManualSelectionAllowed)
                 .set('searchSelectionOnLine1Line2', action.payload.searchSelectionOnLine1Line2)
                 .set('idToSeparatorMap', action.payload.idToSeparatorMap)
                 .set('nextStatusList', action.payload.nextStatusList)
 
         case TOGGLE_JOB_TRANSACTION_LIST_ITEM:
-            return state.set('selectedItems', action.payload.selectedItems)
-                .set('bulkTransactionList', action.payload.bulkTransactions)
+            return state.set('selectedItems', action.payload)
+                        .set('isLoaderRunning', false)
 
         case TOGGLE_ALL_JOB_TRANSACTIONS:
             return state.set('selectedItems', action.payload.selectedItems)
-                .set('bulkTransactionList', action.payload.bulkTransactions)
                 .set('selectAllNone', action.payload.displayText)
                 .set('isSelectAllVisible', action.payload.selectAll)
+                .set('wantUnselectJob', null)
 
         case CLEAR_BULK_STATE:
             return state.set('selectedItems', {})
-                .set('bulkTransactionList', {})
                 .set('selectAllNone', 'Select All')
                 .set('searchText', null)
                 .set('searchSelectionOnLine1Line2', null)
@@ -79,7 +80,6 @@ export default function bulkReducer(state = initialState, action) {
                 .set('searchText', '')
         case SET_BULK_TRANSACTION_PARAMETERS: {
             return state.set('selectedItems', action.payload.selectedItems)
-                .set('bulkTransactionList', action.payload.bulkTransactions)
                 .set('selectAllNone', action.payload.displayText)
                 .set('searchText', action.payload.searchText)
                 .set('isSelectAllVisible', action.payload.selectAll)
