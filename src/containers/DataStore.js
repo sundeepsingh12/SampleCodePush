@@ -144,7 +144,8 @@ class DataStore extends PureComponent {
         } else {
             this.props.actions.setState(SET_DATA_STORE_ATTR_MAP, {
                 dataStoreAttrValueMap: this.props.cloneDataStoreAttrValueMap,
-                searchText: ''
+                searchText: '',
+                detailsVisibleFor: -1
             })
         }
     }
@@ -162,7 +163,8 @@ class DataStore extends PureComponent {
         if (searchText.length <= 2) {
             this.props.actions.setState(SET_DATA_STORE_ATTR_MAP, {
                 dataStoreAttrValueMap: this.props.cloneDataStoreAttrValueMap,
-                searchText
+                searchText,
+                detailsVisibleFor: -1
             })
         }
     }, 500)
@@ -185,8 +187,7 @@ class DataStore extends PureComponent {
     }
 
     _searchDataStore = (value) => {
-        this.fetchDataStoreAttrValueMap(value, false)
-        this.setSearchText(value)
+        this.fetchDataStoreAttrValueMap(value, true)
     }
 
     scanner = () => {
