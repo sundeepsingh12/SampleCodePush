@@ -40,7 +40,7 @@ class TaskListCalender extends PureComponent {
                 <Footer style={[styles.bgWhite, { borderTopWidth: 1, borderTopColor: '#f3f3f3' }]}>
                     <FooterTab style={[styles.flexBasis25]}>
                         <Button transparent vertical
-                            onPress={() => this.props.actions.setState(SET_SELECTED_DATE, { selectedDate: moment().format('YYYY-MM-DD') })}
+                            onPress={() => this.props.actions.setState(SET_SELECTED_DATE, { selectedDate: new Date() })}
                             style={[styles.alignStart]}>
                             <Text style={[{ color: styles.fontPrimaryColor }, styles.fontSm]}>{TODAY}</Text>
                         </Button>
@@ -52,6 +52,7 @@ class TaskListCalender extends PureComponent {
                             onCancel={() => this.props.actions.setState(IS_CALENDAR_VISIBLE, false)}
                             mode='date'
                             datePickerModeAndroid='spinner'
+                            date = {this.props.selectedDate ? (this.props.selectedDate == ALL ? new Date() : this.props.selectedDate) : new Date()}
                         />
                         <Button transparent vertical
                             onPress={() => { this.props.actions.setState(IS_CALENDAR_VISIBLE, true) }}
