@@ -24,7 +24,6 @@ import SyncLoader from '../components/SyncLoader'
 import { redirectToFormLayout } from '../modules/newJob/newJobActions'
 import { navigate } from '../modules/navigators/NavigationService'
 import _ from 'lodash'
-import { navigateToLiveJob } from '../modules/liveJob/liveJobActions'
 
 function mapStateToProps(state) {
   return {
@@ -49,7 +48,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...homeActions, checkForPaymentAtEnd, redirectToFormLayout, navigateToLiveJob }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...homeActions, checkForPaymentAtEnd, redirectToFormLayout }, dispatch)
   }
 }
 
@@ -85,7 +84,7 @@ class Home extends PureComponent {
   }
 
   navigate(url) {
-    this.props.actions.navigateToLiveJob(url)
+    this.props.actions.navigateToLiveJobOrJobDetails(url)
   }
 
   componentWillUnmount() {

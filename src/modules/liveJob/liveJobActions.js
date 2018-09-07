@@ -193,7 +193,7 @@ export function selectAll(liveJobList) {
     }
 }
 
-export function navigateToLiveJob(url) {
+export function navigateToLiveJob() {
     return async function (dispatch) {
         try {
             let pageList = await keyValueDBService.getValueFromStore(PAGES)

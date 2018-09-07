@@ -116,6 +116,7 @@ import { jobService } from '../../services/classes/Job'
 import { each, size, isNull, isEmpty } from 'lodash'
 import { AppState, Linking } from 'react-native'
 import { countDownTimerService } from '../../services/classes/CountDownTimerService'
+import { navigateToLiveJob } from '../liveJob/liveJobActions'
 
 /**
  * Function which updates STATE when component is mounted
@@ -485,9 +486,9 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB');
           if (showLiveJobNotification && showLiveJobNotification.value) {
             if (AppState.currentState == 'background' && Platform.OS !== 'ios') {
-              Linking.canOpenURL('fareyeapp://fareye').then(supported => {
+              Linking.canOpenURL('fareyeapp://fareye/liveJob').then(supported => {
                 if (supported) {
-                  return Linking.openURL('fareyeapp://fareye');
+                  return Linking.openURL('fareyeapp://fareye/liveJob');
                 }
               });
             } else if (AppState.currentState == 'active') {
@@ -791,12 +792,37 @@ export function registerCallReceiver() {
 export function handleCountDownTimerEvent(intentData) {
   return async function (dispatch) {
     try {
-      let jobTransaction = await countDownTimerService.navigateToJobDetailsAndScheduleAlarm(intentData)
-      if (jobTransaction) {
+      if (AppState.currentState == 'active') {
+        let jobTransaction = await countDownTimerService.navigateToJobDetailsAndScheduleAlarm(intentData)
         navigate(JobDetailsV2, { jobTransaction, jobSwipableDetails: {}, calledFromAlarm: true })
+      } else if (AppState.currentState == 'background' && Platform.OS !== 'ios') {
+        let intentDataString = JSON.stringify(intentData)
+        Linking.canOpenURL('fareyeapp://fareye' + '/' + intentDataString).then(supported => {
+          if (supported) {
+            return Linking.openURL('fareyeapp://fareye' + '/' + intentDataString);
+          } else {
+            return
+          }
+        });
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2713, error.message, 'danger', 1)
+    }
+  }
+}
+export function navigateToLiveJobOrJobDetails(url) {
+  return async function (dispatch) {
+    try {
+      const route = url.replace(/.*?:\/\//g, '');
+      const id = route.match(/\/([^\/]+)\/?$/)[1];
+      if (id == 'liveJob') {
+        dispatch(navigateToLiveJob())
+      } else {
+        let intentData = JSON.parse(id)
+        dispatch(handleCountDownTimerEvent(intentData))
+      }
+    } catch (error) {
+      showToastAndAddUserExceptionLog(2714, error.message, 'danger', 1)
     }
   }
 }

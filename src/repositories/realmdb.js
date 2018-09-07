@@ -77,8 +77,6 @@ export function performBatchSave(...tableNamesVsDataList) {
                     } else {
                         record.value.forEach(data => realm.create(record.tableName, data, true))
                     }
-                } else {
-                    record.value.forEach(data => realm.create(record.tableName, data, true))
                 }
             })
         })
