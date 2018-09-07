@@ -36,7 +36,6 @@ class TaskListCalender extends PureComponent {
     }
     render() {
         return (
-            <SafeAreaView style={[styles.bgWhite]}>
                 <Footer style={[styles.bgWhite, { borderTopWidth: 1, borderTopColor: '#f3f3f3' }]}>
                     <FooterTab style={[styles.flexBasis25]}>
                         <Button transparent vertical
@@ -69,7 +68,6 @@ class TaskListCalender extends PureComponent {
                         </Button>
                     </FooterTab>
                 </Footer>
-            </SafeAreaView>
         )
     }
 }
