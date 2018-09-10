@@ -37,11 +37,11 @@ export function hitOtpUrlToGetOtp(contactNumber, walletParameters, selectedWalle
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 3))
-            let { formLayoutState, jobMasterId, jobTransaction, contactData } = navigationParams
+            let { formLayoutState, jobMasterId, jobTransaction } = navigationParams
             const responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndGenerateOtp(jobTransaction, walletParameters, contactNumber, selectedWalletDetails.code)
             if (_.isEqual(responseMessage.status, 'SUCCESS') && _.isEqual(responseMessage.message, 'One-time password (OTP) is sent')) {
                 dispatch(setState(SET_MODAL_VIEW, 3))
-                MosambeeWalletPaymentServices.updateDraftInMosambee(walletParameters, contactData, selectedWalletDetails, formLayoutState, jobMasterId, jobTransaction)
+                MosambeeWalletPaymentServices.updateDraftInMosambee(walletParameters, contactNumber, selectedWalletDetails, formLayoutState, jobMasterId, jobTransaction, 14, '20')
             }else {
                 throw new Error(responseMessage.message)
             }

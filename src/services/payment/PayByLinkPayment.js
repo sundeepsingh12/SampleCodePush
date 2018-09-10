@@ -15,7 +15,7 @@ class PayByLinkPayment {
         if(typeSwitchMode[id] == '3' && payByLinkConfigJSON.enableVpa) {
             requestBody += 'payerAddress'
         }
-        const checkSum = jsSha512.update(requestBody + payByLinkConfigJSON.secretKey)
+        const checkSum = jsSha512.update(requestBody + payByLinkConfigJSON.apiPassword)
         let payerAddress = typeSwitchMode[id] == '3' && payByLinkConfigJSON.enableVpa ? 'payerAddress' : ''
         requestMessage = payByLinkConfigJSON.mosambeeUsername + '~' + String(payByLinkConfigJSON.actualAmount * 100) + '~' + customerContact + '~' + payByLinkConfigJSON.referenceNoActualAmountMap + '~' + typeSwitchMode[id] + '~' + payerAddress + '~' + checkSum;
         let data = String(encodeURIComponent('requestMessage') + '=' + encodeURIComponent(requestMessage));
@@ -24,7 +24,6 @@ class PayByLinkPayment {
         const jsonArray = (payByLinkResponse) ? payByLinkResponse.json : null
         return jsonArray
     }
-    
 }
 
 export let payByLinkPaymentService = new PayByLinkPayment()
