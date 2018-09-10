@@ -207,13 +207,14 @@ export function deleteRecordList(tableName, valueList, property) {
 
 //This is called when sync upload returns 200       
 export function updateFieldDataSyncFlag(jobTransactionIdList) {
-            let query = `syncFlag = 1 AND (`, counter = 0
+            let query = ``, counter = 0
             for (let index in jobTransactionIdList) {
                 query += (counter++ == 0) ? `jobTransactionId = ${index}` : ` OR jobTransactionId = ${index}`
             }
-            query += ')'
+            
             //Refer https://github.com/realm/realm-js/issues/690 (Use of snapshot)
-            let fieldDataWithSyncFlag1 = realm.objects(TABLE_FIELD_DATA).filtered(query).snapshot()
+
+            let fieldDataWithSyncFlag1 = realm.objects(TABLE_FIELD_DATA).filtered(query)
             realm.write(() => {
                 fieldDataWithSyncFlag1.forEach(fieldData => fieldData.syncFlag = 2)
             })

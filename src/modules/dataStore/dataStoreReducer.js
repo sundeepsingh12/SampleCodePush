@@ -29,6 +29,7 @@ export default function dataStoreReducer(state = initialState, action) {
                 .set('loaderRunning', false)
                 .set('errorMessage', '')
                 .set('searchText', action.payload.searchText)
+                .set('detailsVisibleFor', action.payload.detailsVisibleFor)
 
         case SHOW_ERROR_MESSAGE:
             return state.set('errorMessage', action.payload.errorMessage)
