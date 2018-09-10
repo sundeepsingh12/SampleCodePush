@@ -44,7 +44,8 @@ import {
   SET_CALLER_ID_POPUP,
   BluetoothListing,
   SET_UPDATED_TRANSACTION_LIST_IDS,
-  UPDATE_JOBMASTERID_JOBID_MAP
+  UPDATE_JOBMASTERID_JOBID_MAP,
+  RUN_SYNC
 } from '../../lib/constants'
 
 import {
@@ -434,7 +435,7 @@ export function startFCM() {
   }
 }
 
-export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogout, isLiveJob,isCalledFromLogout = false) {
+export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogout, isLiveJob,isCalledFromLogout) {
   return async function (dispatch) {
     let syncStoreDTO
     try {
@@ -446,6 +447,12 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
         await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, {
           syncRunning: true
         })
+      }
+
+      //Case of Sync Started from Logout
+      let syncRunningAllowed = await keyValueDBService.getValueFromStore(RUN_SYNC)
+      if(syncRunningAllowed && !syncRunningAllowed.value){
+          return
       }
       syncStoreDTO = await transactionCustomizationService.getSyncParamaters()
       const userData = syncStoreDTO.user
@@ -510,9 +517,7 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
         lastErpSyncTime: userData.lastERPSyncWithServer
       }))
       //Now schedule sync service which will run regularly after 2 mins,if sync is started from logout,then don't reschedule it
-      if(!isCalledFromLogout){
         await dispatch(syncService())
-      }
      
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
       if (isNull(serverReachable) || serverReachable.value == 2) {

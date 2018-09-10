@@ -153,7 +153,7 @@ class SyncZip {
             trackLogs
      * }
      */
-    getDataToBeSyncedFromDB(transactionIdList,isCalledFromLogout) {
+    getDataToBeSyncedFromDB(transactionIdList,isCalledFromLogout = false) {
         let userExceptionLog = this.getDataFromRealmDB(null, USER_EXCEPTION_LOGS)
         let runSheetSummary = this.getDataFromRealmDB(null, TABLE_RUNSHEET);
         let trackLogs = this.getDataFromRealmDB(null, TABLE_TRACK_LOGS);
@@ -170,7 +170,7 @@ class SyncZip {
                         jobQuery = `id = ${transactionIdList[index].jobId}`;
                         transactionLogQuery = `transactionId = ${transactionIdList[index].id}`;
                     }
-                      //Prepare logs.json for 100 job transactions at a time
+                      //Prepare logs.json for 100 job transactions at a time,in case of sync called from logout,prepare json for all the transactions
                     else if(!isCalledFromLogout && counter == 100){
                         break
                     }

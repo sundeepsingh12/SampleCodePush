@@ -185,10 +185,14 @@ class Menu extends PureComponent {
       "Logout",
       `Are you sure you want to Logout?`,
       [
-        { text: CANCEL, style: 'cancel' },
-        { text: OK, onPress: this.logoutButtonPressed },
+        { text: CANCEL, style: 'cancel', onPress: this.cancelPressInLogout},
+        { text: OK, onPress: this.logoutButtonPressed }
       ],
     )
+  }
+
+  cancelPressInLogout = () => {
+    this.props.actions.togglePerformSync(true)
   }
 
   logoutButtonPressed = () => {
