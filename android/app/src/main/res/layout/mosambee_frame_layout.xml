@@ -12,7 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="10dp"
-            android:text="Please_wait_working_on_mosambee_payment"
+            android:text="Please wait working on mosambee payment"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#000000" />
     </ScrollView>
@@ -23,8 +23,12 @@
         android:text="OK"
         android:visibility="gone"
         />
-
-
+    <Button
+        android:id="@+id/checkTransactionStatusButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Transaction Status"
+        android:visibility="gone"/>
     <FrameLayout
         android:id="@+id/frameContainer"
         android:layout_width="match_parent"

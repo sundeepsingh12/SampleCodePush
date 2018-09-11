@@ -6,7 +6,7 @@ import {
     CUSTOMIZATION_APP_MODULE,
     DEVICE_IMEI
 } from '../../lib/constants'
-import {MOSAMBEE_WALLET_ID} from '../../lib/AttributeConstants'
+import {MOSAMBEE_ID} from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
 import jsSha512 from 'js-sha512'
 import { draftService } from '../classes/DraftService'
@@ -41,6 +41,7 @@ class MosambeeWalletPayment {
             data.push(encodeURIComponent('request') + '=' + encodeURIComponent(requestJson));
         }
         data.push(encodeURIComponent('partnerId') + '=' + encodeURIComponent(partnerId));
+        console.logs("data",data)
         data = data.join("&");
         let walletListResponse = await RestAPIFactory(token.value).serviceCall(data, url, 'WALLET')
         const jsonArray = (walletListResponse) ? walletListResponse.json : null
@@ -53,18 +54,19 @@ class MosambeeWalletPayment {
         let walletParameters = walletModule && walletModule.remark ? JSON.parse(walletModule.remark) : null
         let actualAmount = 0.00, referenceNoActualAmountMap = '', transactionActualAmount, separator = ''
         const walletList = (walletParameters && walletParameters.walletURL && walletParameters.partnerId && walletParameters.secretKey && walletParameters.apiPassword && walletParameters.PayProMID) ? await this.hitWalletUrlToGetWalletList(walletParameters) : null
+        let conversionAmountMultiple = id == MOSAMBEE_ID ? 1 : 100 // In case of mosambee payment only actualAmount be in rupees
         if(isArray(jobTransactionList)){
             for(let transaction in jobTransactionList){
                 transactionActualAmount = (jobTransactionIdAmountMap[jobTransactionList[transaction].jobTransactionId]) ? jobTransactionIdAmountMap[jobTransactionList[transaction].jobTransactionId].actualAmount : 0
                 actualAmount = actualAmount + transactionActualAmount
-                referenceNoActualAmountMap = referenceNoActualAmountMap + separator + jobTransactionList[transaction].referenceNumber + ':' + String(transactionActualAmount * 100) 
+                referenceNoActualAmountMap = referenceNoActualAmountMap + separator + jobTransactionList[transaction].referenceNumber + ':' + String(transactionActualAmount * conversionAmountMultiple) 
                 separator = ', '
             }
         }else{
             actualAmount = jobTransactionIdAmountMap.actualAmount
-            referenceNoActualAmountMap = jobTransactionList.referenceNumber + ':' + actualAmount
+            referenceNoActualAmountMap = jobTransactionList.referenceNumber + ':' + String(actualAmount * conversionAmountMultiple)
         }
-        walletParameters.actualAmount = actualAmount
+        walletParameters.actualAmount = String(actualAmount)
         walletParameters.referenceNoActualAmountMap = referenceNoActualAmountMap
         return { walletParameters, walletList}
     }
