@@ -49,7 +49,11 @@ class Menu extends PureComponent {
     if (this.props.isUnsyncTransactionOnLogout) {
 
       return Alert.alert(LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
-        [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, { isUnsyncTransactionOnLogout: false, isLoggingOut: false }), style: 'cancel' },
+        [{ text: CANCEL, onPress: () => {
+          this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, { isUnsyncTransactionOnLogout: false, isLoggingOut: false })
+          this.props.actions.togglePerformSync(true)
+        }, 
+          style: 'cancel' },
         {
           text: OK, onPress: () => {
             this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, { isUnsyncTransactionOnLogout: false, isLoggingOut: true })
@@ -185,8 +189,8 @@ class Menu extends PureComponent {
       "Logout",
       `Are you sure you want to Logout?`,
       [
-        { text: CANCEL, style: 'cancel' },
-        { text: OK, onPress: this.logoutButtonPressed },
+        { text: CANCEL, style: 'cancel'},
+        { text: OK, onPress: this.logoutButtonPressed }
       ],
     )
   }
