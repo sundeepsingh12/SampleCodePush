@@ -501,10 +501,13 @@ export function completeLongCodeVerification() {
 }
 
 
-export function togglePerformSync(syncValue){
-    try{
-       keyValueDBService.validateAndSaveData(RUN_SYNC, new Boolean(syncValue))
-    }catch(error){
-
+export function togglePerformSync(syncValue) {
+  return async function () {
+    try {
+      await keyValueDBService.validateAndSaveData(RUN_SYNC, new Boolean(syncValue))
+    } catch (error) {
+      showToastAndAddUserExceptionLog(1815, error.message, 'danger', 1)
     }
+  }
+
 }

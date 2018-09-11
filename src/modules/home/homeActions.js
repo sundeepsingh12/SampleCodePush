@@ -516,7 +516,7 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
         erpModalVisible: true,
         lastErpSyncTime: userData.lastERPSyncWithServer
       }))
-      //Now schedule sync service which will run regularly after 2 mins,if sync is started from logout,then don't reschedule it
+      //Now schedule sync service which will run regularly after 2 mins
         await dispatch(syncService())
      
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
