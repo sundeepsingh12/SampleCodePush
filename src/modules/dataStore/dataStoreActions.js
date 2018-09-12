@@ -167,7 +167,8 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
             } else {
                 dispatch(setState(SET_DATA_STORE_ATTR_MAP, {
                     dataStoreAttrValueMap,
-                    searchText
+                    searchText,
+                    detailsVisibleFor: !externalDataStoreUrl && _.size(dataStoreAttrValueMap) == 1 && dataStoreAttrValueMap[0].dataStoreAttributeValueMap[dataStoreAttrValueMap[0].matchKey] == searchText ? dataStoreAttrValueMap[0].id : -1
                 }))
             }
         } catch (error) {
@@ -275,7 +276,8 @@ export function checkOfflineDS(searchText, dataStoreMasterId, dataStoreMasterAtt
                     } else {
                         dispatch(setState(SET_DATA_STORE_ATTR_MAP, {
                             dataStoreAttrValueMap,
-                            searchText
+                            searchText,
+                            detailsVisibleFor: -1
                         }))
                     }
                 } else {

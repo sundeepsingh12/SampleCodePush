@@ -151,11 +151,11 @@ class LiveJobListing extends PureComponent {
     }
 
     renderList() {
-        let jobMasterId = JSON.parse(this.props.navigation.state.params.pageObject.jobMasterIds)[0]
+        let jobMasterIdList = JSON.parse(this.props.navigation.state.params.pageObject.jobMasterIds)
         let jobTransactionArray = []
         let jobTransactionList = this.props.liveJobList
         for (let index in jobTransactionList) {
-            if (jobTransactionList[index].jobMasterId == jobMasterId && this.checkTransactionForSearchText(jobTransactionList[index])) {
+            if (jobMasterIdList.includes(jobTransactionList[index].jobMasterId) && this.checkTransactionForSearchText(jobTransactionList[index])) {
                 jobTransactionArray.push(jobTransactionList[index])
             }
         }
@@ -179,22 +179,22 @@ class LiveJobListing extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                        <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]}>
-                            <Body>
-                                <View
-                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                    <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                    </TouchableOpacity>
-                                    <View style={[styles.headerBody, styles.paddingTop15]}>
-                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS}</Text>
-                                    </View>
-                                    <View style={[styles.headerRight]}>
-                                    </View>
-                                    <View />
+                    <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]}>
+                        <Body>
+                            <View
+                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                </TouchableOpacity>
+                                <View style={[styles.headerBody, styles.paddingTop15]}>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS}</Text>
                                 </View>
-                            </Body>
-                        </Header>
+                                <View style={[styles.headerRight]}>
+                                </View>
+                                <View />
+                            </View>
+                        </Body>
+                    </Header>
                     <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
                         <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
                     </View>
@@ -244,26 +244,26 @@ class LiveJobListing extends PureComponent {
     showListWithSearchBar() {
         let view
         if (!this.props.selectedItems || this.props.selectedItems.length == 0) {
-            view =  
-            <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-            <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-                    <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                        <TouchableOpacity style={[style.headerLeft]} onPress={() => {
-                            this.props.navigation.goBack(null)
-                        }}>
-                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                        </TouchableOpacity>
-                        <View style={[style.headerBody]}>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS}</Text>
+            view =
+                <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+                    <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+                        <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                            <TouchableOpacity style={[style.headerLeft]} onPress={() => {
+                                this.props.navigation.goBack(null)
+                            }}>
+                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                            </TouchableOpacity>
+                            <View style={[style.headerBody]}>
+                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS}</Text>
+                            </View>
+                            <View style={[style.headerRight]}>
+                                <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
+                            </View>
+                            <View />
                         </View>
-                        <View style={[style.headerRight]}>
-                            <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
-                        </View>
-                        <View />
+                        {this.searchBar()}
                     </View>
-                    {this.searchBar()}
-            </View>
-            </SafeAreaView>
+                </SafeAreaView>
         }
         return view
     }
@@ -272,26 +272,26 @@ class LiveJobListing extends PureComponent {
         let view
         if (this.props.selectedItems && this.props.selectedItems.length > 0) {
             view =
-            <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-            <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
-                    <View style={[styles.column, { alignSelf: 'stretch' }]}>
-                        <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>
-                            <View style={[styles.row, styles.justifySpaceAround, styles.alignCenter]}>
-                                <TouchableOpacity
-                                    style={[styles.margin5, styles.padding10, styles.paddingLeft0]}
-                                    onPress={() => this.props.actions.selectNone(this.props.liveJobList)}>
-                                    <Icon name="md-close" style={[styles.fontWhite, styles.fontXl]} />
-                                </TouchableOpacity>
-                                <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + SELECTED} </Text>
+                <SafeAreaView style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+                    <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+                        <View style={[styles.column, { alignSelf: 'stretch' }]}>
+                            <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>
+                                <View style={[styles.row, styles.justifySpaceAround, styles.alignCenter]}>
+                                    <TouchableOpacity
+                                        style={[styles.margin5, styles.padding10, styles.paddingLeft0]}
+                                        onPress={() => this.props.actions.selectNone(this.props.liveJobList)}>
+                                        <Icon name="md-close" style={[styles.fontWhite, styles.fontXl]} />
+                                    </TouchableOpacity>
+                                    <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + SELECTED} </Text>
+                                </View>
+                                <TouchableHighlight disabled={_.size(this.props.liveJobList) == _.size(this.props.selectedItems)} onPress={() => this.props.actions.selectAll(this.props.liveJobList)} >
+                                    <Text style={[styles.fontWhite]}> {SELECT_ALL} </Text>
+                                </TouchableHighlight>
                             </View>
-                            <TouchableHighlight disabled={_.size(this.props.liveJobList) == _.size(this.props.selectedItems)} onPress={() => this.props.actions.selectAll(this.props.liveJobList)} >
-                                <Text style={[styles.fontWhite]}> {SELECT_ALL} </Text>
-                            </TouchableHighlight>
+                            {this.searchBar()}
                         </View>
-                        {this.searchBar()}
                     </View>
-            </View>
-            </SafeAreaView>
+                </SafeAreaView>
         }
         return view
     }

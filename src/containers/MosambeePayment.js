@@ -25,7 +25,8 @@ import {
 } from '../lib/constants'
 
 import {
-    TRANSACTION_PENDING
+    TRANSACTION_PENDING,
+    NO_TRANSACTION_FOUND_UNABLE_TO_CONTACT_SERVER
 } from '../lib/ContainerConstants'
 import { isEmpty } from 'lodash'
 import CheckTransactionView from '../components/CheckTransactionView'
@@ -48,7 +49,7 @@ class MosambeePayment extends PureComponent {
 
     componentDidMount() {
         const contactNumber = isEmpty(this.props.navigation.state.params.contactData) && this.props.navigation.state.params.contactData.length ? this.props.navigation.state.params.contactData[0] : ''
-        this.props.actions.getParameterForMosambee(this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.paymentAtEnd.currentElement.jobTransactionIdAmountMap, contactNumber)
+        this.props.actions.getParameterForMosambee(this.props.navigation.state.params, this.props.navigation.state.params.paymentAtEnd.currentElement.jobTransactionIdAmountMap, contactNumber)
         this.nativeEventListener = DeviceEventEmitter.addListener('showResult',
             (e) => {
                 let data = JSON.parse(e.jsonObject)
@@ -61,9 +62,12 @@ class MosambeePayment extends PureComponent {
                 this.props.actions.hitCheckTransactionApiForCheckingPaymentInMosambee(this.props.mosambeeParameters, this.props.navigation.state.params)
                 this.checkTransactionStatus.remove();
             })
-        BackHandler.addEventListener('hardwareBackPress', () => {
-            return true;
-        });
+        this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload =>
+            BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+        );
     }
 
     componentWillUnmount() {
@@ -71,9 +75,12 @@ class MosambeePayment extends PureComponent {
         this.backHandler.remove()
         this.nativeEventListener.remove();
         this.checkTransactionStatus.remove();
-        BackHandler.removeEventListener('hardwareBackPress',() => {
-            return true;
-        })
+        this._didFocusSubscription && this._didFocusSubscription.remove();
+        this._willBlurSubscription && this._willBlurSubscription.remove();
+    }
+
+    onBackButtonPressAndroid = () => {
+        return true
     }
 
     _headerModal() {
@@ -105,7 +112,8 @@ class MosambeePayment extends PureComponent {
                 <StyleProvider style={getTheme(platform)}>
                     <Container>
                         {this._headerModal()}
-                        {this.props.mosambeeMessage == TRANSACTION_PENDING ? <CheckTransactionView hitCheckTransactionApiForCheckingPayment={() => { this.props.actions.hitCheckTransactionApiForCheckingPaymentInMosambee(this.props.mosambeeParameters, this.props.navigation.state.params) }} onCancelAlert={() => { this._onCancelAlert() }} />
+                        {this.props.mosambeeMessage ? <CheckTransactionView hitCheckTransactionApiForCheckingPayment={() => { this.props.actions.hitCheckTransactionApiForCheckingPaymentInMosambee(this.props.mosambeeParameters, this.props.navigation.state.params) }} 
+                               onCancelAlert={() => { this._onCancelAlert() }} errorMessage = {this.props.mosambeeMessage == TRANSACTION_PENDING ? NO_TRANSACTION_FOUND_UNABLE_TO_CONTACT_SERVER : this.props.mosambeeMessage }/>
                             : this.props.mosambeeLoader == 'START_MOSAMBEE' ? <MosambeeNativeView mosambeeParameters={this.props.mosambeeParameters} /> : null}
                     </Container>
                 </StyleProvider>

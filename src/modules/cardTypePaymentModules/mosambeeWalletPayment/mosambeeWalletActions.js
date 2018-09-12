@@ -14,14 +14,14 @@ import { paymentService } from '../../../services/payment/Payment';
 import _ from 'lodash'
 import { StackActions} from 'react-navigation'
 import { navDispatch } from '../../navigators/NavigationService'
-import { MOSAMBEE_WALLET_ID} from '../../../lib/AttributeConstants'
+import { WALLET_UTILITY_ID} from '../../../lib/AttributeConstants'
 
 
 export function setWalletParametersAndGetWalletList(contactNumber, jobTransaction, jobTransactionIdAmountMap) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 1))
-            const { walletParameters, walletList} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, MOSAMBEE_WALLET_ID)
+            const { walletParameters, walletList} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, WALLET_UTILITY_ID)
             dispatch(setState(SET_MOSAMBEE_WALLET_PARAMETERS, { walletParameters, walletList, contactNumber, isModalVisible: 1 }))
         } catch (error) {
             showToastAndAddUserExceptionLog(2901, error.message, 'danger', 0)
@@ -37,11 +37,11 @@ export function hitOtpUrlToGetOtp(contactNumber, walletParameters, selectedWalle
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 3))
-            let { formLayoutState, jobMasterId, jobTransaction, contactData } = navigationParams
+            let { formLayoutState, jobMasterId, jobTransaction } = navigationParams
             const responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndGenerateOtp(jobTransaction, walletParameters, contactNumber, selectedWalletDetails.code)
             if (_.isEqual(responseMessage.status, 'SUCCESS') && _.isEqual(responseMessage.message, 'One-time password (OTP) is sent')) {
                 dispatch(setState(SET_MODAL_VIEW, 3))
-                MosambeeWalletPaymentServices.updateDraftInMosambee(walletParameters, contactData, selectedWalletDetails, formLayoutState, jobMasterId, jobTransaction)
+                MosambeeWalletPaymentServices.updateDraftInMosambee(walletParameters, contactNumber, selectedWalletDetails, formLayoutState, jobMasterId, jobTransaction, 14, '20')
             }else {
                 throw new Error(responseMessage.message)
             }

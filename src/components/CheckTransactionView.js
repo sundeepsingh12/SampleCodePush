@@ -21,14 +21,14 @@ export default class CheckTransactionView extends PureComponent {
                             />
                         </View>
                         <Text style={[{ fontSize: 18 }, styles.fontBlack, styles.marginTop15]}>{'Payment Failed'}</Text>
-                        <Text style={[{ fontSize: 14 }, styles.marginTop15, styles.fontDarkGray, styles.fontCenter, { marginLeft: 62, marginRight: 70 }]}>{NO_TRANSACTION_FOUND_UNABLE_TO_CONTACT_SERVER}</Text>
+                        <Text style={[{ fontSize: 14 }, styles.marginTop15, styles.fontDarkGray, styles.fontCenter, { marginLeft: 62, marginRight: 70 }]}>{this.props.errorMessage}</Text>
                     </View>
-                    <View>
+                    {this.props.errorMessage == NO_TRANSACTION_FOUND_UNABLE_TO_CONTACT_SERVER ? <View>
                         <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#F2F1FF', borderWidth: 1 }, { height: 50, width: 240 }, styles.alignCenter, styles.justifyCenter, { marginTop: 140 }]}
                             onPress={() => this.props.hitCheckTransactionApiForCheckingPayment()} >
                             <Text style={[{ color: '#000', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}>{CHECK_TRANSACTION_STATUS}</Text>
                         </Button>
-                    </View>
+                    </View> : null}
                     <View>
                         <Text style={[{ fontSize: 16, color: '#727272' }, styles.marginTop25, styles.fontCenter]} onPress={() => this.props.onCancelAlert()}>{CANCEL}</Text>
                     </View>

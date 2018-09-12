@@ -17,21 +17,24 @@ import { paymentService } from '../../../services/payment/Payment'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { isEmpty } from 'lodash'
 import { TRANSACTION_PENDING } from '../../../lib/ContainerConstants'
+import { MOSAMBEE_UTILITY_ID } from '../../../lib/AttributeConstants' 
 
-export function getParameterForMosambee(jobTransaction, jobTransactionIdAmountMap, contactNumber){
+export function getParameterForMosambee(navigationParams, jobTransactionIdAmountMap, contactNumber){
     return async function(dispatch){
         try {
             dispatch(setState(SET_LOADER_FOR_MOSAMBEE, true))
-            const { walletParameters} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, MOSAMBEE_ID)
+            let { formLayoutState, jobMasterId, jobTransaction } = navigationParams
+            let { walletParameters} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, MOSAMBEE_UTILITY_ID)
             walletParameters.contactNumber = contactNumber
             if(walletParameters && isEmpty(walletParameters.userId)){
                 const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI);
                 walletParameters.userId = deviceIMEI.value.id
             }
+            MosambeeWalletPaymentServices.updateDraftInMosambee(walletParameters, contactNumber, null, formLayoutState, jobMasterId, jobTransaction, 12, '1')
             dispatch(setState(SET_MOSAMBEE_PARAMETERS, walletParameters))
         } catch (error) {
-            dispatch(setState(SET_LOADER_FOR_MOSAMBEE, false))
-            showToastAndAddUserExceptionLog(3001, error.message, 'danger', 1)
+            dispatch(setState(SET_MESSAGE_FOR_MOSAMBEE, error.message))
+            showToastAndAddUserExceptionLog(3001, error.message, 'danger', 0)
         }
     }
 }
@@ -46,8 +49,8 @@ export function saveTransactionAfterPayment(jsonData, navigationParams) {
             await MosambeeWalletPaymentServices.setSignatureDataForMosambee(formLayoutState.formElement, jsonData.signature ? jsonData.signature : 'N.A')
             dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
         } catch (error) {
-            showToastAndAddUserExceptionLog(3002, error.message, 'danger', 1)
-            dispatch(setState(SET_LOADER_FOR_MOSAMBEE, false))
+            showToastAndAddUserExceptionLog(3002, error.message, 'danger', 0)
+            dispatch(setState(SET_MESSAGE_FOR_MOSAMBEE, error.message))
         }
     }
 }

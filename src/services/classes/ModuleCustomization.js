@@ -26,9 +26,9 @@ class ModuleCustomization {
      * @param {*} appModuleId 
      * @returns moduleCustomization
      */
-    getModuleCustomizationForAppModuleId(moduleCustomizationList, appModuleId) {
+    getModuleCustomizationForAppModuleId(moduleCustomizationList, utilityID) {
         moduleCustomizationList = moduleCustomizationList ? moduleCustomizationList : []
-        return moduleCustomizationList.filter(moduleCustomization => moduleCustomization.appModulesId == appModuleId)
+        return moduleCustomizationList.filter(moduleCustomization => moduleCustomization.utilityID == utilityID)
     }
 
 
