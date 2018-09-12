@@ -62,6 +62,7 @@ import {
   IS_LOGGING_OUT,
   LONG_CODE_SIM_VERIFICATION,
   DOMAIN_URL,
+  RUN_SYNC
 } from '../../lib/constants'
 import { MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, SHOW_LONG_CODE_IOS_SCREEN, SHOW_LONG_CODE_COMPLETE_SCREEN,LOGIN_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -127,6 +128,9 @@ export function invalidateUserSession(isPreLoader, calledFromAutoLogout, message
       } else {
         dispatch(setState(IS_LOGGING_OUT, false))
       }
+    }
+    finally{
+      await keyValueDBService.validateAndSaveData(RUN_SYNC, new Boolean(true))
     }
   }
 }
@@ -452,10 +456,12 @@ export function checkForUnsyncTransactionAndLogout(calledFromAutoLogout) {
   return async function (dispatch) {
     try {
       dispatch(setState(IS_LOGGING_OUT, true))
-      let message = await dispatch(performSyncService(true, null, calledFromAutoLogout))
+      await dispatch(performSyncService(true, null, calledFromAutoLogout,null,true))
       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       let isUnsyncTransactionsPresent = logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
       if (isUnsyncTransactionsPresent && !calledFromAutoLogout) {
+          //All subsequent syncs which are run after logout should be blocked
+        await keyValueDBService.validateAndSaveData(RUN_SYNC, new Boolean(false))
         dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, { isUnsyncTransactionOnLogout: true, isLoggingOut: false }))
       } else {
         dispatch(invalidateUserSession(false, calledFromAutoLogout))
@@ -492,4 +498,16 @@ export function completeLongCodeVerification() {
       showToastAndAddUserExceptionLog(1814, error.message, 'danger', 0)
     }
   }
+}
+
+
+export function togglePerformSync(syncValue) {
+  return async function () {
+    try {
+      await keyValueDBService.validateAndSaveData(RUN_SYNC, new Boolean(syncValue))
+    } catch (error) {
+      showToastAndAddUserExceptionLog(1815, error.message, 'danger', 1)
+    }
+  }
+
 }
