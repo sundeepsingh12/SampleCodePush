@@ -233,15 +233,6 @@ class JobTransaction {
         return jobTransactionList && jobTransactionList.length > 0 ? jobTransactionList[0] : null
     }
 
-    updateJobTransactionStatusId(jobMasterIdTransactionDtoMap) {
-        // db hit avoid
-        for (let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap) {
-            const transactionIdList = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].transactionId.split(":")
-            let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId
-            realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION, 'jobStatusId', transactionIdList, pendingStatusId)
-        }
-    }
-
     /** @function getEnableMultiPartJobMaster(jobMasterList)
       * function return List of all jobMaster With enable multipart assignment 
       *
