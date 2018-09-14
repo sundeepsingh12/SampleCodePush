@@ -599,7 +599,14 @@ module.exports = keyMirror({
     SET_QC_IMAGE: null,
     SET_QC_REMARKS: null,
     SET_QC_IMAGE_REMARKS_LOADING: null,
-    SET_QC_IMAGE_REMARKS_DATA: null
+    SET_QC_IMAGE_REMARKS_DATA: null,
+
+    //Paytm Actions
+    SET_PAYTM_LOADER: null,
+    SET_PAYTM_CONFIG_OBJECT: null,
+    SET_CONTACT: null,
+    SET_OTP: null,
+    SET_CHECK_TRANSACTION_VIEW: null,
 })
 
 
