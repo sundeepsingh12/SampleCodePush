@@ -6,10 +6,8 @@ import SignatureRemarks from '../components/SignatureRemarks'
 import * as signatureActions from '../modules/signature/signatureActions'
 import SignatureCapture from 'react-native-signature-capture'
 import renderIf from '../lib/renderIf'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import { Container, Header, Body, Icon, StyleProvider, Toast } from 'native-base'
+import { Container, Header, Body, Icon, Toast } from 'native-base'
 import { OK, IMPROPER_SIGNATURE } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -135,7 +133,6 @@ class Signature extends PureComponent {
     }
     render() {
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     {this.headerView()}
                     <View style={[styles.flex1, styles.row, styles.bgWhite]}>
@@ -158,7 +155,6 @@ class Signature extends PureComponent {
                                 {this.saveSignButton()}
                     </View>
                 </Container>
-            </StyleProvider>
         )
     }
 }

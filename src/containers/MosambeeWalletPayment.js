@@ -4,7 +4,7 @@ import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, Modal, TouchableOpacity, Image } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { SET_MODAL_VIEW, SET_OTP_MODAL_VIEW, CHANGE_WALLET_MOBILE_NO, CHANGE_OTP_NUMBER, RESET_STATE_FOR_WALLET} from '../lib/constants'
-import { Container, Content, Footer, FooterTab, Button, Icon, Body, Header, StyleProvider } from 'native-base';
+import { Container, Content, Footer, FooterTab, Button, Icon, Body, Header } from 'native-base';
 import styles from '../themes/FeStyle'
 import * as mosambeeWalletActions from '../modules/cardTypePaymentModules/mosambeeWalletPayment/mosambeeWalletActions'
 import * as globalActions from '../modules/global/globalActions'
@@ -14,15 +14,10 @@ import WalletListView from '../components/mosambeeWallet/WalletListView'
 import OtpGeneratedView from '../components/mosambeeWallet/OtpGeneratedView'
 import OtpDetailView from '../components/mosambeeWallet/OtpDetailView'
 import Loader from '../components/Loader'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
 import {
     FAILED,
     TRANSACTION_SUCCESSFUL,
     PAYMENT_FAILED,
-    PAYMENT_SUCCESSFUL,
-    RETRY_PAYMENT,
-    FINISH,
     SUBMIT,
     SEND_OTP,
     RESEND,
@@ -238,13 +233,11 @@ class MosambeeWalletPayment extends PureComponent {
             <Modal
                 animationType="fade"
                 onRequestClose={() => this._showModalView(this.props.isModalVisible, checkForPayment)}>
-                <StyleProvider style={getTheme(platform)}>
                     <Container>
                         {headerView}
                         {viewModal}
                         {footerView}
                     </Container>
-                </StyleProvider>
             </Modal>
         )
     }

@@ -1,11 +1,9 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { StyleSheet, View, Text, Platform, TextInput, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content,Footer, FooterTab, Input, Button, Item,Icon, StyleProvider } from 'native-base'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
+import { Container, Content,Footer, FooterTab, Input, Button, Item,Icon} from 'native-base'
 import styles from '../themes/FeStyle'
 import * as paymentActions from '../modules/payment/paymentActions'
 import * as globalActions from '../modules/global/globalActions'
@@ -134,7 +132,6 @@ class SplitPayment extends Component {
     render() {
         let paymentModeListView = this.renderPaymentModeListView(this.props.splitPaymentModeMap)
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Content style={{ backgroundColor: '#f4f4f4' }}>
                         <View style={[styles.bgWhite, styles.padding10, styles.marginBottom15]}>
@@ -181,7 +178,6 @@ class SplitPayment extends Component {
                         </Footer>
                     </SafeAreaView>
                 </Container>
-            </StyleProvider>
         )
     }
 }

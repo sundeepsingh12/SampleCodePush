@@ -4,11 +4,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert, SectionList } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
 import Loader from '../components/Loader'
-import { Container, Content, Header, Text, Body, Icon, StyleProvider, Separator } from 'native-base'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
+import { Container, Content, Header, Text, Body, Icon, Separator } from 'native-base'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
@@ -143,7 +140,6 @@ class Menu extends PureComponent {
   
   render() {
     return (
-      <StyleProvider style={getTheme(platform)}>
         <Container>
           {this.renderMenuHeader()}
           {(!isEmpty(this.props.errorMessage_403_400_Logout) &&
@@ -160,7 +156,6 @@ class Menu extends PureComponent {
               {this.renderLogoutView()}
             </Content>)}
         </Container>
-      </StyleProvider>
     )
   }
 

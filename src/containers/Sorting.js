@@ -12,9 +12,7 @@ import * as sortingActions from '../modules/sorting/sortingActions'
 import * as globalActions from '../modules/global/globalActions'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
-import { Container, Content, Header, Button, Text, Input, Body, Icon, StyleProvider, Toast, ActionSheet } from 'native-base'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
+import { Container, Content, Header, Button, Text, Input, Body, Icon, Toast, ActionSheet } from 'native-base'
 import styles from '../themes/FeStyle'
 import { SORTING_SEARCH_VALUE, QrCodeScanner, DEFAULT_ERROR_MESSAGE_IN_SORTING, SORTING_INITIAL_STATE, BluetoothListing } from '../lib/constants'
 import { SORTING, SEARCH_INFO, POST_SEARCH_PLACEHOLDER, OK, STOP, DEPOT, SEARCH_RESULT } from '../lib/ContainerConstants'
@@ -240,7 +238,6 @@ class Sorting extends PureComponent {
     render() {
         const renderView = this._renderContent();
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                         <Body>
@@ -261,7 +258,6 @@ class Sorting extends PureComponent {
                         </Content> : <BluetoothSorting />
                     }
                 </Container>
-            </StyleProvider>
         )
     }
 };

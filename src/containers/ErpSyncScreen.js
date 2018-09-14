@@ -3,8 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, Modal } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Body, StyleProvider } from 'native-base';
+import { Container, Content, Header, Button, Text, Body } from 'native-base';
 import {
   DOWNLOADING,
   INTERNAL_ERROR,
@@ -24,8 +23,6 @@ import {
 } from '../lib/ContainerConstants'
 import { ERP_SYNC_STATUS } from '../lib/constants'
 import ErpSyncIcon from '../svg_components/icons/ErpSyncIcon'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
@@ -249,7 +246,6 @@ class ErpSyncScreen extends PureComponent {
       erpModalView = this.getErpModalView()
     }
     return (
-      <StyleProvider style={getTheme(platform)}>
         <Container>
             <Header searchBar style={[styles.bgWhite, style.header]}>
               <Body>
@@ -269,7 +265,6 @@ class ErpSyncScreen extends PureComponent {
           </Content>
           {erpModalView}
         </Container>
-      </StyleProvider>
 
     )
   }

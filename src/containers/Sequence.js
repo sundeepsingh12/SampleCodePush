@@ -21,10 +21,8 @@ import {
   AUTO_ROUTING_MESSAGE,
   AUTO_ROUTING_EXTRA_MESSAGE
 } from '../lib/ContainerConstants'
-import { Container, Header, Button, Text, Body, Icon, Footer, Item, Input, FooterTab, StyleProvider, Toast, Label } from 'native-base'
+import { Container, Button, Text, Icon, Footer, Item, Input, FooterTab,Toast, Label } from 'native-base'
 import { SET_RESPONSE_MESSAGE, SET_REFERENCE_NO, SET_SEQUENCE_LIST_ITEM, SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST, SET_SEQUENCE_BACK_ENABLED } from '../lib/constants'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import SortableListView from 'react-native-sortable-listview'
 import JobListItem from '../components/JobListItem'
@@ -343,7 +341,6 @@ class Sequence extends PureComponent {
     let buttonView = this.getButtonView()
     let headerView = this.headerView()
     return (
-      <StyleProvider style={getTheme(platform)}>
         <Container>
           {headerView}
           {modalDialogView}
@@ -367,7 +364,6 @@ class Sequence extends PureComponent {
             </View>
             : this.viewForNoJobPresent()}
         </Container>
-      </StyleProvider>
     )
   }
 
@@ -409,7 +405,6 @@ class Sequence extends PureComponent {
 const style = StyleSheet.create({
   header: {
     borderBottomWidth: 0,
-    height: 'auto',
     padding: 0,
     paddingRight: 0,
     paddingLeft: 0,
@@ -439,9 +434,6 @@ const style = StyleSheet.create({
     shadowColor: '#d3d3d3',
     shadowOpacity: .5,
   },
-  footer:{
-    height:'auto'
-  }
 });
 
 

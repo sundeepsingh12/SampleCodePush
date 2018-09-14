@@ -1,16 +1,13 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, Dimensions, View, FlatList, TouchableOpacity } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as summaryActions from '../modules/summary/summaryActions'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import LinearGradient from 'react-native-linear-gradient'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
-import { Container, Content, Header, Text, Body, Icon, StyleProvider } from 'native-base';
+import { Container, Content, Header, Text, Body, Icon} from 'native-base';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { RESET_SUMMARY_STATE } from '../lib/constants'
 
@@ -283,12 +280,10 @@ class Summary extends PureComponent {
     render() {
         const headerView = this._renderHeader()
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     {headerView}
                     {this._renderView()}
                 </Container>
-            </StyleProvider>
         )
     }
 }

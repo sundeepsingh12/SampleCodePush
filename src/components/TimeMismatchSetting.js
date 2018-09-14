@@ -4,7 +4,6 @@ import React, { PureComponent } from 'react'
 import {
     View,
     Text,
-    Modal,
     Image,
     Platform,
     Linking,
@@ -14,9 +13,7 @@ import {
 } from 'react-native'
 
 import styles from '../themes/FeStyle'
-import { StyleProvider, Content, Button, Container, Icon, Spinner } from 'native-base'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
+import { Content, Button, Container, Icon, Spinner } from 'native-base'
 import {
     TIME_MISMATCH_ERROR,
     GO_TO_SETTINGS,
@@ -85,7 +82,6 @@ export default class TimeMismatchSetting extends PureComponent {
     }
     render() {
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Content>
                         <TouchableOpacity style={[styles.paddingVertical10, styles.paddingHorizontal15]}>
@@ -99,7 +95,6 @@ export default class TimeMismatchSetting extends PureComponent {
                         {this._renderView()}
                     </Content>
                 </Container>
-            </StyleProvider>
         )
     }
 }

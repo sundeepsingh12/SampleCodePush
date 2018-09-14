@@ -7,10 +7,8 @@ import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
 import * as backupActions from '../modules/backup/backupActions'
 import { StyleSheet, View, TouchableOpacity, FlatList, Image, Text, Alert, Modal, TouchableHighlight } from 'react-native'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import { Container, Content, Header, Button, Body, Icon, StyleProvider, Toast } from 'native-base'
+import { Container, Content, Header, Button, Body, Icon,Toast } from 'native-base'
 import {
     BACKUP_ALERT_MESSAGE,
     BACKUP_ALERT_TITLE,
@@ -464,7 +462,6 @@ class Backup extends Component {
 
     render() {
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     {/* {this.headerView()} */}
                     {this.uploadingView()}
@@ -485,7 +482,7 @@ class Backup extends Component {
                         </View>
                     </Content>)}
                 </Container>
-            </StyleProvider>)
+            )
     }
 }
 

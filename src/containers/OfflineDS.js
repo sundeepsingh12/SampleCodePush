@@ -5,12 +5,9 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
 import { StyleSheet, View, TouchableOpacity, Image, Text } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import { SET_OFFLINEDS_INITIAL_STATE, } from '../lib/constants'
-import { Container, Header, Button, Body, Right, Icon, StyleProvider, } from 'native-base'
+import { Container, Header, Button, Body, Icon } from 'native-base'
 import { DOWNLOADING_OFFLINE_DS, DOWNLOAD_SUCCESSFUL, DOWNLOAD_FAILED, CLOSE } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -170,7 +167,6 @@ class OfflineDS extends Component {
 
     render() {
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     {this.headerView()}
                     {this.initialScreen()}
@@ -178,7 +174,7 @@ class OfflineDS extends Component {
                     {this.successView()}
                     {this.failureView()}
                 </Container>
-            </StyleProvider>)
+            )
     }
 }
 

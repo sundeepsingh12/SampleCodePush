@@ -3,9 +3,7 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, TouchableOpacity, Platform } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Footer, FooterTab, Input, Button, Item, CheckBox, StyleProvider } from 'native-base'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import { Container, Content, Footer, FooterTab, Input, Button, Item, CheckBox} from 'native-base'
 import styles from '../themes/FeStyle'
 import * as paymentActions from '../modules/payment/paymentActions'
 import * as globalActions from '../modules/global/globalActions'
@@ -307,7 +305,6 @@ class Payment extends PureComponent {
         const paymentModeSelectedView = this.renderPaymentModeSelected(this.props.selectedPaymentMode)
         const splitView = this.renderSplitView()
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Content style={[styles.flex1, styles.bgWhite, styles.padding10]}>
                         {amountTobeCollectedView}
@@ -335,7 +332,6 @@ class Payment extends PureComponent {
                         </Footer>
                     </SafeAreaView>
                 </Container>
-            </StyleProvider>
         )
     }
 }
