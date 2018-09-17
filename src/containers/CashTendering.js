@@ -156,7 +156,7 @@ class CashTendering extends PureComponent {
                     {this._checkIfCashCollectOrReturn()}
                     {this.showFlatList()}
                     <SafeAreaView style={[styles.bgWhite]}>
-                        <Footer style={[styles.column, styles.padding10]}>
+                        <Footer style={[styles.column, styles.padding10,styles.autoHeightFooter]}>
                             {totalAmountInCashTendering}
                             <Button success full onPress={() => (this.props.isReceive) ? this._onSavePress() : this._onSavePressReturn()}>
                                 <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, } from 'react-native'
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Platform} from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -155,8 +155,7 @@ class ArrayFieldAttribute extends PureComponent {
                         {this.getListView()}
                     </Content>
                     <SafeAreaView style={[styles.bgWhite]}>
-                        <Footer
-                            style={[style.footer]}>
+                        <Footer style={[style.footer,styles.autoHeightFooter]}>
                             <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
                                 <Text
                                     style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {size(this.props.arrayElements)}</Text>

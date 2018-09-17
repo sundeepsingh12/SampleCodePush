@@ -156,7 +156,7 @@ class MessageBox extends Component {
         let view
         view =
             <Footer
-                style={[style.footer, styles.bgWhite, styles.row]}>
+                style={[style.footer, styles.bgWhite, styles.row,styles.autoHeightFooter]}>
                 <TextInput
                     autoCapitalize="none"
                     placeholder='Type a message'

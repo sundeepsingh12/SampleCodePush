@@ -291,7 +291,7 @@ class PayByLink extends PureComponent {
     _footerView() {
         return (
             <SafeAreaView>
-                <Footer style={[style.footer]}>
+                <Footer style={[style.footer,styles.autoHeightFooter]}>
                     <FooterTab style={[styles.padding10]}>
                         <Button success full
                             disabled={!size(trim(this.props.customerContact))}
