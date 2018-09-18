@@ -5,37 +5,21 @@ import moment from 'moment'
 import { jobDataService } from './JobData'
 import { addServerSmsService } from './AddServerSms'
 import {
-    ALERT_MESSAGE,
-    ARRAY_SAROJ_FAREYE,
-    ASSIGN,
-    ASSIGN_BY_MATHEMATICAL_FORMULA,
-    ASSIGN_DATE_TIME,
-    AVERAGE,
+    ALERT_MESSAGE, ARRAY_SAROJ_FAREYE, ASSIGN, ASSIGN_BY_MATHEMATICAL_FORMULA, ASSIGN_DATE_TIME, AVERAGE,
     BEFORE,
-    CONCATENATE,
-    DATE,
-    DATE_COMPARATOR,
-    ELSE,
-    EQUAL_TO,
-    CONTAINS,
-    GREATER_THAN,
-    GREATER_THAN_OR_EQUAL_TO,
-    LESS_THAN,
-    LESS_THAN_OR_EQUAL_TO,
-    MAX,
-    MIN,
-    NOT_EQUAL_TO,
+    CONCATENATE, CONTAINS,
+    DATE, DATE_COMPARATOR, DECIMAL,
+    ELSE, EQUAL_TO,
+    GREATER_THAN, GREATER_THAN_OR_EQUAL_TO,
+    LESS_THAN, LESS_THAN_OR_EQUAL_TO,
+    MAX, MIN,
+    NOT_EQUAL_TO, NUMBER,
     OBJECT_SAROJ_FAREYE,
-    RE_ATTEMPT_DATE,
-    REGEX,
-    REQUIRED_FALSE,
-    REQUIRED_TRUE,
-    RETURN,
+    RE_ATTEMPT_DATE, REGEX, REQUIRED_FALSE, REQUIRED_TRUE, RETURN,
     SUM,
-    THEN,
-    TIME,
-    TIME_COMPARATOR,
+    THEN, TIME, TIME_COMPARATOR,
 } from '../../lib/AttributeConstants'
+import DeviceInfo from 'react-native-device-info'
 import _ from 'lodash'
 
 class FieldValidation {
@@ -57,11 +41,12 @@ class FieldValidation {
      * @param {*} timeOfExecution 
      * @param {*} jobTransaction 
      */
-    fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
+    fieldValidations(currentElement, formLayoutState, timeOfExecution) {
+        let formElement = formLayoutState.formElement, jobTransaction = formLayoutState.jobTransaction, fieldAttributeMasterParentIdMap = formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList = formLayoutState.jobAndFieldAttributesList;
         let validationList = currentElement.validation ? currentElement.validation.filter(validationObject => validationObject.timeOfExecution == timeOfExecution) : null
         let validationMapObject = this.prepareValidationReferenceMap(validationList)
         let validationStringMap = this.validationStringMap(validationMapObject.validationReferenceMap)
-        let validationsResult = this.evaluateValidationMap(validationStringMap, validationMapObject.validationMap, formElement, jobTransaction, timeOfExecution, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+        let validationsResult = this.evaluateValidationMap(validationStringMap, validationMapObject.validationMap, timeOfExecution, formLayoutState)
         return validationsResult
     }
 
@@ -118,15 +103,15 @@ class FieldValidation {
      * @param {*} formElement 
      * @param {*} jobTransaction 
      */
-    evaluateValidationMap(validationStringMap, validationMap, formElement, jobTransaction, timeOfExecution, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
+    evaluateValidationMap(validationStringMap, validationMap, timeOfExecution, formLayoutState) {
         let validationActionList, returnValue = true
         for (let index in validationStringMap) {
-            if (this.evaluateValidation(validationStringMap[index], validationMap, '||', formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)) {
+            if (this.evaluateValidation(validationStringMap[index], validationMap, '||', formLayoutState)) {
                 validationActionList = validationMap[index].conditions ? validationMap[index].conditions.filter(validationAction => validationAction.conditionType == THEN) : null
             } else {
                 validationActionList = validationMap[index].conditions ? validationMap[index].conditions.filter(validationAction => validationAction.conditionType == ELSE) : null
             }
-            let validationActionResult = validationActionList ? this.runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, validationMap[index].fieldAttributeMasterId, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) : null
+            let validationActionResult = validationActionList ? this.runValidationActions(validationActionList, timeOfExecution, validationMap[index].fieldAttributeMasterId, formLayoutState) : null
             returnValue = returnValue ? validationActionResult : returnValue
         }
         return returnValue
@@ -140,26 +125,25 @@ class FieldValidation {
      * @param {*} formElement 
      * @param {*} jobTransaction 
      */
-    evaluateValidation(validationString, validationMap, splitOperator, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
+    evaluateValidation(validationString, validationMap, splitOperator, formLayoutState) {
         if (!splitOperator) {
-            return this.evaluateCondition(this.parseKey(validationMap[validationString].leftKey, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList), this.parseKey(validationMap[validationString].rightKey, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList), validationMap[validationString].condition)
+            return this.evaluateCondition(this.parseKey(validationMap[validationString].leftKey, formLayoutState), this.parseKey(validationMap[validationString].rightKey, formLayoutState), validationMap[validationString].condition);
         }
-        let result
-        let validationList = validationString.split(splitOperator)
+        let result, validationList = validationString.split(splitOperator);
         for (let index in validationList) {
             if (splitOperator == '||') {
-                result = this.evaluateValidation(validationList[index], validationMap, '&&', formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+                result = this.evaluateValidation(validationList[index], validationMap, '&&', formLayoutState);
                 if (result) {
                     break;
                 }
             } else if (splitOperator == '&&') {
-                result = this.evaluateValidation(validationList[index], validationMap, null, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+                result = this.evaluateValidation(validationList[index], validationMap, null, formLayoutState);
                 if (!result) {
-                    break
+                    break;
                 }
             }
         }
-        return result
+        return result;
     }
 
     /**
@@ -168,33 +152,52 @@ class FieldValidation {
      * @param {*} formElement 
      * @param {*} jobTransaction 
      */
-    parseKey(key, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
+    parseKey(key, formLayoutState) {
+        let formElement = formLayoutState.formElement, fieldAttributeMasterParentIdMap = formLayoutState.fieldAttributeMasterParentIdMap, jobTransaction = formLayoutState.jobTransaction, jobAndFieldAttributesList = formLayoutState.jobAndFieldAttributesList;
         if (key.startsWith('F[')) {
-            let id = this.splitKey(key, false)
-            let fieldAttributeMasterId = parseInt(id)
-            fieldAttributeMasterId = fieldAttributeMasterId != NaN ? fieldAttributeMasterId : id
-            if (!formElement[fieldAttributeMasterId] && !fieldAttributeMasterParentIdMap[fieldAttributeMasterId]) {
-                let fieldDataQuery = `jobTransactionId = ${jobTransaction.id} AND fieldAttributeMasterId = ${fieldAttributeMasterId}`;
-                let fieldData = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery);
-                return fieldData[0] ? fieldData[0].value : null;
-            } else if (!formElement[fieldAttributeMasterId] && fieldAttributeMasterParentIdMap) {
-                return (this.getChildFieldAttribute(fieldAttributeMasterId, formElement, fieldAttributeMasterParentIdMap))
-            } else if (formElement[fieldAttributeMasterId] && (formElement[fieldAttributeMasterId].displayValue == ARRAY_SAROJ_FAREYE || formElement[fieldAttributeMasterId].displayValue == OBJECT_SAROJ_FAREYE)) {
-                let childList = this.getChildFieldDataValue(formElement[fieldAttributeMasterId].childDataList, fieldAttributeMasterId)
-                return childList
+            let id = this.splitKey(key, false);
+            let fieldAttributeMasterId = parseInt(id);
+            fieldAttributeMasterId = fieldAttributeMasterId != NaN ? fieldAttributeMasterId : id;
+            if (formElement[fieldAttributeMasterId]) {
+                if (formElement[fieldAttributeMasterId].displayValue == ARRAY_SAROJ_FAREYE || formElement[fieldAttributeMasterId].displayValue == OBJECT_SAROJ_FAREYE) {
+                    return (this.getChildFieldAttribute(fieldAttributeMasterId, formElement, fieldAttributeMasterParentIdMap));
+                } else {
+                    return formElement[fieldAttributeMasterId] ? formElement[fieldAttributeMasterId].displayValue : null;
+                }
+            } else {
+                if (fieldAttributeMasterParentIdMap[fieldAttributeMasterId]) {
+                    return (this.getChildFieldAttribute(fieldAttributeMasterId, formElement, fieldAttributeMasterParentIdMap));
+                } else {
+                    if (checkFieldAttributeInTransientState()) {
+                        
+                    } else {
+                        return (this.checkSingleOrMultipleTransaction(jobTransaction, fieldAttributeMasterId, false, jobAndFieldAttributesList));
+                    }
+                }
             }
-            return formElement[fieldAttributeMasterId] ? formElement[fieldAttributeMasterId].displayValue : null
+            // if (!formElement[fieldAttributeMasterId] && !fieldAttributeMasterParentIdMap[fieldAttributeMasterId]) {
+            //     return (this.checkSingleOrMultipleTransaction(jobTransaction, fieldAttributeMasterId, false, jobAndFieldAttributesList));
+            //     // let fieldData = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery);
+            //     // return fieldData[0] ? fieldData[0].value : null;
+            // } else if (!formElement[fieldAttributeMasterId] && fieldAttributeMasterParentIdMap) {
+            //     return (this.getChildFieldAttribute(fieldAttributeMasterId, formElement, fieldAttributeMasterParentIdMap));
+            // } else if (formElement[fieldAttributeMasterId] && (formElement[fieldAttributeMasterId].displayValue == ARRAY_SAROJ_FAREYE || formElement[fieldAttributeMasterId].displayValue == OBJECT_SAROJ_FAREYE)) {
+            //     let childList = this.getChildFieldDataValue(formElement[fieldAttributeMasterId].childDataList, fieldAttributeMasterId);
+            //     return childList;
+            // }
+            // return formElement[fieldAttributeMasterId] ? formElement[fieldAttributeMasterId].displayValue : null;
         } else if (key.startsWith('J[')) {
-            let jobAttributeMasterId = this.splitKey(key, true)
-            let jobDataQuery = `jobId = ${jobTransaction.jobId} AND jobAttributeMasterId = ${jobAttributeMasterId}`
-            const jobData = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
-            return jobData[0] ? jobData[0].value : null
+            let jobAttributeMasterId = this.splitKey(key, true);
+            return (this.checkSingleOrMultipleTransaction(jobTransaction, jobAttributeMasterId, true, jobAndFieldAttributesList));
+            // let jobDataQuery = `jobId = ${jobTransaction.jobId} AND jobAttributeMasterId = ${jobAttributeMasterId}`
+            // const jobData = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
+            // return jobData[0] ? jobData[0].value : null
         } else if (key.includes('_') && key.split('_')[0] == 'fixed') {
             let fixedAttribute = key.split('_')[1];
             return (this.getFixedAttributeValue(fixedAttribute, jobTransaction, jobAndFieldAttributesList, key));
         }
         else {
-            return key
+            return key;
         }
     }
 
@@ -250,8 +253,8 @@ class FieldValidation {
      * @param {*} formElement 
      * @param {*} jobTransaction 
      */
-    runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, currentFieldAttributeMasterId, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
-        let returnValue = true
+    runValidationActions(validationActionList, timeOfExecution, currentFieldAttributeMasterId, formLayoutState) {
+        let returnValue = true, formElement = formLayoutState.formElement, jobTransaction = formLayoutState.jobTransaction, fieldAttributeMasterParentIdMap = formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList = formLayoutState.jobAndFieldAttributesList;
         for (let index in validationActionList) {
             switch (validationActionList[index].type) {
                 case ALERT_MESSAGE: {
@@ -266,7 +269,7 @@ class FieldValidation {
                     }
                     let valueToBeAssigned = null
                     if (validationActionList[index].actionOnAssignFrom) {
-                        valueToBeAssigned = this.actionOnAssignFrom(fieldAttributeMasterId, jobTransaction, formElement, validationActionList[index], fieldAttributeMasterParentIdMap)
+                        valueToBeAssigned = this.actionOnAssignFrom(validationActionList[index], formLayoutState)
                     } else {
                         valueToBeAssigned = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
                     }
@@ -286,7 +289,7 @@ class FieldValidation {
                 case ASSIGN_DATE_TIME: {
                     let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
                     if (formElement[parseInt(fieldAttributeMasterId)]) {
-                        let value = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+                        let value = this.parseKey(validationActionList[index].assignValue, formLayoutState)
                         if (formElement[parseInt(fieldAttributeMasterId)].attributeTypeId == TIME) {
                             let tobeassign = moment()
                             tobeassign.add(parseInt(value), 'h')
@@ -474,13 +477,13 @@ class FieldValidation {
         return value.length > 1 ? value : value[0]
     }
 
-    actionOnAssignFrom(fieldAttributeMasterId, jobTransaction, formElement, validationAction, fieldAttributeMasterParentIdMap) {
-        if (!fieldAttributeMasterParentIdMap) {
+    actionOnAssignFrom(validationAction, formLayoutState) {
+        if (!formLayoutState.fieldAttributeMasterParentIdMap) {
             return null
         }
         let assignFieldAttributeMasterId = this.splitKey(validationAction.assignValue)
         let dataList = []
-        dataList = dataList.concat(this.getChildFieldAttribute(assignFieldAttributeMasterId, formElement, fieldAttributeMasterParentIdMap))
+        dataList = dataList.concat(this.getChildFieldAttribute(assignFieldAttributeMasterId, formLayoutState.formElement, formLayoutState.fieldAttributeMasterParentIdMap))
         let value = this.evaluateActionOnAssign(validationAction, dataList)
         return value
     }
@@ -572,6 +575,39 @@ class FieldValidation {
             case 'userEmpCode':
                 return (jobAndFieldAttributesList && jobAndFieldAttributesList.user) ? jobAndFieldAttributesList.user.employeeCode : key;
         }
+    }
+
+    checkSingleOrMultipleTransaction(jobTransaction, attributeMasterId, isJob, jobAndFieldAttributesList) {
+        let query = ``, result;
+        let imeiNumber = DeviceInfo.getUniqueID()
+        if (!jobTransaction.length) {
+            query = isJob ? `jobId = ${jobTransaction.jobId}` : `jobTransactionId = ${jobTransaction.id}`;
+        } else {
+            let isFirstIndex = true;
+            for (let index in jobTransaction) {
+                if (isFirstIndex) {
+                    query += isJob ? `jobId = ${jobTransaction[index].jobId}` : `jobTransactionId = ${jobTransaction[index].id}`;
+                    isFirstIndex = false;
+                } else {
+                    query += isJob ? ` OR jobId = ${jobTransaction[index].jobId}` : ` OR jobTransactionId = ${jobTransaction[index].id}`
+                }
+            }
+        }
+        query = isJob ? `${query} AND jobAttributeMasterId = ${attributeMasterId}` : `${query} AND fieldAttributeMasterId = ${attributeMasterId}`;
+        let realmDBObject = realm.getRecordListOnQuery(isJob ? TABLE_JOB_DATA : TABLE_FIELD_DATA, query, null, null, true);
+        let attributesList = isJob ? jobAndFieldAttributesList.jobAttributes : jobAndFieldAttributesList.fieldAttributes;
+        let attributeMaster = attributesList.filter(attributeMasterObject => attributeMasterObject.id == attributeMasterId);
+        for (let index in realmDBObject) {
+            let value = realm._decryptData(realmDBObject[index].value, imeiNumber);
+            if (attributeMaster.attributeTypeId == NUMBER || attributeMaster.attributeTypeId == DECIMAL) {
+                let floatValue = parseFloat(value);
+                result += floatValue ? floatValue : 0;
+            } else {
+                result = value;
+                break;
+            }
+        }
+        return result;
     }
 
 }

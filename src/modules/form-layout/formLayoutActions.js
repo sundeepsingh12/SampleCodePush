@@ -46,18 +46,18 @@ import moment from 'moment'
 import { Toast } from 'native-base'
 
 
-export function getSortedRootFieldAttributes(statusData, jobTransactionId, jobTransaction) {
+export function getSortedRootFieldAttributes(statusData, jobTransaction, currentLatestPositionId, transientFormLayoutState) {
     return async function (dispatch) {
         try {
             dispatch(setState(CLEAR_FORM_LAYOUT_WITH_LOADER))
-            let sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusData.statusId, null, jobTransaction, latestPositionId)
-            let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds } = sortedFormAttributesDto
+            let sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusData.statusId, null, jobTransaction, currentLatestPositionId);
+            let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds } = sortedFormAttributesDto;
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
-            sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds);
+            let formLayoutState = { formElement: sortedFormAttributesDto.formLayoutObject, isSaveDisabled: sortedFormAttributesDto.isSaveDisabled, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds, transientFormLayoutState }
+            sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, formLayoutState, null, null, NEXT_FOCUS);
             dispatch(setState(SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT, {
                 statusId: statusData.statusId,
                 statusName: statusData.statusName,
-                jobTransactionId,
                 latestPositionId,
                 fieldAttributeMasterParentIdMap,
                 noFieldAttributeMappedWithStatus: (noFieldAttributeMappedWithStatus || sortedFormAttributesDto.isAllAttributeHidden),
@@ -77,8 +77,9 @@ export function getSortedRootFieldAttributes(statusData, jobTransactionId, jobTr
 export function getNextFocusableAndEditableElements(attributeMasterId, formLayoutState, value, event, jobTransaction) {
     return async function (dispatch) {
         try {
-            const cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
-            const { formLayoutObject, isSaveDisabled } = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, formLayoutState.isSaveDisabled, value, null, event, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList, formLayoutState.sequenceWiseFieldAttributeMasterIds);
+            const cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement));
+            let formLayoutStateParam = { formElement: cloneFormElement, isSaveDisabled: formLayoutState.isSaveDisabled, jobTransaction, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds: formLayoutState.sequenceWiseSortedFieldAttributesMasterIds, transientFormLayoutState: formLayoutState.transientFormLayoutState };
+            const { formLayoutObject, isSaveDisabled } = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, formLayoutStateParam, value, null, event);
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, { formLayoutObject, isSaveDisabled }))
             if (formLayoutState.updateDraft) {
                 formLayoutState.formElement = formLayoutObject
@@ -129,14 +130,15 @@ export function updateFieldData(attributeId, value, formLayoutState, jobTransact
 export function updateFieldDataWithChildData(attributeMasterId, formLayoutState, value, fieldDataListObject, jobTransaction, modalPresent, containerValue) {
     return function (dispatch) {
         try {
-            const cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
+            let cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
+            let formLayoutStateParam = { formElement: cloneFormElement, isSaveDisabled: formLayoutState.isSaveDisabled, jobTransaction, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds: formLayoutState.sequenceWiseSortedFieldAttributesMasterIds, transientFormLayoutState: formLayoutState.transientFormLayoutState };
             cloneFormElement[attributeMasterId].displayValue = value
             cloneFormElement[attributeMasterId].childDataList = fieldDataListObject.fieldDataList
             cloneFormElement[attributeMasterId].alertMessage = null
             let validationsResult = fieldValidationService.fieldValidations(cloneFormElement[attributeMasterId], cloneFormElement, AFTER, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
             cloneFormElement[attributeMasterId].value = validationsResult ? cloneFormElement[attributeMasterId].displayValue : null
             cloneFormElement[attributeMasterId].containerValue = validationsResult ? containerValue : null
-            const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, formLayoutState.isSaveDisabled, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList, formLayoutState.sequenceWiseFieldAttributeMasterIds);
+            const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, formLayoutStateParam, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS);
             dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
                 {
                     formElement: updatedFieldDataObject.formLayoutObject,
@@ -194,7 +196,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                         let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
                         navDispatch(NavigationActions.navigate({ routeName: TabScreen }))
                         if (updatedJobTransactionList && !_.isEmpty(updatedJobTransactionList.value)) {
-                            setTimeout(() => { dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))}, 1000);
+                            setTimeout(() => { dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value)) }, 1000);
                         }
                     } else if (routeName == TabScreen) {
                         navDispatch(StackActions.popToTop());
@@ -275,14 +277,14 @@ export function fieldValidations(currentElement, formLayoutState, timeOfExecutio
     }
 }
 
-export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, jobTransactionId, jobTransaction, latestPositionId, statusData) {
+export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, jobTransaction, latestPositionId, statusData, transientFormLayoutState) {
     return async function (dispatch) {
         try {
             if (editableFormLayoutState) {
                 dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName: statusData.statusName }))
             }
             else {
-                dispatch(getSortedRootFieldAttributes(statusData, jobTransactionId, jobTransaction, latestPositionId))
+                dispatch(getSortedRootFieldAttributes(statusData, jobTransaction, latestPositionId, transientFormLayoutState))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1011, error.message, 'danger', 1)
