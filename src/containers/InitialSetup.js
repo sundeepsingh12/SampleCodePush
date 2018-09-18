@@ -4,15 +4,11 @@ import {
     View,
     Text,
     Image,
-    Linking,
-    Platform
 } from 'react-native'
-import { StyleProvider, Container, Content, Button, List, ListItem, Left, Right } from 'native-base'
+import {Container, Content, Button, List, ListItem, Left, Right } from 'native-base'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import feStyle from '../themes/FeStyle'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
@@ -123,7 +119,6 @@ class InitialSetup extends PureComponent {
             return <TimeMismatchSetting retry = {this.retry} invalidateSession={this.invalidateSession} error = {this.props.error}/>
         }else{
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Content style={[feStyle.paddingTop30]}>
                         {this.showSettingUpHeader()}
@@ -139,7 +134,6 @@ class InitialSetup extends PureComponent {
                         </View>
                     </Content>
                 </Container>
-            </StyleProvider>
         )
     }
     }

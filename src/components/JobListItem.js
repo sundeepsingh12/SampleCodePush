@@ -5,19 +5,8 @@ import styles from '../themes/FeStyle'
 import {
   Text,
   Icon,
-  ActionSheet,
 } from 'native-base'
 import moment from 'moment'
-import {
-  SELECT_NUMBER_FOR_CALL,
-  OK,
-  CANCEL,
-  CALL_CONFIRM,
-  CONFIRMATION,
-  SELECT_ADDRESS_NAVIGATION
-} from '../lib/ContainerConstants'
-import Communications from 'react-native-communications'
-import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
 import MessagingCallingSmsButtonView from './MessagingCallingSmsButtonView'
 
@@ -46,6 +35,7 @@ export default class JobListItem extends PureComponent {
       </View>
     )
   }
+
   componentDidMount() {
     if (this.props.jobEndTime && !this.state.timer) {
       let currentTime = moment()
@@ -54,6 +44,7 @@ export default class JobListItem extends PureComponent {
       this.setState({ timer });
     }
   }
+  
   tick = () => {
     let currentTime = moment()
     if (moment(this.props.jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss")) <= 0) {

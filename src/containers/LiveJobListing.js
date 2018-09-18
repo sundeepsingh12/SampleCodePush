@@ -10,9 +10,7 @@ import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableHighlight, FlatList, TouchableOpacity, TextInput, ScrollView, Vibration } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import _ from 'lodash'
-import { Container, Header, Button, Text, Body, Icon, Footer, FooterTab, StyleProvider, Toast } from 'native-base'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
+import { Container, Header, Button, Text, Body, Icon, Footer, FooterTab,  Toast } from 'native-base'
 import styles from '../themes/FeStyle'
 import JobListItem from '../components/JobListItem'
 import { SET_SEARCH, SET_LIVE_JOB_TOAST, QrCodeScanner, CLEAR_LIVE_JOB_STATE } from '../lib/constants'
@@ -177,7 +175,6 @@ class LiveJobListing extends PureComponent {
 
     emptyListView() {
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]}>
                         <Body>
@@ -199,7 +196,6 @@ class LiveJobListing extends PureComponent {
                         <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
                     </View>
                 </Container>
-            </StyleProvider>
         )
     }
 
@@ -342,7 +338,6 @@ class LiveJobListing extends PureComponent {
                 return this.emptyListView()
             } else {
                 return (
-                    <StyleProvider style={getTheme(platform)}>
                         <Container>
                             {this.showListWithSearchBar()}
                             {this.showMultipleSelectList()}
@@ -353,7 +348,6 @@ class LiveJobListing extends PureComponent {
                             />
                             {this.showFooterView()}
                         </Container>
-                    </StyleProvider>
                 )
             }
         }
@@ -363,7 +357,6 @@ class LiveJobListing extends PureComponent {
 const style = StyleSheet.create({
     header: {
         borderBottomWidth: 0,
-        height: 'auto',
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0,
@@ -407,7 +400,6 @@ const style = StyleSheet.create({
         paddingRight: 0
     },
     footer: {
-        height: 'auto',
         borderTopWidth: 1,
         borderTopColor: '#f9f9f9'
     },

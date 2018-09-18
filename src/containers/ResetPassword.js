@@ -4,9 +4,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
-import { Container, Content, Header, Button, Body, Icon, Item, Input, Label, Footer, FooterTab, StyleProvider } from 'native-base'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
+import { Container, Content, Header, Button, Body, Icon, Item, Input, Label, Footer, FooterTab} from 'native-base'
 import styles from '../themes/FeStyle'
 import * as globalActions from '../modules/global/globalActions'
 import * as profileActions from '../modules/profile/profileActions'
@@ -121,13 +119,11 @@ class ResetPassword extends PureComponent {
       return (<Loader />)
     } else {
       return (
-        <StyleProvider style={getTheme(platform)}>
           <Container>
             {this._getHeaderView()}
             {this._getPasswordDetails()}
             {this._getFooterView()}
           </Container>
-        </StyleProvider>
       )
     }
   }

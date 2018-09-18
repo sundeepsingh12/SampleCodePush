@@ -5,9 +5,7 @@ import { connect } from 'react-redux'
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, TouchableHighlight, Animated, Alert, Keyboard } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { RNCamera } from 'react-native-camera'
-import { Container, Header, Body, Icon, StyleProvider, Button, Content, Toast } from 'native-base'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
+import { Container,  Body, Icon,  Button, Content, Toast } from 'native-base'
 import styles from '../themes/FeStyle'
 import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures';
 import * as postAssignmentActions from '../modules/postAssignment/postAssignmentActions'
@@ -268,7 +266,6 @@ class PostAssignmentScanner extends PureComponent {
             return <Loader />
         }
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     {this.getHeader()}
 
@@ -321,7 +318,6 @@ class PostAssignmentScanner extends PureComponent {
                         </View>
                     </Animated.View>}
                 </Container>
-            </StyleProvider>
         );
     }
 }

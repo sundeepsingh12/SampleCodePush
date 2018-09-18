@@ -237,7 +237,6 @@ class Home extends PureComponent {
     }
 
     return (
-      <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgWhite]}>
           <SafeAreaView>
             <Header style={[styles.bgWhite, styles.paddingTop0]}>
@@ -257,7 +256,6 @@ class Home extends PureComponent {
             {(this.props.callerIdDisplayData.showCallerIdPopup) ? this.showCallerPopupWindow() : null}
           </Content>
         </Container>
-      </StyleProvider>
     )
   }
 

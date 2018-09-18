@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Image, Platform, TouchableHighlight, ImageStore, BackHandler } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Right, Icon, StyleProvider, Toast } from 'native-base'
+import { Container, Right, Icon, Toast } from 'native-base'
 import Loader from '../components/Loader'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
 import { RNCamera } from 'react-native-camera'
@@ -13,10 +13,8 @@ import * as cameraActions from '../modules/camera/cameraActions'
 import * as qcActions from '../modules/qc/qcActions';
 import { SET_SHOW_IMAGE_AND_DATA, SET_CAMERA_LOADER } from '../lib/constants'
 import styles from '../themes/FeStyle'
-import getTheme from '../../native-base-theme/components'
 import ImagePicker from 'react-native-image-picker'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import platform from '../../native-base-theme/variables/platform'
 import { SKU_PHOTO } from '../lib/AttributeConstants'
 import isEmpty from 'lodash/isEmpty'
 
@@ -286,7 +284,6 @@ class CameraFieldAttribute extends PureComponent {
             return <Loader />
 
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <View style={{ flex: 1 }}>
                         {this.showCameraOrImage()}
@@ -320,7 +317,6 @@ class CameraFieldAttribute extends PureComponent {
                         {this.showSwitchCamera(getValidationObject)}
                     </SafeAreaView>
                 </Container>
-            </StyleProvider>
         )
     }
 

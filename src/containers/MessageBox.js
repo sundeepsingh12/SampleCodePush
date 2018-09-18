@@ -1,10 +1,8 @@
 'use strict'
-import { Container, StyleProvider, Footer, Item, Content } from 'native-base';
+import { Container,Footer, Content } from 'native-base';
 import { FlatList, View, Text, StyleSheet, TextInput } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
 import TitleHeader from '../components/TitleHeader';
 import * as globalActions from '../modules/global/globalActions';
 import * as messageActions from '../modules/message/messageActions';
@@ -158,7 +156,7 @@ class MessageBox extends Component {
         let view
         view =
             <Footer
-                style={[style.footer, styles.bgWhite, styles.row]}>
+                style={[style.footer, styles.bgWhite, styles.row,styles.autoHeightFooter]}>
                 <TextInput
                     autoCapitalize="none"
                     placeholder='Type a message'
@@ -184,7 +182,6 @@ class MessageBox extends Component {
     }
     render() {
         return (
-            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Content style={[styles.flex1, styles.bgWhite]}>
                         {this.getMessagesList()}
@@ -192,7 +189,7 @@ class MessageBox extends Component {
                     </Content>
                     {this.getMessageInputBox()}
                 </Container>
-            </StyleProvider>)
+            )
     }
 }
 
@@ -208,7 +205,6 @@ const style = StyleSheet.create({
         borderBottomWidth: 1
     },
     footer: {
-        height: 'auto',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',
         padding: 10

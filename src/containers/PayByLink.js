@@ -291,7 +291,7 @@ class PayByLink extends PureComponent {
     _footerView() {
         return (
             <SafeAreaView>
-                <Footer style={[style.footer]}>
+                <Footer style={[style.footer,styles.autoHeightFooter]}>
                     <FooterTab style={[styles.padding10]}>
                         <Button success full
                             disabled={!size(trim(this.props.customerContact))}
@@ -313,7 +313,7 @@ class PayByLink extends PureComponent {
                     {headerView}
                     {viewModal}
                 </Container>
-            </StyleProvider>
+              </StyleProvider>  
         )
     }
 }
@@ -321,7 +321,6 @@ class PayByLink extends PureComponent {
 const style = StyleSheet.create({
     header: {
         borderBottomWidth: 0,
-        height: 'auto',
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0
@@ -342,7 +341,6 @@ const style = StyleSheet.create({
         padding: 15
     },
     footer: {
-        height: 'auto',
         backgroundColor: '#ffffff',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',

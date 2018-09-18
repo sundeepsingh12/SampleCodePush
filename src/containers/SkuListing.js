@@ -7,11 +7,9 @@ import { connect } from 'react-redux'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
 import Loader from '../components/Loader'
 import SkuListItem from '../components/SkuListItem'
-import { Container, Content, Text, Footer,Button, StyleProvider, Separator } from 'native-base'
+import { Container, Content, Text, Footer,Button, Separator } from 'native-base'
 import styles from '../themes/FeStyle'
 import _ from 'lodash'
-import getTheme from '../../native-base-theme/components'
-import platform from '../../native-base-theme/variables/platform'
 import * as globalActions from '../modules/global/globalActions'
 import SearchBarV2 from '../components/SearchBarV2'
 import { SEARCH_PLACE_HOLDER, PROCEED, SKU } from '../lib/ContainerConstants'
@@ -79,7 +77,6 @@ class SkuListing extends PureComponent {
     }
     else {
       return (
-        <StyleProvider style={getTheme(platform)}>
           <Container>
             <View style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
               {!_.isEmpty(this.props.isSearchBarVisible) ? <SearchBarV2 placeholder={SEARCH_PLACE_HOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} /> : null}
@@ -102,7 +99,6 @@ class SkuListing extends PureComponent {
               </Footer>
             </SafeAreaView>
           </Container>
-        </StyleProvider>
       )
     }
   }
@@ -164,12 +160,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 const style = StyleSheet.create({
-  footer:{
-    height:'auto'
-  },
   header: {
     borderBottomWidth: 0,
-    height: 'auto',
     paddingTop: 10,
     paddingBottom: 10
   },

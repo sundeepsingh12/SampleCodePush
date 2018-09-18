@@ -595,7 +595,6 @@ const style = StyleSheet.create({
     flexDirection: 'column',
     paddingLeft: 0,
     paddingRight: 0,
-    height: 'auto',
     borderBottomWidth: 1,
     borderBottomColor: '#f3f3f3',
     backgroundColor: '#ffffff'
@@ -640,7 +639,6 @@ const style = StyleSheet.create({
   },
 
   footer: {
-    height: 'auto',
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#f3f3f3',

@@ -182,7 +182,6 @@ class BulkListing extends PureComponent {
 
   getBulkEmptyView() {
     return (
-      <StyleProvider style={getTheme(platform)}>
         <Container>
           <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }]}>
             <Body>
@@ -205,7 +204,6 @@ class BulkListing extends PureComponent {
             <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
           </View>
         </Container>
-      </StyleProvider>
     )
   }
 
