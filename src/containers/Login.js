@@ -127,7 +127,6 @@ class Login extends PureComponent {
     let sourceOptions;
     if (this.props.auth.form.logo) {
       sourceOptions = {
-        
         isStatic: true,
         uri: 'data:image/jpeg;base64,' + this.props.auth.form.logo
       }
@@ -138,7 +137,6 @@ class Login extends PureComponent {
       return (
         <TouchableOpacity style={[styles.width100, { height: 'auto' }]} onLongPress={this.onLongPress}>
           <Image
-            resizeMode={'contain'}
             source={sourceOptions}
             style={[{ height: 100, width: 100 }]}
           />
@@ -363,6 +361,7 @@ class Login extends PureComponent {
   render() {
     const imageView = this.getImageView()
     return (
+      <StyleProvider style={getTheme(platform)}>
         <Container>
           <Content>
             <View style={style.container}>
@@ -381,6 +380,7 @@ class Login extends PureComponent {
           </Content>
         </Container>
 
+      </StyleProvider>
     )
   }
 };

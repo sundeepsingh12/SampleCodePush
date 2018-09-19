@@ -8,7 +8,9 @@ import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
 import { StyleSheet, View, TouchableOpacity, FlatList, Alert, BackHandler } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Body, Right, Icon, List, ListItem, Footer, FooterTab } from 'native-base';
+import { Container, Content, Header, Button, Text, Body, Right, Icon, List, ListItem, StyleProvider, Footer, FooterTab } from 'native-base';
+import getTheme from '../../native-base-theme/components';
+import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
 import { FormLayout, Discard, Keep, Checkout, SHOW_DISCARD_ALERT, SET_SAVE_ACTIVATED_DRAFT, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE, SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED } from '../lib/constants'
@@ -317,6 +319,7 @@ class SaveActivated extends PureComponent {
         }
 
         return (
+            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                         <Body>
@@ -400,6 +403,7 @@ class SaveActivated extends PureComponent {
                         </SafeAreaView>
                     )}
                 </Container>
+            </StyleProvider>
 
         )
     }

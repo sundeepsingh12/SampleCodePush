@@ -1,13 +1,16 @@
 import React, { PureComponent,  } from 'react'
 import renderIf from '../lib/renderIf'
 import { StyleSheet, View, FlatList, TouchableOpacity, Modal, BackHandler,KeyboardAvoidingView} from 'react-native'
-import { Container, Content, Header, Button, Text, Body, Right, Item, Input, Icon, List, ListItem, Footer, FooterTab, Toast, } from 'native-base';
+import { SafeAreaView } from 'react-navigation'
+import { Container, Content, Header, Button, Text, Body, Right, Item, Input, Icon, List, ListItem, StyleProvider, Footer, FooterTab, Toast, } from 'native-base';
 import { Print, Receipt, SMS, TotalAmount, CONTACT_NUMBER_TO_SEND_SMS, SET_SAVE_ACTIVATED_TOAST_MESSAGE, EMAILID_VIEW_ARRAY, USER, RETURN_TO_HOME, } from '../lib/constants'
 import { EMAIL, Return_To_Home, View_SignOff_Summary, View_Parcel_Summary, Sign_Off_Summary, REGEX_TO_CHECK_PHONE_NUMBER } from '../lib/AttributeConstants'
 import Loader from '../components/Loader'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
+import getTheme from '../../native-base-theme/components';
+import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import SummaryDetails from '../components/summaryDetails'
 import * as saveActivatedActions from '../modules/saveActivated/saveActivatedActions'
@@ -379,6 +382,7 @@ class CheckoutDetails extends PureComponent {
             )
         }
         return (
+            <StyleProvider style={getTheme(platform)}>
                 <Container>
                         <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                             <Body>
@@ -452,6 +456,7 @@ class CheckoutDetails extends PureComponent {
                             </FooterTab>
                         </Footer>
                 </Container>
+            </StyleProvider>
         )
     }
 }

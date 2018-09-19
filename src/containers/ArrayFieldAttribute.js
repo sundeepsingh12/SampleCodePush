@@ -1,13 +1,15 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Platform} from 'react-native'
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as arrayActions from '../modules/array/arrayActions'
 import ArrayBasicComponent from '../components/ArrayBasicComponent.js'
 import CustomAlert from '../components/CustomAlert.js'
-import { Container, Content, Header, Button, Body, Icon, Footer, Toast } from 'native-base'
+import { Container, Content, Header, Button, Body, Icon, Footer, StyleProvider, Toast } from 'native-base'
 import size from 'lodash/size'
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
@@ -145,6 +147,7 @@ class ArrayFieldAttribute extends PureComponent {
     }
     render() {
         return (
+            <StyleProvider style={getTheme(platform)} >
                 <Container>
                     {/* {this.headerView()} */}
                     {renderIf(this.props.errorMessage != '',
@@ -155,7 +158,8 @@ class ArrayFieldAttribute extends PureComponent {
                         {this.getListView()}
                     </Content>
                     <SafeAreaView style={[styles.bgWhite]}>
-                        <Footer style={[style.footer,styles.autoHeightFooter]}>
+                        <Footer
+                            style={[style.footer, styles.bgWhite]}>
                             <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
                                 <Text
                                     style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {size(this.props.arrayElements)}</Text>
@@ -171,12 +175,14 @@ class ArrayFieldAttribute extends PureComponent {
                         </Footer>
                     </SafeAreaView>
                 </Container >
+            </StyleProvider >
         )
     }
 };
 const style = StyleSheet.create({// Comment Refactor these
     header: {
         borderBottomWidth: 0,
+        height: 'auto',
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0
@@ -198,6 +204,7 @@ const style = StyleSheet.create({// Comment Refactor these
     },
     footer: {
         flexDirection: 'column',
+        height: 'auto',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',
         padding: 10

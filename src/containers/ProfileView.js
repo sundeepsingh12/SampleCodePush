@@ -2,10 +2,12 @@
 'use strict'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import getTheme from '../../native-base-theme/components';
+import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import React, { PureComponent } from 'react'
 import { View, TouchableOpacity } from 'react-native'
-import { Container, Content, Header, Text,  Body, Icon } from 'native-base'
+import { Container, Content, Header, Text,  Body, Icon, StyleProvider } from 'native-base'
 import * as profileActions from '../modules/profile/profileActions'
 import * as globalActions from '../modules/global/globalActions'
 import { RESET_PASSWORD, CONTACT_NUMBER, EMAIL, PROFILE, } from '../lib/ContainerConstants'
@@ -105,6 +107,7 @@ class ProfileView extends PureComponent {
 
   render() {
     return (
+      <StyleProvider style={getTheme(platform)}>
         <Container>
           {this._getHeaderView()}
           <Content style={[styles.flex1, styles.bgWhite]}>
@@ -112,6 +115,7 @@ class ProfileView extends PureComponent {
             {this._getContactDetails()}
           </Content>
         </Container>
+      </StyleProvider>
     )
   }
 };
