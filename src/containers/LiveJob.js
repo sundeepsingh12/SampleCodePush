@@ -1,10 +1,12 @@
 'use strict'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
-import { Container, Content, Header, Button, Text, Body, Icon, Footer, Toast } from 'native-base'
+import { Container, Content, Header, Button, Text, Body, Icon, StyleProvider, Footer, Toast } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as liveJobActions from '../modules/liveJob/liveJobActions'
 import Loader from '../components/Loader'
@@ -211,6 +213,7 @@ class LiveJob extends PureComponent {
     }
     render() {
         return (
+            <StyleProvider style={getTheme(platform)}>
                 <Container style={[styles.bgLightGray]}>
                     {this.showHeaderView()}
                     <View style={{ flexDirection: 'column' }}>
@@ -222,6 +225,7 @@ class LiveJob extends PureComponent {
                     {this.showJobDataList()}
                     <Footer style={[style.footer]} />
                 </Container >
+            </StyleProvider >
         )
     }
 }
@@ -230,6 +234,7 @@ class LiveJob extends PureComponent {
 const style = StyleSheet.create({
     header: {
         borderBottomWidth: 0,
+        height: 'auto',
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0,
@@ -289,6 +294,7 @@ const style = StyleSheet.create({
         borderRadius: 3
     },
     footer: {
+        height: 'auto',
         backgroundColor: '#ffffff',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',

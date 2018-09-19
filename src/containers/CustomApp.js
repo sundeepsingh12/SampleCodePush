@@ -88,7 +88,7 @@ class CustomApp extends PureComponent {
 
     showUrlInputView() {
         return (
-            <View style={[style.headerBody]} >
+            <View style={[style.headerBody]} t>
                 {!this.props.navigation.state.params.customUrl ?
                     <View style={[{ height: 30 }]}>
                         <Input

@@ -268,7 +268,9 @@ class TaskListScreen extends PureComponent {
       return (
         <Container>
           <Content>
+            <List>
               {jobTransactionViewStructure}
+            </List>
           </Content>
         </Container>
       )

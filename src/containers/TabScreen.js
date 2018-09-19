@@ -5,9 +5,11 @@ import { connect } from 'react-redux'
 import Loader from '../components/Loader'
 import SearchBarV2 from '../components/SearchBarV2'
 import React, { PureComponent } from 'react'
-import {  View } from 'react-native'
-import { Container, Text, Tab, Tabs, ScrollableTab } from 'native-base'
+import { StyleSheet, View } from 'react-native'
+import { Container, Text, Tab, Tabs, ScrollableTab, StyleProvider } from 'native-base'
+import getTheme from '../../native-base-theme/components'
 import TaskListScreen from './TaskListScreen';
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as taskListActions from '../modules/taskList/taskListActions'
 import * as globalActions from '../modules/global/globalActions'
@@ -122,15 +124,18 @@ class TabScreen extends PureComponent {
       )
     } else if (size(this.props.tabsList) == 0) {
       return (
+        <StyleProvider style={getTheme(platform)}>
           <Container>
             <View></View>
           </Container>
+        </StyleProvider>
       )
     } else {
       let tabListForPage = this.props.navigation.state.params.pageObject.additionalParams ? JSON.parse(this.props.navigation.state.params.pageObject.additionalParams).tabids : []
       const searchTextValue = (this.props.searchText) ? this.props.searchText.searchText : '';
       const viewTabList = this.renderTabs(tabListForPage)
       return (
+        <StyleProvider style={getTheme(platform)}>
           <Container>
             <View style={[{ backgroundColor: styles.bgPrimaryColor }, styles.header]}>
               <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.fetchDataForScanner.bind(this)} />
@@ -148,6 +153,7 @@ class TabScreen extends PureComponent {
             </Tabs>
             {this.props.isFutureRunsheetEnabled ? <TaskListCalender /> : null}
           </Container>
+        </StyleProvider >
       )
     }
   }
