@@ -183,14 +183,15 @@ class FormLayout {
     async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, taskListScreenDetails) {
         let routeName, routeParam
         const currentStatus = transientStatusAndSaveActivatedService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
-        if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
+        let jobTransactionId = jobTransaction.length ? jobTransaction[0].id : jobTransaction.id;
+        if (jobTransactionId < 0 && currentStatus.saveActivated) {
             routeName = SaveActivated
             routeParam = {
                 formLayoutState, contactData, currentStatus, jobTransaction, jobMasterId, navigationFormLayoutStates
             }
             draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
 
-        } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
+        } else if (jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
             let { elementsArray, amount } = transientStatusAndSaveActivatedService.getDataFromFormElement(formLayoutState.formElement)
             let totalAmount = transientStatusAndSaveActivatedService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
             routeName = CheckoutDetails
@@ -214,7 +215,7 @@ class FormLayout {
             if (navigationFormLayoutStates) {
                 formLayoutObject = this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
-            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction, formLayoutState.jobAndFieldAttributesList)
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction, formLayoutState.jobAndFieldAttributesList)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList, jobMasterId)
             //if (!jobTransaction.length) { //Delete draft only if not bulk
             draftService.deleteDraftFromDb(jobTransaction, jobMasterId)

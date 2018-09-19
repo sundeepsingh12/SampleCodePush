@@ -168,8 +168,9 @@ class FieldValidation {
                 if (fieldAttributeMasterParentIdMap[fieldAttributeMasterId]) {
                     return (this.getChildFieldAttribute(fieldAttributeMasterId, formElement, fieldAttributeMasterParentIdMap));
                 } else {
-                    if (checkFieldAttributeInTransientState()) {
-                        
+                    let valueOfTransientState = this.getFieldAttributeFromTransientState(fieldAttributeMasterId, formLayoutState.transientFormLayoutState);
+                    if (valueOfTransientState) {
+
                     } else {
                         return (this.checkSingleOrMultipleTransaction(jobTransaction, fieldAttributeMasterId, false, jobAndFieldAttributesList));
                     }
@@ -608,6 +609,12 @@ class FieldValidation {
             }
         }
         return result;
+    }
+
+    getFieldAttributeFromTransientState(fieldAttributeMasterId, transientFormLayoutState) {
+        if(!transientFormLayoutState) {
+            return null
+        }
     }
 
 }

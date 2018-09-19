@@ -110,8 +110,8 @@ class ArrayFieldAttribute {
 
     findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, fieldDataList, event, fieldAttributeMasterParentIdMap, sequenceWiseMasterIds) {
         let arrayRow = cloneArrayElements[rowId]
-        let formLayoutStateParam = { formElement: arrayRow.formLayoutObject, isSaveDisabled, jobTransaction: null, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: null, sequenceWiseSortedFieldAttributesMasterIds, transientFormLayoutState: null };
-        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, formLayoutStateParam, value, fieldDataList, event, null, fieldAttributeMasterParentIdMap, null, sequenceWiseMasterIds);
+        let formLayoutStateParam = { formElement: arrayRow.formLayoutObject, isSaveDisabled, jobTransaction: null, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: null, sequenceWiseSortedFieldAttributesMasterIds: sequenceWiseMasterIds, transientFormLayoutState: null };
+        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, formLayoutStateParam, value, fieldDataList, event);
         arrayRow.allRequiredFieldsFilled = (!sortedArrayElements.isSaveDisabled) ? true : false
         let _isSaveDisabled = this.enableSaveIfRequired(cloneArrayElements)
         return {

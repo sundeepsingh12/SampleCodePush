@@ -68,7 +68,7 @@ export function getSortedRootFieldAttributes(statusData, jobTransaction, current
                 sequenceWiseFieldAttributeMasterIds: sequenceWiseSortedFieldAttributesMasterIds
             }))
         } catch (error) {
-            showToastAndAddUserExceptionLog(1001, error.message, 'danger', 0)
+            showToastAndAddUserExceptionLog(1001, error.message, 'danger', 1)
             dispatch(setState(IS_LOADING, false))
         }
     }

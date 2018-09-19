@@ -19,7 +19,7 @@ import { navDispatch } from '../navigators/NavigationService'
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
-import { DELETE_ROW_ERROR, ADD_ROW_ERROR, SAVE_ARRAY_ERROR, UNIQUE_VALIDATION_FAILED_FORMLAYOUT, ADD_TOAST,OK } from '../../lib/ContainerConstants'
+import { DELETE_ROW_ERROR, ADD_ROW_ERROR, SAVE_ARRAY_ERROR, UNIQUE_VALIDATION_FAILED_FORMLAYOUT, ADD_TOAST, OK } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 
 export function showOrDropModal(arrayElements, rowId, idToSet, isSaveDisabled) {
@@ -93,7 +93,9 @@ export function getNextFocusableForArrayWithoutChildDatalist(attributeMasterId, 
         try {
             let cloneArrayElements = JSON.parse(JSON.stringify(arrayElements))
             let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, null, event, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.sequenceWiseMasterIds)
-            if (!newArrayElements) throw new Error(DELETE_ROW_ERROR)
+            if (!newArrayElements) {
+                throw new Error(DELETE_ROW_ERROR)
+            }
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
         } catch (error) {
             showToastAndAddUserExceptionLog(105, error.message, 'danger', 1)

@@ -29,7 +29,7 @@ export default class FormLayoutEventImpl {
      */
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutState, value, fieldDataList, event) {
         let isAllAttributeHidden = true; //this is a check if there are all hidden attribute or not
-        let formLayoutObject = formLayoutState.formElement, isSaveDisabled = formLayoutState.isSaveDisabled, jobTransaction = formLayoutState.jobTransaction, fieldAttributeMasterParentIdMap = formLayoutState.fieldAttributeMasterParentIdMap, sequenceWiseSortedFieldAttributesMasterIds = formLayoutState.sequenceWiseSortedFieldAttributesMasterIds;
+        let formLayoutObject = formLayoutState.formElement, isSaveDisabled = formLayoutState.isSaveDisabled, jobTransaction = formLayoutState.jobTransaction, fieldAttributeMasterParentIdMap = formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList = formLayoutState.jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds = formLayoutState.sequenceWiseSortedFieldAttributesMasterIds;
         if (attributeMasterId && formLayoutObject[attributeMasterId]) {
             this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
         }
