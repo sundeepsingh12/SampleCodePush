@@ -126,6 +126,21 @@ export function updateFieldData(attributeId, value, formLayoutState, jobTransact
     }
 }
 
+export function PreparePrintingTemplate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails) {
+    return async function (dispatch) {
+        try {
+            const cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
+            let printingTemplateFormatData = await formLayoutService.printingTemplateFormatStructure(formLayoutState, jobTransaction)
+            if(printingTemplateFormatData){
+
+            }
+            // dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
+        } catch (error) {
+            showToastAndAddUserExceptionLog(1005, error.message, 'danger', 1)
+        }
+    }
+}
+
 export function updateFieldDataWithChildData(attributeMasterId, formLayoutState, value, fieldDataListObject, jobTransaction, modalPresent, containerValue) {
     return function (dispatch) {
         try {

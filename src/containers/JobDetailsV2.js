@@ -402,12 +402,13 @@ class JobDetailsV2 extends PureComponent {
     }
   }
   showJobDetails() {
+    let jobDataList = Object.values(this.props.jobDataList).sort((x, y) => x.sequence - y.sequence)
     return (
       <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
         <ExpandableHeader
           title={'Basic Details'}
           navigateToDataStoreDetails={this.navigateToDataStoreDetails}
-          dataList={this.props.jobDataList}
+          dataList={jobDataList}
           showDetailsList={true}
         />
       </View>
@@ -430,11 +431,12 @@ class JobDetailsV2 extends PureComponent {
   }
 
   showFieldDetails() {
+    let fieldDataList = Object.values(this.props.fieldDataList).sort((x, y) => x.sequence - y.sequence)
     return (
       <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
         <ExpandableHeader
           title={'Field Details'}
-          dataList={this.props.fieldDataList}
+          dataList={fieldDataList}
           navigateToDataStoreDetails={this.navigateToDataStoreDetails}
           navigateToCameraDetails={this.navigateToCameraDetails}
           showDetailsList={true} />
@@ -445,9 +447,18 @@ class JobDetailsV2 extends PureComponent {
   showFooterView() {
     if (!isEmpty(this.props.jobTransaction)) {
       return (
-        <Footer style={style.footer}>
-          <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} />
-        </Footer>
+        // <Footer style={style.footer}>
+        // {/* <Button onPress = {this._onGoToPreviousStatus}>Print</Button> */}
+        //   <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} />
+        // </Footer>
+                <Footer style={[style.footer]}>
+                    <FooterTab style={[styles.padding10]}>
+                        <Button success full
+                            onPress={() => {this.props.actions.prepareTemplateForPrintAttributeAndPrint(this.props.jobTransaction, this.props.fieldDataList, this.props.jobDataList)}}>
+                            <Text style={[styles.fontLg, styles.fontWhite]}>Print</Text>
+                        </Button>
+                    </FooterTab>
+                </Footer>
       )
     }
   }

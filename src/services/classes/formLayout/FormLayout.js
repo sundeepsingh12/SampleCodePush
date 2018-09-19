@@ -2,7 +2,7 @@ import { keyValueDBService } from '../KeyValueDBService.js'
 import { transientStatusAndSaveActivatedService } from '../TransientStatusAndSaveActivatedService.js'
 import { AFTER, OBJECT, STRING, TEXT, DECIMAL, SCAN_OR_TEXT, QR_SCAN, NUMBER, QC_IMAGE, QC_REMARK, QC_PASS_FAIL, OPTION_CHECKBOX_ARRAY } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
-import { SaveActivated, Transient, CheckoutDetails, TabScreen, SHOULD_RELOAD_START, BACKUP_ALREADY_EXIST, TABLE_FIELD_DATA, TABLE_JOB_TRANSACTION } from '../../../lib/constants'
+import { SaveActivated, Transient, CheckoutDetails, TabScreen, SHOULD_RELOAD_START, BACKUP_ALREADY_EXIST, TABLE_FIELD_DATA, FIELD_ATTRIBUTE_VALUE } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
 import { fieldValidationService } from '../FieldValidation'
@@ -10,7 +10,9 @@ import { dataStoreService } from '../DataStoreService.js'
 import { geoFencingService } from '../GeoFencingService.js'
 import * as realm from '../../../repositories/realmdb'
 import { transactionCustomizationService } from '../TransactionCustomization'
+import { fieldAttributeValueMasterService } from '../FieldAttributeValueMaster'
 import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../../lib/ContainerConstants'
+import { jobDataService } from '../JobData'
 class FormLayout {
 
     /**
@@ -227,6 +229,126 @@ class FormLayout {
             routeName,
             routeParam
         }
+    }
+    async printingTemplateFormatStructure(cloneFormElement, jobTransaction) {
+        let printAttributeMasterId = this.checkCaseOfPrintAttribute(cloneFormElement.formElement, 'fieldAttributeMasterId'), masterIdPrintingObjectMap = {}, jobDataObject = {}
+        let transaction = jobTransaction && jobTransaction.length ? jobTransaction[0] : jobTransaction
+        if (!printAttributeMasterId) {
+            return
+        }
+        const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE);
+        let printingFieldAttributeMasterValue = fieldAttributeValueMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, printAttributeMasterId);
+        let {attributeMap, jobAttributesMap} = this.combineJobAndFieldAttribute(cloneFormElement.jobAndFieldAttributesList.jobAttributes, cloneFormElement.jobAndFieldAttributesList.fieldAttributes)
+        let { masterIdJobAttributeMap, printingAttributeValueMap, labelMap } = this.createMapOfMasterIdAndPrintingObject(printingFieldAttributeMasterValue, masterIdPrintingObjectMap, attributeMap, jobAttributesMap)
+        printingAttributeValueMap = _.sortBy(printingAttributeValueMap, function (object) { return object.sequence });
+        if (!_.isEmpty(masterIdJobAttributeMap)) {
+            jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(transaction.jobId, masterIdJobAttributeMap, masterIdJobAttributeMap)
+        }
+        let dataList = Object.assign({}, jobDataObject.dataList, cloneFormElement.formElement)
+        let { objectSequenceToListOfPrintingObjectDTOMap, sequenceToPrintTypeToFieldDataValueMap } = this.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap, labelMap, true)
+    }
+
+    combineJobAndFieldAttribute(jobAttributes, fieldAttributes){
+       let attributeMap = {}, jobAttributesMap = {}
+       for(let id in jobAttributes){
+           attributeMap[jobAttributes[id].id] = jobAttributes[id]
+           jobAttributesMap[jobAttributes[id].id] = jobAttributes[id]
+       }
+       for(let id in fieldAttributes){
+        attributeMap[fieldAttributes[id].id] = fieldAttributes[id]
+       }
+       return {attributeMap, jobAttributesMap}
+    }
+
+    preparePrintingTemplate(jobTransactionId, dataList, printingAttributeValueMap, printingFieldAttributeMasterValue, labelMap) {
+        let objectSequenceToListOfPrintingObjectDTOMap = new Map(), sequenceToPrintTypeToFieldDataValueMap = []
+        for (let id in printingAttributeValueMap) {
+            let attributeMasterIdType = dataList[printingAttributeValueMap[id].name].data && dataList[printingAttributeValueMap[id].name].data.fieldAttributeMasterId || dataList[printingAttributeValueMap[id].name].fieldAttributeMasterId ? 'fieldAttributeMasterId' : 'jobAttributeMasterId'
+            let attributeId = dataList && printingAttributeValueMap[id] &&  dataList[printingAttributeValueMap[id].name] ? dataList[printingAttributeValueMap[id].name].attributeTypeId : null
+            if (attributeId && attributeId == 17 || attributeId == 12 || attributeId == 18 || attributeId == 50 || attributeId == 19) { 
+                let childDataObject = dataList[printingAttributeValueMap[id].name] ? dataList[printingAttributeValueMap[id].name].childDataList : null
+                let childDataMap = []
+                childDataObject = labelMap && printingAttributeValueMap[id].code == 'Sku' ? childDataObject[jobTransactionId].childDataList : childDataObject
+                for (let data in childDataObject) {
+                    if (childDataObject[data].attributeTypeId == 11) { // case of object in array
+                        let objectChildDtoMap = {}
+                        objectChildDtoMap.label = dataList[printingAttributeValueMap[id].name].label
+                        objectChildDtoMap.childData = []
+                        let childDataValueObject = childDataObject[data].childDataList
+                        for (let childItem in childDataValueObject) {
+                            let childValue = {}
+                            let valueData = childDataValueObject[childItem].data ? childDataValueObject[childItem].data : childDataValueObject[childItem]
+                            let printingDataObject = printingFieldAttributeMasterValue[valueData[attributeMasterIdType]]
+                            if (printingDataObject && valueData.value) {
+                                childValue.label = labelMap ? labelMap[valueData[attributeMasterIdType]] : childDataValueObject[childItem].label
+                                childValue.value = valueData.value
+                                childValue.sequence = printingDataObject.sequence
+                                childValue.printType = printingDataObject.code
+                                objectChildDtoMap.childData.push(childValue)
+                            }
+                        }
+                        objectChildDtoMap.childData = _.sortBy(objectChildDtoMap.childData, function (object) { return object.sequence });
+                        childDataMap.push(objectChildDtoMap)
+                    } else if (childDataObject[data].attributeTypeId == 12) {  // case of array in array
+                        for (let detailsData in childDataObject[data].childDataList) {
+                            let detailArrayChildData = childDataObject[data].childDataList[detailsData]
+                            let detailsValue = labelMap ? detailArrayChildData : detailArrayChildData.data
+                            if (detailsValue && detailsValue.value != null && detailsValue.value == 'ObjectSarojFareye' && detailArrayChildData.childDataList) {
+                                for (let detailObject in detailArrayChildData.childDataList) {
+                                    let objectValue =  detailArrayChildData.childDataList[detailObject] && detailArrayChildData.childDataList[detailObject].data ? detailArrayChildData.childDataList[detailObject].data : detailArrayChildData.childDataList[detailObject]
+                                    if (objectValue && printingFieldAttributeMasterValue[objectValue[attributeMasterIdType]] && objectValue.value) {
+                                        sequenceToPrintTypeToFieldDataValueMap.push({ code: printingFieldAttributeMasterValue[objectValue[attributeMasterIdType]].code, value: `${labelMap ? labelMap[objectValue[attributeMasterIdType]] : detailArrayChildData.childDataList[detailObject].label}!<*>!${objectValue.value}` })
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        let dataItem = childDataObject[data] && childDataObject[data].data ? childDataObject[data].data : childDataObject[data]
+                        if ( dataItem && printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]] && dataItem.value) {
+                            sequenceToPrintTypeToFieldDataValueMap.push({ code: printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]].code, value: `${labelMap ? labelMap[dataItem[attributeMasterIdType]] : childDataObject[data].label}!<*>!${dataItem.value}` })
+                        }
+                    }
+                }
+                if (childDataMap && childDataMap.length) {
+                    objectSequenceToListOfPrintingObjectDTOMap.set(printingAttributeValueMap[id].name, childDataMap)
+                }
+            } else {
+                let dataItem = dataList[printingAttributeValueMap[id].name]  && dataList[printingAttributeValueMap[id].name].data ? dataList[printingAttributeValueMap[id].name].data : dataList[printingAttributeValueMap[id].name]
+                if (dataItem && dataItem.value && printingAttributeValueMap[id]) {
+                    sequenceToPrintTypeToFieldDataValueMap.push({ code: printingAttributeValueMap[id].code, value: `${labelMap ? labelMap[dataItem[attributeMasterIdType]] : dataList[printingAttributeValueMap[id].name].label}!<*>!${dataItem.value}` })
+                }
+            }
+        }
+        console.logs("1223", objectSequenceToListOfPrintingObjectDTOMap, sequenceToPrintTypeToFieldDataValueMap)
+        return { objectSequenceToListOfPrintingObjectDTOMap, sequenceToPrintTypeToFieldDataValueMap }
+    }
+
+    checkCaseOfPrintAttribute(formElement, type) {
+        for (let fieldAttributeMasterId in formElement) {
+            if (formElement[fieldAttributeMasterId].attributeTypeId == 66) {
+                return formElement[fieldAttributeMasterId][type]
+            }
+        }
+        return false
+    }
+
+    createMapOfMasterIdAndPrintingObject(printingAttributeValueList, masterIdPrintingObjectMap, attributeMap, jobAttributesMap) {
+        let masterIdJobAttributeMap = {}, printingAttributeValueMap = {}, labelMap = {}
+        for (let item in printingAttributeValueList) {
+            let masterId = printingAttributeValueList[item].name.split('[')
+            masterId = (masterId[masterId.length - 1]).split(']')
+            printingAttributeValueList[item].name = masterId[0]
+            masterIdPrintingObjectMap[masterId[0]] = printingAttributeValueList[item]
+            if (jobAttributesMap) {
+                labelMap[masterId[0]] = attributeMap[masterId[0]].label
+                if(jobAttributesMap[masterId[0]]) masterIdJobAttributeMap[masterId[0]] = jobAttributesMap[masterId[0]]
+            }
+            if (masterId[0] && ((jobAttributesMap && attributeMap[masterId[0]] && attributeMap[masterId[0]].parentId) || !attributeMap[masterId[0]])) {
+                continue
+            }
+            printingAttributeValueMap[masterId[0]] = printingAttributeValueList[item]
+        }
+        return { masterIdJobAttributeMap, printingAttributeValueMap, labelMap }
     }
 
     isFormValid(formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {

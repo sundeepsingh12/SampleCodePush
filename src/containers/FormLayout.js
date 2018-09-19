@@ -231,7 +231,6 @@ class FormLayout extends PureComponent {
       sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds,
       dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap,
     }
-
     let taskListScreenDetails = {
       jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
       pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
@@ -248,17 +247,17 @@ class FormLayout extends PureComponent {
           navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
           saveActivatedStatusData: this.props.navigation.state.params.saveActivatedStatusData,
           taskListScreenDetails
-        },
+        }
       )
-    } else {
-      this.props.actions.saveJobTransaction(
+    }else{
+      this.props.actions.PreparePrintingTemplate(
         formLayoutState,
         this.props.navigation.state.params.jobMasterId,
         this.props.navigation.state.params.contactData,
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
         this.props.navigation.state.params.saveActivatedStatusData,
-        taskListScreenDetails,
+        taskListScreenDetails
       )
     }
   }

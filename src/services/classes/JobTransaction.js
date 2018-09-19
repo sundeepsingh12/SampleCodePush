@@ -29,6 +29,7 @@ import { formLayoutEventsInterface } from './formLayout/FormLayoutEventInterface
 import { runSheetService } from './RunSheet';
 import { messageService } from '../../services/classes/MessageService'
 import Item from '../../../native-base-theme/components/Item';
+import { formLayoutService } from './formLayout/FormLayout';
 
 class JobTransaction {
 
@@ -676,7 +677,7 @@ class JobTransaction {
         let fieldAttributeMap = fieldAttributeMasterMap[jobMasterId] ? fieldAttributeMasterMap[jobMasterId] : {}
         let jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap)
         let fieldDataObject = (callingActivity != 'LiveJob') ? fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId, fieldAttributeMap, fieldAttributeStatusMap) : {}
-        let jobTime, jobSwipableDetails
+        let jobTime, jobSwipableDetails, printAttributeData
         if (callingActivity != 'LiveJob') {
             jobSwipableDetails = this.prepareJobSwipableDetailsForDetails(jobDataObject.dataMap, jobDataObject.dataList, jobMasterId, customerCareList, smsTemplateList)
             let skuMap = fieldDataObject.dataMap[SKU_ARRAY]
@@ -689,12 +690,11 @@ class JobTransaction {
             }
         }
         let currentStatus = statusIdStatusMap[jobStatusId]
-        jobDataObject.dataList = Object.values(jobDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
         let messageList = messageService.getMessagesForParticularTransaction(jobTransactionId)
         if (callingActivity != 'LiveJob') {
+            printAttributeData = formLayoutService.checkCaseOfPrintAttribute(fieldAttributeMap, 'id')
             const job = realm.getRecordListOnQuery(TABLE_JOB, 'id= ' + jobId)
             let { latitude, longitude } = job[0]
-            fieldDataObject.dataList = Object.values(fieldDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
             const jobTransactionDisplay = {
                 id: jobTransactionId,
                 jobId,
@@ -717,7 +717,8 @@ class JobTransaction {
                 jobSwipableDetails,
                 jobLatitude: latitude,
                 jobLongitude: longitude,
-                deleteFlag
+                deleteFlag,
+                printAttributeMasterId : currentStatus.statusCategory == 3 && printAttributeData ? printAttributeData : null 
             }
             return {
                 currentStatus,
@@ -727,7 +728,7 @@ class JobTransaction {
                 seqSelected,
                 jobTime,
                 checkForSeenStatus,
-                messageList
+                messageList,
             }
         }
         else {

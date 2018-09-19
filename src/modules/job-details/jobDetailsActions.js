@@ -135,6 +135,15 @@ export function deleteDraftAndNavigateToFormLayout(formLayoutData) {
         }
     }
 }
+export function prepareTemplateForPrintAttributeAndPrint(jobTransaction, fieldDataList, jobDataList) {
+    return async function (dispatch) {
+        try {
+            let data = await jobDetailsService.printingTemplateFormatStructureForDetails(jobTransaction, fieldDataList, jobDataList)
+        } catch (error) {
+            showToastAndAddUserExceptionLog(1108, error.message, 'danger', 1)
+        }
+    }
+}
 
 export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, jobData, fieldData) {
     return async function (dispatch) {

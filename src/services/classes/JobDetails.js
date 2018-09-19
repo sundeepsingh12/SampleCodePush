@@ -12,6 +12,7 @@ import {
 } from '../../lib/AttributeConstants'
 import moment from 'moment'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface'
+import { formLayoutService } from '../../services/classes/formLayout/FormLayout'
 import {
     TABLE_JOB,
     USER,
@@ -24,12 +25,15 @@ import {
     JOB_ATTRIBUTE_STATUS,
     FIELD_ATTRIBUTE_STATUS,
     CUSTOMER_CARE,
-    SMS_TEMPLATE
+    SMS_TEMPLATE,
+    FIELD_ATTRIBUTE_VALUE
 } from '../../lib/constants'
 import { keyValueDBService } from './KeyValueDBService'
 import { geoFencingService } from './GeoFencingService'
+import { fieldAttributeValueMasterService } from '../classes/FieldAttributeValueMaster'
 import _ from 'lodash'
 import { draftService } from './DraftService'
+import { jobDataService } from '../classes/JobData'
 
 
 class JobDetails {
@@ -235,6 +239,17 @@ class JobDetails {
             value: jobTransactionArray,
             jobTransactionDTO
         }
+    }
+
+    async printingTemplateFormatStructureForDetails(jobTransaction, fieldDataList, jobDataList) {
+        let  masterIdPrintingObjectMap = {}, jobDataObject = {}
+        let transaction = jobTransaction && jobTransaction.length ? jobTransaction[0] : jobTransaction
+        const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE);
+        let dataList = Object.assign({}, jobDataList, fieldDataList)
+        let printingFieldAttributeMasterValue = fieldAttributeValueMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, jobTransaction.printAttributeMasterId);
+        let { printingAttributeValueMap } = formLayoutService.createMapOfMasterIdAndPrintingObject(printingFieldAttributeMasterValue, masterIdPrintingObjectMap, dataList)
+        printingAttributeValueMap = _.sortBy(printingAttributeValueMap, function (object) { return object.sequence });
+        let { objectSequenceToListOfPrintingObjectDTOMap, sequenceToPrintTypeToFieldDataValueMap } = formLayoutService.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap)
     }
 
     /**@function setAllDataForRevertStatus(statusList,jobTransaction,previousStatus)
