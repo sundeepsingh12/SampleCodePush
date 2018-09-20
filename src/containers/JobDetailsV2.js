@@ -92,7 +92,6 @@ class JobDetailsV2 extends PureComponent {
   componentDidMount() {
     if (this.props.navigation.state.params && this.props.navigation.state.params.calledFromAlarm) {
       Vibration.vibrate([1000, 2000, 3000], true)
-      this.props.navigation.state.params.calledFromAlarm = false
       Sound.setCategory('Playback');
       this.alarm = new Sound('alarm_notification.mp3', Sound.MAIN_BUNDLE, (error) => {
         if (error) {
@@ -146,7 +145,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentDidUpdate() {
-    if (this.props.jobDetailsLoading != 'UPDATING_JOBDATA' && this.props.jobTransaction && !isEmpty(this.props.updatedTransactionListIds) && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId] && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId][this.props.jobTransaction.jobId]) {
+    if (!this.props.navigation.state.params.calledFromAlarm && this.props.jobDetailsLoading != 'UPDATING_JOBDATA' && this.props.jobTransaction && !isEmpty(this.props.updatedTransactionListIds) && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId] && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId][this.props.jobTransaction.jobId]) {
       this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key, 'UPDATING_JOBDATA')
     }
   }

@@ -108,8 +108,6 @@ class CountDownTimerService {
             }
         } else {
             for (let index in alarmJobIdAndTimes.value.alarmTimes) {
-                // console.log(moment(alarmJobIdAndTimes.value.alarmTimes[index]).format('HH:mm:ss'))
-                // console.log(moment(alarmTimeInFormat).format('HH:mm:ss'))
                 if (moment(alarmJobIdAndTimes.value.alarmTimes[index]).format('HH:mm:ss') == moment(alarmTimeInFormat).format('HH:mm:ss')) {
                     let tempAlarmTime = moment(alarmTimeInFormat).add(1, 'minutes')
                     alarmTimeInFormat = moment(tempAlarmTime).format('YYYY-MM-DD HH:mm:ss')
