@@ -106,7 +106,7 @@ import FCM, { FCMEvent, NotificationType, RemoteNotificationResult, WillPresentN
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
-import { FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK, ERROR } from '../../lib/ContainerConstants'
+import { FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK, ERROR, MESSAGE_MODULE_NAME } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import { navDispatch, navigate, popToTop } from '../navigators/NavigationService';
 import CallDetectorManager from 'react-native-call-detection'
@@ -145,7 +145,15 @@ export function fetchPagesAndPiechart() {
           Piechart.enabled = utilities.pieChartEnabled = utility.enabled
           Piechart.params = JSON.parse(utility.additionalParams).jobMasterIds
         };
-        (utility.utilityID == PAGE_MESSAGING) ? utilities.messagingEnabled = utility.enabled : null;
+        utilities.messagingEnabled = null
+        if (utility.utilityID == PAGE_MESSAGING) {
+          utilities.messagingEnabled = utility.enabled
+          if(!isEmpty(utility.name)) {
+            utilities.messageModuleName = utility.name
+          } else {
+            utilities.messageModuleName = MESSAGE_MODULE_NAME
+          }
+        };
       })
 
       //Fetching Summary count for Pie-chart

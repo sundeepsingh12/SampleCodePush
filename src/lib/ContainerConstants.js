@@ -490,4 +490,8 @@ module.exports = {
     SELECT_REASON: 'SELECT REASON',
     TAKE_A_PICTURE: 'Take a picture',
     REMARKS: 'Remarks',
+
+
+    //Message Module Name
+    MESSAGE_MODULE_NAME : "Messages" 
 }

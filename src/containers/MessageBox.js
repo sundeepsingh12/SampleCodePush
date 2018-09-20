@@ -44,7 +44,7 @@ class MessageBox extends Component {
         messageText: ''
     }
     static navigationOptions = ({ navigation }) => {
-        return { header: <TitleHeader pageName='Messages' goBack={navigation.goBack} /> }
+        return { header: <TitleHeader pageName={navigation.state.params.messageModuleName} goBack={navigation.goBack} /> }
     }
 
     componentDidMount() {
