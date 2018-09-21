@@ -11,6 +11,7 @@ module.exports = {
     ADDRESS_LINE_2: 29,
     ADVANCE_DROPDOWN: 46,
     AMOUNT: 'amount',
+    PRINT: 66,
     ARRAY: 12,
     CAMERA: 20,
     CAMERA_HIGH: 42,

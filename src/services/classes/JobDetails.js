@@ -240,6 +240,14 @@ class JobDetails {
             jobTransactionDTO
         }
     }
+    getPrintAttributeMasterId(fieldAttributeStatusMap, printAttributeMap, statusId){
+        for(let id in printAttributeMap){
+            if(fieldAttributeStatusMap[id] && fieldAttributeStatusMap[id].statusId == statusId){
+                return id
+            }
+        }
+        return null
+    }
 
     async printingTemplateFormatStructureForDetails(jobTransaction, fieldDataList, jobDataList) {
         let  masterIdPrintingObjectMap = {}, jobDataObject = {}
@@ -249,7 +257,7 @@ class JobDetails {
         let printingFieldAttributeMasterValue = fieldAttributeValueMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, jobTransaction.printAttributeMasterId);
         let { printingAttributeValueMap } = formLayoutService.createMapOfMasterIdAndPrintingObject(printingFieldAttributeMasterValue, masterIdPrintingObjectMap, dataList)
         printingAttributeValueMap = _.sortBy(printingAttributeValueMap, function (object) { return object.sequence });
-        let { objectSequenceToListOfPrintingObjectDTOMap, sequenceToPrintTypeToFieldDataValueMap } = formLayoutService.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap)
+        await formLayoutService.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap)
     }
 
     /**@function setAllDataForRevertStatus(statusList,jobTransaction,previousStatus)

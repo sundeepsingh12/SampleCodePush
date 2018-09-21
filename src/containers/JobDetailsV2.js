@@ -72,6 +72,7 @@ function mapStateToProps(state) {
     syncLoading: state.jobDetails.syncLoading,
     checkTransactionStatus: state.jobDetails.checkTransactionStatus,
     updatedTransactionListIds: state.listing.updatedTransactionListIds,
+    isBluetoothConnected: state.sorting.isBluetoothConnected
   }
 }
 
@@ -447,18 +448,9 @@ class JobDetailsV2 extends PureComponent {
   showFooterView() {
     if (!isEmpty(this.props.jobTransaction)) {
       return (
-        // <Footer style={style.footer}>
-        // {/* <Button onPress = {this._onGoToPreviousStatus}>Print</Button> */}
-        //   <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} />
-        // </Footer>
-                <Footer style={[style.footer]}>
-                    <FooterTab style={[styles.padding10]}>
-                        <Button success full
-                            onPress={() => {this.props.actions.prepareTemplateForPrintAttributeAndPrint(this.props.jobTransaction, this.props.fieldDataList, this.props.jobDataList)}}>
-                            <Text style={[styles.fontLg, styles.fontWhite]}>Print</Text>
-                        </Button>
-                    </FooterTab>
-                </Footer>
+        <Footer style={style.footer}>
+          <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} prepareTemplateForPrintAttributeAndPrint = {() =>{ this.props.actions.prepareTemplateForPrintAttributeAndPrint(this.props.jobTransaction, this.props.fieldDataList, this.props.jobDataList, this.props.isBluetoothConnected)}}/>
+        </Footer>
       )
     }
   }

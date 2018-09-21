@@ -17,6 +17,7 @@ import { navDispatch } from '../../navigators/NavigationService'
 import { StackActions } from 'react-navigation'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { isEmpty } from 'lodash'
+import { formLayoutService } from '../../../services/classes/formLayout/FormLayout'
 
 export function getParameterForMosambee(jobTransaction, jobTransactionIdAmountMap, contactNumber){
     return async function(dispatch){
@@ -40,11 +41,11 @@ export function saveTransactionAfterPayment(jsonData, navigationParams) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_MOSAMBEE, true))
-            let { formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails } = navigationParams
+            let { formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails, printAttributeMasterId } = navigationParams
             paymentService.addPaymentObjectToDetailsArray(jsonData.amount, 12, jsonData.transactionId, jsonData.receiptLink ? jsonData.receiptLink : 'N.A' , jsonData, formLayoutState)
             Toast.show({ text: 'payment successful', position: "bottom", buttonText: 'Ok', duration: 5000 }) 
-            if(jobTransaction.id < 0) {
-                navDispatch(StackActions.pop())
+            if(printAttributeMasterId){
+                await formLayoutService.printingTemplateFormatStructure(formLayoutState, jobTransaction, printAttributeMasterId)
             }
             await MosambeeWalletPaymentServices.setSignatureDataForMosambee(formLayoutState.formElement, jsonData.signature ? jsonData.signature : 'N.A')
             dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))

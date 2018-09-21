@@ -29,7 +29,7 @@ import { formLayoutEventsInterface } from './formLayout/FormLayoutEventInterface
 import { runSheetService } from './RunSheet';
 import { messageService } from '../../services/classes/MessageService'
 import Item from '../../../native-base-theme/components/Item';
-import { formLayoutService } from './formLayout/FormLayout';
+import { jobDetailsService } from './JobDetails';
 
 class JobTransaction {
 
@@ -671,7 +671,7 @@ class JobTransaction {
         //     jobId = jobTransaction[0].id
         //     referenceNumber = jobTransaction[0].referenceNo
         // }
-        const fieldAttributeMasterMap = fieldAttributeMasterService.getFieldAttributeMasterMap(fieldAttributeMasterList)
+        const {fieldAttributeMasterMap,printAttributeMap }= fieldAttributeMasterService.getFieldAttributeMasterMap(fieldAttributeMasterList, jobMasterId)
         const fieldAttributeStatusMap = fieldAttributeMasterService.getFieldAttributeStatusMap(fieldAttributeStatusList)
         let jobAttributeMap = jobMasterIdJobAttributeStatusMap[jobMasterId] ? jobMasterIdJobAttributeStatusMap[jobMasterId][jobStatusId] ? jobMasterIdJobAttributeStatusMap[jobMasterId][jobStatusId] : {} : jobAttributeMasterMap
         let fieldAttributeMap = fieldAttributeMasterMap[jobMasterId] ? fieldAttributeMasterMap[jobMasterId] : {}
@@ -692,7 +692,7 @@ class JobTransaction {
         let currentStatus = statusIdStatusMap[jobStatusId]
         let messageList = messageService.getMessagesForParticularTransaction(jobTransactionId)
         if (callingActivity != 'LiveJob') {
-            printAttributeData = formLayoutService.checkCaseOfPrintAttribute(fieldAttributeMap, 'id')
+            printAttributeData = jobDetailsService.getPrintAttributeMasterId(fieldAttributeStatusMap, printAttributeMap, currentStatus.id)
             const job = realm.getRecordListOnQuery(TABLE_JOB, 'id= ' + jobId)
             let { latitude, longitude } = job[0]
             const jobTransactionDisplay = {
@@ -718,7 +718,7 @@ class JobTransaction {
                 jobLatitude: latitude,
                 jobLongitude: longitude,
                 deleteFlag,
-                printAttributeMasterId : currentStatus.statusCategory == 3 && printAttributeData ? printAttributeData : null 
+                printAttributeMasterId : printAttributeData 
             }
             return {
                 currentStatus,

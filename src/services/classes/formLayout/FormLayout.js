@@ -1,6 +1,25 @@
 import { keyValueDBService } from '../KeyValueDBService.js'
 import { transientStatusAndSaveActivatedService } from '../TransientStatusAndSaveActivatedService.js'
-import { AFTER, OBJECT, STRING, TEXT, DECIMAL, SCAN_OR_TEXT, QR_SCAN, NUMBER, QC_IMAGE, QC_REMARK, QC_PASS_FAIL, OPTION_CHECKBOX_ARRAY } from '../../../lib/AttributeConstants'
+import { 
+    AFTER, 
+    OBJECT, 
+    STRING, 
+    TEXT, 
+    DECIMAL, 
+    SCAN_OR_TEXT, 
+    QR_SCAN, 
+    NUMBER, 
+    QC_IMAGE, 
+    QC_REMARK, 
+    QC_PASS_FAIL, 
+    OPTION_CHECKBOX_ARRAY,
+    SKU_ARRAY,
+    ARRAY,
+    MONEY_COLLECT,
+    MONEY_PAY,
+    FIXED_SKU,
+    PRINT
+ } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
 import { SaveActivated, Transient, CheckoutDetails, TabScreen, SHOULD_RELOAD_START, BACKUP_ALREADY_EXIST, TABLE_FIELD_DATA, FIELD_ATTRIBUTE_VALUE } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
@@ -13,6 +32,9 @@ import { transactionCustomizationService } from '../TransactionCustomization'
 import { fieldAttributeValueMasterService } from '../FieldAttributeValueMaster'
 import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../../lib/ContainerConstants'
 import { jobDataService } from '../JobData'
+import BluetoothSerial from 'react-native-bluetooth-serial';
+import { EscPos } from 'escpos-xml';
+
 class FormLayout {
 
     /**
@@ -230,12 +252,9 @@ class FormLayout {
             routeParam
         }
     }
-    async printingTemplateFormatStructure(cloneFormElement, jobTransaction) {
-        let printAttributeMasterId = this.checkCaseOfPrintAttribute(cloneFormElement.formElement, 'fieldAttributeMasterId'), masterIdPrintingObjectMap = {}, jobDataObject = {}
+    async printingTemplateFormatStructure(cloneFormElement, jobTransaction, printAttributeMasterId) {
+        let masterIdPrintingObjectMap = {}, jobDataObject = {}
         let transaction = jobTransaction && jobTransaction.length ? jobTransaction[0] : jobTransaction
-        if (!printAttributeMasterId) {
-            return
-        }
         const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE);
         let printingFieldAttributeMasterValue = fieldAttributeValueMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, printAttributeMasterId);
         let {attributeMap, jobAttributesMap} = this.combineJobAndFieldAttribute(cloneFormElement.jobAndFieldAttributesList.jobAttributes, cloneFormElement.jobAndFieldAttributesList.fieldAttributes)
@@ -245,7 +264,7 @@ class FormLayout {
             jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(transaction.jobId, masterIdJobAttributeMap, masterIdJobAttributeMap)
         }
         let dataList = Object.assign({}, jobDataObject.dataList, cloneFormElement.formElement)
-        let { objectSequenceToListOfPrintingObjectDTOMap, sequenceToPrintTypeToFieldDataValueMap } = this.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap, labelMap, true)
+        await this.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap, labelMap)
     }
 
     combineJobAndFieldAttribute(jobAttributes, fieldAttributes){
@@ -260,76 +279,153 @@ class FormLayout {
        return {attributeMap, jobAttributesMap}
     }
 
-    preparePrintingTemplate(jobTransactionId, dataList, printingAttributeValueMap, printingFieldAttributeMasterValue, labelMap) {
-        let objectSequenceToListOfPrintingObjectDTOMap = new Map(), sequenceToPrintTypeToFieldDataValueMap = []
-        for (let id in printingAttributeValueMap) {
-            let attributeMasterIdType = dataList[printingAttributeValueMap[id].name].data && dataList[printingAttributeValueMap[id].name].data.fieldAttributeMasterId || dataList[printingAttributeValueMap[id].name].fieldAttributeMasterId ? 'fieldAttributeMasterId' : 'jobAttributeMasterId'
-            let attributeId = dataList && printingAttributeValueMap[id] &&  dataList[printingAttributeValueMap[id].name] ? dataList[printingAttributeValueMap[id].name].attributeTypeId : null
-            if (attributeId && attributeId == 17 || attributeId == 12 || attributeId == 18 || attributeId == 50 || attributeId == 19) { 
-                let childDataObject = dataList[printingAttributeValueMap[id].name] ? dataList[printingAttributeValueMap[id].name].childDataList : null
-                let childDataMap = []
-                childDataObject = labelMap && printingAttributeValueMap[id].code == 'Sku' ? childDataObject[jobTransactionId].childDataList : childDataObject
-                for (let data in childDataObject) {
-                    if (childDataObject[data].attributeTypeId == 11) { // case of object in array
-                        let objectChildDtoMap = {}
-                        objectChildDtoMap.label = dataList[printingAttributeValueMap[id].name].label
-                        objectChildDtoMap.childData = []
-                        let childDataValueObject = childDataObject[data].childDataList
-                        for (let childItem in childDataValueObject) {
-                            let childValue = {}
-                            let valueData = childDataValueObject[childItem].data ? childDataValueObject[childItem].data : childDataValueObject[childItem]
-                            let printingDataObject = printingFieldAttributeMasterValue[valueData[attributeMasterIdType]]
-                            if (printingDataObject && valueData.value) {
-                                childValue.label = labelMap ? labelMap[valueData[attributeMasterIdType]] : childDataValueObject[childItem].label
-                                childValue.value = valueData.value
-                                childValue.sequence = printingDataObject.sequence
-                                childValue.printType = printingDataObject.code
-                                objectChildDtoMap.childData.push(childValue)
+    printTypeFormatString(value, label){
+       switch(label){
+           case 'Barcode' : return `<barcode system="CODE_128" width="DOT_250" height= "100">${String(value)}</barcode>`
+           case 'Text' :  return `<text size="1:0">${String(value)+` `}</text>`
+           case 'Header' :  return `<bold><text size="1:1">${String(value)+` `}</text></bold>`
+       }
+    }
+
+    prepareTemplateForObjectInArray(childDataValueObject, printingFieldAttributeMasterValue, attributeMasterIdType, labelCount, labelMap, printFormatValue, printArray){
+        let objectLabel = ``
+        let childData = `` , childArray = [], valueData, printingDataObject
+        for (let childItem in childDataValueObject) {
+            valueData = childDataValueObject[childItem].data ? childDataValueObject[childItem].data : childDataValueObject[childItem]
+            printingDataObject = printingFieldAttributeMasterValue[valueData[attributeMasterIdType]]
+            if (printingDataObject) {
+                if(labelCount == 0){
+                    objectLabel += this.printTypeFormatString(labelMap ? labelMap[valueData[attributeMasterIdType]] : childDataValueObject[childItem].label, 'Text')
+                }
+                if(printingDataObject.code == 'Qrcode'){
+                    if(!_.isEmpty(childData)){
+                        childArray.push(childData)
+                        childData = ``
+                    } 
+                    childArray.push([valueData.value])
+                }else{
+                    childData += this.printTypeFormatString(valueData.value, printingDataObject.code)
+                }
+            }
+        }
+        if(labelCount == 0){
+            printFormatValue += objectLabel + `<line-feed />`
+        }
+        for(let child in childArray){
+            if(childArray[child].constructor === Array){
+                if(!_.isEmpty(printFormatValue)) printArray.push(printFormatValue) 
+                printArray.push(childArray[child]) 
+            }else{
+                printArray.push(printFormatValue + childArray[child])
+            }
+            printFormatValue = ``
+        }
+        if(!_.isEmpty(childData)){
+            printFormatValue += childData + `<line-feed />`
+        }
+        return {printArray, printFormatValue}
+    }
+
+    prepareTemplateForArrayInArray(childDataList, labelMap, printingFieldAttributeMasterValue, printFormatValue, attributeMasterIdType, printArray){
+        let detailArrayChildData, detailsValue, objectValue
+        for (let detailsData in childDataList) {
+            detailArrayChildData = childDataList[detailsData]
+            detailsValue = labelMap ? detailArrayChildData : detailArrayChildData.data
+            if (detailsValue && detailsValue.value != null && detailsValue.value == 'ObjectSarojFareye' && detailArrayChildData.childDataList) {
+                for (let detailObject in detailArrayChildData.childDataList) {
+                    objectValue =  detailArrayChildData.childDataList[detailObject] && detailArrayChildData.childDataList[detailObject].data ? detailArrayChildData.childDataList[detailObject].data : detailArrayChildData.childDataList[detailObject]
+                    if (objectValue && printingFieldAttributeMasterValue[objectValue[attributeMasterIdType]] && objectValue.value) {
+                        if(printingFieldAttributeMasterValue[objectValue[attributeMasterIdType]].code == 'Qrcode'){
+                            if(!_.isEmpty(printFormatValue)) {
+                                printArray.push(printFormatValue)
+                                printFormatValue = ``
                             }
-                        }
-                        objectChildDtoMap.childData = _.sortBy(objectChildDtoMap.childData, function (object) { return object.sequence });
-                        childDataMap.push(objectChildDtoMap)
-                    } else if (childDataObject[data].attributeTypeId == 12) {  // case of array in array
-                        for (let detailsData in childDataObject[data].childDataList) {
-                            let detailArrayChildData = childDataObject[data].childDataList[detailsData]
-                            let detailsValue = labelMap ? detailArrayChildData : detailArrayChildData.data
-                            if (detailsValue && detailsValue.value != null && detailsValue.value == 'ObjectSarojFareye' && detailArrayChildData.childDataList) {
-                                for (let detailObject in detailArrayChildData.childDataList) {
-                                    let objectValue =  detailArrayChildData.childDataList[detailObject] && detailArrayChildData.childDataList[detailObject].data ? detailArrayChildData.childDataList[detailObject].data : detailArrayChildData.childDataList[detailObject]
-                                    if (objectValue && printingFieldAttributeMasterValue[objectValue[attributeMasterIdType]] && objectValue.value) {
-                                        sequenceToPrintTypeToFieldDataValueMap.push({ code: printingFieldAttributeMasterValue[objectValue[attributeMasterIdType]].code, value: `${labelMap ? labelMap[objectValue[attributeMasterIdType]] : detailArrayChildData.childDataList[detailObject].label}!<*>!${objectValue.value}` })
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        let dataItem = childDataObject[data] && childDataObject[data].data ? childDataObject[data].data : childDataObject[data]
-                        if ( dataItem && printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]] && dataItem.value) {
-                            sequenceToPrintTypeToFieldDataValueMap.push({ code: printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]].code, value: `${labelMap ? labelMap[dataItem[attributeMasterIdType]] : childDataObject[data].label}!<*>!${dataItem.value}` })
+                            printArray.push([objectValue.value])
+                        }else{
+                            printFormatValue += this.printTypeFormatString(objectValue.value, printingFieldAttributeMasterValue[objectValue[attributeMasterIdType]].code) + `<line-feed />`
                         }
                     }
                 }
-                if (childDataMap && childDataMap.length) {
-                    objectSequenceToListOfPrintingObjectDTOMap.set(printingAttributeValueMap[id].name, childDataMap)
-                }
-            } else {
-                let dataItem = dataList[printingAttributeValueMap[id].name]  && dataList[printingAttributeValueMap[id].name].data ? dataList[printingAttributeValueMap[id].name].data : dataList[printingAttributeValueMap[id].name]
-                if (dataItem && dataItem.value && printingAttributeValueMap[id]) {
-                    sequenceToPrintTypeToFieldDataValueMap.push({ code: printingAttributeValueMap[id].code, value: `${labelMap ? labelMap[dataItem[attributeMasterIdType]] : dataList[printingAttributeValueMap[id].name].label}!<*>!${dataItem.value}` })
-                }
             }
         }
-        console.logs("1223", objectSequenceToListOfPrintingObjectDTOMap, sequenceToPrintTypeToFieldDataValueMap)
-        return { objectSequenceToListOfPrintingObjectDTOMap, sequenceToPrintTypeToFieldDataValueMap }
+        return {printArray, printFormatValue}
     }
 
-    checkCaseOfPrintAttribute(formElement, type) {
-        for (let fieldAttributeMasterId in formElement) {
-            if (formElement[fieldAttributeMasterId].attributeTypeId == 66) {
-                return formElement[fieldAttributeMasterId][type]
+    preparePrintTemplateInCaseOfArray(childDataObject, printingFieldAttributeMasterValue, labelMap, attributeMasterIdType, printFormatValue, printArray){
+        let labelCount = 0, childObjectValue, childArrayObject, dataItem
+        for (let data in childDataObject) {
+            if (childDataObject[data].attributeTypeId == OBJECT) { // case of object in array
+               childObjectValue = this.prepareTemplateForObjectInArray(childDataObject[data].childDataList, printingFieldAttributeMasterValue, attributeMasterIdType, labelCount, labelMap, printFormatValue, printArray)
+               printArray = childObjectValue.printArray
+               printFormatValue = childObjectValue.printFormatValue
+               labelCount +=1
+            } else if (childDataObject[data].attributeTypeId == ARRAY) {  // case of array in array
+               childArrayObject = this.prepareTemplateForArrayInArray(childDataObject[data].childDataList, labelMap, printingFieldAttributeMasterValue, printFormatValue, attributeMasterIdType, printArray)
+               printArray = childArrayObject.printArray
+               printFormatValue = childArrayObject.printFormatValue
+            } else { // case of normal attribute in array
+                dataItem = childDataObject[data] && childDataObject[data].data ? childDataObject[data].data : childDataObject[data]
+                if ( dataItem && printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]] && dataItem.value) {
+                    if(printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]].code == 'Qrcode'){
+                        if(!_.isEmpty(printFormatValue)){
+                            printArray.push(printFormatValue)
+                            printFormatValue = ``
+                        } 
+                        printArray.push([dataItem.value])
+                    }else{
+                        printFormatValue += this.printTypeFormatString(dataItem.value, printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]].code) + `<line-feed />`
+                    }
+                }
             }
         }
-        return false
+        return {printArray, printFormatValue}
+    }
+
+
+   async preparePrintingTemplate(jobTransactionId, dataList, printingAttributeValueMap, printingFieldAttributeMasterValue, labelMap) {
+        let printFormatValue = ``, printArray = [], attributeMasterIdType, attributeId, childDataObject, dataItem, arrayTemplate
+        for (let id in printingAttributeValueMap) {
+            if(!dataList[printingAttributeValueMap[id].name]) continue
+            attributeMasterIdType = dataList[printingAttributeValueMap[id].name].data && dataList[printingAttributeValueMap[id].name].data.fieldAttributeMasterId || dataList[printingAttributeValueMap[id].name].fieldAttributeMasterId ? 'fieldAttributeMasterId' : 'jobAttributeMasterId'
+            attributeId = dataList && printingAttributeValueMap[id] &&  dataList[printingAttributeValueMap[id].name] ? dataList[printingAttributeValueMap[id].name].attributeTypeId : null
+            if (dataList[printingAttributeValueMap[id].name].childDataList && attributeId && attributeId == SKU_ARRAY || attributeId == ARRAY || attributeId == MONEY_COLLECT || attributeId == FIXED_SKU || attributeId == MONEY_PAY) { // case of arrayType attribute
+                childDataObject = dataList[printingAttributeValueMap[id].name] ? dataList[printingAttributeValueMap[id].name].childDataList : null
+                childDataObject = labelMap && printingAttributeValueMap[id].code == 'Sku' ? childDataObject[jobTransactionId].childDataList : childDataObject
+                printFormatValue += `<align mode="center"><text-line size="1:0">${dataList[printingAttributeValueMap[id].name].label}</text-line><line-feed /></align>`
+                arrayTemplate = this.preparePrintTemplateInCaseOfArray(childDataObject, printingFieldAttributeMasterValue, labelMap, attributeMasterIdType, printFormatValue, printArray)
+                printArray = arrayTemplate.printArray
+                printFormatValue = arrayTemplate.printFormatValue
+            } else { // case of normal attribute
+                dataItem = dataList[printingAttributeValueMap[id].name].data ? dataList[printingAttributeValueMap[id].name].data : dataList[printingAttributeValueMap[id].name]
+                if (dataItem && dataItem.value && printingAttributeValueMap[id]) {
+                    if(printingAttributeValueMap[id].code == 'Qrcode'){
+                        if(!_.isEmpty(printFormatValue)){
+                            printArray.push(printFormatValue)
+                            printFormatValue = ``
+                        } 
+                        printArray.push([dataItem.value])
+                    }else{
+                        printFormatValue += this.printTypeFormatString(dataItem.value, printingAttributeValueMap[id].code) + `<line-feed />`
+                    }
+                }
+            }
+        }
+        printFormatValue += `<line-feed />`
+        printArray.push(printFormatValue)
+        await this.printSortingData(printArray)
+    }
+
+    async printSortingData(printArray) {
+        let startStr = `<?xml version="1.0" encoding="UTF-8"?><document><small><align mode="center">`
+        let endStr = `</align></small></document>`, buffer
+        for(let printData in printArray){
+            if(printArray[printData] && printArray[printData].constructor == Array){
+                await BluetoothSerial.write(String(printArray[printData][0]), 150);
+            }else{
+                buffer = EscPos.getBufferFromTemplate(startStr + printArray[printData] + endStr, {});
+                await BluetoothSerial.write(buffer, 0);
+            }
+        }
     }
 
     createMapOfMasterIdAndPrintingObject(printingAttributeValueList, masterIdPrintingObjectMap, attributeMap, jobAttributesMap) {

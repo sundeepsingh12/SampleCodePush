@@ -77,6 +77,9 @@ class MessagingCallingSmsButtonView extends PureComponent {
     callContact = (contact) => {
         Communications.phonecall(contact, false)
     }
+    prepareTemplateForPrintAttributeAndPrint = (jobTransaction) => {
+        this.props.prepareTemplateForPrintAttributeAndPrint()
+    }
 
     customerCareButtonPressed = (jobTransaction) => {
         let customerCareTitles = jobTransaction.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
@@ -170,6 +173,9 @@ class MessagingCallingSmsButtonView extends PureComponent {
                 }
                 {(this.props.jobTransaction.jobSwipableDetails && this.props.jobTransaction.jobSwipableDetails.customerCareData && this.props.jobTransaction.jobSwipableDetails.customerCareData.length > 0) ?
                     this.renderIcon('call-out', this.customerCareButtonPressed) : null
+                }
+                {(this.props.jobTransaction.printAttributeMasterId) ?
+                    this.renderIcon('print', this.prepareTemplateForPrintAttributeAndPrint) : null
                 }
             </View>
         )

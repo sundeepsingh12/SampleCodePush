@@ -126,17 +126,13 @@ export function updateFieldData(attributeId, value, formLayoutState, jobTransact
     }
 }
 
-export function PreparePrintingTemplate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails) {
+export function PreparePrintingTemplate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails, printAttributeMasterId) {
     return async function (dispatch) {
         try {
-            const cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
-            let printingTemplateFormatData = await formLayoutService.printingTemplateFormatStructure(formLayoutState, jobTransaction)
-            if(printingTemplateFormatData){
-
-            }
-            // dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
+            await formLayoutService.printingTemplateFormatStructure(formLayoutState, jobTransaction, printAttributeMasterId)
+            dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
         } catch (error) {
-            showToastAndAddUserExceptionLog(1005, error.message, 'danger', 1)
+            showToastAndAddUserExceptionLog(1015, error.message, 'danger', 1)
         }
     }
 }
