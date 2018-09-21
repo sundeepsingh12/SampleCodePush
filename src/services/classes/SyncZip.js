@@ -37,7 +37,6 @@ class SyncZip {
         //Prepare the SYNC_RESULTS
         var SYNC_RESULTS = {};
         let lastSyncTime = syncStoreDTO.lastSyncWithServer
-      
         let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced,isCalledFromLogout);
         const syncDataDTO = realmDbData.syncDataDTO
         SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
@@ -48,7 +47,7 @@ class SyncZip {
         SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, syncStoreDTO.lastSyncWithServer);
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
-        const userSummary = this.updateUserSummary(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
+        const userSummary = this.updateUserSummary(syncStoreDTO)
         let { communicationLogs, lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogs(syncStoreDTO, userSummary) : { communicationLogs: [], lastCallTime: null, lastSmsTime: null }
         SYNC_RESULTS.userCommunicationLog = communicationLogs ? communicationLogs : []
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
@@ -80,7 +79,8 @@ class SyncZip {
        
     }
 
-    updateUserSummary(statusList, jobMasterList, userSummary) {
+    updateUserSummary(syncStoreDTO) {
+        const {statusList, jobMasterList, userSummary, user, lastSyncWithServer} = syncStoreDTO
         if (!userSummary) {
             throw new Error('User Summary missing in store');
         }
@@ -90,9 +90,16 @@ class SyncZip {
         userSummary.nextJobTransactionId = firstEnableSequenceTransaction ? firstEnableSequenceTransaction.id : null;
         userSummary.appVersion = APP_VERSION_NUMBER
         userSummary.lastLocationDatetime = moment().format('YYYY-MM-DD HH:mm:ss')
+        const activeTime = userSummary.activeTimeInMillis
+        let currentTimeInMili = moment().format('x')
+        if(_.isEmpty(activeTime) || activeTime == 0) {
+            userSummary.activeTimeInMillis = this.calculateActiveTime(moment(user.lastLoginTime).format('x'), currentTimeInMili)
+        } else {
+            userSummary.activeTimeInMillis = activeTime + this.calculateActiveTime(moment(lastSyncWithServer).format('x'), currentTimeInMili);
+        }
+        console.log('activeTimeInMillisLOL', userSummary.activeTimeInMillis);
         return userSummary;
     }
-
 
     _getSyncDataFromDb(transactionIdsObject) {
         let userExceptionLog = this._getDataFromRealm([], null, USER_EXCEPTION_LOGS)
@@ -274,6 +281,10 @@ class SyncZip {
                 }
             }
         }
+    }
+
+    calculateActiveTime(previousActiveTime, currentTimeInMili) {
+        return (currentTimeInMili - previousActiveTime)
     }
 
 }
