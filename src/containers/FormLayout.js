@@ -228,7 +228,6 @@ class FormLayout extends PureComponent {
       jobAndFieldAttributesList: this.props.jobAndFieldAttributesList,
       sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds,
       dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap,
-      transientFormLayoutState: this.props.navigation.state.params.navigationFormLayoutStates
     }
 
     let taskListScreenDetails = {

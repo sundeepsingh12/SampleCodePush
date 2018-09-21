@@ -67,7 +67,8 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
             let arrayRow = cloneArrayElements[rowId]
             arrayRow.formLayoutObject[attributeMasterId].displayValue = value
             arrayRow.formLayoutObject[attributeMasterId].childDataList = fieldDataList
-            let validationsResult = fieldValidationService.fieldValidations(arrayRow.formLayoutObject[attributeMasterId], arrayRow.formLayoutObject, AFTER, null, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
+            let formLayoutStateParam = { formElement: arrayRow.formLayoutObject, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, transientFormLayoutState: formLayoutState.transientFormLayoutState };
+            let validationsResult = fieldValidationService.fieldValidations(arrayRow.formLayoutObject[attributeMasterId], formLayoutStateParam, AFTER)
             arrayRow.formLayoutObject[attributeMasterId].value = (validationsResult) ? arrayRow.formLayoutObject[attributeMasterId].displayValue : null
             arrayRow.formLayoutObject[attributeMasterId].containerValue = (validationsResult) ? containerValue : null
             arrayRow.modalFieldAttributeMasterId = (validationsResult) ? null : (backPressOrModalPresent == 2) ? attributeMasterId : null
@@ -143,7 +144,8 @@ export function fieldValidationsArray(currentElement, arrayElements, timeOfExecu
             let newArray = JSON.parse(JSON.stringify(arrayElements))
             let formElement = newArray[rowId].formLayoutObject
             let isValuePresentInAnotherTransaction = false
-            let validationsResult = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
+            let formLayoutStateParam = { formElement, jobTransaction, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, transientFormLayoutState: formLayoutState.transientFormLayoutState }
+            let validationsResult = fieldValidationService.fieldValidations(currentElement, formLayoutStateParam, timeOfExecution)
             if (timeOfExecution == AFTER) {
                 if (scanValue) {
                     formElement[currentElement.fieldAttributeMasterId].displayValue = currentElement.displayValue = scanValue

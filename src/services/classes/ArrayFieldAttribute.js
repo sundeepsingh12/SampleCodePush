@@ -71,7 +71,8 @@ class ArrayFieldAttribute {
             let childDataList = []
             let arrayData = arrayElements[rowId].formLayoutObject
             for (let arrayRowElement in arrayData) {
-                let afterValidationResult = fieldValidationService.fieldValidations(arrayData[arrayRowElement], arrayElements[rowId].formLayoutObject, AFTER, jobTransaction)
+                let formLayoutStateParam = { formElement: arrayElements[rowId].formLayoutObject, jobTransaction };
+                let afterValidationResult = fieldValidationService.fieldValidations(arrayData[arrayRowElement], formLayoutStateParam, AFTER)
                 let isValuePresentInAnotherTransaction = (arrayData[arrayRowElement].attributeTypeId == TEXT || arrayData[arrayRowElement].attributeTypeId == SCAN_OR_TEXT || arrayData[arrayRowElement].attributeTypeId == STRING || arrayData[arrayRowElement].attributeTypeId == QR_SCAN || arrayData[arrayRowElement].attributeTypeId == NUMBER) ? this.checkforUniqueValidation(arrayData[arrayRowElement], arrayElements, rowId) : false
                 arrayData[arrayRowElement].value = afterValidationResult && !isValuePresentInAnotherTransaction ? arrayData[arrayRowElement].displayValue : null
                 if (arrayData[arrayRowElement].required && (!arrayData[arrayRowElement].value || arrayData[arrayRowElement].value == '')) {

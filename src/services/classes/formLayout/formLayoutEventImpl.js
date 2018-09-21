@@ -54,7 +54,7 @@ export default class FormLayoutEventImpl {
                 }
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
-                fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+                fieldValidationService.fieldValidations(value, formLayoutState, BEFORE)
                 let valueAfterValidation = formLayoutObject[value.fieldAttributeMasterId].value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
                     if (value.required) {
@@ -65,7 +65,7 @@ export default class FormLayoutEventImpl {
                         continue
                     }
                 }
-                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject[value.fieldAttributeMasterId], formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject[value.fieldAttributeMasterId], formLayoutState, AFTER)
                 if (!afterValidationResult && value.required) {
                     break
                 } else {

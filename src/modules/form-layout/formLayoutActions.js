@@ -78,7 +78,7 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formLayou
     return async function (dispatch) {
         try {
             const cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement));
-            let formLayoutStateParam = { formElement: cloneFormElement, isSaveDisabled: formLayoutState.isSaveDisabled, jobTransaction, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds: formLayoutState.sequenceWiseSortedFieldAttributesMasterIds, transientFormLayoutState: formLayoutState.transientFormLayoutState };
+            let formLayoutStateParam = { formElement: cloneFormElement, isSaveDisabled: formLayoutState.isSaveDisabled, jobTransaction, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds: formLayoutState.sequenceWiseFieldAttributeMasterIds, transientFormLayoutState: formLayoutState.transientFormLayoutState };
             const { formLayoutObject, isSaveDisabled } = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, formLayoutStateParam, value, null, event);
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, { formLayoutObject, isSaveDisabled }))
             if (formLayoutState.updateDraft) {
@@ -131,11 +131,11 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
     return function (dispatch) {
         try {
             let cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
-            let formLayoutStateParam = { formElement: cloneFormElement, isSaveDisabled: formLayoutState.isSaveDisabled, jobTransaction, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds: formLayoutState.sequenceWiseSortedFieldAttributesMasterIds, transientFormLayoutState: formLayoutState.transientFormLayoutState };
+            let formLayoutStateParam = { formElement: cloneFormElement, isSaveDisabled: formLayoutState.isSaveDisabled, jobTransaction, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds: formLayoutState.sequenceWiseFieldAttributeMasterIds, transientFormLayoutState: formLayoutState.transientFormLayoutState };
             cloneFormElement[attributeMasterId].displayValue = value
             cloneFormElement[attributeMasterId].childDataList = fieldDataListObject.fieldDataList
             cloneFormElement[attributeMasterId].alertMessage = null
-            let validationsResult = fieldValidationService.fieldValidations(cloneFormElement[attributeMasterId], cloneFormElement, AFTER, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
+            let validationsResult = fieldValidationService.fieldValidations(cloneFormElement[attributeMasterId], formLayoutStateParam, AFTER)
             cloneFormElement[attributeMasterId].value = validationsResult ? cloneFormElement[attributeMasterId].displayValue : null
             cloneFormElement[attributeMasterId].containerValue = validationsResult ? containerValue : null
             const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, formLayoutStateParam, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS);
@@ -183,8 +183,9 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
             if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
                 navDispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
             } else {
-                dispatch(setState(IS_LOADING, true))
-                let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
+                dispatch(setState(IS_LOADING, true));
+                let formLayoutStateParam = { ...cloneFormLayoutState, ...{ transientFormLayoutState: navigationFormLayoutStates } };
+                let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, formLayoutStateParam)
                 if (isFormValidAndFormElement.isFormValid) {
                     const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
                     let { routeName, routeParam } = await formLayoutService.saveAndNavigate(cloneFormLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, taskListScreenDetails)
@@ -259,8 +260,9 @@ export function fieldValidations(currentElement, formLayoutState, timeOfExecutio
     return async function (dispatch) {
         try {
             let cloneFormElement = JSON.parse(JSON.stringify(formLayoutState.formElement))
-            let isValuePresentInAnotherTransaction = false
-            let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, timeOfExecution, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
+            let isValuePresentInAnotherTransaction = false;
+            let formLayoutStateParam = { formElement: cloneFormElement, jobTransaction, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, transientFormLayoutState: formLayoutState.transientFormLayoutState };
+            let validationsResult = fieldValidationService.fieldValidations(currentElement, formLayoutStateParam, timeOfExecution)
             if (timeOfExecution == AFTER) {
                 isValuePresentInAnotherTransaction = formLayoutService.checkUniqueValidation(currentElement)
                 cloneFormElement[currentElement.fieldAttributeMasterId].value = validationsResult && !isValuePresentInAnotherTransaction ? cloneFormElement[currentElement.fieldAttributeMasterId].displayValue : null

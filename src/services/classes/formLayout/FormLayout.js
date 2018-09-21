@@ -230,15 +230,17 @@ class FormLayout {
         }
     }
 
-    isFormValid(formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
+    isFormValid(formElement, jobTransaction, formLayoutState) {
         if (!formElement) {
             throw new Error('formElement is missing')
         }
+        let fieldAttributeMasterParentIdMap = formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList = formLayoutState.jobAndFieldAttributesList;
         for (let currentObject in formElement) {
             if (formElement[currentObject].attributeTypeId == QC_IMAGE || formElement[currentObject].attributeTypeId == QC_REMARK || formElement[currentObject].attributeTypeId == OPTION_CHECKBOX_ARRAY || formElement[currentObject].attributeTypeId == QC_PASS_FAIL) {
                 continue;
             }
-            let afterValidationResult = fieldValidationService.fieldValidations(formElement[currentObject], formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+            let formLayoutStateParam = { formElement, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, transientFormLayoutState: formLayoutState.transientFormLayoutState };
+            let afterValidationResult = fieldValidationService.fieldValidations(formElement[currentObject], formLayoutStateParam, AFTER)
             let uniqueValidationResult = this.checkUniqueValidation(formElement[currentObject])
             if (uniqueValidationResult) {
                 formElement[currentObject].alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT

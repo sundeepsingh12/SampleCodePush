@@ -211,10 +211,10 @@ class QC {
         //For preparing child attribute of option checkbox array
         if (qcArrayChildObject.optionCheckboxArray) {
             this.getChildFieldAttributes(qcArrayChildObject.optionCheckboxArray, fieldAttributeParentIdMap, qcOptionCheckboxArrayChildObject);
+            qcArrayChildObject.optionCheckboxArray.childList = qcOptionCheckboxArrayChildObject;
         }
         qcAttributeMasterArray.childList = qcArrayChildObject;
-        qcArrayChildObject.optionCheckboxArray.childList = qcOptionCheckboxArrayChildObject;
-        qcAttributeMasterArray.qcValidationMap = this.setQCConfigurationValidation(qcAttributeMasterArray, currentElement);
+        qcAttributeMasterArray.qcValidationMap = this.setQCConfigurationValidation(currentElement);
         return qcAttributeMasterArray;
     }
 
@@ -377,7 +377,8 @@ class QC {
      * }
      */
     getQCReasons(qcDataArray, qcAttributeMaster, jobTransaction, formLayoutState) {
-        fieldValidationService.fieldValidations(formLayoutState.formElement[qcAttributeMaster.childList.optionCheckboxArray.fieldAttributeMasterId], formLayoutState.formElement, BEFORE, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList);
+        let formLayoutStateParam = { formElement: formLayoutState.formElement, jobTransaction, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, transientFormLayoutState: formLayoutState.transientFormLayoutState };
+        fieldValidationService.fieldValidations(formLayoutState.formElement[qcAttributeMaster.childList.optionCheckboxArray.fieldAttributeMasterId], formLayoutStateParam, BEFORE);
         let realmJobDataQuery = `jobId = ${jobTransaction.jobId} AND jobAttributeMasterId = ${qcAttributeMaster.childList.optionCheckboxArray.jobAttributeMasterId}`;
         let qcReasonDataObject = {}, qcReasonDataObjectId = 1;
         let realmJobDBObject = realm.getRecordListOnQuery(TABLE_JOB_DATA, null, null, null, true);
@@ -462,7 +463,8 @@ class QC {
         if (stateParameters.qcAttributeMaster.childList.qcPassFail) {
             formLayoutState.formElement[stateParameters.qcAttributeMaster.childList.qcPassFail.fieldAttributeMasterId].value = isQCPass ? (stateParameters.qcAttributeMaster.qcValidationMap ? stateParameters.qcAttributeMaster.qcValidationMap.qcPassButtonTextValidation ? stateParameters.qcAttributeMaster.qcValidationMap.qcPassButtonTextValidation : PASS : PASS) : (stateParameters.qcAttributeMaster.qcValidationMap ? stateParameters.qcAttributeMaster.qcValidationMap.qcFailButtonTextValidation ? stateParameters.qcAttributeMaster.qcValidationMap.qcFailButtonTextValidation : FAIL : FAIL);
         }
-        let afterValidationResult = fieldValidationService.fieldValidations(stateParameters.qcAttributeMaster, formLayoutState.formElement, AFTER, propsParameters.jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList);
+        let formLayoutStateParam = { formElement: formLayoutState.formElement, jobTransaction: propsParameters.jobTransaction, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, transientFormLayoutState: formLayoutState.transientFormLayoutState };
+        let afterValidationResult = fieldValidationService.fieldValidations(stateParameters.qcAttributeMaster, formLayoutStateParam, AFTER);
         if (!afterValidationResult) {
             return { formLayoutState }
         }
@@ -532,7 +534,7 @@ class QC {
             object.childDataList = {};
             object.childDataList[qcObject.qcLabel.id] = paymentService.setFieldDataKeysAndValues(qcObject.qcLabel.attributeTypeId, qcObject.qcLabel.id, qcDataArray[index].qcLabel);
             object.childDataList[qcObject.qcResult.id] = paymentService.setFieldDataKeysAndValues(qcObject.qcResult.attributeTypeId, qcObject.qcResult.id, qcDataArray[index].qcResult ? true : false);
-            object.childDataList[qcObject.qcSequence.id] = paymentService.setFieldDataKeysAndValues(qcObject.qcSequence.attributeTypeId, qcObject.qcSequence.id, qcDataArray[index].qcSequence);
+            qcObject.qcSequence ? object.childDataList[qcObject.qcSequence.id] = paymentService.setFieldDataKeysAndValues(qcObject.qcSequence.attributeTypeId, qcObject.qcSequence.id, qcDataArray[index].qcSequence) : null;
             object.childDataList[qcObject.qcValue.id] = paymentService.setFieldDataKeysAndValues(qcObject.qcValue.attributeTypeId, qcObject.qcValue.id, qcDataArray[index].qcValue);
             fieldDataListDTO.push(object);
         }
@@ -547,7 +549,8 @@ class QC {
         cloneFormLayoutState.formElement[qcAttributeMaster.childList.optionCheckboxArray.fieldAttributeMasterId].value = ARRAY_SAROJ_FAREYE;
         cloneFormLayoutState.formElement[qcAttributeMaster.childList.optionCheckboxArray.fieldAttributeMasterId].childDataList = fieldDataObject.fieldDataList;
         cloneFormLayoutState.latestPositionId = fieldDataObject.latestPositionId;
-        let afterValidationResult = fieldValidationService.fieldValidations(qcAttributeMaster.childList.optionCheckboxArray, cloneFormLayoutState.formElement, AFTER, jobTransaction, cloneFormLayoutState.fieldAttributeMasterParentIdMap, cloneFormLayoutState.jobAndFieldAttributesList);
+        let formLayoutStateParam = { formElement: cloneFormLayoutState.formElement, jobTransaction, fieldAttributeMasterParentIdMap: cloneFormLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: cloneFormLayoutState.jobAndFieldAttributesList, transientFormLayoutState: cloneFormLayoutState.transientFormLayoutState };
+        let afterValidationResult = fieldValidationService.fieldValidations(qcAttributeMaster.childList.optionCheckboxArray, formLayoutStateParam, AFTER);
         if (!afterValidationResult) {
             return { formLayoutState: cloneFormLayoutState }
         }
@@ -575,12 +578,13 @@ class QC {
     getQCImageAndRemarksData(qcAttributeMaster, formLayoutState, jobTransaction, qcImageAndRemarkPresentObject) {
         let imageData, remarksData;
         let cloneFormLayoutState = this.prepareCloneFormLayoutState(formLayoutState);
+        let formLayoutStateParam = { formElement: cloneFormLayoutState.formElement, jobTransaction, fieldAttributeMasterParentIdMap: cloneFormLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: cloneFormLayoutState.jobAndFieldAttributesList, transientFormLayoutState: cloneFormLayoutState.transientFormLayoutState };
         if (qcImageAndRemarkPresentObject.isQCImage) {
-            fieldValidationService.fieldValidations(cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcImage.fieldAttributeMasterId], cloneFormLayoutState.formElement, BEFORE, jobTransaction, cloneFormLayoutState.fieldAttributeMasterParentIdMap, cloneFormLayoutState.jobAndFieldAttributesList);
+            fieldValidationService.fieldValidations(cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcImage.fieldAttributeMasterId], formLayoutStateParam, BEFORE);
             imageData = cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcImage.fieldAttributeMasterId].value;
         }
         if (qcImageAndRemarkPresentObject.isQCRemarks) {
-            fieldValidationService.fieldValidations(cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcRemark.fieldAttributeMasterId], cloneFormLayoutState.formElement, BEFORE, jobTransaction, cloneFormLayoutState.fieldAttributeMasterParentIdMap, cloneFormLayoutState.jobAndFieldAttributesList);
+            fieldValidationService.fieldValidations(cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcRemark.fieldAttributeMasterId], formLayoutStateParam, BEFORE);
             remarksData = cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcRemark.fieldAttributeMasterId].value;
         }
         return { imageData, remarksData };
@@ -589,14 +593,15 @@ class QC {
     saveOCImageRemarksAndNavigate(qcImageRemarksObject, qcAttributeMaster, formLayoutState, jobTransaction) {
         let imageAfterValidationResult = true, remarksAfterValidationResult = true;
         let cloneFormLayoutState = this.prepareCloneFormLayoutState(formLayoutState);
+        let formLayoutStateParam = { formElement: cloneFormLayoutState.formElement, jobTransaction, fieldAttributeMasterParentIdMap: cloneFormLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: cloneFormLayoutState.jobAndFieldAttributesList, transientFormLayoutState: cloneFormLayoutState.transientFormLayoutState };
         if (qcImageRemarksObject.isQCImage) {
             cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcImage.fieldAttributeMasterId].displayValue = qcImageRemarksObject.qcImageData ? qcImageRemarksObject.qcImageData.value : null;
-            imageAfterValidationResult = fieldValidationService.fieldValidations(cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcImage.fieldAttributeMasterId], cloneFormLayoutState.formElement, AFTER, jobTransaction, cloneFormLayoutState.fieldAttributeMasterParentIdMap, cloneFormLayoutState.jobAndFieldAttributesList);
+            imageAfterValidationResult = fieldValidationService.fieldValidations(cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcImage.fieldAttributeMasterId], formLayoutStateParam, AFTER);
             cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcImage.fieldAttributeMasterId].value = imageAfterValidationResult ? cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcImage.fieldAttributeMasterId].displayValue : null;
         }
         if (qcImageRemarksObject.isQCRemarks && qcImageRemarksObject.qcRemarksData) {
             cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcRemark.fieldAttributeMasterId].displayValue = qcImageRemarksObject.qcRemarksData;
-            remarksAfterValidationResult = fieldValidationService.fieldValidations(cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcRemark.fieldAttributeMasterId], cloneFormLayoutState.formElement, AFTER, jobTransaction, cloneFormLayoutState.fieldAttributeMasterParentIdMap, cloneFormLayoutState.jobAndFieldAttributesList);
+            remarksAfterValidationResult = fieldValidationService.fieldValidations(cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcRemark.fieldAttributeMasterId], formLayoutStateParam, AFTER);
             cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcRemark.fieldAttributeMasterId].value = remarksAfterValidationResult ? cloneFormLayoutState.formElement[qcAttributeMaster.childList.qcRemark.fieldAttributeMasterId].displayValue : null;
         }
 

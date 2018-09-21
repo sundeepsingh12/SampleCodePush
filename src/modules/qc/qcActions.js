@@ -187,7 +187,7 @@ export function saveImageRemarksAndNavigate(qcImageRemarksObject, qcAttributeMas
             dispatch(setState(SET_QC_IMAGE_REMARKS_LOADING, { qcImageAndRemarksLoading: true }));
             let navigationObject = qcService.saveOCImageRemarksAndNavigate(qcImageRemarksObject, qcAttributeMaster, formLayoutState, jobTransaction);
             if (navigationObject.screenNameToBeNavigated && navigationObject.screenNameToBeNavigated == FormLayout) {
-                dispatch(saveQCAndNavigateToFormLayout(navigationObject.formLayoutState, stateParameters.qcAttributeMaster, propsParameters.jobTransaction));
+                dispatch(saveQCAndNavigateToFormLayout(navigationObject.formLayoutState, qcAttributeMaster, jobTransaction));
                 return;
             } else if (navigationObject.screenNameToBeNavigated) {
                 navigate(navigationObject.screenNameToBeNavigated, {
@@ -212,7 +212,7 @@ export function saveQCAndNavigateToFormLayout(formLayoutState, qcAttributeMaster
     return async function (dispatch) {
         try {
             let cloneFormLayoutState = JSON.parse(JSON.stringify(formLayoutState));
-            let formLayoutStateParam = { formElement: cloneFormLayoutState.formElement, isSaveDisabled: formLayoutState.cloneFormLayoutState.isSaveDisabled, jobTransaction, fieldAttributeMasterParentIdMap: cloneFormLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: cloneFormLayoutState.jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds: cloneFormLayoutState.sequenceWiseSortedFieldAttributesMasterIds, transientFormLayoutState: cloneFormLayoutState.transientFormLayoutState };
+            let formLayoutStateParam = { formElement: cloneFormLayoutState.formElement, isSaveDisabled: cloneFormLayoutState.isSaveDisabled, jobTransaction, fieldAttributeMasterParentIdMap: cloneFormLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: cloneFormLayoutState.jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds: cloneFormLayoutState.sequenceWiseFieldAttributeMasterIds, transientFormLayoutState: cloneFormLayoutState.transientFormLayoutState };
             const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(qcAttributeMaster.fieldAttributeMasterId, formLayoutStateParam, cloneFormLayoutState.formElement[qcAttributeMaster.fieldAttributeMasterId].value, null, NEXT_FOCUS);
             dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA, {
                 formElement: updatedFieldDataObject.formLayoutObject,
