@@ -4,8 +4,6 @@ import {
     View,
     Text,
     Image,
-    Linking,
-    Platform
 } from 'react-native'
 import { StyleProvider, Container, Content, Button, List, ListItem, Left, Right } from 'native-base'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
