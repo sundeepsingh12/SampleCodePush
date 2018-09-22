@@ -49,7 +49,7 @@
     "react-native-sortable-listview": "0.2.8",
     "react-native-sound": "0.10.9",
     "react-native-star-rating": "1.1.0",
-    "react-native-svg": "6.4.0",
+    "react-native-svg": "7.0.3",
     "react-native-swipe-gestures": "1.0.2",
     "react-native-vector-icons": "4.6.0",
     "react-native-zip-archive": "2.2.6",
@@ -73,12 +73,12 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-external-helpers": "^7.0.0",
-    "eslint": "^4.14.0",
-    "metro-react-native-babel-preset": "^0.45.1",
-    "reactotron-react-native": "^1.14.0",
-    "reactotron-redux": "^1.13.0",
+    "@babel/plugin-external-helpers": "7.0.0",
+    "eslint": "4.14.0",
+    "metro-react-native-babel-preset": "0.45.1",
+    "reactotron-react-native": "1.14.0",
+    "reactotron-redux": "1.13.0",
     "redux-logger": "3.0.6",
-    "rn-nodeify": "^8.2.0"
+    "rn-nodeify": "8.2.0"
   }
 }
