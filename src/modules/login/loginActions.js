@@ -165,7 +165,7 @@ export function onLongPressResetSettings(url) {
         url = domainUrl.value
       }
       dispatch(onLongPressIcon(true))
-      await logoutService.deleteDataBase()
+      await logoutService.deleteDataBase(true)
       let allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
       await keyValueDBService.deleteValueFromStore(allSchemaInstance)
       dispatch(setState(RESET_STATE))

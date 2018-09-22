@@ -101,7 +101,7 @@ function resetNavigationState(index, actions, key = 'StackRouterRoot') {
 export function resetApp() {
   return async function (dispatch) {
     try {
-      await logoutService.deleteDataBase()
+      await logoutService.deleteDataBase(true)
       const allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
       await keyValueDBService.deleteValueFromStore(allSchemaInstance)
       navDispatch(NavigationActions.reset({ index: 0, actions: [NavigationActions.navigate({ routeName: LoginScreen })] }))
