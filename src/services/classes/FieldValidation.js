@@ -563,10 +563,10 @@ class FieldValidation {
             let isFirstIndex = true;
             for (let index in jobTransaction) {
                 if (isFirstIndex) {
-                    query += isJob ? `jobId = ${jobTransaction[index].jobId}` : `jobTransactionId = ${jobTransaction[index].id}`;
+                    query += isJob ? `jobId = ${jobTransaction[index].jobId}` : `jobTransactionId = ${jobTransaction[index].jobTransactionId}`;
                     isFirstIndex = false;
                 } else {
-                    query += isJob ? ` OR jobId = ${jobTransaction[index].jobId}` : ` OR jobTransactionId = ${jobTransaction[index].id}`
+                    query += isJob ? ` OR jobId = ${jobTransaction[index].jobId}` : ` OR jobTransactionId = ${jobTransaction[index].jobTransactionId}`
                 }
             }
         }

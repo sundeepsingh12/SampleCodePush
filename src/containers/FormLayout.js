@@ -78,9 +78,12 @@ class FormLayout extends PureComponent {
       })
       this.props.actions.setState(ERROR_MESSAGE, '')
     }
-    let transactionList = this.props.navigation.state.params.jobTransaction && !isEmpty(this.props.updatedTransactionListIds) && !isEmpty(this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId]) ? this.props.jobTransaction.id ? [this.props.navigation.state.params.jobTransaction] : this.props.navigation.state.params.jobTransaction : null
-    if (transactionList && this.checkForUpdatedTransactionList(transactionList, this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId])) {
-      this.setState({ updatingData: this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId] })
+    let transaction = this.props.navigation.state.params.jobTransaction
+    if (transaction && (transaction.constructor == Array || transaction.jobId > 0)) { // case of not new job and save activated
+      let transactionList = !isEmpty(this.props.updatedTransactionListIds) && !isEmpty(this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId]) ? transaction.constructor != Array ? [transaction] : transaction : null
+      if (transactionList && this.checkForUpdatedTransactionList(transactionList, this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId])) {
+        this.setState({ updatingData: this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId] })
+      }
     }
   }
 
