@@ -133,6 +133,7 @@ class JobTransaction {
             jobTransactionMap[id] = { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual, attemptCount, lastTransactionTimeOnMobile, jobEtaTime, jobCreatedAt, lastUpdatedAtServer };
             jobIdJobTransactionStatusIdMap[transaction.jobId] = transaction.jobStatusId
         }
+        fieldDataQuery = `(${fieldDataQuery}) AND parentId = 0`
         return { jobTransactionMap, jobQuery, jobTransactionQuery, fieldDataQuery, jobIdJobTransactionStatusIdMap };
     }
 
