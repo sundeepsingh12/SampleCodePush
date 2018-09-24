@@ -76,7 +76,7 @@ export function getJobDetails(params, key, payload) {
             }
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(details.jobTransactionDisplay.jobMasterId)
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery,
-                jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId, details.currentStatus.actionOnStatus) : false
+                jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus, details.seqSelected, statusList, jobTransactionId) : false
             const jobExpiryData = (!errorMessage && details.jobDataObject.dataMap[JOB_EXPIRY_TIME]) ? (Object.values(details.jobDataObject.dataMap[JOB_EXPIRY_TIME])[0]) : null
             const jobExpiryTime = jobExpiryData && jobExpiryData.data ? jobExpiryData.data.value : null
             const parentStatusList = (jobMaster[0].isStatusRevert) && !_.isEqual(_.toLower(details.currentStatus.code), 'seen') ? await jobDetailsService.getParentStatusList(statusList, details.currentStatus, jobTransactionId) : []
