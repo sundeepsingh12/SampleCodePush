@@ -23,6 +23,7 @@ class Job {
             jobDataQuery += index == 0 ? 'jobId = ' + id : ' OR jobId = ' + id
             jobMap[id] = { attemptCount, id, jobEndTime, jobMasterId, jobStartTime, latitude, longitude, slot, referenceNo, groupId, jobPriority, jobId: id }
         }
+        jobDataQuery = `(${jobDataQuery}) AND parentId = 0`;
         return { jobMap, jobDataQuery }
     }
 
@@ -30,9 +31,9 @@ class Job {
      * 
      * @param {*} jobId 
      */
-    getJobForJobId(jobId){
+    getJobForJobId(jobId) {
         const jobQuery = `id = ${jobId}`
-        const job = realm.getRecordListOnQuery(TABLE_JOB,jobQuery)
+        const job = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
         return job
     }
 }
