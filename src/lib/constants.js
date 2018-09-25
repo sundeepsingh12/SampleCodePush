@@ -498,9 +498,10 @@ module.exports = keyMirror({
     CLEAR_LIVE_JOB_STATE: null,
 
     //Summary
-    SET_SUMMARY_FOR_JOBMASTER: null,
-    SET_SUMMARY_FOR_RUNSHEET: null,
+    SET_JOB_MASTER_AND_RUNSHEET_DATA: null,
     RESET_SUMMARY_STATE: null,
+    START_FETCHING_DATA: null,
+    SET_RUNSHEET_ID: null,
 
     //Custom App
     START_FETCHING_URL: null,
