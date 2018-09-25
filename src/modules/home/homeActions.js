@@ -115,6 +115,7 @@ import { jobDataService } from '../../services/classes/JobData'
 import { jobService } from '../../services/classes/Job'
 import { each, size, isNull, isEmpty} from 'lodash'
 import { AppState, Linking } from 'react-native'
+import { fetchJobs } from '../taskList/taskListActions';
 
 /**
  * Function which updates STATE when component is mounted
@@ -507,7 +508,11 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
         dispatch(pieChartCount())
         let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
         if(updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)){
-          dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS,updatedJobTransactionList.value))
+          if(updatedJobTransactionList.value.runsheetClosed){
+            dispatch(fetchJobs())
+          }else{
+            dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS,updatedJobTransactionList.value))
+          }
         }     
        }
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {

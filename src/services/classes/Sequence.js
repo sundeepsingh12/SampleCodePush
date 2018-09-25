@@ -12,7 +12,7 @@ import RestAPIFactory from '../../lib/RestAPIFactory'
 import {
     HUB,
     TABLE_JOB_TRANSACTION,
-    SHOULD_RELOAD_START
+    UNSEEN
 } from '../../lib/constants'
 
 import {
@@ -51,13 +51,14 @@ class Sequence {
         }
         let jobMasterMap = _.mapKeys(jobMasterIds);
         let jobTransactionCustomizationList = {}
+        let allStatusIdsMapForCode = await jobStatusService.getAllStatusIdsMapForCode(UNSEEN)
         for(let jobMasterId in jobTransactionList){
             if(jobMasterMap[jobMasterId]){
                 jobTransactionCustomizationList = Object.assign(jobTransactionCustomizationList, jobTransactionList[jobMasterId]) 
             }
         }
         const sequenceMap =  _.pickBy(jobTransactionCustomizationList, function(value, key) {
-            return (value.runsheetNo == runsheetNumber)
+            return (value.runsheetNo == runsheetNumber && !allStatusIdsMapForCode[value.statusId])
         })
         return Object.values(sequenceMap);
     }

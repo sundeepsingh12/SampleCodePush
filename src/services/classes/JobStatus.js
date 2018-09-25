@@ -26,6 +26,18 @@ class JobStatus {
     const jobStatusIds = statusList.filter(jobStatusObject => jobStatusObject.code == statusCode).map(jobStatusObject => jobStatusObject.id)
     return jobStatusIds
   }
+  
+  async getAllStatusIdsMapForCode(statusCode) {
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    let statusIdsMap = {}
+    let statusList = jobStatusArray ? jobStatusArray.value : null
+    for(let status in statusList){
+      if(statusList[status].code == statusCode){
+        statusIdsMap[statusList[status].id] = true
+      }
+    }
+    return statusIdsMap
+  }
 
   /**Generic method for getting particular status id of a particular job master and job status code
    * 

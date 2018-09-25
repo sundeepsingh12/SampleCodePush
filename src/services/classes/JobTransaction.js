@@ -187,9 +187,12 @@ class JobTransaction {
         let jobTransactionDTO = {};
         let jobTransactionCustomizationListParametersMaps = this.prepareMapsForTransactionCustomizationList(jobTransactionCustomizationListParametersDTO);
         let runsheetObject = runSheetService.prepareJobTransactionQueryOnBasisOfRunsheet(jobTransactionCustomizationListParametersDTO.customNaming.enableFutureDateRunsheet);
+        if( jobTransactionCustomizationListParametersDTO.customNaming.enableFutureDateRunsheet && _.isEmpty(runsheetObject.runsheetMap)){
+            return []
+        }
         let jobTransactionQuery = runsheetObject.jobTransactionQuery;
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1';
-        jobTransactionQuery = queryDTO && queryDTO.jobTransactionQuery && queryDTO.jobTransactionQuery.trim() !== '' ? `${jobTransactionQuery} AND ${queryDTO.jobTransactionQuery}` : jobTransactionQuery;
+        jobTransactionQuery = queryDTO && queryDTO.jobTransactionQuery && queryDTO.jobTransactionQuery.trim() !== '' ? `(${jobTransactionQuery}) AND (${queryDTO.jobTransactionQuery})` : jobTransactionQuery;
         let jobTransactionList = [], jobTransactionObject = {}, jobDataList = [], fieldDataList = [];
         jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery);
         if (jobTransactionList.length == 0) {

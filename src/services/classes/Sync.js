@@ -304,6 +304,14 @@ class Sync {
       value: contentQuery.runSheet
     }
 
+    if(!_.isEmpty(contentQuery.runSheet)){
+      for(let runsheet in contentQuery.runSheet){
+        if(contentQuery.runSheet[runsheet] && contentQuery.runSheet[runsheet].isClosed){
+          updatedJobTransactionList['runsheetClosed'] = true
+          break
+        }
+      }
+    }
     //Job data is deleted in insert query also,to handle multiple login case 
     //Ideally Id should be added server side in jobdata table
 
