@@ -314,6 +314,7 @@ module.exports = {
     UPDATE_ALL_SELECTED: 'Update All Selected',
 
     //Sorting
+    ADDRESS: 'Address',
     SORTING: 'Sorting',
     REF_UNAVAILABLE: 'Reference Number Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
