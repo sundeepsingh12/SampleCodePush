@@ -20,7 +20,8 @@ import {
     THEN, TIME, TIME_COMPARATOR,
 } from '../../lib/AttributeConstants'
 import DeviceInfo from 'react-native-device-info'
-import _ from 'lodash'
+import isNaN from 'lodash/isNaN'
+import includes from 'lodash/includes'
 
 class FieldValidation {
 
@@ -42,6 +43,7 @@ class FieldValidation {
      * @param {*} jobTransaction 
      */
     fieldValidations(currentElement, formLayoutState, timeOfExecution) {
+        formLayoutState.formElement[currentElement.fieldAttributeMasterId].alertMessage = null;
         let validationList = currentElement.validation ? currentElement.validation.filter(validationObject => validationObject.timeOfExecution == timeOfExecution) : null
         let validationMapObject = this.prepareValidationReferenceMap(validationList)
         let validationStringMap = this.validationStringMap(validationMapObject.validationReferenceMap)
@@ -195,13 +197,13 @@ class FieldValidation {
                 return (leftKey === rightKey)
             }
             case CONTAINS: {
-                return _.includes(leftKey, rightKey)
+                return includes(leftKey, rightKey)
             }
             case GREATER_THAN:
             case GREATER_THAN_OR_EQUAL_TO:
             case LESS_THAN:
             case LESS_THAN_OR_EQUAL_TO: {
-                if (parseFloat(leftKey) == NaN || parseFloat(rightKey) == NaN) {
+                if (isNaN(parseFloat(leftKey)) || isNaN(parseFloat(rightKey))) {
                     return false
                 }
                 return (eval(leftKey + condition + rightKey))
@@ -584,7 +586,7 @@ class FieldValidation {
                 break;
             }
         }
-        return result;
+        return result + '';
     }
 
     getFieldDataValue(fieldAttributeMasterId, formLayoutState) {
