@@ -525,7 +525,6 @@ module.exports = keyMirror({
     BLUETOOTH: null,
     BULK: null,
     LIVE: null,
-    OFFLINEDATASTORE: null,
     START: null,
     SEQUENCEMODULE: null,
     SUMMARY: null,

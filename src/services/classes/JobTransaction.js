@@ -134,6 +134,7 @@ class JobTransaction {
             jobTransactionMap[id] = { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual, attemptCount, lastTransactionTimeOnMobile, jobEtaTime, jobCreatedAt, lastUpdatedAtServer };
             jobIdJobTransactionStatusIdMap[transaction.jobId] = transaction.jobStatusId
         }
+        fieldDataQuery = `(${fieldDataQuery}) AND parentId = 0`
         return { jobTransactionMap, jobQuery, jobTransactionQuery, fieldDataQuery, jobIdJobTransactionStatusIdMap };
     }
 
@@ -232,15 +233,6 @@ class JobTransaction {
         jobTransactionQuery = `(${jobTransactionQuery}) AND (${jobMasterQuery}) AND (${jobStatusQuery})`
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, SEQ_SELECTED)
         return jobTransactionList && jobTransactionList.length > 0 ? jobTransactionList[0] : null
-    }
-
-    updateJobTransactionStatusId(jobMasterIdTransactionDtoMap) {
-        // db hit avoid
-        for (let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap) {
-            const transactionIdList = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].transactionId.split(":")
-            let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId
-            realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION, 'jobStatusId', transactionIdList, pendingStatusId)
-        }
     }
 
     /** @function getEnableMultiPartJobMaster(jobMasterList)

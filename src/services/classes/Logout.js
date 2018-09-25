@@ -4,8 +4,8 @@ import size from 'lodash/size'
 
 class Logout {
 
-    deleteDataBase() {
-        realm.deleteRecords()
+    deleteDataBase(isDeleteAllRecords) {
+        realm.deleteRecords(isDeleteAllRecords)
     }
 
     checkForUnsyncTransactions(pendingSyncTransactionIds) {
