@@ -13,7 +13,7 @@ class DraftService {
             realm.save(TABLE_DRAFT, draftObject)
         }
     }
-    
+
     setFormLayoutObjectForSaving(formLayoutState, jobMasterId, navigationFormLayoutStates, jobTransaction) {
         if (!formLayoutState || !formLayoutState.formElement) return
         let statusIdToFormLayoutMap = {}
@@ -25,7 +25,7 @@ class DraftService {
             }
         }
         let draftObject = {
-            jobTransactionId: (jobTransaction.id < 0 && jobTransaction.jobId < 0) ? -jobMasterId : formLayoutState.jobTransactionId,
+            jobTransactionId: (jobTransaction.id < 0 && jobTransaction.jobId < 0) ? -jobMasterId : jobTransaction.id,
             statusId: formLayoutState.statusId,
             referenceNumber: jobTransaction.referenceNumber,
             formLayoutObject: JSON.stringify(statusIdToFormLayoutMap),
