@@ -140,7 +140,7 @@ class Payment extends PureComponent {
     }
 
     getPaymentModeSelectedResult(moneyTransactionModeId) {
-        if ((size(this.props.paymentModeList.otherPaymentModeList) == 1 && size(this.props.paymentModeList.endPaymentModeList) == 0) || (size(this.props.paymentModeList.endPaymentModeList) == 1 && size(this.props.paymentModeList.otherPaymentModeList) == 0)) {
+        if((size(this.props.paymentModeList.otherPaymentModeList) == 1 && size(this.props.paymentModeList.endPaymentModeList) == 0) || (size(this.props.paymentModeList.endPaymentModeList) == 1 && size(this.props.paymentModeList.otherPaymentModeList) == 0) && (this.props.paymentModeList.endPaymentModeList[0].moneyTransactionModeId != 16)){
             return true
         }
         if (!this.props.selectedPaymentMode) {
@@ -178,6 +178,7 @@ class Payment extends PureComponent {
                 {this.props.splitPaymentMode == YES ? SELECT_PAYMENT_METHOD_TO_SPLIT : SELECT_PAYMENT_METHOD}
             </Text>
         )
+       
         for (let index in paymentModeList.otherPaymentModeList) {
             if (paymentModeList.otherPaymentModeList[index].moneyTransactionModeId == DISCOUNT.id && this.props.splitPaymentMode != YES) {
                 continue
