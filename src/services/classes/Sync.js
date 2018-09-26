@@ -41,7 +41,7 @@ import { liveJobService } from './LiveJobService';
 
 class Sync {
 
-  async createAndUploadZip(syncStoreDTO, currentDate) {
+  async createAndUploadZip(syncStoreDTO, currentDate,isCalledFromLogout) {
     let isFileExists = await RNFS.exists(PATH_TEMP);
     if (isFileExists) {
       await RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { showToastAndAddUserExceptionLog(2951, JSON.stringify(error), 'danger', 0) })
@@ -50,7 +50,7 @@ class Sync {
     if (!token) {
       throw new Error('Token Missing')
     }
-    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful,syncDataDTO } = await syncZipService.createZip(syncStoreDTO)
+    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful,syncDataDTO } = await syncZipService.createZip(syncStoreDTO,isCalledFromLogout)
     const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, isEncryptionSuccessful,syncDataDTO)
     await communicationLogsService.updateLastCallSmsTimeAndNegativeCommunicationLogsDb(lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);

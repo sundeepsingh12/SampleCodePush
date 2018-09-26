@@ -24,6 +24,9 @@ export function getPayByLinkPaymentParameters(customerContact, jobTransaction, j
         try { 
             dispatch(setState(SET_LOADER_FOR_PAYBYLINK, true))
             const { walletParameters} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, NET_BANKING_ID)
+            let apiPassword = walletParameters.apiPassword 
+            walletParameters.apiPassword = walletParameters.secretKey
+            walletParameters.secretKey = apiPassword
             dispatch(setState(SET_PAY_BY_LINK_PARAMETERS, { payByLinkConfigJSON: walletParameters, customerContact }))
         } catch (error) {
             showToastAndAddUserExceptionLog(3101, error.message, 'danger', 0)
@@ -32,11 +35,13 @@ export function getPayByLinkPaymentParameters(customerContact, jobTransaction, j
     }
 }
 
-export function hitPayByLinkApiForPayment(customerContact, payByLinkConfigJSON, payByLinkId) {
+export function hitPayByLinkApiForPayment(customerContact, payByLinkConfigJSON, payByLinkId, navigationParams) {
     return async function (dispatch) {
         try { 
             dispatch(setState(SET_LOADER_FOR_PAYBYLINK, true))
             const data = await payByLinkPaymentService.prepareJsonAndHitPayByLinkUrl(payByLinkConfigJSON, customerContact, payByLinkId)
+            let { formLayoutState, jobMasterId, jobTransaction } = navigationParams
+            MosambeeWalletPaymentServices.updateDraftInMosambee(payByLinkConfigJSON, customerContact, null, formLayoutState, jobMasterId, jobTransaction, 16, '1')
             dispatch(setState(SET_PAY_BY_LINK_MESSAGE, data.message))
         } catch (error) {
             showToastAndAddUserExceptionLog(3102, error.message, 'danger', 0)
@@ -50,9 +55,6 @@ export function hitCheckTransactionApiForCheckingPayment(payByLinkConfigJSON, na
         try {
             dispatch(setState(SET_LOADER_FOR_PAYBYLINK, true))
             let { formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails } = navigationParams
-            let apiPassword = payByLinkConfigJSON.apiPassword 
-            payByLinkConfigJSON.apiPassword = payByLinkConfigJSON.secretKey
-            payByLinkConfigJSON.secretKey = apiPassword
             const responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndHitCheckTransactionApi(payByLinkConfigJSON,'1')
             if (!_.isEmpty(responseMessage.transId)) {
                 paymentService.addPaymentObjectToDetailsArray(payByLinkConfigJSON.actualAmount, 16, responseMessage.transId, 'N.A', responseMessage, formLayoutState)

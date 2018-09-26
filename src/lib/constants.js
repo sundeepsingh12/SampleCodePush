@@ -525,7 +525,6 @@ module.exports = keyMirror({
     BLUETOOTH: null,
     BULK: null,
     LIVE: null,
-    OFFLINEDATASTORE: null,
     START: null,
     SEQUENCEMODULE: null,
     SUMMARY: null,
@@ -607,6 +606,8 @@ module.exports = keyMirror({
     SET_CONTACT: null,
     SET_OTP: null,
     SET_CHECK_TRANSACTION_VIEW: null,
+    //Case of Sync started From Logout 
+    RUN_SYNC:null
 })
 
 

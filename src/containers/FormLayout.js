@@ -26,13 +26,11 @@ function mapStateToProps(state) {
     formElement: state.formLayout.formElement,
     isSaveDisabled: state.formLayout.isSaveDisabled,
     statusName: state.formLayout.statusName,
-    jobTransactionId: state.formLayout.jobTransactionId,
     statusId: state.formLayout.statusId,
     latestPositionId: state.formLayout.latestPositionId,
     paymentAtEnd: state.formLayout.paymentAtEnd,
     isLoading: state.formLayout.isLoading,
     errorMessage: state.formLayout.errorMessage,
-    currentElement: state.formLayout.currentElement,
     updateDraft: state.formLayout.updateDraft,
     isFormValid: state.formLayout.isFormValid,
     sequenceWiseFieldAttributeMasterIds: state.formLayout.sequenceWiseFieldAttributeMasterIds,
@@ -80,9 +78,12 @@ class FormLayout extends PureComponent {
       })
       this.props.actions.setState(ERROR_MESSAGE, '')
     }
-    let transactionList = this.props.navigation.state.params.jobTransaction && !isEmpty(this.props.updatedTransactionListIds) && !isEmpty(this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId]) ? this.props.jobTransactionId ? [this.props.navigation.state.params.jobTransaction] : this.props.navigation.state.params.jobTransaction : null
-    if (transactionList && this.checkForUpdatedTransactionList(transactionList, this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId])) {
-      this.setState({ updatingData: this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId] })
+    let transaction = this.props.navigation.state.params.jobTransaction
+    if (transaction && (transaction.constructor == Array || transaction.jobId > 0)) { // case of not new job and save activated
+      let transactionList = !isEmpty(this.props.updatedTransactionListIds) && !isEmpty(this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId]) ? transaction.constructor != Array ? [transaction] : transaction : null
+      if (transactionList && this.checkForUpdatedTransactionList(transactionList, this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId])) {
+        this.setState({ updatingData: this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId] })
+      }
     }
   }
 
@@ -131,7 +132,7 @@ class FormLayout extends PureComponent {
     if (!this.props.navigation.state.params.isDraftRestore) {
       let { statusId, statusName } = this.props.navigation.state.params
       const statusData = { statusId, statusName }
-      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId, statusData)
+      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId, statusData, this.props.navigation.state.params.navigationFormLayoutStates)
       if (this.props.navigation.state.params.jobTransaction.length || this.props.navigation.state.params.editableFormLayoutState || this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
         this.props.actions.setState(SET_UPDATE_DRAFT, false)
       }
@@ -170,7 +171,7 @@ class FormLayout extends PureComponent {
       formElement: this.props.formElement,
       isSaveDisabled: this.props.isSaveDisabled,
       statusName: this.props.statusName,
-      jobTransactionId: this.props.jobTransactionId,
+      jobTransactionId: this.props.navigation.state.params.jobTransaction.id,
       statusId: this.props.statusId,
       latestPositionId: this.props.latestPositionId,
       paymentAtEnd: this.props.paymentAtEnd,
@@ -183,7 +184,8 @@ class FormLayout extends PureComponent {
       arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
       jobMasterId: this.props.navigation.state.params.jobMasterId,
       jobAndFieldAttributesList: this.props.jobAndFieldAttributesList,
-      sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds
+      sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds,
+      transientFormLayoutState: this.props.navigation.state.params.navigationFormLayoutStates
     }
     return (
       <BasicFormElement
@@ -216,10 +218,9 @@ class FormLayout extends PureComponent {
   saveJobTransaction() {
     let formLayoutState = {
       formElement: this.props.formElement,
-      nextEditable: this.props.nextEditable,
       isSaveDisabled: this.props.isSaveDisabled,
       statusName: this.props.statusName,
-      jobTransactionId: this.props.jobTransactionId,
+      jobTransactionId: this.props.navigation.state.params.jobTransaction.id,
       statusId: this.props.statusId,
       latestPositionId: this.props.latestPositionId,
       paymentAtEnd: this.props.paymentAtEnd,
@@ -346,7 +347,7 @@ class FormLayout extends PureComponent {
         <Footer style={[style.footer]}>
           <FooterTab style={[styles.padding10]}>
             <Button success full
-              onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
+              onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransaction.id, this.props.statusId)}
               disabled={this.props.isSaveDisabled}>
               <Text style={[styles.fontLg, styles.fontWhite]}>{(this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : (saveActivated || transient) ? 'Continue' : this.props.statusName)}</Text>
             </Button>

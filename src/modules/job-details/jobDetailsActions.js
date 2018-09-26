@@ -101,11 +101,11 @@ export function checkForPaymentAtEnd(draftStatusInfo, jobTransaction, params, ke
             if (paymentAtEnd.parameters) {
                 if (loaderState) dispatch(setState(loaderState, true))
                 const walletParameters = paymentAtEnd.parameters
-                let responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndHitCheckTransactionApi(walletParameters, "20")
+                let responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndHitCheckTransactionApi(walletParameters, walletParameters.transactionType)
                 let transactionId = _.trim(responseMessage.transId)
-                if (_.isEqual(responseMessage.status, 'SUCCESS') && !_.isEmpty(transactionId) && !_.isEqual(transactionId, 'NA') && !_.isEqual(transactionId, 'N.A.')) {
+                if (_.isEqual(_.toLower(responseMessage.status), 'success') && !_.isEmpty(transactionId) && !_.isEqual(transactionId, 'NA') && !_.isEqual(transactionId, 'N.A.')) {
                     const taskListScreenDetails = { jobDetailsScreenKey: key, pageObjectAdditionalParams: params ? params.pageObjectAdditionalParams : null }
-                    paymentService.addPaymentObjectToDetailsArray(walletParameters.actualAmount, 14, responseMessage.transId, walletParameters.selectedWalletDetails.code, responseMessage, formLayoutState)
+                    paymentService.addPaymentObjectToDetailsArray(walletParameters.actualAmount, walletParameters.modeTypeId, responseMessage.transId, walletParameters.selectedWalletDetails ? walletParameters.selectedWalletDetails.code : null, responseMessage, formLayoutState)
                     setTimeout(() => { dispatch(setState(checkTransactionState, TRANSACTION_SUCCESSFUL)) }, 1000);
                     if (!jobTransaction) {
                         Toast.show({ text: TRANSACTION_SUCCESSFUL, position: 'bottom', buttonText: OK, type: 'success', duration: 5000 })
