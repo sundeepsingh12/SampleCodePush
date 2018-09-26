@@ -30,7 +30,7 @@ function mapStateToProps(state) {
         messageList: state.messageReducer.messageList,
         isLoading: state.messageReducer.isLoading,
         jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
-        
+
     }
 }
 
@@ -118,7 +118,7 @@ class MessageBox extends Component {
                         <View style={[styles.absolute, { top: 3, left: 0 }]}>
                             <MessageReceiveIcon />
                         </View>
-                        <View style={[style.msgBlock,styles.flex1, styles.marginLeft10, { backgroundColor: '#E5E5EA' }]}>
+                        <View style={[style.msgBlock, styles.flex1, styles.marginLeft10, { backgroundColor: '#E5E5EA' }]}>
 
                             <Text style={[styles.fontBlack, styles.fontDefault, styles.bold]}>MANAGER</Text>
                             {this.getTransactionView(item, transactionIdToCustomisationMap)}
@@ -142,7 +142,11 @@ class MessageBox extends Component {
     }
 
     getMessagesList() {
-        let flatListView, transactionIdToCustomisationMap = _.mapKeys(this.props.jobTransactionCustomizationList, 'id')
+        let idJobTransactionCustomizationListMap = {}
+        for (let index in this.props.jobTransactionCustomizationList) {
+            idJobTransactionCustomizationListMap = Object.assign(idJobTransactionCustomizationListMap, this.props.jobTransactionCustomizationList[index])
+        }
+        let flatListView, transactionIdToCustomisationMap = _.mapKeys(idJobTransactionCustomizationListMap, 'id')
         if (!_.isEmpty(this.props.messageList)) {
             flatListView = <FlatList
                 data={this.renderList()}
