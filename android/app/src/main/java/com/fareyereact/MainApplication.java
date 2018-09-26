@@ -37,6 +37,7 @@ import android.support.multidex.MultiDexApplication;
 import com.callgetter.CallLogsPackage;
 import com.opendatetimesettings.OpenDateTimeSettingsPackage;
 import com.mosambeePayment.MosambeePaymentPackage;
+import com.schedulealarm.ScheduleAlarmPackage;
 import com.datetime.DateTimePackage;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
@@ -85,6 +86,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
           new CallLogsPackage(),
           new OpenDateTimeSettingsPackage(),
           new MosambeePaymentPackage(),
+          new ScheduleAlarmPackage(),
           new DateTimePackage()
       );
     }
