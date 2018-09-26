@@ -27,8 +27,9 @@ export default class FormLayoutEventImpl {
      * @param {*isSaveDisabled} isSaveDisabled 
      * @param {*fieldAttribute value} value 
      */
-    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds) {
+    findNextFocusableAndEditableElements(attributeMasterId, formLayoutState, value, fieldDataList, event) {
         let isAllAttributeHidden = true; //this is a check if there are all hidden attribute or not
+        let formLayoutObject = formLayoutState.formElement, isSaveDisabled = formLayoutState.isSaveDisabled, jobTransaction = formLayoutState.jobTransaction, fieldAttributeMasterParentIdMap = formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList = formLayoutState.jobAndFieldAttributesList, sequenceWiseSortedFieldAttributesMasterIds = formLayoutState.sequenceWiseSortedFieldAttributesMasterIds;
         if (attributeMasterId && formLayoutObject[attributeMasterId]) {
             this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
         }
@@ -53,7 +54,7 @@ export default class FormLayoutEventImpl {
                 }
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
-                fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+                fieldValidationService.fieldValidations(value, formLayoutState, BEFORE)
                 let valueAfterValidation = formLayoutObject[value.fieldAttributeMasterId].value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
                     if (value.required) {
@@ -64,7 +65,7 @@ export default class FormLayoutEventImpl {
                         continue
                     }
                 }
-                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject[value.fieldAttributeMasterId], formLayoutObject, AFTER, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
+                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject[value.fieldAttributeMasterId], formLayoutState, AFTER)
                 if (!afterValidationResult && value.required) {
                     break
                 } else {
@@ -544,8 +545,8 @@ export default class FormLayoutEventImpl {
      * @param {*currentFieldDataObject} currentFieldDataObject 
      * @param {*jobTransactionId} jobTransactionId 
      */
-    
-     _recursivelyFindChildData(childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId) {
+
+    _recursivelyFindChildData(childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId) {
         for (let i = 0; i <= childDataList.length; i++) {
             let childObject = childDataList[i]
             if (!childObject) {
@@ -571,7 +572,7 @@ export default class FormLayoutEventImpl {
             fieldAttributeMasterId: formLayoutObject.fieldAttributeMasterId,
             attributeTypeId: formLayoutObject.attributeTypeId,
             key: formLayoutObject.key,
-            syncFlag:1
+            syncFlag: 1
         }
     }
 

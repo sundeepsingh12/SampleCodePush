@@ -137,6 +137,7 @@ class Login extends PureComponent {
       return (
         <TouchableOpacity style={[styles.width100, { height: 'auto' }]} onLongPress={this.onLongPress}>
           <Image
+            resizeMode = {'contain'}
             source={sourceOptions}
             style={[{ height: 100, width: 100 }]}
           />
