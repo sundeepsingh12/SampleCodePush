@@ -172,7 +172,7 @@ class BulkListing extends PureComponent {
         jobTransactionArray.push(bulkTransactions[item])
       } else if (some(values, (data) => includes(toLower(data), toLower(searchText)))) {
         jobTransactionArray.push(bulkTransactions[item])
-      }includes
+      }
     }
     jobTransactionArray = sortBy(jobTransactionArray, ['disabled'])
     return { jobTransactionArray, selectedTransactionLength }
