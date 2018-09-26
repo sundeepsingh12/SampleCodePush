@@ -187,10 +187,13 @@ class JobDetails {
      */
 
     checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId, nextStatusList) {
+        if(_.isEmpty(nextStatusList)) { // case if there are no next status map to current status
+            return false
+        }
         const jobMasterIdWithEnableResequence = jobMasterList.filter((obj) => obj.enableResequenceRestriction == true)
         const statusMap = statusList.filter((status) => status.tabId == tabId && status.code !== UNSEEN)
         const firstEnableSequenceTransaction = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
-        return !(!_.isEmpty(firstEnableSequenceTransaction) && firstEnableSequenceTransaction.id != jobTransactionId && seqSelected >= firstEnableSequenceTransaction.seqSelected) || (_.isEmpty(nextStatusList)) ? false : ENABLE_RESEQUENCE_RESTRICTION_MESSAGE
+        return !(!_.isEmpty(firstEnableSequenceTransaction) && firstEnableSequenceTransaction.id != jobTransactionId && seqSelected >= firstEnableSequenceTransaction.seqSelected) ? false : ENABLE_RESEQUENCE_RESTRICTION_MESSAGE
     }
 
     /**@function checkOutForDelivery(jobMasterList)
