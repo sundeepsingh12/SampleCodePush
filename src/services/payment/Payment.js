@@ -115,8 +115,8 @@ class Payment {
             })
         }
         let originalAmountObject = this.getOriginalAmount(moneyCollectMaster, formData, jobTransaction)
-        let actualAmount = this.getTotalActualAmount(moneyCollectMaster, formData)
-        actualAmount = actualAmount ? actualAmount : originalAmountObject.originalAmount
+        // let actualAmount = this.getTotalActualAmount(moneyCollectMaster, formData)
+        let actualAmount = originalAmountObject.originalAmount
         let amountEditableObject = this.actualAmountEditable(moneyCollectMaster, fieldValidationMap, jobStatusId)
         return {
             actualAmount,
