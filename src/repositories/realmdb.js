@@ -100,6 +100,9 @@ export function _encryptData(dataToEncrypt, encryptionKey, counterBlock) {
 }
 
 export function _decryptData(dataToDecrypt, decryptionKey) {
+    if (!decryptionKey) {
+        decryptionKey = DeviceInfo.getUniqueID()
+    }
     return AesCtr.decrypt(dataToDecrypt, decryptionKey, 256)
 }
 export function deleteRecords(isDeleteAllRecords = false) {
