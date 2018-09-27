@@ -15,7 +15,7 @@ import {
     SET_CONTACT
 } from '../lib/constants'
 
-import { Container, Content, Footer, FooterTab, Input, Button, StyleProvider, Header, Body, Icon } from 'native-base'
+import { Container, Content, Footer, FooterTab, Button, StyleProvider, Header, Body, Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 import * as paytmPaymentActions from '../modules/paytmPayment/paytmPaymentActions'
 import * as globalActions from '../modules/global/globalActions'
@@ -25,13 +25,15 @@ import Loader from '../components/Loader';
 import { SafeAreaView } from 'react-navigation'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform'
-import {
-
-} from '../lib/constants'
 import _ from 'lodash'
 import {
     TOTAL_AMOUNT_FOR_WALLET,
-    MOBILE_NUMBER
+    CUSTOMER_NUMBER,
+    ENTER_CUSTOMER_OTP,
+    SUBMIT,
+    CHECK_TRANSACTION_STATUS,
+    TRY_AGAIN,
+    COULD_NOT_CONNECT_SERVER
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -54,11 +56,8 @@ function mapDispatchToProps(dispatch) {
 class PaytmPayment extends PureComponent {
 
     componentDidMount() {
-        const contactNumber = this.props.navigation.state.params.contactData ? this.props.navigation.state.params.contactData[0] : ''
-        this.props.actions.getPaytmParameters(contactNumber, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.paymentAtEnd.currentElement.jobTransactionIdAmountMap)
-    }
-
-    componentWillUnmount() {
+        const contactNumber = !_.isEmpty(this.props.navigation.state.params.contactData) && this.props.navigation.state.params.contactData.length ? this.props.navigation.state.params.contactData[0] : ''
+        this.props.actions.getPaytmParameters(contactNumber, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.paymentAtEnd.currentElement.jobTransactionIdAmountMap, this.props.navigation.state.params.formLayoutState.jobAndFieldAttributesList)
     }
 
     _headerModal() {
@@ -93,7 +92,7 @@ class PaytmPayment extends PureComponent {
                     </View>
                     <View>
                         <View style={{ marginTop: 50 }}>
-                            <Text style={[{ color: styles.fontPrimaryColor }, styles.paddingHorizontal10, styles.fontSm]}>Enter Customer's Mobile Number</Text>
+                            <Text style={[{ color: styles.fontPrimaryColor }, styles.paddingHorizontal10, styles.fontSm]}>{CUSTOMER_NUMBER}</Text>
                         </View>
                         <View>
                             <TextInput
@@ -107,7 +106,7 @@ class PaytmPayment extends PureComponent {
                             />
                         </View>
                         <View style={{ marginTop: 50 }}>
-                            <Text style={[{ color: styles.fontPrimaryColor }, styles.paddingHorizontal10, styles.fontSm]}>Enter OTP from customer's mobile screen</Text>
+                            <Text style={[{ color: styles.fontPrimaryColor }, styles.paddingHorizontal10, styles.fontSm]}>{ENTER_CUSTOMER_OTP}</Text>
                         </View>
                         <View>
                             <TextInput
@@ -124,7 +123,41 @@ class PaytmPayment extends PureComponent {
                 </View>
             </Content>
         }
-        else if (this.props.paytmConfigObject && this.props.paytmConfigObject.isQrCodeTypePaytmPayment && !_.isEmpty(this.props.paytmConfigObject.qrCodeData) && !this.props.showCheckTransaction) {
+    }
+
+    getFooterView() {
+        if (this.props.paytmConfigObject && !this.props.paytmConfigObject.isQrCodeTypePaytmPayment) {
+            return (
+                <SafeAreaView>
+                    <Footer style={[style.footer]}>
+                        <FooterTab style={[styles.padding10]}>
+                            <Button success full
+                                disabled={!_.size(_.trim(this.props.contactNumber)) || !_.size(_.trim(this.props.otp))}
+                                onPress={() => this.props.actions.initiatePaytmPayment(this.props.paytmConfigObject, this.props.actualAmount, this.props.contactNumber, this.props.otp, this.props.navigation.state.params.formLayoutState.jobAndFieldAttributesList)}>
+                                <Text style={[styles.fontLg, styles.fontWhite]}>{SUBMIT}</Text>
+                            </Button>
+                        </FooterTab>
+                    </Footer>
+                </SafeAreaView >
+            )
+        } else if (this.props.paytmConfigObject && this.props.paytmConfigObject.isQrCodeTypePaytmPayment && !_.isEmpty(this.props.paytmConfigObject.qrCodeData) && !this.props.showCheckTransaction) {
+            return (
+                <SafeAreaView>
+                    <Footer style={[style.footer]}>
+                        <FooterTab style={[styles.padding10]}>
+                            <Button success full
+                                disabled={_.isEmpty(this.props.paytmConfigObject.qrCodeData)}
+                                onPress={() => this.props.actions.checkPaytmTransaction(this.props.paytmConfigObject, this.props.navigation.state.params, this.props.actualAmount, this.props.navigation.state.params.paymentAtEnd.currentElement.jobTransactionIdAmountMap, this.props.navigation.state.params.formLayoutState.jobAndFieldAttributesList)}>
+                                <Text style={[styles.fontLg, styles.fontWhite]}>CHECK PAYMENT</Text>
+                            </Button>
+                        </FooterTab>
+                    </Footer>
+                </SafeAreaView >
+            )
+        }
+    }
+    showQrCode() {
+        if (this.props.paytmConfigObject && this.props.paytmConfigObject.isQrCodeTypePaytmPayment && !_.isEmpty(this.props.paytmConfigObject.qrCodeData) && !this.props.showCheckTransaction) {
             return <Image
                 resizeMethod={'resize'}
                 resizeMode={'contain'}
@@ -144,8 +177,8 @@ class PaytmPayment extends PureComponent {
                             </Text>
                         <View>
                             <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, styles.heightAuto, styles.widthAuto, styles.alignCenter, styles.justifyCenter, { marginTop: 120 }]}
-                                onPress={() => { this.props.actions.checkPaytmTransaction(this.props.paytmConfigObject, this.props.navigation.state.params, this.props.actualAmount) }}  >
-                                <Text style={[{ color: '#FFFFFF', lineHeight: 25 }, styles.fontWeight500, styles.fontLg]}>Check Transaction</Text>
+                                onPress={() => { this.props.actions.checkPaytmTransaction(this.props.paytmConfigObject, this.props.navigation.state.params, this.props.actualAmount, this.props.navigation.state.params.paymentAtEnd.currentElement.jobTransactionIdAmountMap, this.props.navigation.state.params.formLayoutState.jobAndFieldAttributesList) }}  >
+                                <Text style={[{ color: '#FFFFFF', lineHeight: 25 }, styles.fontWeight500, styles.fontLg]}>{CHECK_TRANSACTION_STATUS}</Text>
                             </Button>
                         </View>
                         <Text style={[{ color: '#007AFF', lineHeight: 22, height: 19, width: 53 }, styles.fontWeight500, styles.fontLg, { marginTop: 40 }]}
@@ -163,48 +196,16 @@ class PaytmPayment extends PureComponent {
                         source={require('../../images/fareye-default-iconset/unable-to-sync.png')}
                     />
                     <Text style={[styles.fontLg, styles.fontBlack, { marginTop: 27 }, styles.padding10]}>
-                        Could not connect with server. Please try again.
+                        {COULD_NOT_CONNECT_SERVER}
                     </Text>
                     <View>
                         <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#007AFF', borderWidth: 1 }, styles.heightAuto, styles.widthAuto, styles.alignCenter, styles.justifyCenter, { marginTop: 120 }]}
-                            onPress={() => { this.props.actions.initiatePaytmPayment(this.props.paytmConfigObject, this.props.actualAmount) }}  >
-                            <Text style={[{ color: '#FFFFFF', lineHeight: 25 }, styles.fontWeight500, styles.fontLg]}>Try Again</Text>
+                            onPress={() => { this.props.actions.initiatePaytmPayment(this.props.paytmConfigObject, this.props.actualAmount, null, null, this.props.navigation.state.params.formLayoutState.jobAndFieldAttributesList) }}  >
+                            <Text style={[{ color: '#FFFFFF', lineHeight: 25 }, styles.fontWeight500, styles.fontLg]}>{TRY_AGAIN}</Text>
                         </Button>
                     </View>
                 </View>
             </Content>
-            )
-        }
-    }
-
-    getFooterView() {
-        if (this.props.paytmConfigObject && !this.props.paytmConfigObject.isQrCodeTypePaytmPayment) {
-            return (
-                <SafeAreaView>
-                    <Footer style={[style.footer]}>
-                        <FooterTab style={[styles.padding10]}>
-                            <Button success full
-                                disabled={!_.size(_.trim(this.props.contactNumber)) || !_.size(_.trim(this.props.otp))}
-                                onPress={() => this.props.actions.initiatePaytmPayment(this.props.paytmConfigObject, this.props.actualAmount, this.props.contactNumber, this.props.otp)}>
-                                <Text style={[styles.fontLg, styles.fontWhite]}>SUBMIT</Text>
-                            </Button>
-                        </FooterTab>
-                    </Footer>
-                </SafeAreaView >
-            )
-        } else if (this.props.paytmConfigObject && this.props.paytmConfigObject.isQrCodeTypePaytmPayment && !_.isEmpty(this.props.paytmConfigObject.qrCodeData) && !this.props.showCheckTransaction) {
-            return (
-                <SafeAreaView>
-                    <Footer style={[style.footer]}>
-                        <FooterTab style={[styles.padding10]}>
-                            <Button success full
-                                disabled={_.isEmpty(this.props.paytmConfigObject.qrCodeData)}
-                                onPress={() => this.props.actions.checkPaytmTransaction(this.props.paytmConfigObject, this.props.navigation.state.params, this.props.actualAmount)}>
-                                <Text style={[styles.fontLg, styles.fontWhite]}>CHECK PAYMENT</Text>
-                            </Button>
-                        </FooterTab>
-                    </Footer>
-                </SafeAreaView >
             )
         }
     }
@@ -216,6 +217,7 @@ class PaytmPayment extends PureComponent {
                     <Container>
                         {this._headerModal()}
                         {this.showContactAndOtpScreen()}
+                        {this.showQrCode()}
                         {this.getFooterView()}
                     </Container>
                 </StyleProvider>

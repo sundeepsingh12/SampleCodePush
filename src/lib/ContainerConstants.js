@@ -491,4 +491,9 @@ module.exports = {
     SELECT_REASON: 'SELECT REASON',
     TAKE_A_PICTURE: 'Take a picture',
     REMARKS: 'Remarks',
+
+    //Paytm constants
+    CUSTOMER_NUMBER: 'Enter Customers Mobile Number',
+    ENTER_CUSTOMER_OTP: 'Enter OTP from customers mobile screen',
+    COULD_NOT_CONNECT_SERVER: 'Could not connect with server. Please try again.'
 }

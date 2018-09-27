@@ -1,15 +1,5 @@
 'use strict'
 
-import RestAPIFactory from '../../lib/RestAPIFactory'
-import { keyValueDBService } from '../classes/KeyValueDBService'
-import {
-
-} from '../../lib/constants'
-import CONFIG from '../../lib/config'
-import { draftService } from '../classes/DraftService'
-import { moduleCustomizationService } from '../classes/ModuleCustomization'
-import moment from 'moment'
-
 class PaytmPayment {
 
     getPaytmParameters(paytmUtilityId, utilitiesList, jobTransactionList, jobTransactionIdAmountMap) {
