@@ -50,6 +50,7 @@ import QCAttribute from './QCAttribute'
 import QCReason from './QCReason'
 import QCImageAndRemarks from './QCImageAndRemarks'
 import QCSummary from './QCSummary'
+import PaytmPayment from './PaytmPayment'
 
 MenuStack.navigationOptions = ({ navigation }) => {
   let tabBarVisible = true;
@@ -214,6 +215,12 @@ const HomeStack = createStackNavigator({
     screen: QCSummary,
     navigationOptions: {
       gesturesEnabled: false
+    }
+  },
+  PaytmPayment: {
+    screen: PaytmPayment,
+    navigationOptions: {
+      header: null
     }
   },
 })

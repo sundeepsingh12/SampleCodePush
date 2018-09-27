@@ -22,206 +22,221 @@ import { fieldDataService } from '../services/classes/FieldData'
 const fetch = require('react-native-cancelable-fetch');
 
 class RestAPI {
-  /**
-   * ## API.js client
-   *
-   *
-   * @throws tokenMissing if token is undefined
-   */
-  initialize(token) {
-    if (!_.isNull(token) && _.isUndefined(token)) {
-      throw new Error('TokenMissing')
-    }
-    this._sessionToken = _.isNull(token) ? null : token
-  }
-
-  /**
-   * ### _fetch
-   * A generic function that prepares the request
-   *
-   * @returns object:
-   * { code: response.code,
-   *   status: response.status,
-   *   json: response.json() }
-   * 
-   * @throws exception:
-   * {
-   *    code: response.status,
-   *    message: 'Error message like Internal server error'
-   *  }
-   */
-  async _fetch(opts, fetchRequestId) {
-    let url = opts.url
-    if (!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK) && opts.method != 'WALLET') {
-      let data = await keyValueDBService.getValueFromStore(DOMAIN_URL)
-      url = data.value + url
-    }
-    if (opts.method == 'WALLET') opts.method = 'POST'
-    if (this._sessionToken) {
-      opts.headers['Cookie'] = this._sessionToken
-    }
-    const response = await fetch(url, opts, fetchRequestId)
-    const { status, code, headers, _bodyText } = response;
-    let res = {
-      status,
-      code,
-      headers,
-      _bodyText,
-      json: {}
-    }
-
-    //Check if server returned JSON or Text response
-    let isJsonResponse = false;
-    response.headers.forEach(function (val, key) { if (val.indexOf('json') != -1) isJsonResponse = true; });
-    try {
-      res.json = (isJsonResponse) ? await response.json() : await response.text()
-    } catch (e) {
-      res.json = {}
-    }
-    if (res.status != 200 && res.status != 202) {
-      throw {
-        code: res.status,
-        message: ((res.json && res.json.message) ? res.json.message : 'Unknow error. Retry or contact support.')
-      }
-    }
-    return res;
-  }
-
-  /**
-   * Remove  null, NaN, empty String and empty objects from JSON Objects
-   **/
-  _pruneEmpty(obj) {
-    function prune(current) {
-      _.forEach(current, function (value, key) {
-        if (_.isUndefined(value) || _.isNull(value) || _.isNaN(value) ||
-          (_.isString(value) && _.isEmpty(value)) ||
-          (_.isObject(value) && _.isEmpty(prune(value)))) {
-
-          delete current[key];
+    /**
+     * ## API.js client
+     *
+     *
+     * @throws tokenMissing if token is undefined
+     */
+    initialize(token) {
+        if (!_.isNull(token) && _.isUndefined(token)) {
+            throw new Error('TokenMissing')
         }
-      });
-      return current;
-    };
-    return prune(obj);
-  }
-
-  /** 
-  * Parameters (Request Body, URL, Method (enum type POST, LOGIN, GET))
-  * 
-  * Success response JSON object
-  * {
-  *   status,
-  *   code,
-  *   headers,
-  *   json: {}
-  * }
-  * 
-  * Failure response JSON object
-  * {
-  *   code: xxx,
-  *   message: 'error message'
-  * }
-  */
-  serviceCall(body, url, method) {
-    
-    let opts;
-    if (method === 'POST' || method === 'WALLET') {
-      opts = {
-        method,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': method != 'WALLET' ? 'application/json' : 'application/x-www-form-urlencoded'
-        },
-        url,
-        body
-      }
-    } else if (method === 'LOGIN') {
-      opts = {
-        headers: {},
-        url,
-        body,
-        method: 'POST'
-      }
-    } else {
-      opts = {
-        method,
-        url,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      }
+        this._sessionToken = _.isNull(token) ? null : token
     }
 
-    //Random number between 1 and 1000
-    const fetchRequestId = Math.floor((Math.random() * 1000) + 1);
+    /**
+     * ### _fetch
+     * A generic function that prepares the request
+     *
+     * @returns object:
+     * { code: response.code,
+     *   status: response.status,
+     *   json: response.json() }
+     * 
+     * @throws exception:
+     * {
+     *    code: response.status,
+     *    message: 'Error message like Internal server error'
+     *  }
+     */
+    async _fetch(opts, fetchRequestId) {
+        let url = opts.url
+        if (!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK) && opts.method != 'WALLET' && opts.method != 'PAYTM') {
+            let data = await keyValueDBService.getValueFromStore(DOMAIN_URL)
+            url = data.value + url
+        }
+        if (opts.method == 'WALLET' || opts.method == 'PAYTM') opts.method = 'POST'
+        if (this._sessionToken) {
+            opts.headers['Cookie'] = this._sessionToken
+        }
+        const response = await fetch(url, opts, fetchRequestId)
+        const { status, code, headers, _bodyText } = response;
+        let res = {
+            status,
+            code,
+            headers,
+            _bodyText,
+            json: {}
+        }
 
-    //Creating a _fetch request which will timeout in 30 seconds
-    return this.timeoutPromise(120 * 1000, new Error('Timed Out!'), this._fetch(opts, fetchRequestId))
-      .then((res) => {
+        //Check if server returned JSON or Text response
+        let isJsonResponse = false;
+        response.headers.forEach(function(val, key) { if (val.indexOf('json') != -1) isJsonResponse = true; });
+        try {
+            res.json = (isJsonResponse) ? await response.json() : await response.text()
+        } catch (e) {
+            res.json = {}
+        }
+        if (res.status != 200 && res.status != 202) {
+            throw {
+                code: res.status,
+                message: ((res.json && res.json.message) ? res.json.message : 'Unknow error. Retry or contact support.')
+            }
+        }
         return res;
-      })
-      .catch((e) => {
-        //Aborting the Fetch API call
-        fetch.abort(fetchRequestId);
+    }
 
-        //Throw custom error instance
-        if (e instanceof Error) {
-          throw {
-            code: 504,
-            message: 'Slow or no internet on Device.'
-          }
-        } else {
-          throw e
-        }
-      })
-  }
+    /**
+     * Remove  null, NaN, empty String and empty objects from JSON Objects
+     **/
+    _pruneEmpty(obj) {
+        function prune(current) {
+            _.forEach(current, function(value, key) {
+                if (_.isUndefined(value) || _.isNull(value) || _.isNaN(value) ||
+                    (_.isString(value) && _.isEmpty(value)) ||
+                    (_.isObject(value) && _.isEmpty(prune(value)))) {
 
-  //Wrapper function to timeout a "Promise" after specific time
-  timeoutPromise(timeout, err, promise) {
-    return new Promise(function (resolve, reject) {
-      promise.then(resolve, reject);
-      setTimeout(reject.bind(null, err), timeout);
-    });
-  }
+                    delete current[key];
+                }
+            });
+            return current;
+        };
+        return prune(obj);
+    }
 
-  async uploadZipFile(path, fileName, currenDate,isEncryptionSuccessful,syncDataDTO) {
-    // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
-    const baseUrl = (isEncryptionSuccessful) ?  CONFIG.API.POST_ZIP_ENCRYPTED_API : CONFIG.API.UPLOAD_DATA_API
-    var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
-    var filePath = (!path) ? PATH + '/sync.zip' : PATH
-    let responseBody = "Fail"
-    let data = await keyValueDBService.getValueFromStore(DOMAIN_URL)
-    await RNFetchBlob.fetch('POST', data.value +baseUrl, {
-      'cookie': this._sessionToken,
-      'Content-Type': 'multipart/form-data',
-    }, [
-        { name: 'file', filename: (!fileName) ? 'sync.zip' : fileName, data: RNFetchBlob.wrap(filePath) },
-      ]).uploadProgress((written, total) => {
-      }).then(async (resp) => {
-        responseBody = resp.text()
-        const message = responseBody.split(",")[0]
-        if (!path && message == 'success') {
-          if (currenDate) {
-            await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
-          }
-       
-          if (syncDataDTO) {
-            await sync.deleteSpecificTransactionFromStoreList(PENDING_SYNC_TRANSACTION_IDS, currenDate, syncDataDTO.allowedTransactionIdList)
-            await fieldDataService.updateSyncFlag(syncDataDTO.allowedTransactionIdList)
-          
-          }
+    /** 
+    * Parameters (Request Body, URL, Method (enum type POST, LOGIN, GET))
+    * 
+    * Success response JSON object
+    * {
+    *   status,
+    *   code,
+    *   headers,
+    *   json: {}
+    * }
+    * 
+    * Failure response JSON object
+    * {
+    *   code: xxx,
+    *   message: 'error message'
+    * }
+    */
+    serviceCall(body, url, method, paytmParameters) {
+
+        let opts;
+        if (method === 'POST' || method === 'WALLET') {
+            opts = {
+                method,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': method != 'WALLET' ? 'application/json' : 'application/x-www-form-urlencoded'
+                },
+                url,
+                body
+            }
+        } else if (method === 'LOGIN') {
+            opts = {
+                headers: {},
+                url,
+                body,
+                method: 'POST'
+            }
+        } else if (method == 'PAYTM') {
+            opts = {
+                method,
+                url,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    // 'phone': paytmParameters.contactNumber,
+                    // 'otp': paytmParameters.otp,
+                    'hubCode': paytmParameters.hubCode,
+                    'companyId': paytmParameters.companyId + ''
+                },
+                body
+            }
         }
-        else if (message != 'success') {
-          throw new Error(responseBody)
+        else {
+            opts = {
+                method,
+                url,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }
         }
-      }).catch(err => {
-        throw {
-          code: err.message ? JSON.parse(err.message).status : null,
-        }
-      })
-    return responseBody
-  }
+
+        //Random number between 1 and 1000
+        const fetchRequestId = Math.floor((Math.random() * 1000) + 1);
+
+        //Creating a _fetch request which will timeout in 30 seconds
+        return this.timeoutPromise(120 * 1000, new Error('Timed Out!'), this._fetch(opts, fetchRequestId))
+            .then((res) => {
+                return res;
+            })
+            .catch((e) => {
+                //Aborting the Fetch API call
+                fetch.abort(fetchRequestId);
+
+                //Throw custom error instance
+                if (e instanceof Error) {
+                    throw {
+                        code: 504,
+                        message: 'Slow or no internet on Device.'
+                    }
+                } else {
+                    throw e
+                }
+            })
+    }
+
+    //Wrapper function to timeout a "Promise" after specific time
+    timeoutPromise(timeout, err, promise) {
+        return new Promise(function(resolve, reject) {
+            promise.then(resolve, reject);
+            setTimeout(reject.bind(null, err), timeout);
+        });
+    }
+
+    async uploadZipFile(path, fileName, currenDate, isEncryptionSuccessful, syncDataDTO) {
+        // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
+        const baseUrl = (isEncryptionSuccessful) ? CONFIG.API.POST_ZIP_ENCRYPTED_API : CONFIG.API.UPLOAD_DATA_API
+        var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
+        var filePath = (!path) ? PATH + '/sync.zip' : PATH
+        let responseBody = "Fail"
+        let data = await keyValueDBService.getValueFromStore(DOMAIN_URL)
+        await RNFetchBlob.fetch('POST', data.value + baseUrl, {
+            'cookie': this._sessionToken,
+            'Content-Type': 'multipart/form-data',
+        }, [
+                { name: 'file', filename: (!fileName) ? 'sync.zip' : fileName, data: RNFetchBlob.wrap(filePath) },
+            ]).uploadProgress((written, total) => {
+            }).then(async (resp) => {
+                responseBody = resp.text()
+                const message = responseBody.split(",")[0]
+                if (!path && message == 'success') {
+                    if (currenDate) {
+                        await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
+                    }
+
+                    if (syncDataDTO) {
+                        await sync.deleteSpecificTransactionFromStoreList(PENDING_SYNC_TRANSACTION_IDS, currenDate, syncDataDTO.allowedTransactionIdList)
+                        await fieldDataService.updateSyncFlag(syncDataDTO.allowedTransactionIdList)
+
+                    }
+                }
+                else if (message != 'success') {
+                    throw new Error(responseBody)
+                }
+            }).catch(err => {
+                throw {
+                    code: err.message ? JSON.parse(err.message).status : null,
+                }
+            })
+        return responseBody
+    }
 
 
 }
