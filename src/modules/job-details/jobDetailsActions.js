@@ -38,6 +38,7 @@ import {
 import { draftService } from '../../services/classes/DraftService';
 import _ from 'lodash'
 import BluetoothSerial from 'react-native-bluetooth-serial';
+import { printService } from '../../services/classes/PrintService'
 
 export function startFetchingJobDetails(payload) {
     return {
@@ -141,8 +142,8 @@ export function prepareTemplateForPrintAttributeAndPrint(jobTransaction, fieldDa
     return async function (dispatch) {
         try {
             let isBluetoothConnected = await BluetoothSerial.isConnected()
-            if(isBluetoothConnected){
-                await jobDetailsService.printingTemplateFormatStructureForDetails(jobTransaction, fieldDataList, jobDataList)
+            if(!isBluetoothConnected){
+                await printService.printingTemplateFormatStructureForDetails(jobTransaction, fieldDataList, jobDataList)
             }else{
                 navigate(BluetoothListing , { screenName: 'Sorting' })
             }

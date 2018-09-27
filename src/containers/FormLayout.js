@@ -15,7 +15,7 @@ import Loader from '../components/Loader'
 import { NET_BANKING, NET_BANKING_LINK, NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, UPI, MOSAMBEE_WALLET, MOSAMBEE, PRINT } from '../lib/AttributeConstants'
 import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_STATE, JobDetailsV2, BluetoothListing } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
-import { ALERT, INVALID_FORM_ALERT, OK } from '../lib/ContainerConstants'
+import { ALERT, INVALID_FORM_ALERT, OK, PRINT_AND_FINISH, FINISH } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
 import { navigate, navDispatch } from '../modules/navigators/NavigationService'
 import isEmpty from 'lodash/isEmpty'
@@ -311,7 +311,7 @@ class FormLayout extends PureComponent {
         printAttributeMasterId = formElement[fieldAttributeMasterId].fieldAttributeMasterId
       }
     }
-    if (printAttributeMasterId) {
+    if (printAttributeMasterId && Platform.OS == 'android') {
       return (
         <SafeAreaView>
         <Footer style={[style.footer]}>
@@ -320,12 +320,12 @@ class FormLayout extends PureComponent {
               onPress={() => this.checkForPrintAttributeAndSaveData(taskListScreenDetails, printAttributeMasterId)}
               style={[styles.marginRight10, {backgroundColor : '#F2F1FF'}]}
               disabled={this.props.isSaveDisabled}>
-              <Text style={[styles.fontBlack, styles.padding10]} >Print and Finish</Text>
+              <Text style={[styles.fontBlack, styles.padding10]} >{PRINT_AND_FINISH}</Text>
             </Button>
             <Button success full
               onPress={() => this.saveJobTransaction(taskListScreenDetails)}
               disabled={this.props.isSaveDisabled}>
-              <Text style={[styles.fontWhite, styles.padding10]} >Finish</Text>
+              <Text style={[styles.fontWhite, styles.padding10]} >{FINISH}</Text>
             </Button>
           </FooterTab>
         </Footer>

@@ -132,7 +132,7 @@ export function PreparePrintingTemplate(formLayoutState, jobMasterId, contactDat
     return async function (dispatch) {
         try {
             let previousStatusFieldAttributeMap = printService.concatAllNavigationStatusAttribute(navigationFormLayoutStates)
-            await printService.printingTemplateFormatStructure(formLayoutState, jobTransaction, printAttributeMasterId, previousStatusFieldAttributeMap)
+            await printService.printingTemplateFormatStructureForFormLayout(formLayoutState, jobTransaction, printAttributeMasterId, previousStatusFieldAttributeMap)
             dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
         } catch (error) {
             showToastAndAddUserExceptionLog(1015, error.message, 'danger', 1)

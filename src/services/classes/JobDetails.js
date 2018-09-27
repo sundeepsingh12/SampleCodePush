@@ -257,17 +257,6 @@ class JobDetails {
         return null
     }
 
-    async printingTemplateFormatStructureForDetails(jobTransaction, fieldDataList, jobDataList) {
-        let  masterIdPrintingObjectMap = {}
-        let transaction = jobTransaction && jobTransaction.length ? jobTransaction[0] : jobTransaction
-        const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE);
-        let dataList = Object.assign({}, jobDataList, fieldDataList)
-        let printingFieldAttributeMasterValue = fieldAttributeValueMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, jobTransaction.printAttributeMasterId);
-        let { printingAttributeValueMap } = printService.createMapOfMasterIdAndPrintingObject(printingFieldAttributeMasterValue, masterIdPrintingObjectMap, dataList)
-        printingAttributeValueMap = _.sortBy(printingAttributeValueMap, function (object) { return object.sequence });
-        await printService.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap)
-    }
-
     /**@function setAllDataForRevertStatus(statusList,jobTransaction,previousStatus)
      * ## It will set all data for revert status and update realm database
      * 

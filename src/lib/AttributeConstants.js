@@ -214,6 +214,8 @@ module.exports = {
     // Field Data Value Constants
     ARRAY_SAROJ_FAREYE: 'ArraySarojFareye',
     OBJECT_SAROJ_FAREYE: 'ObjectSarojFareye',
+    FIELD_ATTRIBUTE_MASTER_ID: 'fieldAttributeMasterId',
+    JOB_ATTRIBUTE_MASTER_ID: 'jobAttributeMasterId',
 
     //Validation Condition Constants
     EQUAL_TO: '==',

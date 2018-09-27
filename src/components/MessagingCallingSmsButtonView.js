@@ -4,7 +4,8 @@ import React, { PureComponent } from 'react'
 import {
     Alert,
     StyleSheet,
-    View
+    View,
+    Platform
 } from 'react-native'
 import styles from '../themes/FeStyle'
 import { Button, Icon, Footer, FooterTab, ActionSheet } from 'native-base'
@@ -174,7 +175,7 @@ class MessagingCallingSmsButtonView extends PureComponent {
                 {(this.props.jobTransaction.jobSwipableDetails && this.props.jobTransaction.jobSwipableDetails.customerCareData && this.props.jobTransaction.jobSwipableDetails.customerCareData.length > 0) ?
                     this.renderIcon('call-out', this.customerCareButtonPressed) : null
                 }
-                {(this.props.jobTransaction.printAttributeMasterId) ?
+                {(Platform.OS == 'android' &&  this.props.jobTransaction.printAttributeMasterId) ?
                     this.renderIcon('print', this.prepareTemplateForPrintAttributeAndPrint) : null
                 }
             </View>
