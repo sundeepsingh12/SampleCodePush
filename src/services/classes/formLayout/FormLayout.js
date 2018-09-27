@@ -252,7 +252,7 @@ class FormLayout {
             routeParam
         }
     }
-    async printingTemplateFormatStructure(cloneFormElement, jobTransaction, printAttributeMasterId) {
+    async printingTemplateFormatStructure(cloneFormElement, jobTransaction, printAttributeMasterId, navigationFormLayoutStates) {
         let masterIdPrintingObjectMap = {}, jobDataObject = {}
         let transaction = jobTransaction && jobTransaction.length ? jobTransaction[0] : jobTransaction
         const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE);

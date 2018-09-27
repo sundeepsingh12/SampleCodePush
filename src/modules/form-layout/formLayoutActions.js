@@ -129,7 +129,8 @@ export function updateFieldData(attributeId, value, formLayoutState, jobTransact
 export function PreparePrintingTemplate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails, printAttributeMasterId) {
     return async function (dispatch) {
         try {
-            await formLayoutService.printingTemplateFormatStructure(formLayoutState, jobTransaction, printAttributeMasterId)
+            await formLayoutService.printingTemplateFormatStructure(formLayoutState, jobTransaction, printAttributeMasterId, navigationFormLayoutStates)
+           console.logs("navigationFormLayoutStates",navigationFormLayoutStates, formLayoutState)
             dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
         } catch (error) {
             showToastAndAddUserExceptionLog(1015, error.message, 'danger', 1)
