@@ -263,6 +263,7 @@ module.exports = {
     UPDATE_GROUP: 'Update Group',
     YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
     MORE: 'More',
+    ENABLE_RESEQUENCE_RESTRICTION_MESSAGE : "Please finish previous items first",
 
     //Save Activated
     EDIT: 'Edit',
@@ -314,6 +315,7 @@ module.exports = {
     UPDATE_ALL_SELECTED: 'Update All Selected',
 
     //Sorting
+    ADDRESS: 'Address',
     SORTING: 'Sorting',
     REF_UNAVAILABLE: 'Reference Number Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',

@@ -1,13 +1,13 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { View,Text }from 'react-native'
+import { View, Text } from 'react-native'
 import moment from 'moment'
 class CountDownTimer extends PureComponent {
 
     state = {
         timer: null,
-        counter: 0,
+        difference: {},
         counterNegative: false,
     }
     componentWillUnmount() {
@@ -15,62 +15,67 @@ class CountDownTimer extends PureComponent {
     }
 
     tick = () => {
-        let jobEndTime = moment(this.props.value, 'HH:mm:ss')
-        let currentTime = moment()
-        this.setCounterNgative(jobEndTime, currentTime)
-        if (this.state.counterNegative) {
-            this.setState({
-                counter: moment(this.state.counter, 'HH:mm:ss').add(1, 'seconds')
-            });
+        let currentTime = moment(), difference = {}
+        let counterNegative = this.setCounterNgative(currentTime)
+        if (counterNegative) {
+            difference = this.getDifference(currentTime)
+
         } else {
-            this.setState({
-                counter: moment(this.state.counter, 'HH:mm:ss').subtract(1, 'seconds')
-            });
+            difference = this.getDifference(currentTime)
         }
-    }
-    getDifference = (jobEndTime, currentTime) => {
-        if (this.state.counterNegative)
-            return moment.utc(moment(currentTime, "HH:mm:ss").diff(moment(jobEndTime, "HH:mm:ss"))).format("HH:mm:ss")
-        else {
-            return moment.utc(moment(jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
-        }
-    }
-    setCounterNgative = (jobEndTime, currentTime) => {
-
-        if (moment(jobEndTime).diff(moment(currentTime)) <= 0) {
-            this.setState({ counterNegative: true })
-        }
-    }
-    componentWillMount() {
-        let jobEndTime = moment(this.props.value, 'HH:mm:ss')
-        let currentTime = moment()
-        this.setCounterNgative(jobEndTime, currentTime)
-
-    }
-    componentDidMount() {
-        let jobEndTime = moment(this.props.value, 'HH:mm:ss')
-        let currentTime = moment()
-        let differenceInTime = this.getDifference(jobEndTime, currentTime)
         this.setState({
-            counter: differenceInTime
-        })
+            difference,
+            counterNegative
+        });
+    }
+
+    getDifference = (currentTime) => {
+        let difference = {}, y
+        if (this.state.counterNegative) {
+            let x = moment(currentTime).diff(this.props.value)
+            y = moment.duration(x)
+        }
+        else {
+            let x = moment(this.props.value).diff(currentTime)
+            y = moment.duration(x)
+        }
+        difference = {
+            days: (y.days() > 0) ? y.days() : null,
+            hours: (y.hours() > 0) ? y.hours() : null,
+            minutes: (y.minutes() > 0) ? y.minutes() : null,
+            seconds: (y.seconds() > 0) ? y.seconds() : null,
+        }
+        return difference
+    }
+
+    setCounterNgative = (currentTime) => {
+        if (moment(this.props.value).diff(moment(currentTime)) <= 0) {
+            return true
+        }
+        return
+    }
+
+    componentDidMount() {
         let timer = setInterval(this.tick, 1000);
         this.setState({ timer });
     }
+
     renderTime() {
+        let differenceString = ''
+        differenceString += this.state.difference.days ? this.state.difference.days + ' days ' : ''
+        differenceString += this.state.difference.hours ? this.state.difference.hours + ' hours ' : ''
+        differenceString += this.state.difference.minutes ? this.state.difference.minutes + ' minutes ' : ''
+        differenceString += this.state.difference.seconds ? this.state.difference.seconds + ' seconds ' : '0 seconds'
         if (this.state.counterNegative) {
             return (
                 <Text>
-                    {'Delayed by ' + (moment(this.state.counter, "HH:mm:ss")).hours() + ' hours ' +
-                        (moment(this.state.counter, "HH:mm:ss")).minutes() + ' minutes ' +
-                        (moment(this.state.counter, "HH:mm:ss")).seconds() + ' seconds'} </Text>
+                    {'Delayed by ' + differenceString}
+                </Text>
             )
         } else {
             return (
                 <Text>
-                    {(moment(this.state.counter, "HH:mm:ss")).hours() + ' hours ' +
-                        (moment(this.state.counter, "HH:mm:ss")).minutes() + ' minutes ' +
-                        (moment(this.state.counter, "HH:mm:ss")).seconds() + ' seconds left'}
+                    {differenceString + ' left'}
                 </Text>)
         }
     }

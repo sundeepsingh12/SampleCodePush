@@ -23,7 +23,7 @@ import {
 } from '../lib/ContainerConstants'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Alert, Image } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Alert, Image, Vibration } from 'react-native'
 import { Container, Content, Header, Button, Text, Right, Icon, StyleProvider, ListItem, Footer, FooterTab, ActionSheet, Toast, Spinner } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
@@ -52,6 +52,8 @@ import Line1Line2View from '../components/Line1Line2View'
 import SyncLoader from '../components/SyncLoader'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { navigate } from '../modules/navigators/NavigationService';
+import Sound from 'react-native-sound';
+import BackgroundTimer from 'react-native-background-timer'
 import MessagingCallingSmsButtonView from '../components/MessagingCallingSmsButtonView'
 
 function mapStateToProps(state) {
@@ -72,7 +74,6 @@ function mapStateToProps(state) {
     syncLoading: state.jobDetails.syncLoading,
     checkTransactionStatus: state.jobDetails.checkTransactionStatus,
     updatedTransactionListIds: state.listing.updatedTransactionListIds,
-    isBluetoothConnected: state.sorting.isBluetoothConnected
   }
 }
 
@@ -89,6 +90,32 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentDidMount() {
+    if (this.props.navigation.state.params && this.props.navigation.state.params.calledFromAlarm) {
+      Vibration.vibrate([1000, 2000, 3000], true)
+      Sound.setCategory('Playback');
+      this.alarm = new Sound('alarm_notification.mp3', Sound.MAIN_BUNDLE, (error) => {
+        if (error) {
+          console.log('failed to load the sound', error);
+          return;
+        }
+        // loaded successfully
+        this.alarm.play((success) => {
+          if (success) {
+            console.log('successfully finished playing');
+          } else {
+            console.log('playback failed due to audio decoding errors');
+            // reset the player to its uninitialized state (android only)
+            // this is the only option to recover after an error occured and use the player again
+            this.alarm.reset();
+          }
+        });
+        this.alarm.setNumberOfLoops(-1);
+      });
+      BackgroundTimer.setTimeout(() => {
+        Vibration.cancel()
+        this.alarm.stop()
+      }, 30000)
+    }
     this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key, true)
   }
 
@@ -103,6 +130,10 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.isShowDropdown) {
       this.props.actions.setState(SHOW_DROPDOWN, null)
     }
+    if (this.alarm) {
+      Vibration.cancel()
+      this.alarm.stop()
+    }
   }
 
   navigateToDataStoreDetails = (navigationParam) => {
@@ -114,7 +145,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   componentDidUpdate() {
-    if (this.props.jobDetailsLoading != 'UPDATING_JOBDATA' && this.props.jobTransaction && !isEmpty(this.props.updatedTransactionListIds) && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId] && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId][this.props.jobTransaction.jobId]) {
+    if (!this.props.navigation.state.params.calledFromAlarm && this.props.jobDetailsLoading != 'UPDATING_JOBDATA' && this.props.jobTransaction && !isEmpty(this.props.updatedTransactionListIds) && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId] && this.props.updatedTransactionListIds[this.props.jobTransaction.jobMasterId][this.props.jobTransaction.jobId]) {
       this.props.actions.getJobDetails(this.props.navigation.state.params, this.props.navigation.state.key, 'UPDATING_JOBDATA')
     }
   }
@@ -172,7 +203,7 @@ class JobDetailsV2 extends PureComponent {
 
   renderStatusList(statusList) {
     let statusView = []
-    if ((this.props.jobTransaction.id < 0  && this.props.jobTransaction.jobId < 0) || (this.props.jobTransaction.id < 0 && this.props.currentStatus.code != 'PENDING'))  {//In case of new job or assign order to hub which is not synced with server do not show status button
+    if ((this.props.jobTransaction.id < 0 && this.props.jobTransaction.jobId < 0) || (this.props.jobTransaction.id < 0 && this.props.currentStatus.code != 'PENDING')) {//In case of new job or assign order to hub which is not synced with server do not show status button
       return statusView
     }
     let groupId = this.props.navigation.state.params.groupId ? this.props.navigation.state.params.groupId : null
@@ -449,7 +480,7 @@ class JobDetailsV2 extends PureComponent {
     if (!isEmpty(this.props.jobTransaction)) {
       return (
         <Footer style={style.footer}>
-          <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} prepareTemplateForPrintAttributeAndPrint = {() =>{ this.props.actions.prepareTemplateForPrintAttributeAndPrint(this.props.jobTransaction, this.props.fieldDataList, this.props.jobDataList, this.props.isBluetoothConnected)}}/>
+          <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} prepareTemplateForPrintAttributeAndPrint = {() =>{ this.props.actions.prepareTemplateForPrintAttributeAndPrint(this.props.jobTransaction, this.props.fieldDataList, this.props.jobDataList)}}/>
         </Footer>
       )
     }
@@ -556,14 +587,14 @@ class JobDetailsV2 extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgLightGray]}>
-          {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal={this.onCancelPress} /> : null}
-          {draftAlert}
-          {mismatchAlert}
-          {this.showHeaderView()}
-          {this.showContentView()}
-          {this.showFooterView()}
+        {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} cancelModal={this.onCancelPress} /> : null}
+        {draftAlert}
+        {mismatchAlert}
+        {this.showHeaderView()}
+        {this.showContentView()}
+        {this.showFooterView()}
         </Container>
-      </StyleProvider>
+      </StyleProvider >
     )
   }
 

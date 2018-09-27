@@ -62,7 +62,6 @@ export default function formLayoutReducer(state = initialState, action) {
         case SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT: {
             return state.set('statusId', action.payload.statusId)
                 .set('statusName', action.payload.statusName)
-                .set('jobTransactionId', action.payload.jobTransactionId)
                 .set('latestPositionId', action.payload.latestPositionId)
                 .set('fieldAttributeMasterParentIdMap', action.payload.fieldAttributeMasterParentIdMap)
                 .set('noFieldAttributeMappedWithStatus', action.payload.noFieldAttributeMappedWithStatus)
@@ -106,11 +105,9 @@ export default function formLayoutReducer(state = initialState, action) {
          * back pressed from TransientStatus container
          */
         case SET_FORM_LAYOUT_STATE: {
-            return state.set('currentElement', action.payload.editableFormLayoutState.currentElement)
-                .set('latestPositionId', action.payload.editableFormLayoutState.latestPositionId)
+            return state.set('latestPositionId', action.payload.editableFormLayoutState.latestPositionId)
                 .set('isSaveDisabled', action.payload.editableFormLayoutState.isSaveDisabled)
                 .set('statusId', action.payload.editableFormLayoutState.statusId)
-                .set('jobTransactionId', action.payload.editableFormLayoutState.jobTransactionId)
                 .set('statusName', action.payload.statusName)
                 .set('formElement', action.payload.editableFormLayoutState.formElement)
                 .set('isLoading', action.payload.editableFormLayoutState.isLoading)

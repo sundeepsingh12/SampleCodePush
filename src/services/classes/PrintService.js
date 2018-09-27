@@ -13,12 +13,15 @@ import {
     PRINT,
     OBJECT
 } from '../../lib/AttributeConstants'
+import {
+    FIELD_ATTRIBUTE_VALUE
+}from '../../lib/constants'
 import isEmpty from 'lodash/isEmpty'
 import sortBy from 'lodash/sortBy'
 
 class PrintService {
 
-    async printingTemplateFormatStructure(cloneFormElement, jobTransaction, printAttributeMasterId) {
+    async printingTemplateFormatStructure(cloneFormElement, jobTransaction, printAttributeMasterId, previousStatusFieldAttributeMap) {
         let masterIdPrintingObjectMap = {}, jobDataObject = {}
         let transaction = jobTransaction && jobTransaction.length ? jobTransaction[0] : jobTransaction
         const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE);
@@ -29,7 +32,7 @@ class PrintService {
         if (!isEmpty(masterIdJobAttributeMap)) {
             jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(transaction.jobId, masterIdJobAttributeMap, masterIdJobAttributeMap)
         }
-        let dataList = Object.assign({}, jobDataObject.dataList, cloneFormElement.formElement)
+        let dataList = Object.assign({}, jobDataObject.dataList, cloneFormElement.formElement, previousStatusFieldAttributeMap)
         await this.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap, labelMap)
     }
 
@@ -57,9 +60,10 @@ class PrintService {
         let childValue
         for (let childItem in childDataValueObject) {
             childValue = this.prepareTemplateForNormalAttribute(childDataValueObject[childItem], printingFieldAttributeMasterValue, attributeMasterIdType, printFormatValue, printArray)
+            printArray = childValue.printArray
+            printFormatValue = childValue.printFormatValue 
         }
-        printArray = childValue.printArray
-        printFormatValue = childValue.printFormatValue + `<line-feed />`
+        printFormatValue +=  `<line-feed />`
         return { printArray, printFormatValue }
     }
 
@@ -68,13 +72,13 @@ class PrintService {
         for (let detailsData in childDataList) {
             detailArrayChildData = childDataList[detailsData]
             detailsValue = labelMap ? detailArrayChildData : detailArrayChildData.data
-            if (!detailsValue || detailsValue.value != 'ObjectSarojFareye' || detailArrayChildData.childDataList) {
+            if (!detailsValue || detailsValue.value != 'ObjectSarojFareye' || !detailArrayChildData.childDataList) {
                 continue
             }
             for (let detailObject in detailArrayChildData.childDataList) {
                 objectValue = this.prepareTemplateForNormalAttribute(detailArrayChildData.childDataList[detailObject], printingFieldAttributeMasterValue, attributeMasterIdType, printFormatValue, printArray)
                 printArray = objectValue.printArray
-                printFormatValue = objectValue.printFormatValue
+                printFormatValue = objectValue.printFormatValue + `<line-feed />`
             }
         }
         return { printArray, printFormatValue }
@@ -90,6 +94,18 @@ class PrintService {
             }
         }
         return printFormatValue
+    }
+
+    concatAllNavigationStatusAttribute(navigationFormLayoutStates){
+        if(isEmpty(navigationFormLayoutStates)){
+            return {}
+        }
+        let previousStatusFieldAttributeMap = {}
+        for(let statusId in navigationFormLayoutStates){
+            if(isEmpty(navigationFormLayoutStates[statusId].formElement)) continue
+            previousStatusFieldAttributeMap = Object.assign(previousStatusFieldAttributeMap,navigationFormLayoutStates[statusId].formElement)
+        }
+        return previousStatusFieldAttributeMap 
     }
 
     preparePrintTemplateInCaseOfArray(childDataObject, printingFieldAttributeMasterValue, labelMap, attributeMasterIdType, printFormatValue, printArray) {
@@ -124,14 +140,14 @@ class PrintService {
             }
             printArray.push([dataItem.value])
         } else {
-            printFormatValue += this.printTypeFormatString(dataItem.value, printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]].code) + `<line-feed />`
+            printFormatValue += this.printTypeFormatString(dataItem.value, printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]].code)
         }
         return {printArray, printFormatValue}
     }
 
 
     async preparePrintingTemplate(jobTransactionId, dataList, printingAttributeValueMap, printingFieldAttributeMasterValue, labelMap) {
-        let printFormatValue = ``, printArray = [], attributeMasterIdType, attributeId, childDataObject, dataItem, printTemplate
+        let printFormatValue = ``, printArray = [], attributeMasterIdType, attributeId, childDataObject, printTemplate
         for (let id in printingAttributeValueMap) {
             if (!dataList[printingAttributeValueMap[id].name]) { // case of checking print Data is in datalist 
                 continue
@@ -147,9 +163,8 @@ class PrintService {
                 printTemplate = this.prepareTemplateForNormalAttribute(dataList[printingAttributeValueMap[id].name], printingFieldAttributeMasterValue, attributeMasterIdType, printFormatValue, printArray)
             }
             printArray = printTemplate.printArray
-            printFormatValue = printTemplate.printFormatValue
+            printFormatValue = printTemplate.printFormatValue + `<line-feed />`
         }
-        printFormatValue += `<line-feed />`
         printArray.push(printFormatValue)
         await this.printSortingData(printArray)
     }
