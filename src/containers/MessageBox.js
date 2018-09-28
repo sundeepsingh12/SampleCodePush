@@ -1,8 +1,10 @@
 'use strict'
-import { Container,Footer, Content } from 'native-base';
+import { Container, StyleProvider, Footer, Item, Content } from 'native-base';
 import { FlatList, View, Text, StyleSheet, TextInput } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import getTheme from '../../native-base-theme/components';
+import platform from '../../native-base-theme/variables/platform';
 import TitleHeader from '../components/TitleHeader';
 import * as globalActions from '../modules/global/globalActions';
 import * as messageActions from '../modules/message/messageActions';
@@ -28,7 +30,7 @@ function mapStateToProps(state) {
         messageList: state.messageReducer.messageList,
         isLoading: state.messageReducer.isLoading,
         jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
-        
+
     }
 }
 
@@ -116,7 +118,7 @@ class MessageBox extends Component {
                         <View style={[styles.absolute, { top: 3, left: 0 }]}>
                             <MessageReceiveIcon />
                         </View>
-                        <View style={[style.msgBlock,styles.flex1, styles.marginLeft10, { backgroundColor: '#E5E5EA' }]}>
+                        <View style={[style.msgBlock, styles.flex1, styles.marginLeft10, { backgroundColor: '#E5E5EA' }]}>
 
                             <Text style={[styles.fontBlack, styles.fontDefault, styles.bold]}>MANAGER</Text>
                             {this.getTransactionView(item, transactionIdToCustomisationMap)}
@@ -140,7 +142,11 @@ class MessageBox extends Component {
     }
 
     getMessagesList() {
-        let flatListView, transactionIdToCustomisationMap = _.mapKeys(this.props.jobTransactionCustomizationList, 'id')
+        let idJobTransactionCustomizationListMap = {}
+        for (let index in this.props.jobTransactionCustomizationList) {
+            idJobTransactionCustomizationListMap = Object.assign(idJobTransactionCustomizationListMap, this.props.jobTransactionCustomizationList[index])
+        }
+        let flatListView, transactionIdToCustomisationMap = _.mapKeys(idJobTransactionCustomizationListMap, 'id')
         if (!_.isEmpty(this.props.messageList)) {
             flatListView = <FlatList
                 data={this.renderList()}
@@ -156,7 +162,7 @@ class MessageBox extends Component {
         let view
         view =
             <Footer
-                style={[style.footer, styles.bgWhite, styles.row,styles.autoHeightFooter]}>
+                style={[style.footer, styles.bgWhite, styles.row]}>
                 <TextInput
                     autoCapitalize="none"
                     placeholder='Type a message'
@@ -182,6 +188,7 @@ class MessageBox extends Component {
     }
     render() {
         return (
+            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Content style={[styles.flex1, styles.bgWhite]}>
                         {this.getMessagesList()}
@@ -189,7 +196,7 @@ class MessageBox extends Component {
                     </Content>
                     {this.getMessageInputBox()}
                 </Container>
-            )
+            </StyleProvider>)
     }
 }
 
@@ -205,6 +212,7 @@ const style = StyleSheet.create({
         borderBottomWidth: 1
     },
     footer: {
+        height: 'auto',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',
         padding: 10

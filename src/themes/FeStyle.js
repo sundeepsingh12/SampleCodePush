@@ -673,8 +673,5 @@ export default {
         width: 116,
         height: 116,
         resizeMode: 'contain'
-    },
-    autoHeightFooter:{
-        height:'auto'
     }
 }

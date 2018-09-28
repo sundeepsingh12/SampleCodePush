@@ -1,13 +1,15 @@
 'use strict';
 import React, { PureComponent } from 'react';
 import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native';
-import { Container, Header,Body, Icon} from 'native-base';
+import { Container, Header,Body, Icon,StyleProvider } from 'native-base';
 import { RNCamera } from 'react-native-camera'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import { SCANNING } from '../lib/constants'
 import styles from '../themes/FeStyle'
+import platform from '../../native-base-theme/variables/platform'
+import getTheme from '../../native-base-theme/components'
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const VIEW_PORT =   SCREEN_WIDTH * 0.8;
@@ -115,6 +117,7 @@ class QrCodeScanner extends PureComponent {
     render() {
         if (this.props.scanning) {
             return (
+                <StyleProvider style={getTheme(platform)}>
                     <Container>
                         {this.showHeader()}
                         <View style={{flex: 1}}>
@@ -135,6 +138,7 @@ class QrCodeScanner extends PureComponent {
                             </RNCamera>
                         </View>
                     </Container>
+                </StyleProvider>
             );
         } else {
             return null;

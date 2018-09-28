@@ -12,7 +12,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import BasicFormElement from '../components/FormLayoutBasicComponent.js'
 import Loader from '../components/Loader'
-import { NET_BANKING, NET_BANKING_LINK, NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, UPI, MOSAMBEE_WALLET, MOSAMBEE } from '../lib/AttributeConstants'
+import { NET_BANKING, NET_BANKING_LINK, NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, UPI, MOSAMBEE_WALLET, MOSAMBEE, PAYTM } from '../lib/AttributeConstants'
 import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_STATE, JobDetailsV2 } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
 import { ALERT, INVALID_FORM_ALERT, OK } from '../lib/ContainerConstants'
@@ -26,13 +26,11 @@ function mapStateToProps(state) {
     formElement: state.formLayout.formElement,
     isSaveDisabled: state.formLayout.isSaveDisabled,
     statusName: state.formLayout.statusName,
-    jobTransactionId: state.formLayout.jobTransactionId,
     statusId: state.formLayout.statusId,
     latestPositionId: state.formLayout.latestPositionId,
     paymentAtEnd: state.formLayout.paymentAtEnd,
     isLoading: state.formLayout.isLoading,
     errorMessage: state.formLayout.errorMessage,
-    currentElement: state.formLayout.currentElement,
     updateDraft: state.formLayout.updateDraft,
     isFormValid: state.formLayout.isFormValid,
     sequenceWiseFieldAttributeMasterIds: state.formLayout.sequenceWiseFieldAttributeMasterIds,
@@ -56,13 +54,13 @@ class FormLayout extends PureComponent {
   _willBlurSubscription;
 
   static navigationOptions = ({ navigation, props }) => {
-    return { header: null   }
+    return { header: null }
   }
 
   constructor(props) {
     super(props);
     this.state = {
-      updatingData : null
+      updatingData: null
     }
     this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
       BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
@@ -80,23 +78,26 @@ class FormLayout extends PureComponent {
       })
       this.props.actions.setState(ERROR_MESSAGE, '')
     }
-    let transactionList = this.props.navigation.state.params.jobTransaction  && !isEmpty(this.props.updatedTransactionListIds) &&  !isEmpty(this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId]) ? this.props.jobTransactionId ? [this.props.navigation.state.params.jobTransaction] : this.props.navigation.state.params.jobTransaction : null
-    if( transactionList && this.checkForUpdatedTransactionList(transactionList, this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId])){
-      this.setState({updatingData : this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId]})
+    let transaction = this.props.navigation.state.params.jobTransaction
+    if (transaction && (transaction.constructor == Array || transaction.jobId > 0)) { // case of not new job and save activated
+      let transactionList = !isEmpty(this.props.updatedTransactionListIds) && !isEmpty(this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId]) ? transaction.constructor != Array ? [transaction] : transaction : null
+      if (transactionList && this.checkForUpdatedTransactionList(transactionList, this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId])) {
+        this.setState({ updatingData: this.props.updatedTransactionListIds[this.props.navigation.state.params.jobMasterId] })
+      }
     }
   }
 
-  checkForUpdatedTransactionList(transactionList, updatedTransactionListIds){
-    for(let item in transactionList){
-      if(updatedTransactionListIds[transactionList[item].jobId]){
+  checkForUpdatedTransactionList(transactionList, updatedTransactionListIds) {
+    for (let item in transactionList) {
+      if (updatedTransactionListIds[transactionList[item].jobId]) {
         return true
       }
     }
     return false
   }
 
-  headerView(){
-    if(!this.state.updatingData){
+  headerView() {
+    if (!this.state.updatingData) {
       return <TitleHeader pageName={this.props.navigation.state.params.statusName} goBack={this.props.navigation.state.params.backForTransient} />
     }
   }
@@ -107,11 +108,11 @@ class FormLayout extends PureComponent {
         <Container style={[styles.bgWhite]}>
           <View style={[styles.justifyCenter, styles.alignCenter, styles.column, styles.flex1]}>
             <Text style={[{ paddingLeft: 70, paddingRight: 72 }, styles.fontCenter, styles.fontDarkGray, styles.marginTop10]}>Some changes were made from the server. Please go to the details page and start again.</Text>
-            <View style={[{ width: 100, marginTop : 50 }, styles.alignCenter, styles.justifyCenter]}>
-            <Button success
-              onPress={() => this.resetBackToUpdatedView()}>
-              <Text style={[styles.fontLg, styles.fontWhite]}>Refresh</Text>
-            </Button>
+            <View style={[{ width: 100, marginTop: 50 }, styles.alignCenter, styles.justifyCenter]}>
+              <Button success
+                onPress={() => this.resetBackToUpdatedView()}>
+                <Text style={[styles.fontLg, styles.fontWhite]}>Refresh</Text>
+              </Button>
             </View>
           </View>
 
@@ -122,7 +123,7 @@ class FormLayout extends PureComponent {
 
   resetBackToUpdatedView() {
     this.props.actions.deleteDraftForTransactions(this.props.navigation.state.params.jobTransaction, this.state.updatingData)
-    this.setState({updatingData : null})
+    this.setState({ updatingData: null })
     this.props.navigation.goBack(null)
   }
 
@@ -131,7 +132,7 @@ class FormLayout extends PureComponent {
     if (!this.props.navigation.state.params.isDraftRestore) {
       let { statusId, statusName } = this.props.navigation.state.params
       const statusData = { statusId, statusName }
-      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId, statusData)
+      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId, statusData, this.props.navigation.state.params.navigationFormLayoutStates)
       if (this.props.navigation.state.params.jobTransaction.length || this.props.navigation.state.params.editableFormLayoutState || this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
         this.props.actions.setState(SET_UPDATE_DRAFT, false)
       }
@@ -170,7 +171,7 @@ class FormLayout extends PureComponent {
       formElement: this.props.formElement,
       isSaveDisabled: this.props.isSaveDisabled,
       statusName: this.props.statusName,
-      jobTransactionId: this.props.jobTransactionId,
+      jobTransactionId: this.props.navigation.state.params.jobTransaction.id,
       statusId: this.props.statusId,
       latestPositionId: this.props.latestPositionId,
       paymentAtEnd: this.props.paymentAtEnd,
@@ -183,7 +184,8 @@ class FormLayout extends PureComponent {
       arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
       jobMasterId: this.props.navigation.state.params.jobMasterId,
       jobAndFieldAttributesList: this.props.jobAndFieldAttributesList,
-      sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds
+      sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds,
+      transientFormLayoutState: this.props.navigation.state.params.navigationFormLayoutStates
     }
     return (
       <BasicFormElement
@@ -207,6 +209,7 @@ class FormLayout extends PureComponent {
       case UPI.id: return 'UPIPayment'
       case MOSAMBEE_WALLET.id: return 'MosamBeeWalletPayment'
       case MOSAMBEE.id: return 'MosambeePayment'
+      case PAYTM.id: return 'PaytmPayment'
     }
 
     return null
@@ -215,10 +218,9 @@ class FormLayout extends PureComponent {
   saveJobTransaction() {
     let formLayoutState = {
       formElement: this.props.formElement,
-      nextEditable: this.props.nextEditable,
       isSaveDisabled: this.props.isSaveDisabled,
       statusName: this.props.statusName,
-      jobTransactionId: this.props.jobTransactionId,
+      jobTransactionId: this.props.navigation.state.params.jobTransaction.id,
       statusId: this.props.statusId,
       latestPositionId: this.props.latestPositionId,
       paymentAtEnd: this.props.paymentAtEnd,
@@ -338,14 +340,14 @@ class FormLayout extends PureComponent {
     const footerView = this.getFooterView(transient, saveActivated)
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
-    if(this.state.updatingData){ return this.deletedTransactionView() }
+    if (this.state.updatingData) { return this.deletedTransactionView() }
     if (this.props.formElement && this.props.formElement.length == 0) {
-      <SafeAreaView style={[styles.bgWhite]}>   
-            {this.headerView()}
+      <SafeAreaView style={[styles.bgWhite]}>
+        {this.headerView()}
         <Footer style={[style.footer]}>
           <FooterTab style={[styles.padding10]}>
             <Button success full
-              onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
+              onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransaction.id, this.props.statusId)}
               disabled={this.props.isSaveDisabled}>
               <Text style={[styles.fontLg, styles.fontWhite]}>{(this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : (saveActivated || transient) ? 'Continue' : this.props.statusName)}</Text>
             </Button>
@@ -373,7 +375,7 @@ class FormLayout extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         {formView}
-        </StyleProvider>
+      </StyleProvider >
     )
   }
 }
@@ -381,6 +383,7 @@ class FormLayout extends PureComponent {
 const style = StyleSheet.create({
   header: {
     borderBottomWidth: 0,
+    height: 'auto',
     padding: 0,
     paddingRight: 0,
     paddingLeft: 0
@@ -401,9 +404,9 @@ const style = StyleSheet.create({
     padding: 15
   },
   footer: {
+    height: 'auto',
     borderTopWidth: 1,
-    borderTopColor: '#f3f3f3',
-    height: (Platform.OS ==='android') ? 'auto':null
+    borderTopColor: '#f3f3f3'
   },
 });
 

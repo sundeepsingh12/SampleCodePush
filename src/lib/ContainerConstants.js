@@ -170,6 +170,8 @@ module.exports = {
     RECEPIENTS_CONTACT_NUMBER: `Recepient's Contact Number`,
     SEND: 'Send',
     RECEPIENTS_EMAIL_ADDRESS: `Recepient's Email Address`,
+    DELETE_ALL_ITEMS: 'Do you want to delete all items?',
+    DELETE_SINGLE_ITEM: 'Do you want to delete this item?',
 
     //Backup Exceptions
     USER_MISSING: 'user missing',
@@ -263,6 +265,7 @@ module.exports = {
     UPDATE_GROUP: 'Update Group',
     YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
     MORE: 'More',
+    ENABLE_RESEQUENCE_RESTRICTION_MESSAGE: "Please finish previous items first",
 
     //Save Activated
     EDIT: 'Edit',
@@ -314,6 +317,7 @@ module.exports = {
     UPDATE_ALL_SELECTED: 'Update All Selected',
 
     //Sorting
+    ADDRESS: 'Address',
     SORTING: 'Sorting',
     REF_UNAVAILABLE: 'Reference Number Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
@@ -493,5 +497,9 @@ module.exports = {
 
 
     //Message Module Name
-    MESSAGE_MODULE_NAME : "Messages" 
+    MESSAGE_MODULE_NAME : "Messages",
+    //Paytm constants
+    CUSTOMER_NUMBER: 'Enter Customers Mobile Number',
+    ENTER_CUSTOMER_OTP: 'Enter OTP from customers mobile screen',
+    COULD_NOT_CONNECT_SERVER: 'Could not connect with server. Please try again.'
 }

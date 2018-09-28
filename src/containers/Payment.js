@@ -1,9 +1,11 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity, Platform } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity, Platform, TextInput } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Footer, FooterTab, Input, Button, Item, CheckBox} from 'native-base'
+import { Container, Content, Footer, FooterTab, Input, Button, Item, CheckBox, StyleProvider } from 'native-base'
+import getTheme from '../../native-base-theme/components';
+import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import * as paymentActions from '../modules/payment/paymentActions'
 import * as globalActions from '../modules/global/globalActions'
@@ -87,7 +89,7 @@ class Payment extends PureComponent {
             <View>
                 <Text> {type} </Text>
                 <View style={[styles.positionRelative, { zIndex: 1 }]} >
-                    <Input
+                    <TextInput
                         keyboardType="numeric"
                         returnKeyType='done'
                         value={this.props.transactionNumber}
@@ -138,7 +140,7 @@ class Payment extends PureComponent {
     }
 
     getPaymentModeSelectedResult(moneyTransactionModeId) {
-        if((size(this.props.paymentModeList.otherPaymentModeList) == 1 && size(this.props.paymentModeList.endPaymentModeList) == 0) || (size(this.props.paymentModeList.endPaymentModeList) == 1 && size(this.props.paymentModeList.otherPaymentModeList) == 0) ){
+        if((size(this.props.paymentModeList.otherPaymentModeList) == 1 && size(this.props.paymentModeList.endPaymentModeList) == 0) || (size(this.props.paymentModeList.endPaymentModeList) == 1 && size(this.props.paymentModeList.otherPaymentModeList) == 0) && (this.props.paymentModeList.endPaymentModeList[0].moneyTransactionModeId != 16)){
             return true
         }
         if (!this.props.selectedPaymentMode) {
@@ -150,7 +152,7 @@ class Payment extends PureComponent {
         return ((this.props.selectedPaymentMode.otherPaymentModeList && this.props.selectedPaymentMode.otherPaymentModeList[moneyTransactionModeId]) || this.props.selectedPaymentMode.cardPaymentMode == moneyTransactionModeId)
     }
 
-    paymentItemView = (id, moneyTransactionModeId,disabled) => {
+    paymentItemView = (id, moneyTransactionModeId, disabled) => {
         let paymentSelectedResult = this.getPaymentModeSelectedResult(moneyTransactionModeId)
         return (
             <TouchableOpacity key={id}
@@ -176,12 +178,13 @@ class Payment extends PureComponent {
                 {this.props.splitPaymentMode == YES ? SELECT_PAYMENT_METHOD_TO_SPLIT : SELECT_PAYMENT_METHOD}
             </Text>
         )
+       
         for (let index in paymentModeList.otherPaymentModeList) {
             if (paymentModeList.otherPaymentModeList[index].moneyTransactionModeId == DISCOUNT.id && this.props.splitPaymentMode != YES) {
                 continue
             }
             paymentModeView.push(
-                this.paymentItemView( paymentModeList.otherPaymentModeList[index].id, paymentModeList.otherPaymentModeList[index].moneyTransactionModeId, false)
+                this.paymentItemView(paymentModeList.otherPaymentModeList[index].id, paymentModeList.otherPaymentModeList[index].moneyTransactionModeId, false)
             )
         }
         for (let index in paymentModeList.endPaymentModeList) {
@@ -192,12 +195,12 @@ class Payment extends PureComponent {
             if (paymentModeList.endPaymentModeList[index].moneyTransactionModeId == NET_BANKING.id) {
                 for (let type = 97; type < 100; type++) {
                     paymentModeView.push(
-                        this.paymentItemView( type, type,cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
+                        this.paymentItemView(type, type, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
                     )
                 }
-            } else if(paymentModeList.endPaymentModeList[index].moneyTransactionModeId != MOSAMBEE.id || Platform.OS != 'ios'){
+            } else if (paymentModeList.endPaymentModeList[index].moneyTransactionModeId != MOSAMBEE.id || Platform.OS != 'ios') {
                 paymentModeView.push(
-                    this.paymentItemView( paymentModeList.endPaymentModeList[index].id, paymentModeList.endPaymentModeList[index].moneyTransactionModeId, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
+                    this.paymentItemView(paymentModeList.endPaymentModeList[index].id, paymentModeList.endPaymentModeList[index].moneyTransactionModeId, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
                 )
             }
         }
@@ -305,6 +308,7 @@ class Payment extends PureComponent {
         const paymentModeSelectedView = this.renderPaymentModeSelected(this.props.selectedPaymentMode)
         const splitView = this.renderSplitView()
         return (
+            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Content style={[styles.flex1, styles.bgWhite, styles.padding10]}>
                         {amountTobeCollectedView}
@@ -332,6 +336,7 @@ class Payment extends PureComponent {
                         </Footer>
                     </SafeAreaView>
                 </Container>
+            </StyleProvider>
         )
     }
 }

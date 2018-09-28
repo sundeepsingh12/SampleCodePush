@@ -3,7 +3,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, Platform, ActivityIndicator, SectionList, Modal, TouchableOpacity, FlatList, TouchableHighlight, Linking } from 'react-native'
+import { StyleSheet, View, Image, Platform, ActivityIndicator, SectionList, Modal, TouchableOpacity, FlatList, TouchableHighlight, Linking, DeviceEventEmitter } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import Loader from '../components/Loader'
 import PieChart from '../components/PieChart'
@@ -24,7 +24,6 @@ import SyncLoader from '../components/SyncLoader'
 import { redirectToFormLayout } from '../modules/newJob/newJobActions'
 import { navigate } from '../modules/navigators/NavigationService'
 import _ from 'lodash'
-import { navigateToLiveJob } from '../modules/liveJob/liveJobActions'
 
 function mapStateToProps(state) {
   return {
@@ -49,7 +48,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...homeActions, checkForPaymentAtEnd, redirectToFormLayout, navigateToLiveJob }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...homeActions, checkForPaymentAtEnd, redirectToFormLayout }, dispatch)
   }
 }
 
@@ -68,6 +67,12 @@ class Home extends PureComponent {
           this.navigate(url)
         }
       });
+      this.nativeEventListener = DeviceEventEmitter.addListener('SHOW_ALARM',
+        (e) => {
+          //console.log('e', e)
+          let data = JSON.parse(e[0])
+          this.props.actions.handleCountDownTimerEvent(data)
+        })
     } else {
       Linking.addEventListener('url', this.handleOpenURL);
     }
@@ -77,9 +82,9 @@ class Home extends PureComponent {
       this.navigate(event.url)
     }
   }
-  
+
   navigate(url) {
-    this.props.actions.navigateToLiveJob(url)
+    this.props.actions.navigateToLiveJobOrJobDetails(url)
   }
 
   componentWillUnmount() {
@@ -237,6 +242,7 @@ class Home extends PureComponent {
     }
 
     return (
+      <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgWhite]}>
           <SafeAreaView>
             <Header style={[styles.bgWhite, styles.paddingTop0]}>
@@ -256,6 +262,7 @@ class Home extends PureComponent {
             {(this.props.callerIdDisplayData.showCallerIdPopup) ? this.showCallerPopupWindow() : null}
           </Content>
         </Container>
+      </StyleProvider>
     )
   }
 

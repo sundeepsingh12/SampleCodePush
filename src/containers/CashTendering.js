@@ -2,7 +2,9 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Button, Header, Body, Content, Icon, Toast, Footer } from 'native-base';
+import { Container, Button, Header, Body, Content, Icon, Toast, Footer, StyleProvider } from 'native-base';
+import getTheme from '../../native-base-theme/components';
+import platform from '../../native-base-theme/variables/platform';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
@@ -151,12 +153,13 @@ class CashTendering extends PureComponent {
         }
         let totalAmountInCashTendering = this._totalAmountInCashTenderingToCollectOrReturn()
         return (
+            <StyleProvider style={getTheme(platform)}>
                 <Container style={[styles.bgLightGray]}>
                     {this.showHeaderView()}
                     {this._checkIfCashCollectOrReturn()}
                     {this.showFlatList()}
                     <SafeAreaView style={[styles.bgWhite]}>
-                        <Footer style={[styles.column, styles.padding10,styles.autoHeightFooter]}>
+                        <Footer style={[style.footer, styles.column, styles.padding10]}>
                             {totalAmountInCashTendering}
                             <Button success full onPress={() => (this.props.isReceive) ? this._onSavePress() : this._onSavePressReturn()}>
                                 <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
@@ -164,10 +167,14 @@ class CashTendering extends PureComponent {
                         </Footer>
                     </SafeAreaView>
                 </Container>
+            </StyleProvider>
         )
     }
 }
 const style = StyleSheet.create({
+    footer:{
+        height:'auto'
+    },
     header: {
         borderBottomWidth: 0,
         height: 'auto',

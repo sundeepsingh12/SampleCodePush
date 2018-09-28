@@ -1,6 +1,7 @@
 'use strict'
 import React, { PureComponent } from 'react'
 import { FlatList, View, Text } from 'react-native'
+import { StyleProvider } from 'native-base'
 import styles from '../themes/FeStyle'
 class SignatureRemarks extends PureComponent {
 
@@ -15,6 +16,7 @@ class SignatureRemarks extends PureComponent {
 
     render() {
         return (
+            <StyleProvider>
                 <View style={[styles.padding10]}>
                     <FlatList
                         data={this.props.fieldDataList}
@@ -22,6 +24,7 @@ class SignatureRemarks extends PureComponent {
                         keyExtractor={item => String(item.fieldAttributeMasterId)}
                     />
                 </View>
+            </StyleProvider>
         )
     }
 }

@@ -5,7 +5,10 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { Component } from 'react'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
-import { Container, Content, Header, Text, List, ListItem, Body, Right, Icon,Toast } from 'native-base';
+import { SafeAreaView } from 'react-navigation'
+import { Container, Content, Header, Text, List, ListItem, Body, Right, Icon, StyleProvider, Toast } from 'native-base';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as sequenceActions from '../modules/sequence/sequenceActions'
 import * as globalActions from '../modules/global/globalActions'
@@ -72,7 +75,9 @@ class SequenceRunsheetList extends Component {
 
     render() {
         return (
+            <StyleProvider style={getTheme(platform)}>
                 <Container>
+                    <SafeAreaView style={{ backgroundColor: styles.bgPrimaryColor }}>
                         <Header style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                             <Body>
                                 <View
@@ -89,6 +94,7 @@ class SequenceRunsheetList extends Component {
                                 </View>
                             </Body>
                         </Header>
+                    </SafeAreaView>
                     <Content style={[styles.bgWhite]}>
                         <Text style={[styles.fontSm, { color: styles.fontPrimaryColor }, styles.padding15]}>{SELECT_RUNSHEET_NUMBER}</Text>
                         <List>
@@ -101,6 +107,7 @@ class SequenceRunsheetList extends Component {
                         </List>
                     </Content>
                 </Container>
+            </StyleProvider>
         )
     }
 

@@ -8,12 +8,14 @@ import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
 import { StyleSheet, View, TouchableOpacity, FlatList, Alert, BackHandler } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Content, Header, Button, Text, Body, Right, Icon, List, ListItem, Footer, FooterTab } from 'native-base';
+import { Container, Content, Header, Button, Text, Body, Right, Icon, List, ListItem, StyleProvider, Footer, FooterTab } from 'native-base';
+import getTheme from '../../native-base-theme/components';
+import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
 import { FormLayout, Discard, Keep, Checkout, SHOW_DISCARD_ALERT, SET_SAVE_ACTIVATED_DRAFT, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE, SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED } from '../lib/constants'
 import { Yes_Checkout, Total, NO } from '../lib/AttributeConstants'
-import { Discard_these_jobs, Do_you_want_to_checkout, EDIT, TRANSACTION_SUCCESSFUL, DELETE_DRAFT } from '../lib/ContainerConstants'
+import { Discard_these_jobs, Do_you_want_to_checkout, EDIT, TRANSACTION_SUCCESSFUL, DELETE_DRAFT, DELETE_ALL_ITEMS, DELETE_SINGLE_ITEM, YES } from '../lib/ContainerConstants'
 import DraftModal from '../components/DraftModal'
 import _ from 'lodash'
 import { redirectToFormLayout } from '../modules/newJob/newJobActions'
@@ -179,8 +181,8 @@ class SaveActivated extends PureComponent {
         )
     }
 
-    renderRecurringData = (item, textCounter) => {
-        let showText = (item.textToShow) ? item.textToShow : textCounter
+    renderRecurringData = (item, recurringData) => {
+        let showText = (item.textToShow) ? item.textToShow : _.indexOf(recurringData, item) + 1
         return (
             <View style={[styles.bgWhite, { borderBottomColor: '#f5f5f5', borderBottomWidth: 1 }]}>
                 <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} >
@@ -199,16 +201,16 @@ class SaveActivated extends PureComponent {
         )
     }
 
-    showDeleteAlert(item) {
+    showDeleteAlert(item, deleteAllItems) {
         Alert.alert(
-            'Do you want to delete item?',
+            (deleteAllItems) ? DELETE_ALL_ITEMS : DELETE_SINGLE_ITEM,
             '',
             [
                 { text: NO, style: 'cancel' },
                 {
-                    text: 'Yes', onPress: () => {
+                    text: YES, onPress: () => {
                         this.props.actions.deleteItem(
-                            item.id,
+                            (deleteAllItems) ? '' : item.id,
                             this.props.recurringData,
                             this.props.commonData, {
                                 navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
@@ -217,7 +219,8 @@ class SaveActivated extends PureComponent {
                                 currentStatus: this.props.navigation.state.params.currentStatus,
                                 jobMasterId: this.props.navigation.state.params.jobMasterId
                             },
-                            this.props.headerTitle
+                            this.props.headerTitle,
+                            deleteAllItems
                         )
                     }
                 },
@@ -303,7 +306,7 @@ class SaveActivated extends PureComponent {
         return null
     }
     render() {
-        let textCounter = 1
+        let recurringData = _.values(this.props.recurringData)
         if (this.props.loading) {
             return (
                 <Loader />
@@ -317,6 +320,7 @@ class SaveActivated extends PureComponent {
         }
 
         return (
+            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
                         <Body>
@@ -329,6 +333,12 @@ class SaveActivated extends PureComponent {
                                     <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.navigation.state.params.currentStatus) ? this.props.navigation.state.params.currentStatus.name : 'Save Activated'}</Text>
                                 </View>
                                 <View style={[style.headerRight]}>
+                                    {_.size(this.props.recurringData) > 0 && <TouchableOpacity
+                                        onPress={() => {
+                                            this.showDeleteAlert(null, true)
+                                        }}>
+                                        <Icon name="md-trash" style={[styles.fontXxxl, styles.fontWhite, styles.alignSelfCenter]} />
+                                    </TouchableOpacity>}
                                 </View>
                                 <View />
                             </View>
@@ -371,9 +381,9 @@ class SaveActivated extends PureComponent {
                         {/* List View */}
 
                         <FlatList
-                            data={_.values(this.props.recurringData)}
+                            data={recurringData}
                             extraData={this.state}
-                            renderItem={(item) => this.renderRecurringData(item.item, textCounter++)}
+                            renderItem={(item) => this.renderRecurringData(item.item, recurringData)}
                             keyExtractor={this._keyExtractor}>
                         </FlatList>
                     </Content>
@@ -400,6 +410,7 @@ class SaveActivated extends PureComponent {
                         </SafeAreaView>
                     )}
                 </Container>
+            </StyleProvider>
 
         )
     }
@@ -425,8 +436,7 @@ const style = StyleSheet.create({
     },
     headerRight: {
         width: '20%',
-        paddingTop: 15,
-        paddingBottom: 15,
+        padding: 10,
         paddingRight: 15
     },
     footer: {

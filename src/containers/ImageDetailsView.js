@@ -3,10 +3,12 @@
 import React, { PureComponent } from 'react';
 import {  Text, View, Image } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
-import { Container, Icon} from 'native-base'
+import { Container, Icon, StyleProvider } from 'native-base'
 import * as cameraActions from '../modules/camera/cameraActions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import platform from '../../native-base-theme/variables/platform'
+import getTheme from '../../native-base-theme/components'
 import styles from '../themes/FeStyle'
 
 function mapStateToProps(state) {
@@ -52,6 +54,7 @@ class ImageDetailsView extends PureComponent {
     }
     render() {
         return (
+            <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <View style={{ flex: 1 , backgroundColor: '#fff'}}>
                         {this.getImageView()}
@@ -67,6 +70,7 @@ class ImageDetailsView extends PureComponent {
                         </SafeAreaView>
                     </View>
                 </Container>
+            </StyleProvider>
         );
     }
 }

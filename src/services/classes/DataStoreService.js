@@ -697,7 +697,8 @@ class DataStoreService {
     }
 
     async runDataStoreBeforeValidations(currentElement, formLayoutState, jobTransaction, cloneFormElement, dataStoreFilterReverse) {
-        let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, BEFORE, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
+        let formLayoutStateParam = { formElement: cloneFormElement, jobTransaction, fieldAttributeMasterParentIdMap: formLayoutState.fieldAttributeMasterParentIdMap, jobAndFieldAttributesList: formLayoutState.jobAndFieldAttributesList, transientFormLayoutState: formLayoutState.transientFormLayoutState };
+        let validationsResult = fieldValidationService.fieldValidations(currentElement, formLayoutStateParam, BEFORE)
         let { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, keyLabelAttributeMap } = await this.checkForFilters(currentElement, cloneFormElement, jobTransaction, dataStoreFilterReverse)
         let validation = {
             isScannerEnabled: false,
