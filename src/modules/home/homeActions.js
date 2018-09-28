@@ -151,11 +151,7 @@ export function fetchPagesAndPiechart() {
         utilities.messagingEnabled = null
         if (utility.utilityID == PAGE_MESSAGING) {
           utilities.messagingEnabled = utility.enabled
-          if(!isEmpty(utility.name)) {
-            utilities.messageModuleName = utility.name
-          } else {
-            utilities.messageModuleName = MESSAGE_MODULE_NAME
-          }
+          isEmpty(utility.name) ? utilities.messageModuleName = MESSAGE_MODULE_NAME : utilities.messageModuleName = utility.name
         };
       })
 
