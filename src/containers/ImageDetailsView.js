@@ -38,7 +38,7 @@ class ImageDetailsView extends PureComponent {
         if (this.props.viewData) {
             return <Image
                 resizeMethod={'resize'}
-                resizeMode={(this.props.navigation.state.params.isSignature) ? 'contain' : 'cover'}
+                resizeMode={'contain'}
                 source={{
                     uri: 'data:image/jpeg;base64,' + this.props.viewData,
                 }}

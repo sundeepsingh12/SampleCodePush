@@ -208,6 +208,7 @@ class CameraFieldAttribute extends PureComponent {
             return (
                 <Image
                     resizeMethod={'resize'}
+                    resizeMode={'contain'}
                     source={{
                         uri: this.state.imageData != null && this.state.imageData.uri != null ? this.state.imageData.uri : 'data:image/jpeg;base64,' + this.state.imageData.base64,
                     }}
