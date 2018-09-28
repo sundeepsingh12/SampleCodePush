@@ -106,7 +106,7 @@ class ResetPassword extends PureComponent {
 
   _getFooterView() {
     return (
-        <Footer style={[styles.footer]}>
+        <Footer style={[styles.footer,styles.autoHeightFooter]}>
           <FooterTab style={[styles.padding10]}>
             <Button success full onPress={this._onResetPress} disabled={this.props.isSaveResetButtonDisabled}>
               <Text style={[styles.fontLg, styles.fontWhite]}>{RESET_PASSWORD}</Text>

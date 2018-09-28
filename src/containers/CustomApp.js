@@ -88,7 +88,7 @@ class CustomApp extends PureComponent {
 
     showUrlInputView() {
         return (
-            <View style={[style.headerBody]} t>
+            <View style={[style.headerBody]}>
                 {!this.props.navigation.state.params.customUrl ?
                     <View style={[{ height: 30 }]}>
                         <Input
@@ -107,7 +107,7 @@ class CustomApp extends PureComponent {
 
     showFooterView() {
         return (
-                <Footer style={[style.footer]}>
+                <Footer style={[style.footer,styles.autoHeightFooter]}>
                     <FooterTab>
                         <Button full style={[styles.bgWhite]} onPress={this.goBack}>
                             <Icon name="ios-arrow-back" style={[styles.fontLg, styles.fontBlack]} />
@@ -179,7 +179,6 @@ class CustomApp extends PureComponent {
 const style = StyleSheet.create({
     header: {
         borderBottomWidth: 0,
-        height: 'auto',
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0
@@ -226,7 +225,6 @@ const style = StyleSheet.create({
 
     },
     footer: {
-        height: 'auto',
         backgroundColor: '#ffffff',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',

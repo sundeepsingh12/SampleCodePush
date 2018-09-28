@@ -127,7 +127,7 @@ class ArrayFieldAttribute extends PureComponent {
     }
     headerView() {
         let view
-        view = <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header]}>
+        view = <Header searchBar style={[{ backgroundColor: styles.bgPrimaryColor }, style.header,styles.autoHeightFooter]}>
             <Body>
                 <View
                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -159,7 +159,7 @@ class ArrayFieldAttribute extends PureComponent {
                     </Content>
                     <SafeAreaView style={[styles.bgWhite]}>
                         <Footer
-                            style={[style.footer, styles.bgWhite]}>
+                            style={[style.footer, styles.bgWhite,styles.autoHeightFooter]}>
                             <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
                                 <Text
                                     style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {size(this.props.arrayElements)}</Text>
@@ -182,7 +182,6 @@ class ArrayFieldAttribute extends PureComponent {
 const style = StyleSheet.create({// Comment Refactor these
     header: {
         borderBottomWidth: 0,
-        height: 'auto',
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0
@@ -204,7 +203,6 @@ const style = StyleSheet.create({// Comment Refactor these
     },
     footer: {
         flexDirection: 'column',
-        height: 'auto',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',
         padding: 10

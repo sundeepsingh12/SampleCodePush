@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import Loader from '../components/Loader'
 import SearchBarV2 from '../components/SearchBarV2'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import { Container, Text, Tab, Tabs, ScrollableTab, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import TaskListScreen from './TaskListScreen';
