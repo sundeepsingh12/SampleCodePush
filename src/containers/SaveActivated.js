@@ -181,14 +181,14 @@ class SaveActivated extends PureComponent {
         )
     }
 
-    renderRecurringData = (item, textCounter) => {
-        let showText = (item.textToShow) ? item.textToShow : textCounter
+    renderRecurringData = (item, recurringData) => {
+        let showText = (item.textToShow) ? item.textToShow : _.indexOf(recurringData, item) + 1
         return (
             <View style={[styles.bgWhite, { borderBottomColor: '#f5f5f5', borderBottomWidth: 1 }]}>
                 <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} >
                     <TouchableOpacity style={[styles.flexBasis90, styles.row, styles.alignCenter]}
                         onPress={() => { this.review(true, item.fieldDataArray, true, item.textToShow, item.id) }}>
-                        <Text style={[styles.fontDefault]}>{showText}</Text>
+                        <Text style={[styles.fontDefault]}>{_.clone(showText)}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.flexBasis10]}
                         onPress={() => {
@@ -201,16 +201,16 @@ class SaveActivated extends PureComponent {
         )
     }
 
-    showDeleteAlert(item) {
+    showDeleteAlert(item, deleteAllItems) {
         Alert.alert(
-            'Do you want to delete item?',
+            (deleteAllItems) ? 'Do you want to delete all items?' : 'Do you want to delete this item?',
             '',
             [
                 { text: NO, style: 'cancel' },
                 {
                     text: 'Yes', onPress: () => {
                         this.props.actions.deleteItem(
-                            item.id,
+                            (deleteAllItems) ? '' : item.id,
                             this.props.recurringData,
                             this.props.commonData, {
                                 navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
@@ -219,7 +219,8 @@ class SaveActivated extends PureComponent {
                                 currentStatus: this.props.navigation.state.params.currentStatus,
                                 jobMasterId: this.props.navigation.state.params.jobMasterId
                             },
-                            this.props.headerTitle
+                            this.props.headerTitle,
+                            deleteAllItems
                         )
                     }
                 },
@@ -305,7 +306,7 @@ class SaveActivated extends PureComponent {
         return null
     }
     render() {
-        let textCounter = 1
+        let recurringData = _.values(this.props.recurringData)
         if (this.props.loading) {
             return (
                 <Loader />
@@ -332,6 +333,12 @@ class SaveActivated extends PureComponent {
                                     <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.navigation.state.params.currentStatus) ? this.props.navigation.state.params.currentStatus.name : 'Save Activated'}</Text>
                                 </View>
                                 <View style={[style.headerRight]}>
+                                    {_.size(this.props.recurringData) > 0 && <TouchableOpacity
+                                        onPress={() => {
+                                            this.showDeleteAlert(null, true)
+                                        }}>
+                                        <Icon name="md-trash" style={[styles.fontXxxl, styles.fontWhite, styles.alignSelfCenter]} />
+                                    </TouchableOpacity>}
                                 </View>
                                 <View />
                             </View>
@@ -374,9 +381,9 @@ class SaveActivated extends PureComponent {
                         {/* List View */}
 
                         <FlatList
-                            data={_.values(this.props.recurringData)}
+                            data={recurringData}
                             extraData={this.state}
-                            renderItem={(item) => this.renderRecurringData(item.item, textCounter++)}
+                            renderItem={(item) => this.renderRecurringData(item.item, recurringData)}
                             keyExtractor={this._keyExtractor}>
                         </FlatList>
                     </Content>
@@ -429,8 +436,7 @@ const style = StyleSheet.create({
     },
     headerRight: {
         width: '20%',
-        paddingTop: 15,
-        paddingBottom: 15,
+        padding: 10,
         paddingRight: 15
     },
     footer: {
