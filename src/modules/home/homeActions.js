@@ -196,6 +196,10 @@ export function navigateToPage(pageObject, navigationProps) {
           navigate(BluetoothListing, { pageObject })
           break;
         case PAGE_BULK_UPDATE: {
+          let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+          if (updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)) {
+            dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
+          }
           dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
           break;
         }
@@ -305,10 +309,6 @@ export function checkCustomErpPullActivated() {
 export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) {
   return async function (dispatch) {
     try {
-      let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
-      if (updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)) {
-        dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
-      }
       if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
         dispatch(setState(syncLoader, true))
         let message = await dispatch(performSyncService())

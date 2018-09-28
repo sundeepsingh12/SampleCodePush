@@ -214,7 +214,7 @@ class Bulk {
         return numberOfEnabledItems
     }
 
-    checkForJobMasterIdsOfUpdatedJobs(updatedTransactionListIds, statusId, jobTransactionCustomizationList){
+    checkForJobMasterIdsOfUpdatedJobsInBulk(updatedTransactionListIds, statusId, jobTransactionCustomizationList){
         for(let item in updatedTransactionListIds){
           if(updatedTransactionListIds[item].jobStatusId == statusId || (jobTransactionCustomizationList[item] && jobTransactionCustomizationList[item].statusId == statusId)){
             return true

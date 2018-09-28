@@ -7,16 +7,14 @@ import {
 import {
     jobStatusService
 } from './JobStatus'
-import { transactionCustomizationService } from './TransactionCustomization'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import {
     HUB,
     TABLE_JOB_TRANSACTION,
-    UNSEEN
+    PENDING
 } from '../../lib/constants'
 
 import {
-    PENDING,
     ADDRESS_LINE_1,
     ADDRESS_LINE_2,
     PINCODE,
@@ -45,20 +43,19 @@ class Sequence {
      * @param {*} jobMasterIds // job master ids whose jobs are visible in this module 
      * @returns jobTransactionCustomizationList // jobTransacion List
      */
-    async getSequenceList(runsheetNumber, jobMasterIds, jobTransactionList) {
+    async getSequenceList(runsheetNumber, jobMasterMap, jobTransactionList) {
         if (!runsheetNumber) {
             throw new Error(RUNSHEET_NUMBER_MISSING);
         }
-        let jobMasterMap = _.mapKeys(jobMasterIds);
         let jobTransactionCustomizationList = {}
-        let allStatusIdsMapForCode = await jobStatusService.getAllStatusIdsMapForCode(UNSEEN)
+        let allStatusIdsMapForCode = await jobStatusService.getAllStatusIdsMapForCode(PENDING)
         for(let jobMasterId in jobTransactionList){
             if(jobMasterMap[jobMasterId]){
                 jobTransactionCustomizationList = Object.assign(jobTransactionCustomizationList, jobTransactionList[jobMasterId]) 
             }
         }
         const sequenceMap =  _.pickBy(jobTransactionCustomizationList, function(value, key) {
-            return (value.runsheetNo == runsheetNumber && !allStatusIdsMapForCode[value.statusId])
+            return (value.runsheetNo == runsheetNumber && allStatusIdsMapForCode[value.statusId])
         })
         return Object.values(sequenceMap);
     }
@@ -110,6 +107,16 @@ class Sequence {
         })
         return sequenceRequestDto
     }
+
+    checkForJobMasterIdsOfUpdatedJobsInSequence(updatedTransactionListIds, jobMasterMap) {
+        let updatedJobMasterIdsList = Object.keys(updatedTransactionListIds)
+        for (let jobMaster in updatedJobMasterIdsList) {
+          if (jobMasterMap[updatedJobMasterIdsList[jobMaster]]) {
+            return true
+          }
+        }
+        return false
+      }
 
     /**
      * This method will update seqSelected property of transaction as per the response and save updated transaction to DB
@@ -440,15 +447,6 @@ class Sequence {
         }
     }
 
-
-    checkForJobMasterIdsOfUpdatedJobs(updatedTransactionListIds, jobMasterIdsList){
-        for(let jobMasterId in jobMasterIdsList){
-            if(!_.isEmpty(updatedTransactionListIds[jobMasterIdsList[jobMasterId]])){
-                return true
-            }
-        }
-        return false
-    }
 
     /**
      * it will find routing number and change it to the new routing number
