@@ -23,6 +23,7 @@ import { addServerSmsService } from './AddServerSms'
 import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, PENDING, PATH, PATH_TEMP, APP_VERSION_NUMBER, QC_IMAGE, SKU_PHOTO } from '../../lib/AttributeConstants'
 import { userExceptionLogsService } from './UserException'
 import { communicationLogsService } from './CommunicationLogs'
+import { userSummaryService } from './UserSummary'
 import _ from 'lodash'
 
 import { Platform } from 'react-native'
@@ -48,7 +49,7 @@ class SyncZip {
         SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, syncStoreDTO.lastSyncWithServer);
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
-        const userSummary = this.updateUserSummary(syncStoreDTO)
+        const userSummary = userSummaryService.updateUserSummary(syncStoreDTO)
         let { communicationLogs, lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogs(syncStoreDTO, userSummary) : { communicationLogs: [], lastCallTime: null, lastSmsTime: null }
         SYNC_RESULTS.userCommunicationLog = communicationLogs ? communicationLogs : []
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
@@ -78,28 +79,6 @@ class SyncZip {
         await zip(sourcePath, targetPath);
         return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful, syncDataDTO }
 
-    }
-
-    updateUserSummary(syncStoreDTO) {
-        const {statusList, jobMasterList, userSummary, user, lastSyncWithServer} = syncStoreDTO
-        if (!userSummary) {
-            throw new Error('User Summary missing in store');
-        }
-        const pendingStatusList = statusList ? statusList.filter(jobStatus => jobStatus.statusCategory == PENDING && jobStatus.code != UNSEEN) : null;
-        const jobMasterListWithEnableResequence = jobMasterList ? jobMasterList.filter(jobMaster => jobMaster.enableResequenceRestriction == true) : null;
-        const firstEnableSequenceTransaction = (jobMasterListWithEnableResequence && pendingStatusList) ? jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterListWithEnableResequence, pendingStatusList) : null;
-        userSummary.nextJobTransactionId = firstEnableSequenceTransaction ? firstEnableSequenceTransaction.id : null;
-        userSummary.appVersion = APP_VERSION_NUMBER
-        userSummary.lastLocationDatetime = moment().format('YYYY-MM-DD HH:mm:ss')
-        const activeTime = userSummary.activeTimeInMillis
-        let currentTimeInMili = moment().format('x')
-        if(_.isEmpty(activeTime) || activeTime == 0) {
-            userSummary.activeTimeInMillis = this.calculateActiveTime(moment(user.lastLoginTime).format('x'), currentTimeInMili)
-        } else {
-            userSummary.activeTimeInMillis = activeTime + this.calculateActiveTime(moment(lastSyncWithServer).format('x'), currentTimeInMili);
-        }
-        console.log('activeTimeInMillisLOL', userSummary.activeTimeInMillis);
-        return userSummary;
     }
 
     _getSyncDataFromDb(transactionIdsObject) {
@@ -282,10 +261,6 @@ class SyncZip {
                 }
             }
         }
-    }
-
-    calculateActiveTime(previousActiveTime, currentTimeInMili) {
-        return (currentTimeInMili - previousActiveTime)
     }
 
 }

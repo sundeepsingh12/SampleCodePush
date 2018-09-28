@@ -1,5 +1,6 @@
 import {
     USER_SUMMARY,
+    UNSEEN
 } from '../../lib/constants'
 
 import {
@@ -12,6 +13,8 @@ import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActi
 let imei = require('../../wrapper/IMEI')
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import { PENDING, APP_VERSION_NUMBER } from '../../lib/AttributeConstants'
+import { jobTransactionService } from './JobTransaction'
 
 class UserSummary {
 
@@ -65,6 +68,32 @@ class UserSummary {
           }
           userSummary.imeiNumber = imeiNumber
           return userSummary
+    }
+
+    updateUserSummary(syncStoreDTO) {
+        const {statusList, jobMasterList, userSummary, user, lastSyncWithServer} = syncStoreDTO
+        if (!userSummary) {
+            throw new Error('User Summary missing in store');
+        }
+        const pendingStatusList = statusList ? statusList.filter(jobStatus => jobStatus.statusCategory == PENDING && jobStatus.code != UNSEEN) : null;
+        const jobMasterListWithEnableResequence = jobMasterList ? jobMasterList.filter(jobMaster => jobMaster.enableResequenceRestriction == true) : null;
+        const firstEnableSequenceTransaction = (jobMasterListWithEnableResequence && pendingStatusList) ? jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterListWithEnableResequence, pendingStatusList) : null;
+        userSummary.nextJobTransactionId = firstEnableSequenceTransaction ? firstEnableSequenceTransaction.id : null;
+        userSummary.appVersion = APP_VERSION_NUMBER
+        userSummary.lastLocationDatetime = moment().format('YYYY-MM-DD HH:mm:ss')
+        const activeTime = userSummary.activeTimeInMillis
+        let currentTimeInMili = moment().format('x')
+        if(_.isEmpty(activeTime) || activeTime == 0) {
+            userSummary.activeTimeInMillis = this._calculateActiveTime(moment(user.lastLoginTime).format('x'), currentTimeInMili)
+        } else {
+            userSummary.activeTimeInMillis = activeTime + this._calculateActiveTime(moment(lastSyncWithServer).format('x'), currentTimeInMili);
+        }
+        console.log('activeTimeInMillisLOL', userSummary.activeTimeInMillis);
+        return userSummary;
+    }
+
+    _calculateActiveTime(previousActiveTime, currentTimeInMili) {
+        return (currentTimeInMili - previousActiveTime)
     }
 }
 
