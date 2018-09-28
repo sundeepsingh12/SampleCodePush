@@ -495,6 +495,9 @@ module.exports = {
     TAKE_A_PICTURE: 'Take a picture',
     REMARKS: 'Remarks',
 
+
+    //Message Module Name
+    MESSAGE_MODULE_NAME : "Messages",
     //Paytm constants
     CUSTOMER_NUMBER: 'Enter Customers Mobile Number',
     ENTER_CUSTOMER_OTP: 'Enter OTP from customers mobile screen',
