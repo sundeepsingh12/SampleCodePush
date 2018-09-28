@@ -111,3 +111,6 @@
 
 #mosambee
 -dontwarn com.dspread.xpos.**
+
+#react-native-svg
+-keep public class com.horcrux.svg.** {*;}

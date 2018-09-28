@@ -23,6 +23,7 @@ import {
     DEMAND_DRAFT,
     OBJECT_SAROJ_FAREYE,
     MONEY_PAY,
+    NET_BANKING
 } from '../../lib/AttributeConstants'
 
 import {
@@ -66,9 +67,12 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
             if(size(paymentParameters.paymentModeList.endPaymentModeList) == 0 && size(paymentParameters.paymentModeList.otherPaymentModeList) == 1){
                 selectedPaymentMode = paymentParameters.paymentModeList.otherPaymentModeList[0].moneyTransactionModeId
             }
-            else if(size(paymentParameters.paymentModeList.otherPaymentModeList) == 0 && size(paymentParameters.paymentModeList.endPaymentModeList) == 1 ){
+            //In case of net banking  auto select should not work as in net banking there are 3 sub types
+            else if(size(paymentParameters.paymentModeList.otherPaymentModeList) == 0 && size(paymentParameters.paymentModeList.endPaymentModeList) == 1 && paymentParameters.paymentModeList.endPaymentModeList[0].moneyTransactionModeId != NET_BANKING.id){
                 selectedPaymentMode = paymentParameters.paymentModeList.endPaymentModeList[0].moneyTransactionModeId
             }
+            //In case of cheque and DD Save button should be initially disabed as there is no cheque number or DD number present
+            let isSaveButtonDisabled = !(parseFloat(paymentParameters.actualAmount) && ((size(paymentParameters.paymentModeList.endPaymentModeList) == 1 && size(paymentParameters.paymentModeList.otherPaymentModeList) == 0) && paymentParameters.paymentModeList.endPaymentModeList[0].moneyTransactionModeId != NET_BANKING.id   || (size(paymentParameters.paymentModeList.otherPaymentModeList) == 1 && paymentParameters.paymentModeList.otherPaymentModeList[0].moneyTransactionModeId != CHEQUE.id && paymentParameters.paymentModeList.otherPaymentModeList[0].moneyTransactionModeId != DEMAND_DRAFT.id && size(paymentParameters.paymentModeList.endPaymentModeList) == 0)))
             dispatch(setState(
                 SET_PAYMENT_INITIAL_PARAMETERS,
                 {
@@ -82,7 +86,7 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
                     splitPaymentMode: paymentParameters.splitPaymentMode ? NO : null,
                     jobTransactionIdAmountMap: paymentParameters.jobTransactionIdAmountMap,
                     selectedPaymentMode,
-                    isSaveButtonDisabled:!(parseFloat(paymentParameters.actualAmount) && ((size(paymentParameters.paymentModeList.endPaymentModeList) == 1 && size(paymentParameters.paymentModeList.otherPaymentModeList) == 0)  || (size(paymentParameters.paymentModeList.otherPaymentModeList) == 1 && size(paymentParameters.paymentModeList.endPaymentModeList) == 0)))
+                    isSaveButtonDisabled
 
                 }
             ))
