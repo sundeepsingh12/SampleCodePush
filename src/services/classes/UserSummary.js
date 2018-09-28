@@ -82,13 +82,13 @@ class UserSummary {
         userSummary.appVersion = APP_VERSION_NUMBER
         userSummary.lastLocationDatetime = moment().format('YYYY-MM-DD HH:mm:ss')
         const activeTime = userSummary.activeTimeInMillis
+        // format('x') ; This is used to get time in miliseconds 
         let currentTimeInMili = moment().format('x')
-        if(_.isEmpty(activeTime) || activeTime == 0) {
+        if(isEmpty(activeTime) || activeTime == 0) {
             userSummary.activeTimeInMillis = this._calculateActiveTime(moment(user.lastLoginTime).format('x'), currentTimeInMili)
         } else {
             userSummary.activeTimeInMillis = activeTime + this._calculateActiveTime(moment(lastSyncWithServer).format('x'), currentTimeInMili);
         }
-        console.log('activeTimeInMillisLOL', userSummary.activeTimeInMillis);
         return userSummary;
     }
 
