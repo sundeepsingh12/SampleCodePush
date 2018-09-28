@@ -15,7 +15,7 @@ import styles from '../themes/FeStyle'
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
 import { FormLayout, Discard, Keep, Checkout, SHOW_DISCARD_ALERT, SET_SAVE_ACTIVATED_DRAFT, CHECK_TRANSACTION_STATUS_SAVE_ACTIVATED, LOADER_ACTIVE, SET_CHECK_TRANSACTION_AND_DRAFT_SAVEACTIVATED } from '../lib/constants'
 import { Yes_Checkout, Total, NO } from '../lib/AttributeConstants'
-import { Discard_these_jobs, Do_you_want_to_checkout, EDIT, TRANSACTION_SUCCESSFUL, DELETE_DRAFT } from '../lib/ContainerConstants'
+import { Discard_these_jobs, Do_you_want_to_checkout, EDIT, TRANSACTION_SUCCESSFUL, DELETE_DRAFT, DELETE_ALL_ITEMS, DELETE_SINGLE_ITEM, YES } from '../lib/ContainerConstants'
 import DraftModal from '../components/DraftModal'
 import _ from 'lodash'
 import { redirectToFormLayout } from '../modules/newJob/newJobActions'
@@ -188,7 +188,7 @@ class SaveActivated extends PureComponent {
                 <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} >
                     <TouchableOpacity style={[styles.flexBasis90, styles.row, styles.alignCenter]}
                         onPress={() => { this.review(true, item.fieldDataArray, true, item.textToShow, item.id) }}>
-                        <Text style={[styles.fontDefault]}>{_.clone(showText)}</Text>
+                        <Text style={[styles.fontDefault]}>{showText}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.flexBasis10]}
                         onPress={() => {
@@ -203,12 +203,12 @@ class SaveActivated extends PureComponent {
 
     showDeleteAlert(item, deleteAllItems) {
         Alert.alert(
-            (deleteAllItems) ? 'Do you want to delete all items?' : 'Do you want to delete this item?',
+            (deleteAllItems) ? DELETE_ALL_ITEMS : DELETE_SINGLE_ITEM,
             '',
             [
                 { text: NO, style: 'cancel' },
                 {
-                    text: 'Yes', onPress: () => {
+                    text: YES, onPress: () => {
                         this.props.actions.deleteItem(
                             (deleteAllItems) ? '' : item.id,
                             this.props.recurringData,
