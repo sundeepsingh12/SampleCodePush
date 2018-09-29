@@ -116,6 +116,7 @@ import { jobDataService } from '../../services/classes/JobData'
 import { jobService } from '../../services/classes/Job'
 import { each, size, isNull, isEmpty } from 'lodash'
 import { AppState, Linking } from 'react-native'
+import { fetchJobs } from '../taskList/taskListActions';
 import { countDownTimerService } from '../../services/classes/CountDownTimerService'
 import { navigateToLiveJob } from '../liveJob/liveJobActions'
 
@@ -199,6 +200,10 @@ export function navigateToPage(pageObject, navigationProps) {
           navigate(BluetoothListing, { pageObject })
           break;
         case PAGE_BULK_UPDATE: {
+          let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+          if (updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)) {
+            dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
+          }
           dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
           break;
         }
@@ -308,10 +313,6 @@ export function checkCustomErpPullActivated() {
 export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) {
   return async function (dispatch) {
     try {
-      let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
-      if (updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)) {
-        dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
-      }
       if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
         dispatch(setState(syncLoader, true))
         let message = await dispatch(performSyncService())
@@ -513,10 +514,14 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
       if (isJobsPresent) {
         dispatch(pieChartCount())
         let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
-        if (updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)) {
-          dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
-        }
-      }
+        if(updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)){
+          if(updatedJobTransactionList.value.runsheetClosed){
+            dispatch(fetchJobs())
+          }else{
+            dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS,updatedJobTransactionList.value))
+          }
+        }     
+       }
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
         unsyncedTransactionList: [],
         syncStatus: 'OK',
