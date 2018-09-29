@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { StyleSheet, View, Text, Platform, TextInput, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Content,Footer, FooterTab, Input, Button, Item,Icon, StyleProvider } from 'native-base'
 import getTheme from '../../native-base-theme/components'

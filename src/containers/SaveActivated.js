@@ -389,7 +389,7 @@ class SaveActivated extends PureComponent {
                     </Content>
                     {renderIf(_.size(this.props.recurringData) > 0,
                         <SafeAreaView style={{ backgroundColor: '#ffffff' }}>
-                            <Footer style={[style.footer]}>
+                            <Footer style={[style.footer,styles.autoHeightFooter]}>
                                 {renderIf(this.props.isSignOffVisible, <FooterTab style={[styles.paddingLeft10, styles.paddingRight5, styles.bgLightGray, styles.marginLeft10]}>
                                     <Button onPress={() => {
                                         this.signOff(
@@ -418,7 +418,6 @@ class SaveActivated extends PureComponent {
 const style = StyleSheet.create({
     header: {
         borderBottomWidth: 0,
-        height: 'auto',
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0
@@ -440,7 +439,6 @@ const style = StyleSheet.create({
         paddingRight: 15
     },
     footer: {
-        height: 'auto',
         backgroundColor: '#ffffff',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',

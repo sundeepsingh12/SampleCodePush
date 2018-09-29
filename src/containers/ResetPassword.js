@@ -110,13 +110,13 @@ class ResetPassword extends PureComponent {
 
   _getFooterView() {
     return (
-      <Footer style={[styles.footer]}>
-        <FooterTab style={[styles.padding10]}>
-          <Button success full onPress={this._onResetPress} disabled={this.props.isSaveResetButtonDisabled}>
-            <Text style={[styles.fontLg, styles.fontWhite]}>{RESET_PASSWORD}</Text>
-          </Button>
-        </FooterTab>
-      </Footer>
+        <Footer style={[styles.footer,styles.autoHeightFooter]}>
+          <FooterTab style={[styles.padding10]}>
+            <Button success full onPress={this._onResetPress} disabled={this.props.isSaveResetButtonDisabled}>
+              <Text style={[styles.fontLg, styles.fontWhite]}>{RESET_PASSWORD}</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
     )
   }
 
