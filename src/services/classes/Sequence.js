@@ -11,7 +11,6 @@ import RestAPIFactory from '../../lib/RestAPIFactory'
 import {
     HUB,
     TABLE_JOB_TRANSACTION,
-    PENDING
 } from '../../lib/constants'
 
 import {
@@ -19,7 +18,8 @@ import {
     ADDRESS_LINE_2,
     PINCODE,
     LANDMARK,
-    POST
+    POST,
+    PENDING
 } from '../../lib/AttributeConstants'
 import {
     SEQUENCELIST_MISSING,
@@ -48,14 +48,14 @@ class Sequence {
             throw new Error(RUNSHEET_NUMBER_MISSING);
         }
         let jobTransactionCustomizationList = {}
-        let allStatusIdsMapForCode = await jobStatusService.getAllStatusIdsMapForCode(PENDING)
+        let allPendingStatusIdsMapForCategory = await jobStatusService.getMapOfNonUnseenStatusIdsForStatusCategory(PENDING)
         for(let jobMasterId in jobTransactionList){
             if(jobMasterMap[jobMasterId]){
                 jobTransactionCustomizationList = Object.assign(jobTransactionCustomizationList, jobTransactionList[jobMasterId]) 
             }
         }
         const sequenceMap =  _.pickBy(jobTransactionCustomizationList, function(value, key) {
-            return (value.runsheetNo == runsheetNumber && allStatusIdsMapForCode[value.statusId])
+            return (value.runsheetNo == runsheetNumber && allPendingStatusIdsMapForCategory[value.statusId])
         })
         return Object.values(sequenceMap);
     }
