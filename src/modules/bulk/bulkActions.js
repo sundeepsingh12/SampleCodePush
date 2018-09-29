@@ -41,7 +41,7 @@ export function getBulkJobTransactions(bulkParams, jobTransactionList, updatedTr
             let jobTransactionCustomizationList = JSON.parse(JSON.stringify(jobTransactionList))
             cloneBulkParams.pageObject.additionalParams = JSON.parse(cloneBulkParams.pageObject.additionalParams)
             cloneBulkParams.pageObject.jobMasterIds = JSON.parse(cloneBulkParams.pageObject.jobMasterIds)
-            if (isEmpty(jobTransactionCustomizationList) || !isEmpty(updatedTransactionListIds) && !isEmpty(updatedTransactionListIds[cloneBulkParams.pageObject.jobMasterIds[0]]) && bulkService.checkForJobMasterIdsOfUpdatedJobs(updatedTransactionListIds[cloneBulkParams.pageObject.jobMasterIds[0]], cloneBulkParams.pageObject.additionalParams.statusId, jobTransactionCustomizationList[cloneBulkParams.pageObject.jobMasterIds[0]])) {
+            if (isEmpty(jobTransactionCustomizationList) || !isEmpty(updatedTransactionListIds) && !isEmpty(updatedTransactionListIds[cloneBulkParams.pageObject.jobMasterIds[0]]) && bulkService.checkForJobMasterIdsOfUpdatedJobsInBulk(updatedTransactionListIds[cloneBulkParams.pageObject.jobMasterIds[0]], cloneBulkParams.pageObject.additionalParams.statusId, jobTransactionCustomizationList[cloneBulkParams.pageObject.jobMasterIds[0]])) {
                 let jobIdList = !isEmpty(jobTransactionCustomizationList) ? updatedTransactionListIds : null
                 jobTransactionCustomizationList = await transactionCustomizationService.fetchUpdatedTransactionList(jobIdList, jobTransactionCustomizationList);
                 dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }));

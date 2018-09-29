@@ -124,12 +124,14 @@ class Menu extends PureComponent {
   messageView() {
     let view
     if (this.props.utilities.messagingEnabled) {
-      view = <TouchableOpacity onPress={() => navigate('MessageBox', null)}>
+      view = <TouchableOpacity onPress={() => navigate('MessageBox', {
+        messageModuleName: this.props.utilities.messageModuleName
+      })}>
         <View style={[styles.bgWhite, styles.borderBottomGray]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
               <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomColor: '#f3f3f3' }]}>
-                <Text style={[styles.fontDefault]}> Messages </Text>
+                <Text style={[styles.fontDefault]}> {this.props.utilities.messageModuleName} </Text>
                 <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontBlack]} />
               </View>
             </View>

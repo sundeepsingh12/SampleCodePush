@@ -4,7 +4,8 @@ var InitialState = Record({
     subMenuList: [],
     utilities: {
         pieChartEnabled: false,
-        messagingEnabled: false
+        messagingEnabled: false,
+        messageModuleName: ''
     },
     pagesLoading: false,
     pieChartSummaryCount: {
