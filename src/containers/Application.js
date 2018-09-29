@@ -10,7 +10,6 @@ import { APP_VERSION_NUMBER } from '../lib/AttributeConstants'
 
 console.disableYellowBox = false;
 
-import * as authActions from '../modules/login/loginActions'
 import * as initialLoadActions from '../modules/intialLoad/initialLoadActions'
 
 import {
@@ -49,7 +48,4 @@ class Application extends PureComponent {
 
 }
 
-/**
- * Connect the properties
- */
-export default connect(null, {...authActions, ...initialLoadActions})(Application)
+export default connect(null, { ...initialLoadActions})(Application)

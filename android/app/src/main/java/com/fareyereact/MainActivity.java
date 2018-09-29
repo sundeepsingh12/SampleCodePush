@@ -1,7 +1,6 @@
 package com.fareyereact;
 
 import com.facebook.react.ReactActivity;
-import io.realm.react.RealmReactPackage;
 import android.content.Intent;
 
 public class MainActivity extends ReactActivity {
