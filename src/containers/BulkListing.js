@@ -60,7 +60,7 @@ class BulkListing extends PureComponent {
   }
 
   renderData = (item, bulkTransactionLength, selectedTransactionLength) => {
-    if (isEmpty(item.jobExpiryData.value) || moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(item.jobExpiryData.value)) {
+    if (isEmpty(item.jobExpiryData.value) || (moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(item.jobExpiryData.value))) {
       return (
         <JobListItem data={item}
           onPressItem={() => this.onClickRowItem(item, bulkTransactionLength, selectedTransactionLength)}

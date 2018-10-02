@@ -73,6 +73,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/runtime": "^7.1.2",
     "eslint": "4.14.0",
     "metro-react-native-babel-preset": "0.45.1",
     "reactotron-react-native": "1.14.0",
