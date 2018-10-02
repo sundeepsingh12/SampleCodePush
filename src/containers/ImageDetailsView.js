@@ -1,7 +1,7 @@
 
 'use strict';
 import React, { PureComponent } from 'react';
-import {  Text, View, Image } from 'react-native'
+import { Text, View, Image } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Icon, StyleProvider } from 'native-base'
 import * as cameraActions from '../modules/camera/cameraActions'
@@ -10,6 +10,7 @@ import { bindActionCreators } from 'redux'
 import platform from '../../native-base-theme/variables/platform'
 import getTheme from '../../native-base-theme/components'
 import styles from '../themes/FeStyle'
+import Loader from '../components/Loader';
 
 function mapStateToProps(state) {
     return {
@@ -35,14 +36,17 @@ class ImageDetailsView extends PureComponent {
     }
 
     getImageView() {
+        if (this.props.viewData == '') {
+            return <Loader />
+        }
         if (this.props.viewData) {
             return <Image
                 resizeMethod={'resize'}
-                resizeMode={(this.props.navigation.state.params.isSignature) ? 'contain' : 'cover'}
+                resizeMode={'contain'}
                 source={{
                     uri: 'data:image/jpeg;base64,' + this.props.viewData,
                 }}
-                style={[{ height: '100%', width: '100%'}, styles.flex1]}
+                style={[{ height: '100%', width: '100%' }, styles.flex1]}
             />
         } else {
             let view =
@@ -56,7 +60,7 @@ class ImageDetailsView extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <View style={{ flex: 1 , backgroundColor: '#fff'}}>
+                    <View style={{ flex: 1, backgroundColor: '#fff' }}>
                         {this.getImageView()}
                         <SafeAreaView style={[styles.absolute, styles.marginLeft5, styles.padding15, { top: 0, left: 0, flex: 2 }]}>
                             <View>

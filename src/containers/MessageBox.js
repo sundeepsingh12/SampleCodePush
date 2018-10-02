@@ -1,5 +1,5 @@
 'use strict'
-import { Container, StyleProvider, Footer, Item, Content } from 'native-base';
+import { Container, StyleProvider, Footer, Content } from 'native-base';
 import { FlatList, View, Text, StyleSheet, TextInput } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -46,7 +46,7 @@ class MessageBox extends Component {
         messageText: ''
     }
     static navigationOptions = ({ navigation }) => {
-        return { header: <TitleHeader pageName='Messages' goBack={navigation.goBack} /> }
+        return { header: <TitleHeader pageName={navigation.state.params.messageModuleName} goBack={navigation.goBack} /> }
     }
 
     componentDidMount() {
@@ -162,7 +162,7 @@ class MessageBox extends Component {
         let view
         view =
             <Footer
-                style={[style.footer, styles.bgWhite, styles.row]}>
+                style={[style.footer, styles.bgWhite, styles.row,styles.autoHeightFooter]}>
                 <TextInput
                     autoCapitalize="none"
                     placeholder='Type a message'
@@ -212,13 +212,10 @@ const style = StyleSheet.create({
         borderBottomWidth: 1
     },
     footer: {
-        height: 'auto',
         borderTopWidth: 1,
         borderTopColor: '#f3f3f3',
         padding: 10
     },
-
-
     msgBlock: {
         maxWidth: 250,
         borderRadius: 5,

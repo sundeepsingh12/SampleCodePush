@@ -5,12 +5,12 @@ import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import * as homeActions from '../modules/home/homeActions'
-import { StyleSheet, View, Image, Text, BackHandler } from 'react-native'
+import { View, Image, Text, BackHandler } from 'react-native'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import { SET_FAIL_UPLOAD_COUNT } from '../lib/constants'
-import { Container, Button, StyleProvider, } from 'native-base'
+import { Container, Button, StyleProvider } from 'native-base'
 import {
     UNABLE_TO_UPLOAD,
     BACKUP_FILE,

@@ -19,7 +19,6 @@ import includes from 'lodash/includes'
 import toLower from 'lodash/toLower'
 import sortBy from 'lodash/sortBy'
 import isEmpty from 'lodash/isEmpty'
-
 import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED, NO_JOBS_PRESENT, TOTAL_COUNT } from '../lib/ContainerConstants'
 import { FormLayout, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner, SET_BULK_TRANSACTION_PARAMETERS, SET_BULK_PARAMS_FOR_SELECTED_DATA, SET_BULK_CHECK_ALERT_VIEW } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
