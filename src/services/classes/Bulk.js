@@ -3,6 +3,7 @@ import { jobTransactionService } from './JobTransaction'
 import { transactionCustomizationService } from './TransactionCustomization'
 import _ from 'lodash'
 import { INVALID_SCAN, SELECT_ALL, SELECT_NONE } from '../../lib/ContainerConstants'
+import moment from 'moment'
 
 class Bulk {
 
@@ -61,7 +62,7 @@ class Bulk {
         let bulkJobSimilarityConfig = this.getBulkJobSimilarityConfig(clonePageObject)
         let isTransactionSelected = false
         for (let key in bulkTransactions) {
-            if(bulkTransactions[key].statusId != clonePageObject.additionalParams.statusId){
+            if(bulkTransactions[key].statusId != clonePageObject.additionalParams.statusId || (!_.isEmpty(bulkTransactions[key].jobExpiryData.value) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(bulkTransactions[key].jobExpiryData.value))){
                 continue
             }
             bulkTransactionLength++;

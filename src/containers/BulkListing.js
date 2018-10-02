@@ -60,7 +60,7 @@ class BulkListing extends PureComponent {
   }
 
   renderData = (item, bulkTransactionLength, selectedTransactionLength) => {
-    if (isEmpty(item.jobExpiryData.value) || moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(item.jobExpiryData.value)) {
+    if (isEmpty(item.jobExpiryData.value) || (moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(item.jobExpiryData.value))) {
       return (
         <JobListItem data={item}
           onPressItem={() => this.onClickRowItem(item, bulkTransactionLength, selectedTransactionLength)}
@@ -69,7 +69,6 @@ class BulkListing extends PureComponent {
     }
 
   }
-
 
   onClickRowItem(item, bulkTransactionLength, selectedTransactionLength) {
     if (this.props.isManualSelectionAllowed && !this.props.selectedItems[item.jobId].disabled) {
@@ -115,7 +114,6 @@ class BulkListing extends PureComponent {
     }
     return false
   }
-
 
   _setQrValue = (selectedTransactionLength, value) => {
     if (value && value != '')
@@ -165,7 +163,8 @@ class BulkListing extends PureComponent {
     // Function for filtering on basis of reference number, runsheet number, line1, line2, circleline1, circleline2
     for (let item in bulkTransactions) {
       let values = [bulkTransactions[item].runsheetNo, bulkTransactions[item].referenceNumber, bulkTransactions[item].line1, bulkTransactions[item].line2, bulkTransactions[item].circleLine1, bulkTransactions[item].circleLine2]
-      if (bulkTransactions[item].isChecked && !bulkTransactions[item].disabled) {
+     //Jobs which are expired also present in bulk state,hence we need to check if current time is less than job expiry
+      if (bulkTransactions[item].isChecked && !bulkTransactions[item].disabled && (isEmpty(bulkTransactions[item].jobExpiryData.value)  || (moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(bulkTransactions[item].jobExpiryData.value)))) {
         selectedTransactionLength++
       }
       if ((isEmpty(searchText))) {
