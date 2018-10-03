@@ -26,6 +26,10 @@ import {
     CUSTOMER_CARE,
     SMS_TEMPLATE
 } from '../../lib/constants'
+
+import {
+    ENABLE_RESEQUENCE_RESTRICTION_MESSAGE
+} from '../../lib/ContainerConstants'
 import { keyValueDBService } from './KeyValueDBService'
 import { geoFencingService } from './GeoFencingService'
 import _ from 'lodash'
@@ -115,13 +119,13 @@ class JobDetails {
      *@returns {string,Boolean} It returns boolean if enableOutForDelivery,enableResequenceRestriction and jobTime cases fail
      */
 
-    checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId, actionOnStatus) {
+    checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, currentStatus, seqSelected, statusList, jobTransactionId) {
         let enableFlag = false
         if (enableOutForDelivery) { // check for out for delivery
             enableFlag = this.checkOutForDelivery(jobMasterList, statusList)
         }
-        if (!enableFlag && enableResequenceRestriction && actionOnStatus != 1) { // check for enable resequence restriction and job closed
-            enableFlag = this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)
+        if (!enableFlag && enableResequenceRestriction && currentStatus.actionOnStatus != 1) { // check for enable resequence restriction and job closed
+            enableFlag = this.checkEnableResequence(jobMasterList, currentStatus.tabId, seqSelected, statusList, jobTransactionId, currentStatus.nextStatusList)
         }
         if (!enableFlag && jobTime) { // check for jobTime expiry
             enableFlag = this.checkJobExpire(jobTime)
@@ -182,11 +186,14 @@ class JobDetails {
      *@returns {string,Boolean} if seqSelected value is greater than firstEnableSequenceTransaction seqSelected value  then return boolean else string
      */
 
-    checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId) {
+    checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId, nextStatusList) {
+        if(_.isEmpty(nextStatusList)) { // case if there are no next status map to current status
+            return false
+        }
         const jobMasterIdWithEnableResequence = jobMasterList.filter((obj) => obj.enableResequenceRestriction == true)
         const statusMap = statusList.filter((status) => status.tabId == tabId && status.code !== UNSEEN)
         const firstEnableSequenceTransaction = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
-        return !(!_.isEmpty(firstEnableSequenceTransaction) && firstEnableSequenceTransaction.id != jobTransactionId && seqSelected >= firstEnableSequenceTransaction.seqSelected) ? false : "Please finish previous items first"
+        return !(!_.isEmpty(firstEnableSequenceTransaction) && firstEnableSequenceTransaction.id != jobTransactionId && seqSelected >= firstEnableSequenceTransaction.seqSelected) ? false : ENABLE_RESEQUENCE_RESTRICTION_MESSAGE
     }
 
     /**@function checkOutForDelivery(jobMasterList)
@@ -298,7 +305,7 @@ class JobDetails {
             jobAttributeMasterList: jobAttributeMasterList ? jobAttributeMasterList.value : jobAttributeMasterList,
             jobAttributeStatusList: jobAttributeStatusList ? jobAttributeStatusList.value : jobAttributeStatusList,
             jobMasterList: jobMasterList ? jobMasterList.value : jobMasterList,
-            fieldAttributeMasterList : fieldAttributeMasterList ? fieldAttributeMasterList.value : fieldAttributeMasterList,
+            fieldAttributeMasterList: fieldAttributeMasterList ? fieldAttributeMasterList.value : fieldAttributeMasterList,
             smsTemplateList: smsTemplateList ? smsTemplateList.value : smsTemplateList,
             statusList: statusList ? statusList.value : statusList,
             fieldAttributeStatusList: fieldAttributeStatusList ? fieldAttributeStatusList.value : fieldAttributeStatusList,

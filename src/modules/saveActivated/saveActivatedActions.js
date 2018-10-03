@@ -148,11 +148,11 @@ export function clearStateAndStore(jobMasterId) {
 }
 
 
-export function deleteItem(itemId, recurringData, commonData, navigationParams, statusName) {
+export function deleteItem(itemId, recurringData, commonData, navigationParams, statusName, deleteAllItems) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_ACTIVE, true))
-            recurringData = await transientStatusAndSaveActivatedService.deleteRecurringItem(itemId, recurringData)
+            recurringData = await transientStatusAndSaveActivatedService.deleteRecurringItem(itemId, recurringData, deleteAllItems)
             await dispatch(storeState({
                 commonData,
                 differentData: recurringData,

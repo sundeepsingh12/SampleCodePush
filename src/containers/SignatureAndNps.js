@@ -1,10 +1,9 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, TouchableOpacity, BackHandler } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import { Container, Header, Body, Icon, StyleProvider, Toast, FooterTab } from 'native-base';
+import { Container, Header, Body, Icon, StyleProvider, Toast} from 'native-base';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SignatureRemarks from '../components/SignatureRemarks'

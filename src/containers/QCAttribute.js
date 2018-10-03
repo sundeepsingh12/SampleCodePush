@@ -161,18 +161,16 @@ class QCAttribute extends PureComponent {
                             </View>
                         </View>
                     </Content>
-                    <SafeAreaView style={[styles.bgWhite]}>
-                        <Footer style={[styles.footer]}>
-                            <FooterTab style={[styles.padding10]}>
-                                <Button danger full onPress={() => this.props.actions.saveQCDataAndNavigate(false, { qcDataArray: this.props.qcDataArray, qcAttributeMaster: this.props.qcAttributeMaster }, { jobTransaction: this.props.navigation.state.params.jobTransaction, formLayoutState: this.props.navigation.state.params.formLayoutState })}>
-                                    <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcValidationMap && this.props.qcAttributeMaster.qcValidationMap.qcFailButtonTextValidation ? this.props.qcAttributeMaster.qcValidationMap.qcFailButtonTextValidation : FAIL}</Text>
-                                </Button>
-                                <Button success full onPress={() => this.props.actions.saveQCDataAndNavigate(true, { qcDataArray: this.props.qcDataArray, qcAttributeMaster: this.props.qcAttributeMaster }, { jobTransaction: this.props.navigation.state.params.jobTransaction, formLayoutState: this.props.navigation.state.params.formLayoutState })} style={[styles.marginLeft10]}>
-                                    <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcValidationMap && this.props.qcAttributeMaster.qcValidationMap.qcPassButtonTextValidation ? this.props.qcAttributeMaster.qcValidationMap.qcPassButtonTextValidation : PASS}</Text>
-                                </Button>
-                            </FooterTab>
-                        </Footer>
-                    </SafeAreaView>
+                    <Footer style={[styles.footer]}>
+                        <FooterTab style={[styles.padding10]}>
+                            <Button danger full onPress={() => this.props.actions.saveQCDataAndNavigate(false, { qcDataArray: this.props.qcDataArray, qcAttributeMaster: this.props.qcAttributeMaster }, { jobTransaction: this.props.navigation.state.params.jobTransaction, formLayoutState: this.props.navigation.state.params.formLayoutState })}>
+                                <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcValidationMap && this.props.qcAttributeMaster.qcValidationMap.qcFailButtonTextValidation ? this.props.qcAttributeMaster.qcValidationMap.qcFailButtonTextValidation : FAIL}</Text>
+                            </Button>
+                            <Button success full onPress={() => this.props.actions.saveQCDataAndNavigate(true, { qcDataArray: this.props.qcDataArray, qcAttributeMaster: this.props.qcAttributeMaster }, { jobTransaction: this.props.navigation.state.params.jobTransaction, formLayoutState: this.props.navigation.state.params.formLayoutState })} style={[styles.marginLeft10]}>
+                                <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.qcAttributeMaster && this.props.qcAttributeMaster.qcValidationMap && this.props.qcAttributeMaster.qcValidationMap.qcPassButtonTextValidation ? this.props.qcAttributeMaster.qcValidationMap.qcPassButtonTextValidation : PASS}</Text>
+                            </Button>
+                        </FooterTab>
+                    </Footer>
                 </Container>
             </StyleProvider>
         )

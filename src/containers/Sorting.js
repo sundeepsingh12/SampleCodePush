@@ -17,7 +17,7 @@ import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import { SORTING_SEARCH_VALUE, QrCodeScanner, DEFAULT_ERROR_MESSAGE_IN_SORTING, SORTING_INITIAL_STATE, BluetoothListing } from '../lib/constants'
-import { SORTING, SEARCH_INFO, POST_SEARCH_PLACEHOLDER, OK, STOP, DEPOT, SEARCH_RESULT } from '../lib/ContainerConstants'
+import { SORTING, SEARCH_INFO, POST_SEARCH_PLACEHOLDER, OK, STOP, DEPOT, SEARCH_RESULT, ADDRESS } from '../lib/ContainerConstants'
 import BluetoothSerial from 'react-native-bluetooth-serial';
 import BluetoothSorting from '../components/BluetoothSorting';
 import { navigate } from '../modules/navigators/NavigationService';
@@ -83,7 +83,10 @@ class SortingListing extends PureComponent {
         let data = {
             feName: this.props.sortingDetails[1].value,
             sequenceNumber: `${STOP}   :  ` + this.props.sortingDetails[3].value,
-            hub: `${DEPOT}   :  ` + this.props.sortingDetails[2].value.split('/')[1].toLocaleUpperCase()
+            hub: `${DEPOT}   :  ` + this.props.sortingDetails[2].value.split('/')[1].toLocaleUpperCase(),
+        }
+        if(this.props.sortingDetails[4]) {
+            data.address = `${ADDRESS} : ` + this.props.sortingDetails[4].value;
         }
         let sortingXmlData = `
         <?xml version="1.0" encoding="UTF-8"?>
@@ -95,6 +98,8 @@ class SortingListing extends PureComponent {
             <text-line size="1:0">{{sequenceNumber}}</text-line>
             <line-feed />
             <text-line size="1:0">{{hub}}</text-line>
+            <line-feed />
+            <text-line size="1:0">{{address}}</text-line>
             <line-feed />
         </align>
         </document>

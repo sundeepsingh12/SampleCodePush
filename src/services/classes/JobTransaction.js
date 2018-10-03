@@ -133,6 +133,7 @@ class JobTransaction {
             jobTransactionMap[id] = { id, jobId, jobMasterId, jobStatusId, referenceNumber, runsheetNo, runsheetId, seqSelected, trackCallCount, trackCallDuration, trackHalt, trackKm, trackSmsCount, trackTransactionTimeSpent, seqAssigned, seqActual, attemptCount, lastTransactionTimeOnMobile, jobEtaTime, jobCreatedAt, lastUpdatedAtServer };
             jobIdJobTransactionStatusIdMap[transaction.jobId] = transaction.jobStatusId
         }
+        fieldDataQuery = `(${fieldDataQuery}) AND parentId = 0`
         return { jobTransactionMap, jobQuery, jobTransactionQuery, fieldDataQuery, jobIdJobTransactionStatusIdMap };
     }
 
@@ -186,9 +187,12 @@ class JobTransaction {
         let jobTransactionDTO = {};
         let jobTransactionCustomizationListParametersMaps = this.prepareMapsForTransactionCustomizationList(jobTransactionCustomizationListParametersDTO);
         let runsheetObject = runSheetService.prepareJobTransactionQueryOnBasisOfRunsheet(jobTransactionCustomizationListParametersDTO.customNaming.enableFutureDateRunsheet);
+        if( jobTransactionCustomizationListParametersDTO.customNaming.enableFutureDateRunsheet && _.isEmpty(runsheetObject.runsheetMap)){
+            return []
+        }
         let jobTransactionQuery = runsheetObject.jobTransactionQuery;
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1';
-        jobTransactionQuery = queryDTO && queryDTO.jobTransactionQuery && queryDTO.jobTransactionQuery.trim() !== '' ? `${jobTransactionQuery} AND ${queryDTO.jobTransactionQuery}` : jobTransactionQuery;
+        jobTransactionQuery = queryDTO && queryDTO.jobTransactionQuery && queryDTO.jobTransactionQuery.trim() !== '' ? `(${jobTransactionQuery}) AND (${queryDTO.jobTransactionQuery})` : jobTransactionQuery;
         let jobTransactionList = [], jobTransactionObject = {}, jobDataList = [], fieldDataList = [];
         jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery);
         if (jobTransactionList.length == 0) {

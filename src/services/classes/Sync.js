@@ -38,6 +38,8 @@ import RNFS from 'react-native-fs'
 import { showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
 import { communicationLogsService } from './CommunicationLogs'
 import { liveJobService } from './LiveJobService';
+import { countDownTimerService } from './CountDownTimerService';
+import { Platform } from 'react-native'
 
 class Sync {
 
@@ -190,6 +192,10 @@ class Sync {
       } else if (queryType == 'message') {
         messageIdDto = messageIdDto.concat(this.saveMessagesInDb(tdcContentObject))
       }
+
+      if (Platform.OS == 'android' && (queryType == 'insert' || queryType == 'update')) {
+        await countDownTimerService.checkForCountDownTimer(contentQuery.jobData, syncStoreDTO)
+      }
     }
     return { jobMasterIds, messageIdDto }
   }
@@ -304,6 +310,14 @@ class Sync {
       value: contentQuery.runSheet
     }
 
+    if(!_.isEmpty(contentQuery.runSheet)){
+      for(let runsheet in contentQuery.runSheet){
+        if(contentQuery.runSheet[runsheet] && contentQuery.runSheet[runsheet].isClosed){
+          updatedJobTransactionList['runsheetClosed'] = true
+          break
+        }
+      }
+    }
     //Job data is deleted in insert query also,to handle multiple login case 
     //Ideally Id should be added server side in jobdata table
 
@@ -731,7 +745,7 @@ class Sync {
    * @param {*} topic 
    */
   sendRegistrationTokenToServer(token, fcmToken, topic) {
-    const url = CONFIG.API.FCM_TOKEN_REGISTRATON + '?topic=' + encodeURIComponent(topic) +'&type='+encodeURIComponent('device')
+    const url = CONFIG.API.FCM_TOKEN_REGISTRATON + '?topic=' + encodeURIComponent(topic) + '&type=' + encodeURIComponent('device')
     RestAPIFactory(token.value).serviceCall(fcmToken, url, 'POST')
   }
 

@@ -90,7 +90,7 @@ class TransientStatusAndSaveActivatedService {
                 priority = 2
                 textToShow = formData[currentObject].value
             }
-            else if (formData[currentObject].attributeTypeId == QR_SCAN && priority < 1) {
+            else if (formData[currentObject].attributeTypeId == QR_SCAN && formData[currentObject].value && priority < 1) {
                 priority = 1
                 textToShow = formData[currentObject].value
             }
@@ -214,7 +214,7 @@ class TransientStatusAndSaveActivatedService {
                 referenceNumber: dataForSingleTransaction.referenceNumber
             }
             let index = Object.keys(previousFormLayoutState)[0]
-            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, dataForSingleTransaction.id, statusId, jobMasterId, jobTransaction,previousFormLayoutState[index].jobAndFieldAttributesList)
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, dataForSingleTransaction.id, statusId, jobMasterId, jobTransaction, previousFormLayoutState[index].jobAndFieldAttributesList)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList, jobMasterId)
         }
         return { emailTableElement, emailIdInFieldData, contactNumberInFieldData }
@@ -231,39 +231,39 @@ class TransientStatusAndSaveActivatedService {
      */
 
     async sendEmailOrSms(totalAmount, emailTableElement, emailIdOrSmsList, isEmail, emailGeneratedFromComplete, jobMasterId) {
-            const userData = await keyValueDBService.getValueFromStore(USER)
-            if (userData && userData.value && userData.value.company && userData.value.company.code && (_.startsWith(_.toLower(userData.value.company.code), 'dhl'))) {
-                if (!_.isEmpty(emailIdOrSmsList) && !isEmail) {
-                    emailIdOrSmsList = [_.trim(emailIdOrSmsList)]
-                }
-                const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-                let currentJobMasterCode = jobMasterList.value.filter((data) => data.id == jobMasterId)[0].code
-                let body = {
-                    companyCode: userData.value.company.code,
-                    emailTableElement,
-                    emailTotalCash: totalAmount,
-                }
-                const hub = await keyValueDBService.getValueFromStore(HUB)
-                let hubcode = hub.value.code
-                const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-                let postJSON = "{\"emailIds\":" + JSON.stringify(emailIdOrSmsList) + ", \"subject\": \"" + currentJobMasterCode + "\"" + ", \"hubCode\": \"" + hubcode + "\"" + ", \"body\": " + JSON.stringify(body) + ", \"emailGeneratedFromComplete\": \"" + emailGeneratedFromComplete + "\"" + "}";
-                let jSessionId = ((token.value).split('JSESSIONID=')[1]).split(';')[0]
-                let url = (isEmail) ? CONFIG.API.SEND_EMAIL_LINK + jSessionId : CONFIG.API.SEND_SMS_LINK + jSessionId
-                let response = await RestAPIFactory(token.value).serviceCall(postJSON, url, POST)  // dhl sit https
-                if (!response || response.status != 202) {
-                    if (!isEmail) {
-                        return SMS_NOT_SENT_TRY_AGAIN_LATER
-                    } else {
-                        return EMAIL_NOT_SENT_TRY_AGAIN_LATER
-                    }
+        const userData = await keyValueDBService.getValueFromStore(USER)
+        if (userData && userData.value && userData.value.company && userData.value.company.code && (_.startsWith(_.toLower(userData.value.company.code), 'dhl'))) {
+            if (!_.isEmpty(emailIdOrSmsList) && !isEmail) {
+                emailIdOrSmsList = [_.trim(emailIdOrSmsList)]
+            }
+            const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+            let currentJobMasterCode = jobMasterList.value.filter((data) => data.id == jobMasterId)[0].code
+            let body = {
+                companyCode: userData.value.company.code,
+                emailTableElement,
+                emailTotalCash: totalAmount,
+            }
+            const hub = await keyValueDBService.getValueFromStore(HUB)
+            let hubcode = hub.value.code
+            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            let postJSON = "{\"emailIds\":" + JSON.stringify(emailIdOrSmsList) + ", \"subject\": \"" + currentJobMasterCode + "\"" + ", \"hubCode\": \"" + hubcode + "\"" + ", \"body\": " + JSON.stringify(body) + ", \"emailGeneratedFromComplete\": \"" + emailGeneratedFromComplete + "\"" + "}";
+            let jSessionId = ((token.value).split('JSESSIONID=')[1]).split(';')[0]
+            let url = (isEmail) ? CONFIG.API.SEND_EMAIL_LINK + jSessionId : CONFIG.API.SEND_SMS_LINK + jSessionId
+            let response = await RestAPIFactory(token.value).serviceCall(postJSON, url, POST)  // dhl sit https
+            if (!response || response.status != 202) {
+                if (!isEmail) {
+                    return SMS_NOT_SENT_TRY_AGAIN_LATER
                 } else {
-                    if (!isEmail) {
-                        return SMS_SENT_SUCCESSFULLY
-                    } else {
-                        return EMAIL_SENT_SUCCESSFULLY
-                    }
+                    return EMAIL_NOT_SENT_TRY_AGAIN_LATER
                 }
-            } else return 'companyId is not dhl'
+            } else {
+                if (!isEmail) {
+                    return SMS_SENT_SUCCESSFULLY
+                } else {
+                    return EMAIL_SENT_SUCCESSFULLY
+                }
+            }
+        } else return 'companyId is not dhl'
     }
 
     /**
@@ -313,7 +313,10 @@ class TransientStatusAndSaveActivatedService {
     * @param {*} recurringData // save activated data
     * @returns resulting recurring data
     */
-    deleteRecurringItem(itemId, recurringData) {
+    deleteRecurringItem(itemId, recurringData, deleteAllItems) {
+        if (deleteAllItems) {
+            return {}
+        }
         let cloneRecurringData = { ...recurringData }
         delete cloneRecurringData[itemId]
         return cloneRecurringData
@@ -321,10 +324,10 @@ class TransientStatusAndSaveActivatedService {
 
     createObjectForStore(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates) {
         let cloneSaveActivatedState = JSON.parse(JSON.stringify(saveActivatedState))
-        let cloneNavigationFormLayoutStates = (navigationFormLayoutStates)?JSON.parse(JSON.stringify(navigationFormLayoutStates)):null
+        let cloneNavigationFormLayoutStates = (navigationFormLayoutStates) ? JSON.parse(JSON.stringify(navigationFormLayoutStates)) : null
         let storeObject = {}
         storeObject[jobMasterId] = {
-            saveActivatedState: cloneSaveActivatedState, 
+            saveActivatedState: cloneSaveActivatedState,
             screenName,
             jobMasterId,
             navigationParams,

@@ -159,7 +159,7 @@ class CashTendering extends PureComponent {
                     {this._checkIfCashCollectOrReturn()}
                     {this.showFlatList()}
                     <SafeAreaView style={[styles.bgWhite]}>
-                        <Footer style={[style.footer, styles.column, styles.padding10]}>
+                        <Footer style={[styles.column, styles.padding10,styles.autoHeightFooter]}>
                             {totalAmountInCashTendering}
                             <Button success full onPress={() => (this.props.isReceive) ? this._onSavePress() : this._onSavePressReturn()}>
                                 <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
@@ -172,12 +172,8 @@ class CashTendering extends PureComponent {
     }
 }
 const style = StyleSheet.create({
-    footer:{
-        height:'auto'
-    },
     header: {
         borderBottomWidth: 0,
-        height: 'auto',
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0

@@ -95,7 +95,7 @@ class SkuListing extends PureComponent {
             </Content>
 
             <SafeAreaView style={[styles.bgWhite]}>
-              <Footer style={[ style.footer,styles.column, styles.padding10]}>
+              <Footer style={[styles.column, styles.padding10,styles.autoHeightFooter]}>
                 <Button primary full onPress={this.saveSkuList}>
                   <Text style={[styles.fontLg, styles.fontWhite]}>{PROCEED}</Text>
                 </Button>
@@ -164,12 +164,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 const style = StyleSheet.create({
-  footer:{
-    height:'auto'
-  },
   header: {
     borderBottomWidth: 0,
-    height: 'auto',
     paddingTop: 10,
     paddingBottom: 10
   },

@@ -43,6 +43,7 @@ import {
   JOB_ATTRIBUTE,
   SET_CALLER_ID_POPUP,
   BluetoothListing,
+  JobDetailsV2,
   SET_UPDATED_TRANSACTION_LIST_IDS,
   UPDATE_JOBMASTERID_JOBID_MAP,
   RUN_SYNC
@@ -106,15 +107,18 @@ import FCM, { FCMEvent, NotificationType, RemoteNotificationResult, WillPresentN
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { NavigationActions } from 'react-navigation'
-import { FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK, ERROR } from '../../lib/ContainerConstants'
+import { FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR, FCM_PERMISSION_DENIED, OK, ERROR, MESSAGE_MODULE_NAME } from '../../lib/ContainerConstants'
 import RNFS from 'react-native-fs'
 import { navDispatch, navigate, popToTop } from '../navigators/NavigationService';
 import CallDetectorManager from 'react-native-call-detection'
 import { jobAttributeMasterService } from '../../services/classes/JobAttributeMaster'
 import { jobDataService } from '../../services/classes/JobData'
 import { jobService } from '../../services/classes/Job'
-import { each, size, isNull, isEmpty} from 'lodash'
+import { each, size, isNull, isEmpty } from 'lodash'
 import { AppState, Linking } from 'react-native'
+import { fetchJobs } from '../taskList/taskListActions';
+import { countDownTimerService } from '../../services/classes/CountDownTimerService'
+import { navigateToLiveJob } from '../liveJob/liveJobActions'
 
 /**
  * Function which updates STATE when component is mounted
@@ -145,7 +149,11 @@ export function fetchPagesAndPiechart() {
           Piechart.enabled = utilities.pieChartEnabled = utility.enabled
           Piechart.params = JSON.parse(utility.additionalParams).jobMasterIds
         };
-        (utility.utilityID == PAGE_MESSAGING) ? utilities.messagingEnabled = utility.enabled : null;
+        utilities.messagingEnabled = null
+        if (utility.utilityID == PAGE_MESSAGING) {
+          utilities.messagingEnabled = utility.enabled
+          isEmpty(utility.name) ? utilities.messageModuleName = MESSAGE_MODULE_NAME : utilities.messageModuleName = utility.name
+        };
       })
 
       //Fetching Summary count for Pie-chart
@@ -192,6 +200,10 @@ export function navigateToPage(pageObject, navigationProps) {
           navigate(BluetoothListing, { pageObject })
           break;
         case PAGE_BULK_UPDATE: {
+          let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+          if (updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)) {
+            dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
+          }
           dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
           break;
         }
@@ -241,10 +253,10 @@ export function navigateToPage(pageObject, navigationProps) {
           navigate(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' })
           break;
         case PAGE_TABS:
-        let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
-      if(updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)){
-        dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS,updatedJobTransactionList.value))
-      }
+          let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
+          if (updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)) {
+            dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS, updatedJobTransactionList.value))
+          }
           navigate(TabScreen, { pageObject })
           break;
         default:
@@ -301,10 +313,6 @@ export function checkCustomErpPullActivated() {
 export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) {
   return async function (dispatch) {
     try {
-      let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
-      if(updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)){
-        dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS,updatedJobTransactionList.value))
-      }
       if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
         dispatch(setState(syncLoader, true))
         let message = await dispatch(performSyncService())
@@ -402,7 +410,7 @@ export function startFCM() {
             alert: true
           });
         } catch (e) {
-          showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED+'\n'+e.message, 'danger', 1)
+          showToastAndAddUserExceptionLog(2717, FCM_PERMISSION_DENIED + '\n' + e.message, 'danger', 1)
         }
         const userObject = await keyValueDBService.getValueFromStore(USER)
         const topic = `FE_${userObject.value.id}`
@@ -412,7 +420,7 @@ export function startFCM() {
           await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
 
         }, (error) => {
-        }).catch((error) => showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR+'\n'+error.message, 'danger', 1))
+        }).catch((error) => showToastAndAddUserExceptionLog(2716, FCM_REGISTRATION_ERROR + '\n' + error.message, 'danger', 1))
 
         if (Platform.OS === 'ios') {
           FCM.getAPNSToken().then(token => {
@@ -490,9 +498,9 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB');
           if (showLiveJobNotification && showLiveJobNotification.value) {
             if (AppState.currentState == 'background' && Platform.OS !== 'ios') {
-              Linking.canOpenURL('fareyeapp://fareye').then(supported => {
+              Linking.canOpenURL('fareyeapp://fareye/liveJob').then(supported => {
                 if (supported) {
-                  return Linking.openURL('fareyeapp://fareye');
+                  return Linking.openURL('fareyeapp://fareye/liveJob');
                 }
               });
             } else if (AppState.currentState == 'active') {
@@ -507,7 +515,11 @@ export function performSyncService(isCalledFromHome, erpPull, calledFromAutoLogo
         dispatch(pieChartCount())
         let updatedJobTransactionList = await keyValueDBService.getValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
         if(updatedJobTransactionList && !isEmpty(updatedJobTransactionList.value)){
-          dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS,updatedJobTransactionList.value))
+          if(updatedJobTransactionList.value.runsheetClosed){
+            dispatch(fetchJobs())
+          }else{
+            dispatch(setState(SET_UPDATED_TRANSACTION_LIST_IDS,updatedJobTransactionList.value))
+          }
         }     
        }
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
@@ -793,4 +805,41 @@ export function registerCallReceiver() {
     }
   }
 
+}
+export function handleCountDownTimerEvent(intentData) {
+  return async function (dispatch) {
+    try {
+      if (AppState.currentState == 'active') {
+        let jobTransaction = await countDownTimerService.navigateToJobDetailsAndScheduleAlarm(intentData)
+        navigate(JobDetailsV2, { jobTransaction, jobSwipableDetails: {}, calledFromAlarm: true })
+      } else if (AppState.currentState == 'background' && Platform.OS !== 'ios') {
+        let intentDataString = JSON.stringify(intentData)
+        Linking.canOpenURL('fareyeapp://fareye' + '/' + intentDataString).then(supported => {
+          if (supported) {
+            return Linking.openURL('fareyeapp://fareye' + '/' + intentDataString);
+          } else {
+            return
+          }
+        });
+      }
+    } catch (error) {
+      showToastAndAddUserExceptionLog(2713, error.message, 'danger', 1)
+    }
+  }
+}
+export function navigateToLiveJobOrJobDetails(url) {
+  return async function (dispatch) {
+    try {
+      const route = url.replace(/.*?:\/\//g, '');
+      const id = route.match(/\/([^\/]+)\/?$/)[1];
+      if (id == 'liveJob') {
+        dispatch(navigateToLiveJob())
+      } else {
+        let intentData = JSON.parse(id)
+        dispatch(handleCountDownTimerEvent(intentData))
+      }
+    } catch (error) {
+      showToastAndAddUserExceptionLog(2714, error.message, 'danger', 1)
+    }
+  }
 }
