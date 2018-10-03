@@ -4,7 +4,8 @@ import { Record } from 'immutable'
 
 var InitialState = Record({
     mosambeeLoader: false,
-    mosambeeParameters: null,    
+    mosambeeParameters: null,  
+    mosambeeMessage: null,  
 })
 
 export default InitialState

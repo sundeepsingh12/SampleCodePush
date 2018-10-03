@@ -1,7 +1,6 @@
 'use strict'
 
 import { setState, showToastAndAddUserExceptionLog } from '../../global/globalActions'
-import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { payByLinkPaymentService } from '../../../services/payment/PayByLinkPayment'
 import {
     SET_PAY_BY_LINK_PARAMETERS,
@@ -10,21 +9,19 @@ import {
 } from '../../../lib/constants'
 import { MosambeeWalletPaymentServices } from '../../../services/payment/MosambeeWalletPayment'
 import {
-    NET_BANKING_ID,
+    NET_BANKING_UTILITY_ID
 } from '../../../lib/AttributeConstants'
 import { TRANSACTION_SUCCESSFUL, TRANSACTION_PENDING } from '../../../lib/ContainerConstants'
 import { saveJobTransaction } from '../../form-layout/formLayoutActions';
 import { paymentService } from '../../../services/payment/Payment';
 import _ from 'lodash'
-import { formLayoutService } from '../../../services/classes/formLayout/FormLayout'
-import { StackActions} from 'react-navigation'
-import { navDispatch } from '../../navigators/NavigationService'
+import { printService } from '../../../services/classes/PrintService'
 
 export function getPayByLinkPaymentParameters(customerContact, jobTransaction, jobTransactionIdAmountMap) {
     return async function (dispatch) {
         try { 
             dispatch(setState(SET_LOADER_FOR_PAYBYLINK, true))
-            const { walletParameters} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, NET_BANKING_ID)
+            const { walletParameters} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, NET_BANKING_UTILITY_ID)
             let apiPassword = walletParameters.apiPassword 
             walletParameters.apiPassword = walletParameters.secretKey
             walletParameters.secretKey = apiPassword
@@ -61,7 +58,7 @@ export function hitCheckTransactionApiForCheckingPayment(payByLinkConfigJSON, na
                 paymentService.addPaymentObjectToDetailsArray(payByLinkConfigJSON.actualAmount, 16, responseMessage.transId, 'N.A', responseMessage, formLayoutState)
                 setTimeout(() => { dispatch(setState(SET_PAY_BY_LINK_MESSAGE, TRANSACTION_SUCCESSFUL)) }, 1000);
                 if(printAttributeMasterId){
-                    await formLayoutService.printingTemplateFormatStructure(formLayoutState, jobTransaction, printAttributeMasterId)
+                    await printService.printingTemplateFormatStructureForFormLayout(formLayoutState, jobTransaction, printAttributeMasterId, {})
                 }
                 dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
             }else{

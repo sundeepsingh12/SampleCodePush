@@ -184,6 +184,8 @@ module.exports = keyMirror({
     //mosambee Payment
     SET_LOADER_FOR_MOSAMBEE: null,
     SET_MOSAMBEE_PARAMETERS: null,
+    SET_MESSAGE_FOR_MOSAMBEE: null,
+    RESET_STATE_FOR_MOSAMBEE: null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,

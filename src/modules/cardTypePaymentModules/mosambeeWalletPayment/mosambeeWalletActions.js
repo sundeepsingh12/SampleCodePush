@@ -14,15 +14,15 @@ import { paymentService } from '../../../services/payment/Payment';
 import _ from 'lodash'
 import { StackActions} from 'react-navigation'
 import { navDispatch } from '../../navigators/NavigationService'
-import { MOSAMBEE_WALLET_ID} from '../../../lib/AttributeConstants'
-import { formLayoutService } from '../../../services/classes/formLayout/FormLayout'
+import { printService } from '../../../services/classes/PrintService'
+import { WALLET_UTILITY_ID} from '../../../lib/AttributeConstants'
 
 
 export function setWalletParametersAndGetWalletList(contactNumber, jobTransaction, jobTransactionIdAmountMap) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 1))
-            const { walletParameters, walletList} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, MOSAMBEE_WALLET_ID)
+            const { walletParameters, walletList} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, WALLET_UTILITY_ID)
             dispatch(setState(SET_MOSAMBEE_WALLET_PARAMETERS, { walletParameters, walletList, contactNumber, isModalVisible: 1 }))
         } catch (error) {
             showToastAndAddUserExceptionLog(2901, error.message, 'danger', 0)
@@ -66,7 +66,7 @@ export function hitPaymentUrlforPayment(contactNumber, walletParameters, selecte
                 paymentService.addPaymentObjectToDetailsArray(walletParameters.actualAmount, 14, responseMessage.transId, selectedWalletDetails.code, responseMessage, formLayoutState)
                 setTimeout(() => { dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, { errorMessage: TRANSACTION_SUCCESSFUL, isModalVisible: 4 })) }, 1000);
                 if(printAttributeMasterId){
-                    await formLayoutService.printingTemplateFormatStructure(formLayoutState, jobTransaction, printAttributeMasterId)
+                    await printService.printingTemplateFormatStructureForFormLayout(formLayoutState, jobTransaction, printAttributeMasterId, {})
                 }
                 if(jobTransaction.id < 0) {
                     navDispatch(StackActions.pop())

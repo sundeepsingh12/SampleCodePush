@@ -149,7 +149,6 @@ export function fetchPagesAndPiechart() {
           Piechart.enabled = utilities.pieChartEnabled = utility.enabled
           Piechart.params = JSON.parse(utility.additionalParams).jobMasterIds
         };
-        utilities.messagingEnabled = null
         if (utility.utilityID == PAGE_MESSAGING) {
           utilities.messagingEnabled = utility.enabled
           isEmpty(utility.name) ? utilities.messageModuleName = MESSAGE_MODULE_NAME : utilities.messageModuleName = utility.name
