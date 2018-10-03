@@ -23,6 +23,7 @@ import { addServerSmsService } from './AddServerSms'
 import { SIGNATURE, CAMERA, CAMERA_HIGH, CAMERA_MEDIUM, PENDING, PATH, PATH_TEMP, APP_VERSION_NUMBER, QC_IMAGE, SKU_PHOTO } from '../../lib/AttributeConstants'
 import { userExceptionLogsService } from './UserException'
 import { communicationLogsService } from './CommunicationLogs'
+import { userSummaryService } from './UserSummary'
 import _ from 'lodash'
 
 import { Platform } from 'react-native'
@@ -30,15 +31,15 @@ var CryptoJS = require("crypto-js");
 
 class SyncZip {
 
-    async createZip(syncStoreDTO) {
+    async createZip(syncStoreDTO, isCalledFromLogout) {
         //Create FarEye folder if doesn't exist
         RNFS.mkdir(PATH);
         RNFS.mkdir(PATH_TEMP);
         //Prepare the SYNC_RESULTS
         var SYNC_RESULTS = {};
         let lastSyncTime = syncStoreDTO.lastSyncWithServer
-      
-        let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced);
+
+        let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced, isCalledFromLogout);
         const syncDataDTO = realmDbData.syncDataDTO
         SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
         SYNC_RESULTS.job = realmDbData.jobList;
@@ -48,7 +49,7 @@ class SyncZip {
         SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, syncStoreDTO.lastSyncWithServer);
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
-        const userSummary = this.updateUserSummary(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
+        const userSummary = userSummaryService.updateUserSummary(syncStoreDTO)
         let { communicationLogs, lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds } = (Platform.OS !== 'ios') ? await communicationLogsService.getCallLogs(syncStoreDTO, userSummary) : { communicationLogs: [], lastCallTime: null, lastSmsTime: null }
         SYNC_RESULTS.userCommunicationLog = communicationLogs ? communicationLogs : []
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
@@ -76,23 +77,9 @@ class SyncZip {
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
-        return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds,isEncryptionSuccessful,syncDataDTO }
-       
-    }
+        return { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful, syncDataDTO }
 
-    updateUserSummary(statusList, jobMasterList, userSummary) {
-        if (!userSummary) {
-            throw new Error('User Summary missing in store');
-        }
-        const pendingStatusList = statusList ? statusList.filter(jobStatus => jobStatus.statusCategory == PENDING && jobStatus.code != UNSEEN) : null;
-        const jobMasterListWithEnableResequence = jobMasterList ? jobMasterList.filter(jobMaster => jobMaster.enableResequenceRestriction == true) : null;
-        const firstEnableSequenceTransaction = (jobMasterListWithEnableResequence && pendingStatusList) ? jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterListWithEnableResequence, pendingStatusList) : null;
-        userSummary.nextJobTransactionId = firstEnableSequenceTransaction ? firstEnableSequenceTransaction.id : null;
-        userSummary.appVersion = APP_VERSION_NUMBER
-        userSummary.lastLocationDatetime = moment().format('YYYY-MM-DD HH:mm:ss')
-        return userSummary;
     }
-
 
     _getSyncDataFromDb(transactionIdsObject) {
         let userExceptionLog = this._getDataFromRealm([], null, USER_EXCEPTION_LOGS)
@@ -153,45 +140,45 @@ class SyncZip {
             trackLogs
      * }
      */
-    getDataToBeSyncedFromDB(transactionIdList) {
+    getDataToBeSyncedFromDB(transactionIdList, isCalledFromLogout = false) {
         let userExceptionLog = this.getDataFromRealmDB(null, USER_EXCEPTION_LOGS)
         let runSheetSummary = this.getDataFromRealmDB(null, TABLE_RUNSHEET);
         let trackLogs = this.getDataFromRealmDB(null, TABLE_TRACK_LOGS);
-        let transactionList = [], fieldDataList = [], jobList = [], serverSmsLogs = [], transactionLogs = [],syncDataDTO ;
+        let transactionList = [], fieldDataList = [], jobList = [], serverSmsLogs = [], transactionLogs = [], syncDataDTO;
         if (!transactionIdList) {
             serverSmsLogs = this.getDataFromRealmDB(null, TABLE_SERVER_SMS_LOG);
-            return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog,syncDataDTO };
+            return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog, syncDataDTO };
         }
-        let fieldDataQuery, jobTransactionQuery, jobQuery, transactionLogQuery,allowedTransactionIdList = {},counter = 0
-                for(let index in transactionIdList){
-                    if(counter == 0){
-                        fieldDataQuery = `jobTransactionId = ${transactionIdList[index].id}`;
-                        jobTransactionQuery = `id = ${transactionIdList[index].id}`;
-                        jobQuery = `id = ${transactionIdList[index].jobId}`;
-                        transactionLogQuery = `transactionId = ${transactionIdList[index].id}`;
-                    }
-                      //Prepare logs.json for 150 job transactions at a time
-                    else if(counter == 150){
-                        break
-                    }
-                    else{
-                        fieldDataQuery += ` OR jobTransactionId = ${transactionIdList[index].id}`;
-                        jobTransactionQuery += ` OR id = ${transactionIdList[index].id}`;
-                        jobQuery += ` OR id = ${transactionIdList[index].jobId}`;
-                        transactionLogQuery += ` OR transactionId = ${transactionIdList[index].id}`;
-                    }
-                    allowedTransactionIdList[index]= transactionIdList[index].id
-                    counter++
-                }
+        let fieldDataQuery, jobTransactionQuery, jobQuery, transactionLogQuery, allowedTransactionIdList = {}, counter = 0
+        for (let index in transactionIdList) {
+            if (counter == 0) {
+                fieldDataQuery = `jobTransactionId = ${transactionIdList[index].id}`;
+                jobTransactionQuery = `id = ${transactionIdList[index].id}`;
+                jobQuery = `id = ${transactionIdList[index].jobId}`;
+                transactionLogQuery = `transactionId = ${transactionIdList[index].id}`;
+            }
+            //Prepare logs.json for 100 job transactions at a time,in case of sync called from logout,prepare json for all the transactions
+            else if (!isCalledFromLogout && counter == 100) {
+                break
+            }
+            else {
+                fieldDataQuery += ` OR jobTransactionId = ${transactionIdList[index].id}`;
+                jobTransactionQuery += ` OR id = ${transactionIdList[index].id}`;
+                jobQuery += ` OR id = ${transactionIdList[index].jobId}`;
+                transactionLogQuery += ` OR transactionId = ${transactionIdList[index].id}`;
+            }
+            allowedTransactionIdList[index] = transactionIdList[index].id
+            counter++
+        }
         fieldDataList = this.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA);
         transactionList = this.getDataFromRealmDB(jobTransactionQuery, TABLE_JOB_TRANSACTION);
         jobList = this.getDataFromRealmDB(jobQuery, TABLE_JOB);
         serverSmsLogs = this.getDataFromRealmDB(fieldDataQuery, TABLE_SERVER_SMS_LOG);
         transactionLogs = this.getDataFromRealmDB(transactionLogQuery, TABLE_TRANSACTION_LOGS);
-       syncDataDTO = {
+        syncDataDTO = {
             allowedTransactionIdList
         }
-        return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog,syncDataDTO }
+        return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog, syncDataDTO }
     }
 
     /**
@@ -222,17 +209,17 @@ class SyncZip {
         }
     }
 
-    getDataFromRealmDB(query, table) {
+    getDataFromRealmDB(query, table, calledFromBackup) {
         let data = realm.getRecordListOnQuery(table, query);
         // send id as 0 in case of field data
         if (table == TABLE_FIELD_DATA) {
             let fieldDataList = []
             for (let index in data) {
                 let fieldData = { ...data[index] }
-                if (fieldData.syncFlag == 1) {
+                if (fieldData.syncFlag == 1 || calledFromBackup) {
                     fieldData.id = 0
                     fieldDataList.push(_.omit(fieldData, ['syncFlag']))
-                   
+
                 }
             }
             return fieldDataList

@@ -48,7 +48,7 @@ function mapDispatchToProps(dispatch) {
 class MosambeePayment extends PureComponent {
 
     componentDidMount() {
-        const contactNumber = isEmpty(this.props.navigation.state.params.contactData) && this.props.navigation.state.params.contactData.length ? this.props.navigation.state.params.contactData[0] : ''
+        const contactNumber = !isEmpty(this.props.navigation.state.params.contactData) && this.props.navigation.state.params.contactData.length ? this.props.navigation.state.params.contactData[0] : ''
         this.props.actions.getParameterForMosambee(this.props.navigation.state.params, this.props.navigation.state.params.paymentAtEnd.currentElement.jobTransactionIdAmountMap, contactNumber)
         this.nativeEventListener = DeviceEventEmitter.addListener('showResult',
             (e) => {

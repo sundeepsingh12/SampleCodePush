@@ -1,7 +1,6 @@
 'use strict'
 
 import { setState, showToastAndAddUserExceptionLog } from '../../global/globalActions'
-import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { payByLinkPaymentService } from '../../../services/payment/PayByLinkPayment'
 import {
     SET_PAY_BY_LINK_PARAMETERS,

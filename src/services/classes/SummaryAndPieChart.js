@@ -53,14 +53,15 @@ class SummaryAndPieChart {
     *
     */
 
-    setAllJobMasterSummary(jobMasterList, jobStatusList, jobSummaryList, allPendingSuccessFailIds, noNextStatusMap) {
-        let jobMasterIdMap = {}, jobMasterSummaryList = {}
+    setAllJobMasterSummary(jobMasterList, jobStatusList, allPendingSuccessFailIds, noNextStatusMap) {
+        let  jobMasterSummaryList = {}
         jobMasterList.forEach(id => {
-            jobMasterSummaryList[id.id] = { id: id.id, code: id.identifier, cashCollected: 0, cashCollectedByCard: 0, cashPayment: 0, identifierColor: id.identifierColor, title: id.title, count: 0, 1: { count: 0, list: [] }, 2: { count: 0, list: [] }, 3: { count: 0, list: [] } }
+            jobMasterSummaryList[id.id] = { id: id.id, code: id.identifier, cashCollected: 0, cashCollectedByCard: 0, cashPayment: 0, identifierColor: id.identifierColor, title: id.title, count: 0,1: { count: 0, list: [] }, 2: { count: 0, list: [] }, 3: { count: 0, list: [] } }
         }) // map of jobMasterId and jobMaster Summary details Dto
         const jobTransactions = this.getTransactionsForPieChartAndSummary(allPendingSuccessFailIds, Object.keys(jobMasterSummaryList)) // get transactions for summary
-        const jobStatusIdCountMap = this.createJobStatusCountMap(jobTransactions, noNextStatusMap, jobSummaryList, jobMasterSummaryList) // get jobStatus and count map
-        return this.buildJobMasterSummaryList(jobStatusList, jobMasterSummaryList, jobStatusIdCountMap)
+        const data = this.createJobStatusCountMap(jobTransactions, noNextStatusMap) // get jobStatus and count map
+        const jobMasterSummaryLists = this.buildJobMasterSummaryList(jobStatusList, jobMasterSummaryList, data.runsheetIdJobStatusIdCountMap,data.runsheetIdJobMasterIdMoneyTransactionTypeAmountMap)
+        return jobMasterSummaryLists
     }
 
     /**@function getTransactionsForPieChartAndSummary(allPendingSuccessFailIds,jobMasterList)
@@ -107,16 +108,40 @@ class SummaryAndPieChart {
     *
     */
 
-    buildJobMasterSummaryList(jobStatusList, jobMasterSummaryList, jobStatusIdCountMap) {
-        for (let id in jobStatusList) {
-            if (jobStatusList[id].code == UNSEEN || !jobMasterSummaryList[jobStatusList[id].jobMasterId]) { // check for unseen code and selected jobMaster
-                continue
+    buildJobMasterSummaryList(jobStatusList, jobMasterSummaryList,runsheetIdJobStatusIdCountMap,runsheetIdJobMasterIdMoneyTransactionTypeAmountMap) {
+        let runsheetIdJobSummaryList = {}
+        for (let runsheetId in runsheetIdJobStatusIdCountMap) {
+
+            let jobSummaryListClone = {}
+            jobSummaryListClone = JSON.parse(JSON.stringify(jobMasterSummaryList))
+           
+
+            for (let id in jobStatusList) {
+                if (jobStatusList[id].code == UNSEEN || !jobMasterSummaryList[jobStatusList[id].jobMasterId]) { // check for unseen code and selected jobMaster
+                    continue
+                }
+                let jobStatusCount = (runsheetIdJobStatusIdCountMap[runsheetId][jobStatusList[id].id]) ? runsheetIdJobStatusIdCountMap[runsheetId][jobStatusList[id].id] : 0
+
+                jobSummaryListClone[jobStatusList[id].jobMasterId][jobStatusList[id].statusCategory].list.push({
+                    count: jobStatusCount,
+                    name: jobStatusList[id].name,
+                    id: jobStatusList[id].id
+                });
+                jobSummaryListClone[jobStatusList[id].jobMasterId][jobStatusList[id].statusCategory].count += jobStatusCount;
+                jobSummaryListClone[jobStatusList[id].jobMasterId].count += jobStatusCount;
+
+                let jobMasterIdMoneyTransactionTypeAmountMap = (runsheetIdJobMasterIdMoneyTransactionTypeAmountMap[runsheetId]) ? runsheetIdJobMasterIdMoneyTransactionTypeAmountMap[runsheetId] : {}
+                let moneyTransactionTypeAmountMap = (jobMasterIdMoneyTransactionTypeAmountMap[jobStatusList[id].jobMasterId]) ? jobMasterIdMoneyTransactionTypeAmountMap[jobStatusList[id].jobMasterId] : {}
+                jobSummaryListClone[jobStatusList[id].jobMasterId].cashCollected = moneyTransactionTypeAmountMap['Collection-Cash'];
+
+                jobSummaryListClone[jobStatusList[id].jobMasterId].cashCollectedByCard = moneyTransactionTypeAmountMap['Collection-SOD'];
+
+                jobSummaryListClone[jobStatusList[id].jobMasterId].cashPayment =  moneyTransactionTypeAmountMap['Refund']
             }
-            jobMasterSummaryList[jobStatusList[id].jobMasterId][jobStatusList[id].statusCategory].list.push({ count: jobStatusIdCountMap[jobStatusList[id].id], name: jobStatusList[id].name, id: jobStatusList[id].id });
-            jobMasterSummaryList[jobStatusList[id].jobMasterId][jobStatusList[id].statusCategory].count += jobStatusIdCountMap[jobStatusList[id].id];
-            jobMasterSummaryList[jobStatusList[id].jobMasterId].count += jobStatusIdCountMap[jobStatusList[id].id];
+            runsheetIdJobSummaryList[runsheetId] = jobSummaryListClone
         }
-        return Object.values(jobMasterSummaryList)
+
+        return runsheetIdJobSummaryList
     }
 
     /**@function createJobStatusCountMap(jobTransactions,noNextStatusMap,jobSummaryList)
@@ -134,22 +159,26 @@ class SummaryAndPieChart {
     *
     */
 
-    createJobStatusCountMap(jobTransactions, noNextStatusMap, jobSummaryList, jobMasterSummaryList) {
-        let jobStatusIdMap = {}
-        const moneyTypeCollectionTypeMap = { 'Collection-Cash': 'cashCollected', 'Collection-SOD': 'cashCollectedByCard', 'Refund': 'cashPayment' }
+    createJobStatusCountMap(jobTransactions, noNextStatusMap) {
+        let runsheetIdJobStatusIdCountMap = {},runsheetIdJobMasterIdMoneyTransactionTypeAmountMap = {}
+
         const todayDate = moment().format('YYYY-MM-DD')
         jobTransactions.forEach(item => {
             if (moment(todayDate).isSame(moment(item.lastUpdatedAtServer).format('YYYY-MM-DD')) || !noNextStatusMap[item.jobStatusId]) { // check for today's date transaction and
-                if (item.moneyTransactionType && item.actualAmount > 0) { // check for moneyTransactionType and actualAmount
-                    jobMasterSummaryList[item.jobMasterId][moneyTypeCollectionTypeMap[item.moneyTransactionType]] += item.actualAmount
+                if (item.moneyTransactionType && item.actualAmount > 0) {
+                    const jobMasterIdmoneyTransactionTypeAmountMap = (runsheetIdJobMasterIdMoneyTransactionTypeAmountMap[item.runsheetId]) ? runsheetIdJobMasterIdMoneyTransactionTypeAmountMap[item.runsheetId] : {}
+                    let moneyTransactionTypeAmountMap = (jobMasterIdmoneyTransactionTypeAmountMap[item.jobMasterId]) ? jobMasterIdmoneyTransactionTypeAmountMap[item.jobMasterId] : {}
+                    moneyTransactionTypeAmountMap[item.moneyTransactionType] = (moneyTransactionTypeAmountMap[item.moneyTransactionType]) ? moneyTransactionTypeAmountMap[item.moneyTransactionType] + item.actualAmount : item.actualAmount
+                    jobMasterIdmoneyTransactionTypeAmountMap[item.jobMasterId] = moneyTransactionTypeAmountMap
+                    runsheetIdJobMasterIdMoneyTransactionTypeAmountMap[item.runsheetId] = jobMasterIdmoneyTransactionTypeAmountMap
                 }
-                jobStatusIdMap[item.jobStatusId] = (jobStatusIdMap[item.jobStatusId]) ? jobStatusIdMap[item.jobStatusId] + 1 : 1
+                let jobStatusCountMap = (runsheetIdJobStatusIdCountMap[item.runsheetId]) ? runsheetIdJobStatusIdCountMap[item.runsheetId] : {}
+                jobStatusCountMap[item.jobStatusId] = (jobStatusCountMap[item.jobStatusId]) ? jobStatusCountMap[item.jobStatusId] + 1 : 1
+                runsheetIdJobStatusIdCountMap[item.runsheetId] = jobStatusCountMap
             }
-        })
-        return jobSummaryList.reduce(function (total, current) {
-            total[current.jobStatusId] = (jobStatusIdMap[current.jobStatusId]) ? jobStatusIdMap[current.jobStatusId] : 0;
-            return total;
-        }, {})
+            })
+
+        return {runsheetIdJobStatusIdCountMap,runsheetIdJobMasterIdMoneyTransactionTypeAmountMap}
     }
 
     /** @function setAllCounts(allTransactions,pendingStatusIds,successStatusIds,failStatusIds)
@@ -180,7 +209,7 @@ class SummaryAndPieChart {
         let setRunsheetSummary = []
         let runsheetQuery = 'isClosed = false'
         const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery, true, 'startDate', false, true)
-        runSheetData.forEach(item => setRunsheetSummary.push([item.runsheetNumber, item.successCount, item.pendingCount, item.failCount, item.cashCollected, item.cashCollectedByCard]))
+        runSheetData.forEach(item => setRunsheetSummary.push([item.runsheetNumber, item.successCount, item.pendingCount, item.failCount, item.cashCollected, item.cashCollectedByCard,item.id]))
         return setRunsheetSummary;
     }
 

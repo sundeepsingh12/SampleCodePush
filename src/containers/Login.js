@@ -41,7 +41,6 @@ var style = StyleSheet.create({
 
   logoStyle: {
     width: 94,
-    resizeMode: 'contain'
   }
 
 })
@@ -138,8 +137,9 @@ class Login extends PureComponent {
       return (
         <TouchableOpacity style={[styles.width100, { height: 'auto' }]} onLongPress={this.onLongPress}>
           <Image
+            resizeMode = {'contain'}
             source={sourceOptions}
-            style={[{ height: 100, width: 100, resizeMode: Image.resizeMode.contain }]}
+            style={[{ height: 100, width: 100 }]}
           />
         </TouchableOpacity>
       )

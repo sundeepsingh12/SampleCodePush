@@ -30,6 +30,7 @@ import {
 import Mailer from 'react-native-mail';
 import { Alert, Platform } from 'react-native'
 import RNFS from 'react-native-fs'
+import { performSyncService } from '../home/homeActions';
 
 
 /** This method creates backup manually when button is pressed.
@@ -135,6 +136,7 @@ export function autoLogoutAfterUpload(calledFromHome) {
         try {
             if (!calledFromHome) {
                 dispatch(setState(SET_BACKUP_VIEW, 4))
+                await dispatch(performSyncService(true, null, false, null, true))
             } else {
                 dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 3))
             }

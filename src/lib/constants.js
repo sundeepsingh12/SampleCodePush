@@ -255,6 +255,7 @@ module.exports = keyMirror({
     LAST_CALL_AND_SMS_TIME: null,
     LONG_CODE_SIM_VERIFICATION: null,
     ENCRYPTION_KEY: null,
+    ALARM_JOB_TIMES: null,
     UPDATE_JOBMASTERID_JOBID_MAP: null,
 
     //Realm Tables
@@ -500,9 +501,10 @@ module.exports = keyMirror({
     CLEAR_LIVE_JOB_STATE: null,
 
     //Summary
-    SET_SUMMARY_FOR_JOBMASTER: null,
-    SET_SUMMARY_FOR_RUNSHEET: null,
+    SET_JOB_MASTER_AND_RUNSHEET_DATA: null,
     RESET_SUMMARY_STATE: null,
+    START_FETCHING_DATA: null,
+    SET_RUNSHEET_ID: null,
 
     //Custom App
     START_FETCHING_URL: null,
@@ -527,7 +529,6 @@ module.exports = keyMirror({
     BLUETOOTH: null,
     BULK: null,
     LIVE: null,
-    OFFLINEDATASTORE: null,
     START: null,
     SEQUENCEMODULE: null,
     SUMMARY: null,
@@ -601,7 +602,16 @@ module.exports = keyMirror({
     SET_QC_IMAGE: null,
     SET_QC_REMARKS: null,
     SET_QC_IMAGE_REMARKS_LOADING: null,
-    SET_QC_IMAGE_REMARKS_DATA: null
+    SET_QC_IMAGE_REMARKS_DATA: null,
+
+    //Paytm Actions
+    SET_PAYTM_LOADER: null,
+    SET_PAYTM_CONFIG_OBJECT: null,
+    SET_CONTACT: null,
+    SET_OTP: null,
+    SET_CHECK_TRANSACTION_VIEW: null,
+    //Case of Sync started From Logout 
+    RUN_SYNC:null
 })
 
 

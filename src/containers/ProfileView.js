@@ -10,7 +10,7 @@ import { View, TouchableOpacity } from 'react-native'
 import { Container, Content, Header, Text,  Body, Icon, StyleProvider } from 'native-base'
 import * as profileActions from '../modules/profile/profileActions'
 import * as globalActions from '../modules/global/globalActions'
-import { RESET_PASSWORD, CONTACT_NUMBER, EMAIL, PROFILE, } from '../lib/ContainerConstants'
+import { RESET_PASSWORD, CONTACT_NUMBER, EMAIL } from '../lib/ContainerConstants'
 import { navigate } from '../modules/navigators/NavigationService';
 
 function mapStateToProps(state) {

@@ -223,7 +223,6 @@ class LiveJob extends PureComponent {
                         {this.showAccepRejectButtons()}
                     </View>
                     {this.showJobDataList()}
-                    <Footer style={[style.footer]} />
                 </Container >
             </StyleProvider >
         )
@@ -234,7 +233,6 @@ class LiveJob extends PureComponent {
 const style = StyleSheet.create({
     header: {
         borderBottomWidth: 0,
-        height: 'auto',
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0,
@@ -293,13 +291,6 @@ const style = StyleSheet.create({
         height: 6,
         borderRadius: 3
     },
-    footer: {
-        height: 'auto',
-        backgroundColor: '#ffffff',
-        borderTopWidth: 1,
-        borderTopColor: '#f3f3f3',
-    }
-
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LiveJob)

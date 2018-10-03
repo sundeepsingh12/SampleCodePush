@@ -115,8 +115,8 @@ class Payment {
             })
         }
         let originalAmountObject = this.getOriginalAmount(moneyCollectMaster, formData, jobTransaction)
-        let actualAmount = this.getTotalActualAmount(moneyCollectMaster, formData)
-        actualAmount = actualAmount ? actualAmount : originalAmountObject.originalAmount
+        // let actualAmount = this.getTotalActualAmount(moneyCollectMaster, formData)
+        let actualAmount = originalAmountObject.originalAmount
         let amountEditableObject = this.actualAmountEditable(moneyCollectMaster, fieldValidationMap, jobStatusId)
         return {
             actualAmount,
@@ -251,7 +251,7 @@ class Payment {
         for (let formElement in formData) {
             // Check if sku present in form element and its sequence is before money collect
             if (formData[formElement].attributeTypeId == SKU_ARRAY && formData[formElement].positionId < formData[moneyCollectMaster.id].positionId) {
-                actualAmount += this.getActualAmount(formData[formElement], SKU_ACTUAL_AMOUNT)
+                actualAmount += this.getTotalAmountFromSku(formData[formElement])
             }
 
             // Check if fixed sku present in form element and its sequence is before money collect
@@ -316,6 +316,23 @@ class Payment {
             }
         }
         return 0
+    }
+
+    /**This calculates skuActualAmount for single as well as bulk transactions 
+     * 
+     * @param {*} formElement 
+     */
+    getTotalAmountFromSku(formElement) {
+        let childList = formElement.childDataList,totalAmountFromSku = 0
+        for (let index in childList) {
+            let skuArrayChildElementsForParticularTransaction = childList[index].childDataList
+            for (let index1 in skuArrayChildElementsForParticularTransaction) {
+                if (skuArrayChildElementsForParticularTransaction[index1].attributeTypeId == SKU_ACTUAL_AMOUNT) {
+                    totalAmountFromSku += skuArrayChildElementsForParticularTransaction[index1].value
+                }
+            }
+        }
+        return totalAmountFromSku
     }
 
     /**

@@ -1,7 +1,7 @@
 import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
 module.exports = {
-    APP_VERSION_NUMBER: '0.9.0',
+    APP_VERSION_NUMBER: '0.10.0',
     /**
      * TODO : Change money collect details object keys to attribute type id
      */
@@ -410,6 +410,7 @@ module.exports = {
     NET_BANKING_UTILITY_ID: 9,
     MOSAMBEE_UTILITY_ID: 6,
     WALLET_UTILITY_ID: 7,
+    PAGE_PAYTM: 11,
 
     //App Upgrade & Code Push Constants
     LATEST_APK_PATH: '/fareye_latest1.apk',

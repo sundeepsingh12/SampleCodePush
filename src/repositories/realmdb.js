@@ -39,7 +39,9 @@ import {
     TABLE_DRAFT,
     USER_EXCEPTION_LOGS,
     TABLE_MESSAGE_INTERACTION,
-    TABLE_NEGATIVE_COMMUNICATION_LOG
+    TABLE_NEGATIVE_COMMUNICATION_LOG,
+    Datastore_Master_DB,
+    DataStore_DB
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -98,9 +100,12 @@ export function _encryptData(dataToEncrypt, encryptionKey, counterBlock) {
 }
 
 export function _decryptData(dataToDecrypt, decryptionKey) {
+    if (!decryptionKey) {
+        decryptionKey = DeviceInfo.getUniqueID()
+    }
     return AesCtr.decrypt(dataToDecrypt, decryptionKey, 256)
 }
-export function deleteRecords() {
+export function deleteRecords(isDeleteAllRecords = false) {
     return realm.write(() => {
         realm.delete(realm.objects(TABLE_JOB_TRANSACTION))
         realm.delete(realm.objects(TABLE_JOB))
@@ -114,8 +119,14 @@ export function deleteRecords() {
         realm.delete(realm.objects(USER_EXCEPTION_LOGS))
         realm.delete(realm.objects(TABLE_MESSAGE_INTERACTION))
         realm.delete(realm.objects(TABLE_NEGATIVE_COMMUNICATION_LOG))
+        //These records should not be deleted during logout
+        if(isDeleteAllRecords){
+            realm.delete(realm.objects(Datastore_Master_DB))
+            realm.delete(realm.objects(DataStore_DB))
+        }
     });
 }
+
 
 /**
  * 

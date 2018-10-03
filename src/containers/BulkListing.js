@@ -19,15 +19,13 @@ import includes from 'lodash/includes'
 import toLower from 'lodash/toLower'
 import sortBy from 'lodash/sortBy'
 import isEmpty from 'lodash/isEmpty'
-
-
-
 import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO, OK, CANCEL, UPDATE_ALL_SELECTED, NO_JOBS_PRESENT, TOTAL_COUNT } from '../lib/ContainerConstants'
 import { FormLayout, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE, QrCodeScanner, SET_BULK_TRANSACTION_PARAMETERS, SET_BULK_PARAMS_FOR_SELECTED_DATA, SET_BULK_CHECK_ALERT_VIEW } from '../lib/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
 import { navigate } from '../modules/navigators/NavigationService';
 import BulkUnselectJobAlert from '../components/BulkUnselectJobAlert'
+
 function mapStateToProps(state) {
   return {
     jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
@@ -62,7 +60,7 @@ class BulkListing extends PureComponent {
   }
 
   renderData = (item, bulkTransactionLength, selectedTransactionLength) => {
-    if (isEmpty(item.jobExpiryData.value) || moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(item.jobExpiryData.value)) {
+    if (isEmpty(item.jobExpiryData.value) || (moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(item.jobExpiryData.value))) {
       return (
         <JobListItem data={item}
           onPressItem={() => this.onClickRowItem(item, bulkTransactionLength, selectedTransactionLength)}
@@ -71,7 +69,6 @@ class BulkListing extends PureComponent {
     }
 
   }
-
 
   onClickRowItem(item, bulkTransactionLength, selectedTransactionLength) {
     if (this.props.isManualSelectionAllowed && !this.props.selectedItems[item.jobId].disabled) {
@@ -117,7 +114,6 @@ class BulkListing extends PureComponent {
     }
     return false
   }
-
 
   _setQrValue = (selectedTransactionLength, value) => {
     if (value && value != '')
@@ -167,7 +163,8 @@ class BulkListing extends PureComponent {
     // Function for filtering on basis of reference number, runsheet number, line1, line2, circleline1, circleline2
     for (let item in bulkTransactions) {
       let values = [bulkTransactions[item].runsheetNo, bulkTransactions[item].referenceNumber, bulkTransactions[item].line1, bulkTransactions[item].line2, bulkTransactions[item].circleLine1, bulkTransactions[item].circleLine2]
-      if (bulkTransactions[item].isChecked && !bulkTransactions[item].disabled) {
+     //Jobs which are expired also present in bulk state,hence we need to check if current time is less than job expiry
+      if (bulkTransactions[item].isChecked && !bulkTransactions[item].disabled && (isEmpty(bulkTransactions[item].jobExpiryData.value)  || (moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isBefore(bulkTransactions[item].jobExpiryData.value)))) {
         selectedTransactionLength++
       }
       if ((isEmpty(searchText))) {

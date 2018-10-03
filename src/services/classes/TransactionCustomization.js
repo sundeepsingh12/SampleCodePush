@@ -87,7 +87,7 @@ class TransactionCustomization {
         let jobTransactionList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO);
         await keyValueDBService.deleteValueFromStore(UPDATE_JOBMASTERID_JOBID_MAP)
         for (let jobId in jobIdList) {
-            if (jobTransactionList[jobIdList[jobId].jobMasterId] && !jobTransactionList[jobIdList[jobId].jobMasterId][jobId] && jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] && jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId]) {
+            if (jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] && jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId] && (_.isEmpty(jobTransactionList) || !jobTransactionList[jobIdList[jobId].jobMasterId] || !jobTransactionList[jobIdList[jobId].jobMasterId][jobId])) {
                 delete jobTransactionCustomizationList[jobIdList[jobId].jobMasterId][jobId]
             } else if(jobTransactionList[jobIdList[jobId].jobMasterId] && jobTransactionList[jobIdList[jobId].jobMasterId][jobId]){
                 jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] = jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] ? jobTransactionCustomizationList[jobIdList[jobId].jobMasterId] : {}

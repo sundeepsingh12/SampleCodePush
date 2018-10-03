@@ -130,7 +130,7 @@ export function authenticateUser(username, password, rememberMe) {
     try {
       dispatch(loginRequest())
       const authenticationResponse = await authenticationService.login(username, password)
-      let cookie = authenticationResponse.headers.map['set-cookie'][0]
+      let cookie = authenticationResponse.headers.map['set-cookie']
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)
       await authenticationService.saveLoginCredentials(username, password, rememberMe)
       dispatch(loginSuccess())
@@ -165,7 +165,7 @@ export function onLongPressResetSettings(url) {
         url = domainUrl.value
       }
       dispatch(onLongPressIcon(true))
-      await logoutService.deleteDataBase()
+      await logoutService.deleteDataBase(true)
       let allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
       await keyValueDBService.deleteValueFromStore(allSchemaInstance)
       dispatch(setState(RESET_STATE))
