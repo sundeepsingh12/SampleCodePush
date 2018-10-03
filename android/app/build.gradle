@@ -2,6 +2,7 @@ apply plugin: "com.android.application"
 
 
 import com.android.build.OutputFile
+import com.android.builder.core.DefaultManifestParser
 
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
@@ -103,7 +104,7 @@ android {
         versionCode 1
         versionName "1.0"
         ndk {
-            abiFilters "armeabi-v7a", "x86"
+            abiFilters "armeabi-v7a"
         }
     }
     splits {
@@ -111,7 +112,7 @@ android {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
             universalApk false  // If true, also generate a universal APK
-            include "armeabi-v7a", "x86"
+            include "armeabi-v7a"
         }
     }
     dexOptions {
@@ -135,12 +136,16 @@ android {
         variant.outputs.each { output ->
             // For each separate APK per architecture, set a unique version code as described here:
             // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
-            def versionCodes = ["armeabi-v7a":1, "x86":2]
+            def versionCodes = ["armeabi-v7a":1]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
                 output.versionCodeOverride =
                         versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
             }
+             def manifestParser = new DefaultManifestParser(android.sourceSets.main.manifest.srcFile)
+              outputFileName = new File(
+                    output.outputFile.parent,
+                    "FarEyeReact_v" + manifestParser.getVersionName() + ".apk");
         }
     }
 }
