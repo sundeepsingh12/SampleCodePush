@@ -407,6 +407,9 @@ module.exports = {
     //PAGE UTILITY Constants
     PAGE_SUMMARY_PIECHART: 1,
     PAGE_MESSAGING: 2,
+    NET_BANKING_UTILITY_ID: 9,
+    MOSAMBEE_UTILITY_ID: 6,
+    WALLET_UTILITY_ID: 7,
     PAGE_PAYTM: 11,
 
     //App Upgrade & Code Push Constants

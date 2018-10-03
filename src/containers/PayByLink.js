@@ -53,6 +53,7 @@ import {
 } from '../lib/ContainerConstants'
 import { isEmpty, size, trim } from 'lodash'
 import PaymentSuccessfullScreen from '../components/mosambeeWallet/PaymentSuccessfullScreen'
+import CheckTransactionView from '../components/CheckTransactionView'
 
 
 function mapStateToProps(state) {
@@ -123,7 +124,8 @@ class PayByLink extends PureComponent {
             case null: return this._mobileScreenView()
             case SMS_LINK_SENT_SUCCESSFULLY: return this._sendSmsView()
             case RESEND_SMS: return this._reSendLinkView()
-            case TRANSACTION_PENDING: return this._checkTransactionView()
+            case TRANSACTION_PENDING: return <CheckTransactionView hitCheckTransactionApiForCheckingPayment = {() => {this.props.actions.hitCheckTransactionApiForCheckingPayment(this.props.payByLinkConfigJSON, this.props.navigation.state.params) }} 
+                                                                   onCancelAlert = {() => {this._onCancelAlert()}}  errorMessage = {NO_TRANSACTION_FOUND_UNABLE_TO_CONTACT_SERVER}/>
             case TRANSACTION_SUCCESSFUL: return <PaymentSuccessfullScreen/>
             default: return this.showSmsFailedScreen()
         }
@@ -195,32 +197,6 @@ class PayByLink extends PureComponent {
                     </View>
                     <View>
                         <Text style={[{ fontSize: 16, color: '#727272' }, styles.marginTop25, styles.fontCenter]} onPress={() => { this.props.actions.setState(SET_PAY_BY_LINK_MESSAGE, SMS_LINK_SENT_SUCCESSFULLY) }} >{CANCEL}</Text>
-                    </View>
-                </View>
-            </Content>
-        )
-    }
-
-    _checkTransactionView() {
-        return (
-            <Content >
-                <View style={[styles.flex1, styles.column, styles.justifyCenter, styles.alignCenter]}>
-                    <View style={[styles.justifyCenter, styles.alignCenter, { marginTop: 85 }]}>
-                        <View style={[styles.borderRadius50, styles.justifyCenter, { borderColor: '#ff2d55', width: 100, height: 100, borderWidth: 2 }]}>
-                            <MaterialIcons name='close' style={[styles.alignSelfCenter, styles.fontWhite, styles.padding5, { color: '#ff2d55', fontSize: 36 }]} onPress={() => { }}
-                            />
-                        </View>
-                        <Text style={[{ fontSize: 18 }, styles.fontBlack, styles.marginTop15]}>{'Payment Failed'}</Text>
-                        <Text style={[{ fontSize: 14 }, styles.marginTop15, styles.fontDarkGray, styles.fontCenter, { marginLeft: 62, marginRight: 70 }]}>{NO_TRANSACTION_FOUND_UNABLE_TO_CONTACT_SERVER}</Text>
-                    </View>
-                    <View>
-                        <Button bordered style={[{ borderColor: '#EAEAEA', backgroundColor: '#F2F1FF', borderWidth: 1 }, { height: 50, width: 240 }, styles.alignCenter, styles.justifyCenter, { marginTop: 140 }]}
-                            onPress={() => { this.props.actions.hitCheckTransactionApiForCheckingPayment(this.props.payByLinkConfigJSON, this.props.navigation.state.params) }} >
-                            <Text style={[{ color: '#000', lineHeight: 19 }, styles.fontWeight500, styles.fontLg]}>{CHECK_TRANSACTION_STATUS}</Text>
-                        </Button>
-                    </View>
-                    <View>
-                        <Text style={[{ fontSize: 16, color: '#727272' }, styles.marginTop25, styles.fontCenter]} onPress={() => { this._onCancelAlert() }}>{CANCEL}</Text>
                     </View>
                 </View>
             </Content>

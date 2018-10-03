@@ -4,16 +4,17 @@ import RestAPIFactory from '../../lib/RestAPIFactory'
 import { keyValueDBService } from '../classes/KeyValueDBService'
 import {
     CUSTOMIZATION_APP_MODULE,
-    DEVICE_IMEI
+    DEVICE_IMEI,
+    PAGES_ADDITIONAL_UTILITY
 } from '../../lib/constants'
-import {MOSAMBEE_WALLET_ID} from '../../lib/AttributeConstants'
+import {MOSAMBEE_ID} from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
 import jsSha512 from 'js-sha512'
 import { draftService } from '../classes/DraftService'
 import { moduleCustomizationService } from '../classes/ModuleCustomization'
 import {isArray, isEqual, isEmpty, toLower} from 'lodash'
 import { signatureService } from '../classes/SignatureRemarks'
-import { SIGNATURE } from '../../lib/AttributeConstants'
+import { SIGNATURE, MOSAMBEE_UTILITY_ID } from '../../lib/AttributeConstants'
 import moment from 'moment'
 
 class MosambeeWalletPayment {
@@ -48,23 +49,25 @@ class MosambeeWalletPayment {
     }
 
     async setWalletListAndWalletParameters(jobTransactionList, jobTransactionIdAmountMap, id){
-        const modulesCustomization = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
-        const walletModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomization.value, id)[0]
-        let walletParameters = walletModule && walletModule.remark ? JSON.parse(walletModule.remark) : null
+        const modulesCustomization = await keyValueDBService.getValueFromStore(PAGES_ADDITIONAL_UTILITY)
+        let walletModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomization.value, id)[0]
+        if(!walletModule || !walletModule.enabled) throw new Error('Module is not Active, please active it for use.')
+        let walletParameters = walletModule && walletModule.additionalParams ? JSON.parse(walletModule.additionalParams) : null
         let actualAmount = 0.00, referenceNoActualAmountMap = '', transactionActualAmount, separator = ''
-        const walletList = (walletParameters && walletParameters.walletURL && walletParameters.partnerId && walletParameters.secretKey && walletParameters.apiPassword && walletParameters.PayProMID) ? await this.hitWalletUrlToGetWalletList(walletParameters) : null
+        const walletList = (walletModule && walletParameters.walletURL && walletParameters.partnerId && walletParameters.secretKey && walletParameters.apiPassword && walletParameters.PayProMID) ? await this.hitWalletUrlToGetWalletList(walletParameters) : null
+        let conversionAmountMultiple = id == MOSAMBEE_UTILITY_ID ? 1 : 100 // In case of mosambee payment only actualAmount be in rupees
         if(isArray(jobTransactionList)){
             for(let transaction in jobTransactionList){
                 transactionActualAmount = (jobTransactionIdAmountMap[jobTransactionList[transaction].jobTransactionId]) ? jobTransactionIdAmountMap[jobTransactionList[transaction].jobTransactionId].actualAmount : 0
                 actualAmount = actualAmount + transactionActualAmount
-                referenceNoActualAmountMap = referenceNoActualAmountMap + separator + jobTransactionList[transaction].referenceNumber + ':' + String(transactionActualAmount * 100) 
+                referenceNoActualAmountMap = referenceNoActualAmountMap + separator + jobTransactionList[transaction].referenceNumber + ':' + String(transactionActualAmount * conversionAmountMultiple) 
                 separator = ', '
             }
         }else{
             actualAmount = jobTransactionIdAmountMap.actualAmount
-            referenceNoActualAmountMap = jobTransactionList.referenceNumber + ':' + actualAmount
+            referenceNoActualAmountMap = jobTransactionList.referenceNumber + ':' + String(actualAmount * conversionAmountMultiple)
         }
-        walletParameters.actualAmount = actualAmount
+        walletParameters.actualAmount = String(actualAmount)
         walletParameters.referenceNoActualAmountMap = referenceNoActualAmountMap
         return { walletParameters, walletList}
     }

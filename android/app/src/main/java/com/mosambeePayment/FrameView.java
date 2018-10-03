@@ -1,6 +1,7 @@
 package com.mosambeePayment;
 
 import android.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -67,9 +68,10 @@ public class FrameView  extends LinearLayout implements TransactionResult{
     public void onResult(ResultData result) {
         if (!result.getResult()) {
             mosambeeButton.setVisibility(View.VISIBLE);
-            mosambeeTextView.setText("Payment_unsuccesful"
-                    + "\n"+"Reason_code"+" " + result.getReasonCode()
-                    + "\n"+"Reason"+" " + result.getReason());
+            mosambeeTextView.setText("Payment_unsuccesful" + "\n"+"Reason_code"+" " + result.getReasonCode() + "\n"+"Reason"+" " + result.getReason());
+            if (!result.getReason().contains("MAU002")) {
+                checkTransactionStatusButton.setVisibility(View.VISIBLE);
+            }
         } else {
             if (alertDialog != null) {
                 alertDialog.dismiss();
@@ -89,6 +91,7 @@ public class FrameView  extends LinearLayout implements TransactionResult{
         FrameLayout frameLayout = (FrameLayout) dialogView.findViewById(R.id.frameContainer);
         mosambeeTextView = (TextView) dialogView.findViewById(R.id.mosambeeText);
         mosambeeButton = (Button) dialogView.findViewById(R.id.mosambeeButton);
+        checkTransactionStatusButton = (Button) dialogView.findViewById(R.id.checkTransactionStatusButton);
         builder.setView(dialogView);
         builder.setCancelable(false);
         alertDialog = builder.create();
@@ -103,6 +106,15 @@ public class FrameView  extends LinearLayout implements TransactionResult{
                 }
             }
         });
+        checkTransactionStatusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (alertDialog != null && alertDialog.isShowing()) {
+                    context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("checkTransactionStatus",null);
+                    alertDialog.dismiss();                
+                }
+            }
+        });
         alertDialog.show();
         SimpleDateFormat formattedDt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         String dateTime = formattedDt.format(new Date());
@@ -113,6 +125,7 @@ public class FrameView  extends LinearLayout implements TransactionResult{
         moscCallback.initialiseFields("sale", mosambeeParameters.getString("contactNumber"),
                 mosambeeParameters.getString("appKey"), true, "email@test.com",
                 null, null, dateTime, null);
+        Log.i("data ->>>>","data is" + mosambeeParameters.getString("referenceNoActualAmountMap") +"       " + Double.parseDouble(mosambeeParameters.getString("actualAmount")));
         tc.processTransaction(mosambeeParameters.getString("referenceNoActualAmountMap"), Double.parseDouble(mosambeeParameters.getString("actualAmount")), null, "");
     }
 

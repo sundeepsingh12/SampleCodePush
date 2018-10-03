@@ -1,7 +1,6 @@
 'use strict'
 
 import { setState, showToastAndAddUserExceptionLog } from '../../global/globalActions'
-import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { payByLinkPaymentService } from '../../../services/payment/PayByLinkPayment'
 import {
     SET_PAY_BY_LINK_PARAMETERS,
@@ -10,7 +9,7 @@ import {
 } from '../../../lib/constants'
 import { MosambeeWalletPaymentServices } from '../../../services/payment/MosambeeWalletPayment'
 import {
-    NET_BANKING_ID,
+    NET_BANKING_UTILITY_ID
 } from '../../../lib/AttributeConstants'
 import { TRANSACTION_SUCCESSFUL, TRANSACTION_PENDING } from '../../../lib/ContainerConstants'
 import { saveJobTransaction } from '../../form-layout/formLayoutActions';
@@ -23,7 +22,7 @@ export function getPayByLinkPaymentParameters(customerContact, jobTransaction, j
     return async function (dispatch) {
         try { 
             dispatch(setState(SET_LOADER_FOR_PAYBYLINK, true))
-            const { walletParameters} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, NET_BANKING_ID)
+            const { walletParameters} = await MosambeeWalletPaymentServices.setWalletListAndWalletParameters(jobTransaction, jobTransactionIdAmountMap, NET_BANKING_UTILITY_ID)
             let apiPassword = walletParameters.apiPassword 
             walletParameters.apiPassword = walletParameters.secretKey
             walletParameters.secretKey = apiPassword
