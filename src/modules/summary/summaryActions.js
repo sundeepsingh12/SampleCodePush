@@ -40,7 +40,7 @@ export function getDataForJobMasterSummaryAndRunSheetSummary() {
             const jobMasterListValue = (_.size(Piechart.params)) ? jobMasterList.value.filter((jobMaster) => _.includes(Piechart.params, jobMaster.id)) : jobMasterList.value
             const jobMasterSummaryList =  summaryAndPieChartService.setAllJobMasterSummary(jobMasterListValue,jobStatusList.value,allPendingSuccessFailIds,noNextStatusMap) // set all jobMasterSummary list
             const runsheetSummaryList =   summaryAndPieChartService.getAllRunSheetSummary() // set all runSheetList summary
-            const currentActiveRunsheetId = runsheetSummaryList[0][6] ;
+            const currentActiveRunsheetId = (runsheetSummaryList && runsheetSummaryList[0]) ? runsheetSummaryList[0][6] : 0 ;
             dispatch(setState(SET_JOB_MASTER_AND_RUNSHEET_DATA, {jobMasterSummaryList,runsheetSummaryList,currentActiveRunsheetId}))
         } catch (error) {
             showToastAndAddUserExceptionLog(9901, error.message, 'danger', 1)
