@@ -17,9 +17,8 @@ import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_S
 import CustomAlert from "../components/CustomAlert"
 import { ALERT, INVALID_FORM_ALERT, OK, PRINT_AND_FINISH, FINISH } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
-import { navigate, navDispatch } from '../modules/navigators/NavigationService'
+import { navigate } from '../modules/navigators/NavigationService'
 import isEmpty from 'lodash/isEmpty'
-import BluetoothSerial from 'react-native-bluetooth-serial';
 
 function mapStateToProps(state) {
   return {
@@ -40,6 +39,7 @@ function mapStateToProps(state) {
     arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
     jobAndFieldAttributesList: state.formLayout.jobAndFieldAttributesList,
     updatedTransactionListIds: state.listing.updatedTransactionListIds,
+    isBluetoothConnected: state.sorting.isBluetoothConnected
   }
 }
 
@@ -214,9 +214,8 @@ class FormLayout extends PureComponent {
     return null
   }
 
-  async checkForPrintAttributeAndSaveData(taskListScreenDetails, printAttributeMasterId) {
-    let bluetoothConnected = await BluetoothSerial.isConnected()
-    if(bluetoothConnected){
+  checkForPrintAttributeAndSaveData(taskListScreenDetails, printAttributeMasterId) {
+    if(this.props.isBluetoothConnected){
       if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
         navigate(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId), this.paymentAtEndNavigationParams(taskListScreenDetails, printAttributeMasterId))
       } else {
@@ -234,7 +233,6 @@ class FormLayout extends PureComponent {
     }else{
       navigate(BluetoothListing , { screenName: 'Sorting' })
     }
-
     }
 
   formLayoutState = () => {

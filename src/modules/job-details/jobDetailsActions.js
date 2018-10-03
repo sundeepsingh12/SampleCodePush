@@ -138,11 +138,10 @@ export function deleteDraftAndNavigateToFormLayout(formLayoutData) {
         }
     }
 }
-export function prepareTemplateForPrintAttributeAndPrint(jobTransaction, fieldDataList, jobDataList) {
+export function prepareTemplateForPrintAttributeAndPrint(jobTransaction, fieldDataList, jobDataList, isBluetoothConnected) {
     return async function (dispatch) {
         try {
-            let isBluetoothConnected = await BluetoothSerial.isConnected()
-            if(!isBluetoothConnected){
+            if(isBluetoothConnected){
                 await printService.printingTemplateFormatStructureForDetails(jobTransaction, fieldDataList, jobDataList)
             }else{
                 navigate(BluetoothListing , { screenName: 'Sorting' })
