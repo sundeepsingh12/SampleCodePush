@@ -32,13 +32,13 @@ class PrintService {
             const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE);
             let printingFieldAttributeMasterValue = fieldAttributeValueMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, printAttributeMasterId);
             let { attributeMap, jobAttributesMap } = this.combineJobAndFieldAttribute(cloneFormElement.jobAndFieldAttributesList.jobAttributes, cloneFormElement.jobAndFieldAttributesList.fieldAttributes)
-            let { masterIdJobAttributeMap, printingAttributeValueMap, labelMap } = this.createMapOfMasterIdAndPrintingObject(printingFieldAttributeMasterValue, masterIdPrintingObjectMap, attributeMap, jobAttributesMap, true)
+            let { masterIdJobAttributeMap, printingAttributeValueMap, labelMap } = this.createMapOfMasterIdAndPrintingObject(printingFieldAttributeMasterValue, masterIdPrintingObjectMap, attributeMap, jobAttributesMap)
             printingAttributeValueMap = sortBy(printingAttributeValueMap, function (object) { return object.sequence });
             if (!isEmpty(masterIdJobAttributeMap)) {
                 jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(transaction.jobId, masterIdJobAttributeMap, masterIdJobAttributeMap)
             }
             let dataList = Object.assign({}, jobDataObject.dataList, cloneFormElement.formElement, previousStatusFieldAttributeMap)
-            await this.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap, labelMap)
+            await this.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap, labelMap,true)
         } catch (error) {
             console.log(error.message)
         }
@@ -53,9 +53,9 @@ class PrintService {
         let { attributeMap } = this.combineJobAndFieldAttribute(jobAttributeMasterList.value, fieldAttributeMasterList.value)
         let dataList = Object.assign({}, jobDataList, fieldDataList)
         let printingFieldAttributeMasterValue = fieldAttributeValueMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, jobTransaction.printAttributeMasterId);
-        let { printingAttributeValueMap } = this.createMapOfMasterIdAndPrintingObject(printingFieldAttributeMasterValue, masterIdPrintingObjectMap, attributeMap)
+        let { printingAttributeValueMap, labelMap } = this.createMapOfMasterIdAndPrintingObject(printingFieldAttributeMasterValue, masterIdPrintingObjectMap, attributeMap)
         printingAttributeValueMap = sortBy(printingAttributeValueMap, function (object) { return object.sequence });
-        await this.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap)
+        await this.preparePrintingTemplate(transaction.id, dataList, printingAttributeValueMap, masterIdPrintingObjectMap, labelMap)
     }
 
     combineJobAndFieldAttribute(jobAttributes, fieldAttributes) {
@@ -118,7 +118,7 @@ class PrintService {
         let detailArrayChildData, detailsValue, objectValue
         for (let detailsData in childDataList) {
             detailArrayChildData = childDataList[detailsData]
-            detailsValue = labelMap ? detailArrayChildData : detailArrayChildData.data
+            detailsValue = detailArrayChildData.data ? detailArrayChildData.data : detailArrayChildData
             if (!detailsValue || detailsValue.value != OBJECT_SAROJ_FAREYE || !detailArrayChildData.childDataList) {
                 continue
             }
@@ -137,7 +137,7 @@ class PrintService {
             valueData = childDataValueObject[childItem].data ? childDataValueObject[childItem].data : childDataValueObject[childItem]
             printingDataObject = printingFieldAttributeMasterValue[valueData[attributeMasterIdType]]
             if (printingDataObject) {
-                mapValue[valueData[attributeMasterIdType]] = labelMap ? labelMap[valueData[attributeMasterIdType]] : childDataValueObject[childItem].label
+                mapValue[valueData[attributeMasterIdType]] = labelMap[valueData[attributeMasterIdType]]
                 arrayData.push({ masterId: valueData[attributeMasterIdType], sequence: printingDataObject.sequence })
             }
         }
@@ -196,12 +196,12 @@ class PrintService {
         if (!dataItem || !dataItem.value || !printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]]) {
             return { printArray, printFormatValue }
         }
-        let dataValue = this.prepareTemplateForArrayObjectChildAttribute(printArray, printFormatValue, dataItem.value, printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]].code, LINE_FEED, labelMap ? labelMap[dataItem[attributeMasterIdType]] : dataItem.label)
+        let dataValue = this.prepareTemplateForArrayObjectChildAttribute(printArray, printFormatValue, dataItem.value, printingFieldAttributeMasterValue[dataItem[attributeMasterIdType]].code, LINE_FEED, labelMap[dataItem[attributeMasterIdType]])
         return { printArray: dataValue.printArray, printFormatValue: dataValue.printFormatValue }
     }
 
 
-    async preparePrintingTemplate(jobTransactionId, dataList, printingAttributeValueMap, printingFieldAttributeMasterValue, labelMap) {
+    async preparePrintingTemplate(jobTransactionId, dataList, printingAttributeValueMap, printingFieldAttributeMasterValue, labelMap, isCalledFromFormLayout) {
         let printFormatValue = ``, printArray = [], attributeMasterIdType, childDataObject, printTemplate
         for (let id in printingAttributeValueMap) {
             if (!dataList[printingAttributeValueMap[id].name]) { // case of checking print Data is in datalist 
@@ -210,7 +210,7 @@ class PrintService {
             attributeMasterIdType = dataList[printingAttributeValueMap[id].name].data && dataList[printingAttributeValueMap[id].name].data.fieldAttributeMasterId || dataList[printingAttributeValueMap[id].name].fieldAttributeMasterId ? FIELD_ATTRIBUTE_MASTER_ID : JOB_ATTRIBUTE_MASTER_ID
             if (dataList[printingAttributeValueMap[id].name].childDataList) { // case of arrayType attribute
                 childDataObject = dataList[printingAttributeValueMap[id].name] ? dataList[printingAttributeValueMap[id].name].childDataList : null
-                childDataObject = labelMap && printingAttributeValueMap[id].code == PRINT_SKU ? childDataObject[jobTransactionId].childDataList : childDataObject
+                childDataObject = isCalledFromFormLayout && printingAttributeValueMap[id].code == PRINT_SKU ? childDataObject[jobTransactionId].childDataList : childDataObject
                 printFormatValue += `<align mode="center"><text-line size="1:0">${dataList[printingAttributeValueMap[id].name].label}</text-line><line-feed /></align>`
                 printTemplate = this.preparePrintTemplateInCaseOfArray(childDataObject, printingFieldAttributeMasterValue, labelMap, attributeMasterIdType, printFormatValue, printArray)
             } else { // case of normal attribute
@@ -244,18 +244,16 @@ class PrintService {
         }
     }
 
-    createMapOfMasterIdAndPrintingObject(printingAttributeValueList, masterIdPrintingObjectMap, attributeMap, jobAttributesMap, calledFromFormLayout) {
+    createMapOfMasterIdAndPrintingObject(printingAttributeValueList, masterIdPrintingObjectMap, attributeMap, jobAttributesMap) {
         let masterIdJobAttributeMap = {}, printingAttributeValueMap = {}, labelMap = {}
         for (let item in printingAttributeValueList) {
             let masterId = printingAttributeValueList[item].name.split('[')
             masterId = (masterId[masterId.length - 1]).split(']')
             printingAttributeValueList[item].name = masterId[0]
             masterIdPrintingObjectMap[masterId[0]] = printingAttributeValueList[item]
-            if (calledFromFormLayout) { // check for jobData in printAttribute in case of formLayout
-                labelMap[masterId[0]] = attributeMap[masterId[0]].label
-                if (jobAttributesMap && jobAttributesMap[masterId[0]]) {
-                    masterIdJobAttributeMap[masterId[0]] = jobAttributesMap[masterId[0]]
-                }
+            labelMap[masterId[0]] = attributeMap[masterId[0]].label
+            if (jobAttributesMap && jobAttributesMap[masterId[0]]) { // check for jobData in printAttribute in case of formLayout
+                masterIdJobAttributeMap[masterId[0]] = jobAttributesMap[masterId[0]]
             }
             if (masterId[0] && attributeMap[masterId[0]] && attributeMap[masterId[0]].parentId) { // !attributeMap[masterId[0]] is to check case for JobDetails
                 continue
