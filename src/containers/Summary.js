@@ -17,6 +17,8 @@ function mapStateToProps(state) {
     return {
         jobMasterSummary: state.summary.jobMasterSummary,
         runSheetSummary: state.summary.runSheetSummary,
+        currentActiveRunsheetId:state.summary.currentActiveRunsheetId,
+        isLoaderRunning:state.summary.isLoaderRunning
     }
 }
 function mapDispatchToProps(dispatch) {
@@ -33,13 +35,8 @@ function wp(percentage) {
     return Math.round(value);
 }
 
-const slideHeight = viewportHeight * 0.4;
-
 // slider width 
 const slideWidth = wp(100);
-
-// Margin from last slide when scroll
-const itemHorizontalMargin = wp(10);
 
 // getting slider width
 const sliderWidth = viewportWidth;
@@ -47,6 +44,7 @@ const itemWidth = slideWidth;
 
 
 const SLIDER_1_FIRST_ITEM = 0;
+
 class SummaryListing extends PureComponent {
 
     renderData(status, item) {
@@ -64,11 +62,10 @@ class SummaryListing extends PureComponent {
                     <View style={[styles.marginTop5]}>
                         <FlatList
                             data={item[i + 1].list}
-                            extraData={this.state}
                             renderItem={({ item }) => {
                                 return (
                                     <Text style={[styles.fontDefault]}>
-                                        {item.name} -  {item.count}
+                                        {item.name} - {item.count}
                                     </Text>
                                 )
                             }}
@@ -104,7 +101,7 @@ class SummaryListing extends PureComponent {
     render() {
         return (
             <View>
-                {this.renderData(this.props.status, this.props.data)}
+                {this.renderData(this.props.status, this.props.data,this.props.currentActiveRunsheetId)}
                 {this.renderDataForCollection(this.props.data)}
             </View>
         )
@@ -117,10 +114,11 @@ class Summary extends PureComponent {
     }
 
     constructor(props) {
+       
         super(props);
         this.state = {
             slider1ActiveSlide: SLIDER_1_FIRST_ITEM,
-            slider1Ref: null
+            slider1Ref: null,
         };
     }
 
@@ -187,7 +185,9 @@ class Summary extends PureComponent {
                 inactiveSlideOpacity={0.7}
                 enableMomentum={false}
                 loop={false}
-                onSnapToItem={(index) => this.setState({ slider1ActiveSlide: index })}
+                onSnapToItem={(index) => {
+                    this.props.actions.setCurrentActiveRunsheetId(this.props.runSheetSummary[index][6])
+                    this.setState({ slider1ActiveSlide: index })}}
             />
         )
     }
@@ -249,48 +249,59 @@ class Summary extends PureComponent {
         )
     }
 
+    renderFlatListData(listData,status,currentActiveRunsheetId){
+        return (
+            <FlatList
+            data={listData}
+            renderItem={({ item }) => {
+                return (
+                    <View style={[styles.margin10, styles.bgWhite, { elevation: 2 }]}>
+                        {this._renderJobMasterView(item)}
+                        <SummaryListing status={status} data={item} currentActiveRunsheetId = {currentActiveRunsheetId} />
+                    </View>
+                )
+            }
+            }
+            keyExtractor={item => String(item.id)}
+        />
+        )
+    }
+
     _renderView = () => {
         const status = ['Pending', 'Failed', 'Successful']
-        const listData = this.props.jobMasterSummary
-        listData.sort((master1, master2) => master1.title.toLowerCase().localeCompare(master2.title.toLowerCase()))
-        if (this.props.jobMasterSummary && this.props.jobMasterSummary.length == 0) {
-            return <Loader />
-        }
+        const listData = (this.props.jobMasterSummary[this.props.currentActiveRunsheetId]) ? this.props.jobMasterSummary[this.props.currentActiveRunsheetId] : {}
+        const flatListData = Object.values(listData)
+        flatListData.sort((master1, master2) => master1.title.toLowerCase().localeCompare(master2.title.toLowerCase()))
         return (
             <Content style={[styles.bgLightGray]}>
                 <LinearGradient
                     colors={[styles.bgPrimaryColor, styles.shadeColor]}>
                     {this._renderCrousel()}
                 </LinearGradient>
-                <FlatList
-                    data={listData}
-                    renderItem={({ item }) => {
-                        return (
-                            <View style={[styles.margin10, styles.bgWhite, { elevation: 2 }]}>
-                                {this._renderJobMasterView(item)}
-                                <SummaryListing status={status} data={item} />
-                            </View>
-                        )
-                    }
-                    }
-                    keyExtractor={item => String(item.id)}
-                />
+                {this.renderFlatListData(flatListData,status,this.props.currentActiveRunsheetId)}
             </Content>
         )
     }
 
     render() {
         const headerView = this._renderHeader()
-        return (
-            <StyleProvider style={getTheme(platform)}>
-                <Container>
-                    {headerView}
-                    {this._renderView()}
-                </Container>
-            </StyleProvider>
-        )
+        if(this.props.isLoaderRunning){
+            return <Loader/>
+        }
+        else{
+            return (
+                <StyleProvider style={getTheme(platform)}>
+                    <Container>
+                        {headerView}
+                        {this._renderView()}
+                    </Container>
+                </StyleProvider>
+            )
+        }
+       
     }
 }
+
 const style = StyleSheet.create({
     header: {
         borderBottomWidth: 0,
