@@ -20,6 +20,7 @@ import { formLayoutEventsInterface } from '../classes/formLayout/FormLayoutEvent
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 import moment from 'moment'
+import { addServerSmsService } from './AddServerSms'
 
 class PostAssignment {
 
@@ -104,6 +105,7 @@ class PostAssignment {
         }
         realm.performBatchSave(jobTransactionTableDTO, runSheet)
         await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionDTOMap, jobMaster.id)
+        await addServerSmsService.setServerSmsMapForPendingStatus(transactionList, user.value)
     }
 
     /**
