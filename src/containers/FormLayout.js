@@ -12,8 +12,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import BasicFormElement from '../components/FormLayoutBasicComponent.js'
 import Loader from '../components/Loader'
-import { NET_BANKING, NET_BANKING_LINK, NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, UPI, MOSAMBEE_WALLET, MOSAMBEE, PRINT } from '../lib/AttributeConstants'
-import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_STATE, JobDetailsV2, BluetoothListing } from '../lib/constants'
+import { NET_BANKING, NET_BANKING_LINK, NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, UPI, MOSAMBEE_WALLET, MOSAMBEE, PRINT, PAYTM } from '../lib/AttributeConstants'
+import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_STATE, BluetoothListing } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
 import { ALERT, INVALID_FORM_ALERT, OK, PRINT_AND_FINISH, FINISH } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
@@ -209,6 +209,7 @@ class FormLayout extends PureComponent {
       case UPI.id: return 'UPIPayment'
       case MOSAMBEE_WALLET.id: return 'MosamBeeWalletPayment'
       case MOSAMBEE.id: return 'MosambeePayment'
+      case PAYTM.id: return 'PaytmPayment'
     }
 
     return null
@@ -312,7 +313,7 @@ class FormLayout extends PureComponent {
     if (printAttributeMasterId && Platform.OS == 'android') {
       return (
         <SafeAreaView>
-        <Footer style={[style.footer]}>
+        <Footer style={[style.footer, styles.autoHeightFooter]}>
           <FooterTab style={[styles.paddingLeft10, styles.paddingRight10, styles.paddingTop10,{paddingBottom : 10}, styles.row, styles.justifySpaceBetween]}>
             <Button  full
               onPress={() => this.checkForPrintAttributeAndSaveData(taskListScreenDetails, printAttributeMasterId)}
@@ -332,7 +333,7 @@ class FormLayout extends PureComponent {
     } else {
       return(
       <SafeAreaView style={[styles.bgWhite]}>
-          <Footer style={[style.footer]}>
+          <Footer style={[style.footer, styles.autoHeightFooter]}>
             <FooterTab style={[styles.padding10]}>
               <Button success full
                 onPress={() => this.saveJobTransaction(taskListScreenDetails)}
@@ -398,7 +399,7 @@ class FormLayout extends PureComponent {
     if (this.props.formElement && this.props.formElement.length == 0) {
       <SafeAreaView style={[styles.bgWhite]}>
         {this.headerView()}
-        <Footer style={[style.footer]}>
+        <Footer style={[style.footer,styles.autoHeightFooter]}>
           <FooterTab style={[styles.padding10]}>
             <Button success full
               onPress={() => this.saveJobTransaction(taskListScreenDetails)}
@@ -437,7 +438,6 @@ class FormLayout extends PureComponent {
 const style = StyleSheet.create({
   header: {
     borderBottomWidth: 0,
-    height: 'auto',
     padding: 0,
     paddingRight: 0,
     paddingLeft: 0
@@ -458,7 +458,6 @@ const style = StyleSheet.create({
     padding: 15
   },
   footer: {
-    height: 'auto',
     borderTopWidth: 1,
     borderTopColor: '#f3f3f3'
   },

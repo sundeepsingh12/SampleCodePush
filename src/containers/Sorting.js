@@ -80,7 +80,6 @@ class SortingListing extends PureComponent {
     }
 
     async printSortingData() {
-        let a = null
         let data = {
             feName: this.props.sortingDetails[1].value,
             sequenceNumber: `${STOP}   :  ` + this.props.sortingDetails[3].value,

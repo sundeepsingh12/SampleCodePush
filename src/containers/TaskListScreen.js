@@ -1,7 +1,7 @@
 'use strict'
 import React, { PureComponent } from 'react';
 import { View, SectionList, TouchableOpacity, Text } from 'react-native';
-import { Container, Content, List, Separator, Icon, Toast } from 'native-base';
+import { Container, Content, Separator, Icon, Toast } from 'native-base';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as taskListActions from '../modules/taskList/taskListActions';
@@ -268,9 +268,7 @@ class TaskListScreen extends PureComponent {
       return (
         <Container>
           <Content>
-            <List>
               {jobTransactionViewStructure}
-            </List>
           </Content>
         </Container>
       )

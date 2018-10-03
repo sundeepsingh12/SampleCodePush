@@ -26,6 +26,7 @@ class JobStatus {
     const jobStatusIds = statusList.filter(jobStatusObject => jobStatusObject.code == statusCode).map(jobStatusObject => jobStatusObject.id)
     return jobStatusIds
   }
+  
 
   /**Generic method for getting particular status id of a particular job master and job status code
    * 
@@ -153,6 +154,21 @@ class JobStatus {
     }
     const filteredJobStatusIds = jobStatusArray.value.filter(jobStatus => jobStatus.statusCategory == statusCategory && jobStatus.code != UNSEEN).map(jobStatus => jobStatus.id)
     return filteredJobStatusIds
+  }
+
+  async getMapOfNonUnseenStatusIdsForStatusCategory(statusCategory) {
+    let nonUnseenStatusIdsMap = {}
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    if (!jobStatusArray || !jobStatusArray.value) {
+      throw new Error(JOB_STATUS_MISSING)
+    }
+    for(let status in jobStatusArray.value){
+      if(jobStatusArray.value[status].code == UNSEEN || jobStatusArray.value[status].statusCategory != statusCategory) {
+        continue
+      }
+      nonUnseenStatusIdsMap[jobStatusArray.value[status].id] = true
+    }
+    return nonUnseenStatusIdsMap
   }
 
   /**@function getStatusIdsForAllStatusCategory()

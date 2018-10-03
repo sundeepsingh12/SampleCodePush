@@ -6,7 +6,7 @@ import * as sequenceActions from '../modules/sequence/sequenceActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Alert, TouchableOpacity, Modal, BackHandler } from 'react-native'
+import { StyleSheet, View, Alert, TouchableOpacity, Modal, BackHandler,Platform } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { ROUTE_OPTIMIZATION, FILTER_REF_NO } from '../lib/AttributeConstants'
 import {
@@ -21,7 +21,7 @@ import {
   AUTO_ROUTING_MESSAGE,
   AUTO_ROUTING_EXTRA_MESSAGE
 } from '../lib/ContainerConstants'
-import { Container, Header, Button, Text, Body, Icon, Footer, Item, Input, FooterTab, StyleProvider, Toast, Label } from 'native-base'
+import { Container, Button, Text, Icon, Footer, Item, Input, FooterTab, StyleProvider, Toast, Label } from 'native-base'
 import { SET_RESPONSE_MESSAGE, SET_REFERENCE_NO, SET_SEQUENCE_LIST_ITEM, SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST, SET_SEQUENCE_BACK_ENABLED } from '../lib/constants'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -359,7 +359,7 @@ class Sequence extends PureComponent {
                 activeOpacity={1}
                 sortRowStyle={style.sortableListStyle}
                 renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(row)} />} />
-                <Footer style={[style.footer]}>
+                <Footer style = {[styles.row,styles.autoHeightFooter]}>
                   <FooterTab style={[styles.padding10]}>
                     {buttonView}
                   </FooterTab>
@@ -439,9 +439,6 @@ const style = StyleSheet.create({
     shadowColor: '#d3d3d3',
     shadowOpacity: .5,
   },
-  footer:{
-    height:'auto'
-  }
 });
 
 

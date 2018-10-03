@@ -26,6 +26,9 @@ class LiveJobService {
         let jobTransactionCustomizationListParametersMaps = jobTransactionService.prepareMapsForTransactionCustomizationList(jobTransactionCustomizationListParametersDTO);
         let jobQuery = 'status = 6';
         let jobsList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery);
+        if (!jobsList || jobsList.length == 0) {
+            return {}
+        }
         let jobMapAndJobDataQuery = jobService.getJobMapAndJobDataQuery(jobsList);
         let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobMapAndJobDataQuery.jobDataQuery);
         let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap);

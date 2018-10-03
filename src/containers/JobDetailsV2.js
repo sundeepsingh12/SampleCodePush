@@ -349,7 +349,7 @@ class JobDetailsV2 extends PureComponent {
 
   showHeaderView() {
     return (
-      <Header style={[style.header]}>
+      <Header style={[style.header,styles.autoHeightFooter]}>
         <View style={style.seqCard}>
           {this.showJobMasterIdentifier()}
           <Line1Line2View data={this.props.navigation.state.params.jobTransaction} />
@@ -480,7 +480,7 @@ class JobDetailsV2 extends PureComponent {
   showFooterView() {
     if (!isEmpty(this.props.jobTransaction)) {
       return (
-        <Footer style={style.footer}>
+        <Footer style={[style.footer, styles.autoHeightFooter]}>
           <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} prepareTemplateForPrintAttributeAndPrint = {() =>{ this.props.actions.prepareTemplateForPrintAttributeAndPrint(this.props.jobTransaction, this.props.fieldDataList, this.props.jobDataList, this.props.isBluetoothConnected)}}/>
         </Footer>
       )
@@ -630,7 +630,6 @@ const style = StyleSheet.create({
     flexDirection: 'column',
     paddingLeft: 0,
     paddingRight: 0,
-    height: 'auto',
     borderBottomWidth: 1,
     borderBottomColor: '#f3f3f3',
     backgroundColor: '#ffffff'
@@ -675,7 +674,6 @@ const style = StyleSheet.create({
   },
 
   footer: {
-    height: 'auto',
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#f3f3f3',

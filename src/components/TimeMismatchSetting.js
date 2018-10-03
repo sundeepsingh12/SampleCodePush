@@ -4,7 +4,6 @@ import React, { PureComponent } from 'react'
 import {
     View,
     Text,
-    Modal,
     Image,
     Platform,
     Linking,
@@ -24,9 +23,8 @@ import {
     TIMEMISMATCH,
     RETRY
 } from '../lib/ContainerConstants'
+
 let openDateTimeSettings = require('../wrapper/OpenSettings');
-
-
 
 export default class TimeMismatchSetting extends PureComponent {
     goToSettings() {

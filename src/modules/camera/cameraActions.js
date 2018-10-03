@@ -129,8 +129,6 @@ export function cropImage(path, setImage) {
             dispatch(setState(SET_CAMERA_LOADER, true))
             ImageCropPicker.openCropper({
                 path,
-                width: 300,
-                height: 300,
                 freeStyleCropEnabled: true,
                 includeBase64: (Platform.OS === 'android') ? false : true
 

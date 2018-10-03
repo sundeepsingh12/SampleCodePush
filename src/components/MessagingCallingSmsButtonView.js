@@ -3,12 +3,11 @@
 import React, { PureComponent } from 'react'
 import {
     Alert,
-    StyleSheet,
     View,
     Platform
 } from 'react-native'
 import styles from '../themes/FeStyle'
-import { Button, Icon, Footer, FooterTab, ActionSheet } from 'native-base'
+import { Button, Icon, FooterTab, ActionSheet } from 'native-base'
 import Communications from 'react-native-communications'
 import getDirections from 'react-native-google-maps-directions'
 import {
@@ -23,10 +22,7 @@ import MessageButtonItem from './MessageButtonItem'
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import _ from 'lodash'
 
-
-
 class MessagingCallingSmsButtonView extends PureComponent {
-
 
     renderIcon(iconName, action) {
         if (this.props.isCalledFrom == 'JobDetailsV2') {
@@ -183,14 +179,5 @@ class MessagingCallingSmsButtonView extends PureComponent {
     }
 
 }
-
-const style = StyleSheet.create({
-    footer: {
-        height: 'auto',
-        backgroundColor: '#ffffff',
-        borderTopWidth: 1,
-        borderTopColor: '#f3f3f3',
-    }
-});
 
 export default MessagingCallingSmsButtonView
