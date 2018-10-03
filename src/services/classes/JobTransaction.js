@@ -29,6 +29,7 @@ import { formLayoutEventsInterface } from './formLayout/FormLayoutEventInterface
 import { runSheetService } from './RunSheet';
 import { messageService } from '../../services/classes/MessageService'
 import Item from '../../../native-base-theme/components/Item';
+import { jobDetailsService } from './JobDetails';
 
 class JobTransaction {
 
@@ -665,13 +666,13 @@ class JobTransaction {
         //     jobId = jobTransaction[0].id
         //     referenceNumber = jobTransaction[0].referenceNo
         // }
-        const fieldAttributeMasterMap = fieldAttributeMasterService.getFieldAttributeMasterMap(fieldAttributeMasterList)
+        const {fieldAttributeMasterMap,printAttributeMap }= fieldAttributeMasterService.getFieldAttributeMasterMap(fieldAttributeMasterList, jobMasterId)
         const fieldAttributeStatusMap = fieldAttributeMasterService.getFieldAttributeStatusMap(fieldAttributeStatusList)
         let jobAttributeMap = jobMasterIdJobAttributeStatusMap[jobMasterId] ? jobMasterIdJobAttributeStatusMap[jobMasterId][jobStatusId] ? jobMasterIdJobAttributeStatusMap[jobMasterId][jobStatusId] : {} : jobAttributeMasterMap
         let fieldAttributeMap = fieldAttributeMasterMap[jobMasterId] ? fieldAttributeMasterMap[jobMasterId] : {}
         let jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap)
         let fieldDataObject = (callingActivity != 'LiveJob') ? fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId, fieldAttributeMap, fieldAttributeStatusMap) : {}
-        let jobTime, jobSwipableDetails
+        let jobTime, jobSwipableDetails, printAttributeData
         if (callingActivity != 'LiveJob') {
             jobSwipableDetails = this.prepareJobSwipableDetailsForDetails(jobDataObject.dataMap, jobDataObject.dataList, jobMasterId, customerCareList, smsTemplateList)
             let skuMap = fieldDataObject.dataMap[SKU_ARRAY]
@@ -684,12 +685,11 @@ class JobTransaction {
             }
         }
         let currentStatus = statusIdStatusMap[jobStatusId]
-        jobDataObject.dataList = Object.values(jobDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
         let messageList = messageService.getMessagesForParticularTransaction(jobTransactionId)
         if (callingActivity != 'LiveJob') {
+            printAttributeData = jobDetailsService.getPrintAttributeMasterId(fieldAttributeStatusMap, printAttributeMap, currentStatus.id)
             const job = realm.getRecordListOnQuery(TABLE_JOB, 'id= ' + jobId)
             let { latitude, longitude } = job[0]
-            fieldDataObject.dataList = Object.values(fieldDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
             const jobTransactionDisplay = {
                 id: jobTransactionId,
                 jobId,
@@ -712,7 +712,8 @@ class JobTransaction {
                 jobSwipableDetails,
                 jobLatitude: latitude,
                 jobLongitude: longitude,
-                deleteFlag
+                deleteFlag,
+                printAttributeMasterId : printAttributeData 
             }
             return {
                 currentStatus,
@@ -722,7 +723,7 @@ class JobTransaction {
                 seqSelected,
                 jobTime,
                 checkForSeenStatus,
-                messageList
+                messageList,
             }
         }
         else {

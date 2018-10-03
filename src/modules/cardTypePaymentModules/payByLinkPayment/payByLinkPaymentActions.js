@@ -15,8 +15,7 @@ import { TRANSACTION_SUCCESSFUL, TRANSACTION_PENDING } from '../../../lib/Contai
 import { saveJobTransaction } from '../../form-layout/formLayoutActions';
 import { paymentService } from '../../../services/payment/Payment';
 import _ from 'lodash'
-import { StackActions} from 'react-navigation'
-import { navDispatch } from '../../navigators/NavigationService'
+import { printService } from '../../../services/classes/PrintService'
 
 export function getPayByLinkPaymentParameters(customerContact, jobTransaction, jobTransactionIdAmountMap) {
     return async function (dispatch) {
@@ -53,11 +52,14 @@ export function hitCheckTransactionApiForCheckingPayment(payByLinkConfigJSON, na
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_PAYBYLINK, true))
-            let { formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails } = navigationParams
+            let { formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails, printAttributeMasterId } = navigationParams
             const responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndHitCheckTransactionApi(payByLinkConfigJSON,'1')
             if (!_.isEmpty(responseMessage.transId)) {
                 paymentService.addPaymentObjectToDetailsArray(payByLinkConfigJSON.actualAmount, 16, responseMessage.transId, 'N.A', responseMessage, formLayoutState)
                 setTimeout(() => { dispatch(setState(SET_PAY_BY_LINK_MESSAGE, TRANSACTION_SUCCESSFUL)) }, 1000);
+                if(printAttributeMasterId){
+                    await printService.printingTemplateFormatStructureForFormLayout(formLayoutState, jobTransaction, printAttributeMasterId, {})
+                }
                 dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
             }else{
                 dispatch(setState(SET_PAY_BY_LINK_MESSAGE, TRANSACTION_PENDING))

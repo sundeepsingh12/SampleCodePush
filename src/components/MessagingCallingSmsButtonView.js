@@ -3,7 +3,8 @@
 import React, { PureComponent } from 'react'
 import {
     Alert,
-    View
+    View,
+    Platform
 } from 'react-native'
 import styles from '../themes/FeStyle'
 import { Button, Icon, FooterTab, ActionSheet } from 'native-base'
@@ -72,6 +73,9 @@ class MessagingCallingSmsButtonView extends PureComponent {
 
     callContact = (contact) => {
         Communications.phonecall(contact, false)
+    }
+    prepareTemplateForPrintAttributeAndPrint = (jobTransaction) => {
+        this.props.prepareTemplateForPrintAttributeAndPrint()
     }
 
     customerCareButtonPressed = (jobTransaction) => {
@@ -166,6 +170,9 @@ class MessagingCallingSmsButtonView extends PureComponent {
                 }
                 {(this.props.jobTransaction.jobSwipableDetails && this.props.jobTransaction.jobSwipableDetails.customerCareData && this.props.jobTransaction.jobSwipableDetails.customerCareData.length > 0) ?
                     this.renderIcon('call-out', this.customerCareButtonPressed) : null
+                }
+                {(Platform.OS == 'android' &&  this.props.jobTransaction.printAttributeMasterId) ?
+                    this.renderIcon('print', this.prepareTemplateForPrintAttributeAndPrint) : null
                 }
             </View>
         )

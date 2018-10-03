@@ -79,6 +79,7 @@ module.exports = {
     ALERT: 'Alert!',
     OPTIONAL: '(optional)',
     SELECTED: ' Selected',
+    PRINT_AND_FINISH: 'Print and Finish',
 
     //status revert 
     REVERT_STATUS_TO: 'Revert Status to',
@@ -246,6 +247,8 @@ module.exports = {
     RESULT_NOT_FOUND: 'No result found for your search',
     ACTUAL_QUANTITY_INPUT_ERROR: 'Please enter valid quantity',
     SKU: 'SKU',
+    PRINT_SKU: 'Sku',
+    LINE_FEED: `<line-feed />`,
 
     //Array
     ADD: 'Add',

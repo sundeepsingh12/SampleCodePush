@@ -1,8 +1,27 @@
 import { keyValueDBService } from '../KeyValueDBService.js'
 import { transientStatusAndSaveActivatedService } from '../TransientStatusAndSaveActivatedService.js'
-import { AFTER, OBJECT, STRING, TEXT, DECIMAL, SCAN_OR_TEXT, QR_SCAN, NUMBER, QC_IMAGE, QC_REMARK, QC_PASS_FAIL, OPTION_CHECKBOX_ARRAY } from '../../../lib/AttributeConstants'
+import { 
+    AFTER, 
+    OBJECT, 
+    STRING, 
+    TEXT, 
+    DECIMAL, 
+    SCAN_OR_TEXT, 
+    QR_SCAN, 
+    NUMBER, 
+    QC_IMAGE, 
+    QC_REMARK, 
+    QC_PASS_FAIL, 
+    OPTION_CHECKBOX_ARRAY,
+    SKU_ARRAY,
+    ARRAY,
+    MONEY_COLLECT,
+    MONEY_PAY,
+    FIXED_SKU,
+    PRINT
+ } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
-import { SaveActivated, Transient, CheckoutDetails, TabScreen, SHOULD_RELOAD_START, BACKUP_ALREADY_EXIST, TABLE_FIELD_DATA, TABLE_JOB_TRANSACTION } from '../../../lib/constants'
+import { SaveActivated, Transient, CheckoutDetails, TabScreen, SHOULD_RELOAD_START, BACKUP_ALREADY_EXIST, TABLE_FIELD_DATA, FIELD_ATTRIBUTE_VALUE } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
 import { fieldValidationService } from '../FieldValidation'
@@ -10,7 +29,12 @@ import { dataStoreService } from '../DataStoreService.js'
 import { geoFencingService } from '../GeoFencingService.js'
 import * as realm from '../../../repositories/realmdb'
 import { transactionCustomizationService } from '../TransactionCustomization'
+import { fieldAttributeValueMasterService } from '../FieldAttributeValueMaster'
 import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../../lib/ContainerConstants'
+import { jobDataService } from '../JobData'
+import BluetoothSerial from 'react-native-bluetooth-serial';
+import { EscPos } from 'escpos-xml';
+
 class FormLayout {
 
     /**
@@ -229,6 +253,7 @@ class FormLayout {
             routeParam
         }
     }
+
 
     isFormValid(formElement, jobTransaction, formLayoutState) {
         if (!formElement) {

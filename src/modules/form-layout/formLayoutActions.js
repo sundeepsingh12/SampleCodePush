@@ -44,6 +44,7 @@ import { dataStoreService } from '../../services/classes/DataStoreService'
 import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT, OK } from '../../lib/ContainerConstants'
 import moment from 'moment'
 import { Toast } from 'native-base'
+import { printService } from '../../services/classes/PrintService';
 
 
 export function getSortedRootFieldAttributes(statusData, jobTransaction, currentLatestPositionId, transientFormLayoutState) {
@@ -123,6 +124,18 @@ export function updateFieldData(attributeId, value, formLayoutState, jobTransact
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1005, error.message, 'danger', 1)
+        }
+    }
+}
+
+export function PreparePrintingTemplate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails, printAttributeMasterId) {
+    return async function (dispatch) {
+        try {
+            let previousStatusFieldAttributeMap = printService.concatAllNavigationStatusAttribute(navigationFormLayoutStates)
+            await printService.printingTemplateFormatStructureForFormLayout(formLayoutState, jobTransaction, printAttributeMasterId, previousStatusFieldAttributeMap)
+            dispatch(saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, taskListScreenDetails))
+        } catch (error) {
+            showToastAndAddUserExceptionLog(1015, error.message, 'danger', 1)
         }
     }
 }

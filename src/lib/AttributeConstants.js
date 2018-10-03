@@ -11,6 +11,7 @@ module.exports = {
     ADDRESS_LINE_2: 29,
     ADVANCE_DROPDOWN: 46,
     AMOUNT: 'amount',
+    PRINT: 66,
     ARRAY: 12,
     CAMERA: 20,
     CAMERA_HIGH: 42,
@@ -213,6 +214,8 @@ module.exports = {
     // Field Data Value Constants
     ARRAY_SAROJ_FAREYE: 'ArraySarojFareye',
     OBJECT_SAROJ_FAREYE: 'ObjectSarojFareye',
+    FIELD_ATTRIBUTE_MASTER_ID: 'fieldAttributeMasterId',
+    JOB_ATTRIBUTE_MASTER_ID: 'jobAttributeMasterId',
 
     //Validation Condition Constants
     EQUAL_TO: '==',

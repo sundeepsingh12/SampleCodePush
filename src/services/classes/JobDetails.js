@@ -12,6 +12,7 @@ import {
 } from '../../lib/AttributeConstants'
 import moment from 'moment'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface'
+import { formLayoutService } from '../../services/classes/formLayout/FormLayout'
 import {
     TABLE_JOB,
     USER,
@@ -24,7 +25,8 @@ import {
     JOB_ATTRIBUTE_STATUS,
     FIELD_ATTRIBUTE_STATUS,
     CUSTOMER_CARE,
-    SMS_TEMPLATE
+    SMS_TEMPLATE,
+    FIELD_ATTRIBUTE_VALUE
 } from '../../lib/constants'
 
 import {
@@ -32,8 +34,11 @@ import {
 } from '../../lib/ContainerConstants'
 import { keyValueDBService } from './KeyValueDBService'
 import { geoFencingService } from './GeoFencingService'
+import { fieldAttributeValueMasterService } from '../classes/FieldAttributeValueMaster'
 import _ from 'lodash'
 import { draftService } from './DraftService'
+import { jobDataService } from '../classes/JobData'
+import { printService } from './PrintService';
 
 
 class JobDetails {
@@ -242,6 +247,14 @@ class JobDetails {
             value: jobTransactionArray,
             jobTransactionDTO
         }
+    }
+    getPrintAttributeMasterId(fieldAttributeStatusMap, printAttributeMap, statusId){
+        for(let id in printAttributeMap){
+            if(fieldAttributeStatusMap[id] && fieldAttributeStatusMap[id].statusId == statusId){
+                return id
+            }
+        }
+        return null
     }
 
     /**@function setAllDataForRevertStatus(statusList,jobTransaction,previousStatus)

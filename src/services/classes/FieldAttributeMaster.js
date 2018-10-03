@@ -12,14 +12,17 @@ class FieldAttributeMaster {
      *                                            }
      *                           }
      */
-    getFieldAttributeMasterMap(fieldAttributeMasterList) {
-        let fieldAttributeMasterMap = {}
+    getFieldAttributeMasterMap(fieldAttributeMasterList, jobMasterId) {
+        let fieldAttributeMasterMap = {}, printAttributeMap = {}
         fieldAttributeMasterList = fieldAttributeMasterList ? fieldAttributeMasterList : []
         fieldAttributeMasterList.forEach(fieldAttributeMaster => {
             fieldAttributeMasterMap[fieldAttributeMaster.jobMasterId] = fieldAttributeMasterMap[fieldAttributeMaster.jobMasterId] ? fieldAttributeMasterMap[fieldAttributeMaster.jobMasterId] : {}
             fieldAttributeMasterMap[fieldAttributeMaster.jobMasterId][fieldAttributeMaster.id] = fieldAttributeMaster
+            if(fieldAttributeMaster.jobMasterId == jobMasterId && fieldAttributeMaster.attributeTypeId == 66){
+               printAttributeMap[fieldAttributeMaster.id] = fieldAttributeMaster.id
+            }
         })
-        return fieldAttributeMasterMap
+        return {fieldAttributeMasterMap,printAttributeMap}
     }
 
     /**

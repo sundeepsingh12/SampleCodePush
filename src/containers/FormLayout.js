@@ -1,6 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Text, Platform, FlatList, KeyboardAvoidingView, BackHandler } from 'react-native'
+import { StyleSheet, View, Alert, Text, Platform, FlatList, KeyboardAvoidingView, BackHandler } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { Container, Button, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
 import styles from '../themes/FeStyle'
@@ -12,14 +12,13 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import BasicFormElement from '../components/FormLayoutBasicComponent.js'
 import Loader from '../components/Loader'
-import { NET_BANKING, NET_BANKING_LINK, NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, UPI, MOSAMBEE_WALLET, MOSAMBEE, PAYTM } from '../lib/AttributeConstants'
-import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_STATE } from '../lib/constants'
+import { NET_BANKING, NET_BANKING_LINK, NET_BANKING_CARD_LINK, NET_BANKING_UPI_LINK, UPI, MOSAMBEE_WALLET, MOSAMBEE, PRINT, PAYTM } from '../lib/AttributeConstants'
+import { SET_UPDATE_DRAFT, ERROR_MESSAGE, SET_FORM_TO_INVALID, SET_FORM_LAYOUT_STATE, BluetoothListing } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
-import { ALERT, INVALID_FORM_ALERT, OK } from '../lib/ContainerConstants'
+import { ALERT, INVALID_FORM_ALERT, OK, PRINT_AND_FINISH, FINISH } from '../lib/ContainerConstants'
 import TitleHeader from '../components/TitleHeader'
 import { navigate } from '../modules/navigators/NavigationService'
 import isEmpty from 'lodash/isEmpty'
-
 
 function mapStateToProps(state) {
   return {
@@ -39,7 +38,8 @@ function mapStateToProps(state) {
     noFieldAttributeMappedWithStatus: state.formLayout.noFieldAttributeMappedWithStatus,
     arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
     jobAndFieldAttributesList: state.formLayout.jobAndFieldAttributesList,
-    updatedTransactionListIds: state.listing.updatedTransactionListIds
+    updatedTransactionListIds: state.listing.updatedTransactionListIds,
+    isBluetoothConnected: state.sorting.isBluetoothConnected
   }
 }
 
@@ -215,8 +215,29 @@ class FormLayout extends PureComponent {
     return null
   }
 
-  saveJobTransaction() {
-    let formLayoutState = {
+  checkForPrintAttributeAndSaveData(taskListScreenDetails, printAttributeMasterId) {
+    if(this.props.isBluetoothConnected){
+      if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
+        navigate(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId), this.paymentAtEndNavigationParams(taskListScreenDetails, printAttributeMasterId))
+      } else {
+        this.props.actions.PreparePrintingTemplate(
+          this.formLayoutState(),
+          this.props.navigation.state.params.jobMasterId,
+          this.props.navigation.state.params.contactData,
+          this.props.navigation.state.params.jobTransaction,
+          this.props.navigation.state.params.navigationFormLayoutStates,
+          this.props.navigation.state.params.saveActivatedStatusData,
+          taskListScreenDetails,
+          printAttributeMasterId
+        )
+      }
+    }else{
+      navigate(BluetoothListing , { screenName: 'Sorting' })
+    }
+    }
+
+  formLayoutState = () => {
+    return {
       formElement: this.props.formElement,
       isSaveDisabled: this.props.isSaveDisabled,
       statusName: this.props.statusName,
@@ -233,34 +254,35 @@ class FormLayout extends PureComponent {
       sequenceWiseFieldAttributeMasterIds: this.props.sequenceWiseFieldAttributeMasterIds,
       dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap,
     }
+  }
 
-    let taskListScreenDetails = {
-      jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
-      pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
+  paymentAtEndNavigationParams = (taskListScreenDetails, printAttributeMasterId) => {
+    return {
+      contactData: this.props.navigation.state.params.contactData,
+      formElement: this.props.formElement,
+      jobTransaction: this.props.navigation.state.params.jobTransaction,
+      paymentAtEnd: this.props.paymentAtEnd,
+      formLayoutState: this.formLayoutState(),
+      jobMasterId: this.props.navigation.state.params.jobMasterId,
+      navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
+      saveActivatedStatusData: this.props.navigation.state.params.saveActivatedStatusData,
+      taskListScreenDetails,
+      printAttributeMasterId
     }
+  }
+
+  saveJobTransaction(taskListScreenDetails) {
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
-      navigate(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
-        {
-          contactData: this.props.navigation.state.params.contactData,
-          formElement: this.props.formElement,
-          jobTransaction: this.props.navigation.state.params.jobTransaction,
-          paymentAtEnd: this.props.paymentAtEnd,
-          formLayoutState,
-          jobMasterId: this.props.navigation.state.params.jobMasterId,
-          navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
-          saveActivatedStatusData: this.props.navigation.state.params.saveActivatedStatusData,
-          taskListScreenDetails
-        },
-      )
+      navigate(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId), this.paymentAtEndNavigationParams(taskListScreenDetails, false))
     } else {
       this.props.actions.saveJobTransaction(
-        formLayoutState,
+        this.formLayoutState(),
         this.props.navigation.state.params.jobMasterId,
         this.props.navigation.state.params.contactData,
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
         this.props.navigation.state.params.saveActivatedStatusData,
-        taskListScreenDetails,
+        taskListScreenDetails
       )
     }
   }
@@ -281,20 +303,48 @@ class FormLayout extends PureComponent {
     return view
   }
 
-  getFooterView(transient, saveActivated) {
-    return (
-      <SafeAreaView style={[styles.bgWhite]}>
-        <Footer style={[style.footer,styles.autoHeightFooter]}>
-          <FooterTab style={[styles.padding10]}>
-            <Button success full
-              onPress={() => this.saveJobTransaction()}
+  getFooterView(transient, saveActivated, formElement, taskListScreenDetails) {
+    let printAttributeMasterId = null
+    for (let fieldAttributeMasterId in formElement) {
+      if (formElement[fieldAttributeMasterId].attributeTypeId == PRINT) {
+        printAttributeMasterId = formElement[fieldAttributeMasterId].fieldAttributeMasterId
+      }
+    }
+    if (printAttributeMasterId && Platform.OS == 'android') {
+      return (
+        <SafeAreaView>
+        <Footer style={[style.footer, styles.autoHeightFooter]}>
+          <FooterTab style={[styles.paddingLeft10, styles.paddingRight10, styles.paddingTop10,{paddingBottom : 10}, styles.row, styles.justifySpaceBetween]}>
+            <Button  full
+              onPress={() => this.checkForPrintAttributeAndSaveData(taskListScreenDetails, printAttributeMasterId)}
+              style={[styles.marginRight10, {backgroundColor : '#F2F1FF'}]}
               disabled={this.props.isSaveDisabled}>
-              <Text style={[styles.fontLg, styles.fontWhite]}>{!isEmpty(this.props.paymentAtEnd) ? (this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : (saveActivated || transient) ? 'Continue' : this.props.statusName) : (saveActivated || transient) ? 'Continue' : this.props.statusName}</Text>
+              <Text style={[styles.fontBlack, styles.padding10]} >{PRINT_AND_FINISH}</Text>
+            </Button>
+            <Button success full
+              onPress={() => this.saveJobTransaction(taskListScreenDetails)}
+              disabled={this.props.isSaveDisabled}>
+              <Text style={[styles.fontWhite, styles.padding10]} >{FINISH}</Text>
             </Button>
           </FooterTab>
         </Footer>
       </SafeAreaView>
-    )
+      )
+    } else {
+      return(
+      <SafeAreaView style={[styles.bgWhite]}>
+          <Footer style={[style.footer, styles.autoHeightFooter]}>
+            <FooterTab style={[styles.padding10]}>
+              <Button success full
+                onPress={() => this.saveJobTransaction(taskListScreenDetails)}
+                disabled={this.props.isSaveDisabled}>
+                <Text style={[styles.fontLg, styles.fontWhite]}>{!isEmpty(this.props.paymentAtEnd) ? (this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : (saveActivated || transient) ? 'Continue' : this.props.statusName) : (saveActivated || transient) ? 'Continue' : this.props.statusName}</Text>
+              </Button>
+            </FooterTab>
+          </Footer>
+        </SafeAreaView>
+      )
+    }
   }
 
   /**
@@ -334,11 +384,16 @@ class FormLayout extends PureComponent {
   }
 
   render() {
+    // console.logs("this.props",this.props)
     const { saveActivated, transient } = this.props.navigation.state.params
     const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
     let emptyFieldAttributeForStatusView = this.emptyFieldAttributeForStatusView()
-    const footerView = this.getFooterView(transient, saveActivated)
     let formView = null
+    let taskListScreenDetails = {
+      jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
+      pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
+    }
+    const footerView = this.getFooterView(transient, saveActivated, this.props.formElement, taskListScreenDetails)
     if (this.props.isLoading) { return <Loader /> }
     if (this.state.updatingData) { return this.deletedTransactionView() }
     if (this.props.formElement && this.props.formElement.length == 0) {
@@ -347,7 +402,7 @@ class FormLayout extends PureComponent {
         <Footer style={[style.footer,styles.autoHeightFooter]}>
           <FooterTab style={[styles.padding10]}>
             <Button success full
-              onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransaction.id, this.props.statusId)}
+              onPress={() => this.saveJobTransaction(taskListScreenDetails)}
               disabled={this.props.isSaveDisabled}>
               <Text style={[styles.fontLg, styles.fontWhite]}>{(this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : (saveActivated || transient) ? 'Continue' : this.props.statusName)}</Text>
             </Button>

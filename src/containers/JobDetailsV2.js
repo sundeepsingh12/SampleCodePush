@@ -74,6 +74,7 @@ function mapStateToProps(state) {
     syncLoading: state.jobDetails.syncLoading,
     checkTransactionStatus: state.jobDetails.checkTransactionStatus,
     updatedTransactionListIds: state.listing.updatedTransactionListIds,
+    isBluetoothConnected: state.sorting.isBluetoothConnected
   }
 }
 
@@ -434,12 +435,13 @@ class JobDetailsV2 extends PureComponent {
     }
   }
   showJobDetails() {
+    let jobDataList = Object.values(this.props.jobDataList).sort((x, y) => x.sequence - y.sequence)
     return (
       <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
         <ExpandableHeader
           title={'Basic Details'}
           navigateToDataStoreDetails={this.navigateToDataStoreDetails}
-          dataList={this.props.jobDataList}
+          dataList={jobDataList}
           showDetailsList={true}
         />
       </View>
@@ -462,11 +464,12 @@ class JobDetailsV2 extends PureComponent {
   }
 
   showFieldDetails() {
+    let fieldDataList = Object.values(this.props.fieldDataList).sort((x, y) => x.sequence - y.sequence)
     return (
       <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
         <ExpandableHeader
           title={'Field Details'}
-          dataList={this.props.fieldDataList}
+          dataList={fieldDataList}
           navigateToDataStoreDetails={this.navigateToDataStoreDetails}
           navigateToCameraDetails={this.navigateToCameraDetails}
           showDetailsList={true} />
@@ -477,8 +480,8 @@ class JobDetailsV2 extends PureComponent {
   showFooterView() {
     if (!isEmpty(this.props.jobTransaction)) {
       return (
-        <Footer style={[style.footer,styles.autoHeightFooter]}>
-          <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} />
+        <Footer style={[style.footer, styles.autoHeightFooter]}>
+          <MessagingCallingSmsButtonView sendMessageToContact={this.sendMessageToContact} jobTransaction={this.props.jobTransaction} isCalledFrom={'JobDetailsV2'} prepareTemplateForPrintAttributeAndPrint = {() =>{ this.props.actions.prepareTemplateForPrintAttributeAndPrint(this.props.jobTransaction, this.props.fieldDataList, this.props.jobDataList, this.props.isBluetoothConnected)}}/>
         </Footer>
       )
     }

@@ -32,10 +32,13 @@ import {
     SET_CHECK_TRANSACTION_STATUS,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT,
     SET_UPDATED_TRANSACTION_LIST_IDS,
-    UPDATE_JOBMASTERID_JOBID_MAP
+    UPDATE_JOBMASTERID_JOBID_MAP,
+    BluetoothListing
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService';
 import _ from 'lodash'
+import BluetoothSerial from 'react-native-bluetooth-serial';
+import { printService } from '../../services/classes/PrintService'
 
 export function startFetchingJobDetails(payload) {
     return {
@@ -130,6 +133,19 @@ export function deleteDraftAndNavigateToFormLayout(formLayoutData) {
         try {
             draftService.deleteDraftFromDb(formLayoutData.jobTransaction, formLayoutData.jobMasterId)
             navigate('FormLayout', formLayoutData)
+        } catch (error) {
+            showToastAndAddUserExceptionLog(1118, error.message, 'danger', 1)
+        }
+    }
+}
+export function prepareTemplateForPrintAttributeAndPrint(jobTransaction, fieldDataList, jobDataList, isBluetoothConnected) {
+    return async function (dispatch) {
+        try {
+            if(isBluetoothConnected){
+                await printService.printingTemplateFormatStructureForDetails(jobTransaction, fieldDataList, jobDataList)
+            }else{
+                navigate(BluetoothListing , { screenName: 'Sorting' })
+            }
         } catch (error) {
             showToastAndAddUserExceptionLog(1108, error.message, 'danger', 1)
         }

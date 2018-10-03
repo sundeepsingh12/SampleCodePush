@@ -14,6 +14,7 @@ import { paymentService } from '../../../services/payment/Payment';
 import _ from 'lodash'
 import { StackActions} from 'react-navigation'
 import { navDispatch } from '../../navigators/NavigationService'
+import { printService } from '../../../services/classes/PrintService'
 import { WALLET_UTILITY_ID} from '../../../lib/AttributeConstants'
 
 
@@ -59,11 +60,14 @@ export function hitPaymentUrlforPayment(contactNumber, walletParameters, selecte
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_FOR_WALLET, 4))
-            let { formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails } = navigationParams
+            let { formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, taskListScreenDetails, printAttributeMasterId } = navigationParams
             const responseMessage = await MosambeeWalletPaymentServices.prepareJsonAndHitPaymentUrl(walletParameters, contactNumber, otpNumber, jobTransaction, selectedWalletDetails.code)
             if (_.isEqual(responseMessage.status, 'SUCCESS') &&  _.isEqual(responseMessage.message, 'Transaction Successfull')) {
                 paymentService.addPaymentObjectToDetailsArray(walletParameters.actualAmount, 14, responseMessage.transId, selectedWalletDetails.code, responseMessage, formLayoutState)
                 setTimeout(() => { dispatch(setState(SET_ERROR_MESSAGE_FOR_WALLET, { errorMessage: TRANSACTION_SUCCESSFUL, isModalVisible: 4 })) }, 1000);
+                if(printAttributeMasterId){
+                    await printService.printingTemplateFormatStructureForFormLayout(formLayoutState, jobTransaction, printAttributeMasterId, {})
+                }
                 if(jobTransaction.id < 0) {
                     navDispatch(StackActions.pop())
                 }
