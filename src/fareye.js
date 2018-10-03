@@ -26,7 +26,7 @@ export default function native() {
       codePush.sync({
       updateDialog: true,
       installMode: codePush.InstallMode.IMMEDIATE,
-      deploymentKey: 'oFk0-SJCZqp30txXWUsv57dcOpvbfa6cce67-4548-4405-8a0c-2ace10925777', //this key is hardcoded for testing purpose
+      deploymentKey: 'IMPeOC6bXseg6YbjmoKKbkQlRnlFfa6cce67-4548-4405-8a0c-2ace10925777', //this key is hardcoded for testing purpose
     }, (status) => {
       switch (status) {
         case codePush.SyncStatus.CHECKING_FOR_UPDATE:
