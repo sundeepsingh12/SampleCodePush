@@ -43,7 +43,7 @@ import { Platform } from 'react-native'
 
 class Sync {
 
-  async createAndUploadZip(syncStoreDTO, currentDate,isCalledFromLogout) {
+  async createAndUploadZip(syncStoreDTO, currentDate, isCalledFromLogout) {
     let isFileExists = await RNFS.exists(PATH_TEMP);
     if (isFileExists) {
       await RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { showToastAndAddUserExceptionLog(2951, JSON.stringify(error), 'danger', 0) })
@@ -52,8 +52,8 @@ class Sync {
     if (!token) {
       throw new Error('Token Missing')
     }
-    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful,syncDataDTO } = await syncZipService.createZip(syncStoreDTO,isCalledFromLogout)
-    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, isEncryptionSuccessful,syncDataDTO)
+    let { lastCallTime, lastSmsTime, userSummary, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds, isEncryptionSuccessful, syncDataDTO } = await syncZipService.createZip(syncStoreDTO, isCalledFromLogout)
+    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate, isEncryptionSuccessful, syncDataDTO)
     await communicationLogsService.updateLastCallSmsTimeAndNegativeCommunicationLogsDb(lastCallTime, lastSmsTime, negativeCommunicationLogs, previousNegativeCommunicationLogsTransactionIds)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
     return responseBody
@@ -158,18 +158,18 @@ class Sync {
       if (queryType == 'insert') {
         jobMasterIds = await this.saveDataFromServerInDB(contentQuery, updatedJobTransactionList, isLiveJob, jobIdToLiveJobMap)
       } else if (queryType == 'update') {
-        jobMasterIds= await this.insertOrUpdateDataInDb(contentQuery, updatedJobTransactionList)
+        jobMasterIds = await this.insertOrUpdateDataInDb(contentQuery, updatedJobTransactionList)
       } else if (queryType == 'updateStatus') {
         jobMasterIds = await this.updateDataInDB(contentQuery, updatedJobTransactionList)
-      } 
+      }
       else if (queryType == 'delete') {
         jobMasterIds = `${JOBS_DELETED}`
         let jobIds = []
         contentQuery.job.forEach(jobObject => {
           updatedJobTransactionList[jobObject.jobMasterId] = _.isEmpty(updatedJobTransactionList[jobObject.jobMasterId]) ? {} : updatedJobTransactionList[jobObject.jobMasterId]
-          updatedJobTransactionList[jobObject.jobMasterId][jobObject.id] =  {jobMasterId: jobObject.jobMasterId, jobStatusId : jobObject.lastTransactionStatusId}
+          updatedJobTransactionList[jobObject.jobMasterId][jobObject.id] = { jobMasterId: jobObject.jobMasterId, jobStatusId: jobObject.lastTransactionStatusId }
           jobIds.push(jobObject.id)
-        })         
+        })
         const deleteJobTransactions = {
           tableName: TABLE_JOB_TRANSACTION,
           valueList: jobIds,
@@ -207,11 +207,11 @@ class Sync {
     for (let jobTransaction in transactionList) {
       jobIdJobIdMap[transactionList[jobTransaction].jobId] = transactionList[jobTransaction].jobId
     }
-    for (let jobs of query.job) {
-      let jobMaster = jobMasterMapWithAssignOrderToHubEnabled[jobs.jobMasterId]
+    for (let index in query.job) {
+      let jobMaster = jobMasterMapWithAssignOrderToHubEnabled[query.job[index].jobMasterId]
       //Make transactions for those whose job transaction node is null
-      if (jobMaster && (!jobIdJobIdMap[jobs.id]) && jobs.status == 1) {
-        let unassignedTransactions = this.createTransactionsOfUnassignedJobs(jobs, syncStoreDTO, jobMaster, jobMasterIdJobStatusIdOfPendingCodeMap)
+      if (jobMaster && (!jobIdJobIdMap[query.job[index].id]) && query.job[index].status == 1) {
+        let unassignedTransactions = this.createTransactionsOfUnassignedJobs(query.job[index], syncStoreDTO, jobMaster, jobMasterIdJobStatusIdOfPendingCodeMap)
         allJobsToTransactions.push(unassignedTransactions)
       }
     }
@@ -274,13 +274,13 @@ class Sync {
   }
 
 
-  async saveDataFromServerInDB(contentQuery, updatedJobTransactionList, isLiveJob, jobIdToLiveJobMap,isUpdateStatus = false) {
+  async saveDataFromServerInDB(contentQuery, updatedJobTransactionList, isLiveJob, jobIdToLiveJobMap, isUpdateStatus = false) {
     const jobIds = []
     contentQuery.job.forEach(jobObject => {
       updatedJobTransactionList[jobObject.jobMasterId] = _.isEmpty(updatedJobTransactionList[jobObject.jobMasterId]) ? {} : updatedJobTransactionList[jobObject.jobMasterId]
-      updatedJobTransactionList[jobObject.jobMasterId][jobObject.id] =  {jobMasterId: jobObject.jobMasterId, jobStatusId : jobObject.lastTransactionStatusId}
+      updatedJobTransactionList[jobObject.jobMasterId][jobObject.id] = { jobMasterId: jobObject.jobMasterId, jobStatusId: jobObject.lastTransactionStatusId }
       jobIds.push(jobObject.id)
-    })    
+    })
     const existingJobDatas = {
       tableName: TABLE_JOB_DATA,
       valueList: jobIds,
@@ -310,9 +310,9 @@ class Sync {
       value: contentQuery.runSheet
     }
 
-    if(!_.isEmpty(contentQuery.runSheet)){
-      for(let runsheet in contentQuery.runSheet){
-        if(contentQuery.runSheet[runsheet] && contentQuery.runSheet[runsheet].isClosed){
+    if (!_.isEmpty(contentQuery.runSheet)) {
+      for (let runsheet in contentQuery.runSheet) {
+        if (contentQuery.runSheet[runsheet] && contentQuery.runSheet[runsheet].isClosed) {
           updatedJobTransactionList['runsheetClosed'] = true
           break
         }
@@ -322,10 +322,10 @@ class Sync {
     //Ideally Id should be added server side in jobdata table
 
     //Job data comes blank in case of 'updateStatus' query type
-    if(!isUpdateStatus){
+    if (!isUpdateStatus) {
       realm.deleteRecordsInBatch(existingJobDatas)
     }
-   
+
     realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
     let jobMasterIds = this.getJobMasterIds(contentQuery.job)
     if (isLiveJob) {
@@ -364,7 +364,7 @@ class Sync {
     both jobs would be deleted and insert but at insert field data of one job will be found resulting in deletion of
     field data of 2nd job.Same goes for job data
     */
-   const jobIds = contentQuery.jobData.map(jobDataObject => jobDataObject.jobId)
+    const jobIds = contentQuery.jobData.map(jobDataObject => jobDataObject.jobId)
     let { jobTransactionsIds, newJobTransactionsIds } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions, updatedJobTransactionList)
     let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
     const jobDatas = {
@@ -390,7 +390,7 @@ class Sync {
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
     realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, jobFieldData)
-    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery, updatedJobTransactionList,null,null,true)
+    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery, updatedJobTransactionList, null, null, true)
     return jobMasterIds
   }
 
@@ -639,7 +639,7 @@ class Sync {
           if (!isLiveJob) {
             await this.deleteDataFromServer(successSyncIds, messageIdDTOs, jobMasterIdJobStatusIdTransactionIdDtoObject.transactionIdDtos, jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries)
             if (postOrderList) {
-              await this.deleteSpecificTransactionFromStoreList(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS, moment().format('YYYY-MM-DD HH:mm:ss'),postOrderList.value)
+              await this.deleteSpecificTransactionFromStoreList(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS, moment().format('YYYY-MM-DD HH:mm:ss'), postOrderList.value)
             }
           }
           realm.saveList(TABLE_JOB_TRANSACTION, jobMasterIdJobStatusIdTransactionIdDtoObject.updatedTransactonsList)
@@ -697,7 +697,7 @@ class Sync {
       priority: "high",
       sound: "default",
       show_in_foreground: true,
-      wake_screen:true //works for Android only
+      wake_screen: true //works for Android only
     });
   }
 
@@ -728,7 +728,7 @@ class Sync {
         newJobTransactionsIds.push(jobTransactionList[jobTransaction].negativeJobTransactionId)
         negativeJobTransactions.push(jobTransactionList[jobTransaction])
         updatedJobTransactionList[jobTransactionList[jobTransaction].jobMasterId] = _.isEmpty(updatedJobTransactionList[jobTransactionList[jobTransaction].jobMasterId]) ? {} : updatedJobTransactionList[jobTransactionList[jobTransaction].jobMasterId]
-        updatedJobTransactionList[jobTransactionList[jobTransaction].jobMasterId][jobTransactionList[jobTransaction].negativeJobTransactionId] =  {jobMasterId: jobTransactionList[jobTransaction].jobMasterId, jobStatusId : jobTransactionList[jobTransaction].jobStatusId} 
+        updatedJobTransactionList[jobTransactionList[jobTransaction].jobMasterId][jobTransactionList[jobTransaction].negativeJobTransactionId] = { jobMasterId: jobTransactionList[jobTransaction].jobMasterId, jobStatusId: jobTransactionList[jobTransaction].jobStatusId }
       }
     }
     return {
@@ -792,7 +792,7 @@ class Sync {
    * @param {*} schemaName
    * @param {*} date
    */
-  async deleteSpecificTransactionFromStoreList(schemaName, date,allowedTransactionIds = {}) {
+  async deleteSpecificTransactionFromStoreList(schemaName, date, allowedTransactionIds = {}) {
     let transactionToBeSynced = await keyValueDBService.getValueFromStore(schemaName);
     let originalTransactionsToBeSynced = transactionToBeSynced ? transactionToBeSynced.value : {}
     for (let index in allowedTransactionIds) {
