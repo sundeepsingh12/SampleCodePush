@@ -72,6 +72,7 @@ class Tracking {
             distanceFilter: 10,
             // Activity Recognition
             stopTimeout: 1,
+            foregroundService:true, //Set true to make the plugin mostly immune to OS termination due to memory pressure from other apps.
             // Application config
             debug: false, // <-- enable this hear sounds for background-geolocation life-cycle.
             logLevel: BackgroundGeolocation.LOG_LEVEL_OFF,
