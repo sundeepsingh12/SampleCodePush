@@ -41,6 +41,8 @@ import {
     SMS_SENT_SUCCESSFULLY,
     EMAIL_SENT_SUCCESSFULLY,
 } from '../../lib/ContainerConstants'
+import {showToastAndAddUserExceptionLog } from '../../modules/global/globalActions'
+
 class TransientStatusAndSaveActivatedService {
 
     /**
@@ -231,40 +233,47 @@ class TransientStatusAndSaveActivatedService {
      */
 
     async sendEmailOrSms(totalAmount, emailTableElement, emailIdOrSmsList, isEmail, emailGeneratedFromComplete, jobMasterId) {
-        const userData = await keyValueDBService.getValueFromStore(USER)
-        if (userData && userData.value && userData.value.company && userData.value.company.code && (_.startsWith(_.toLower(userData.value.company.code), 'dhl'))) {
-            if (!_.isEmpty(emailIdOrSmsList) && !isEmail) {
-                emailIdOrSmsList = [_.trim(emailIdOrSmsList)]
-            }
-            const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-            let currentJobMasterCode = jobMasterList.value.filter((data) => data.id == jobMasterId)[0].code
-            let body = {
-                companyCode: userData.value.company.code,
-                emailTableElement,
-                emailTotalCash: totalAmount,
-            }
-            const hub = await keyValueDBService.getValueFromStore(HUB)
-            let hubcode = hub.value.code
-            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            let postJSON = "{\"emailIds\":" + JSON.stringify(emailIdOrSmsList) + ", \"subject\": \"" + currentJobMasterCode + "\"" + ", \"hubCode\": \"" + hubcode + "\"" + ", \"body\": " + JSON.stringify(body) + ", \"emailGeneratedFromComplete\": \"" + emailGeneratedFromComplete + "\"" + "}";
-            let jSessionId = ((token.value).split('JSESSIONID=')[1]).split(';')[0]
-            let url = (isEmail) ? CONFIG.API.SEND_EMAIL_LINK + jSessionId : CONFIG.API.SEND_SMS_LINK + jSessionId
-            let response = await RestAPIFactory(token.value).serviceCall(postJSON, url, POST)  // dhl sit https
-            if (!response || response.status != 202) {
-                if (!isEmail) {
-                    return SMS_NOT_SENT_TRY_AGAIN_LATER
-                } else {
-                    return EMAIL_NOT_SENT_TRY_AGAIN_LATER
+        //This code is in try catch because checkout shouldn't be stopped even if email or sms is not sent
+        
+        try {
+            const userData = await keyValueDBService.getValueFromStore(USER)
+            if (userData && userData.value && userData.value.company && userData.value.company.code && (_.startsWith(_.toLower(userData.value.company.code), 'dhl'))) {
+                if (!_.isEmpty(emailIdOrSmsList) && !isEmail) {
+                    emailIdOrSmsList = [_.trim(emailIdOrSmsList)]
                 }
-            } else {
-                if (!isEmail) {
-                    return SMS_SENT_SUCCESSFULLY
-                } else {
-                    return EMAIL_SENT_SUCCESSFULLY
+                const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+                let currentJobMasterCode = jobMasterList.value.filter((data) => data.id == jobMasterId)[0].code
+                let body = {
+                    companyCode: userData.value.company.code,
+                    emailTableElement,
+                    emailTotalCash: totalAmount,
                 }
-            }
-        } else return 'companyId is not dhl'
-    }
+                const hub = await keyValueDBService.getValueFromStore(HUB)
+                let hubcode = hub.value.code
+                const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+                let postJSON = "{\"emailIds\":" + JSON.stringify(emailIdOrSmsList) + ", \"subject\": \"" + currentJobMasterCode + "\"" + ", \"hubCode\": \"" + hubcode + "\"" + ", \"body\": " + JSON.stringify(body) + ", \"emailGeneratedFromComplete\": \"" + emailGeneratedFromComplete + "\"" + "}";
+                let jSessionId = ((token.value).split('JSESSIONID=')[1]).split(';')[0]
+                let url = (isEmail) ? CONFIG.API.SEND_EMAIL_LINK + jSessionId : CONFIG.API.SEND_SMS_LINK + jSessionId
+                let response = await RestAPIFactory(token.value).serviceCall(postJSON, url, POST) // dhl sit https
+                if (!response || response.status != 202) {
+                    if (!isEmail) {
+                        return SMS_NOT_SENT_TRY_AGAIN_LATER
+                    } else {
+                        return EMAIL_NOT_SENT_TRY_AGAIN_LATER
+                    }
+                } else {
+                    if (!isEmail) {
+                        return SMS_SENT_SUCCESSFULLY
+                    } else {
+                        return EMAIL_SENT_SUCCESSFULLY
+                    }
+                }
+            } else return 'companyId is not dhl'
+        } catch (error) {
+            showToastAndAddUserExceptionLog(2009, error.message, 'danger', 0)
+        }
+
+        }
 
     /**
      * 
