@@ -97,6 +97,10 @@
     <init>(java.lang.Throwable);
 }
 
+-keepclassmembers class com.facebook.react.ReactInstanceManager { 
+    private final ** mBundleLoader; 
+}
+
 # logback
 -keep class ch.qos.** { *; }
 -keep class org.slf4j.** { *; }
